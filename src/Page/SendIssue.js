@@ -1,294 +1,276 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { useHistory } from 'react-router-dom';
-import { Form, Row, Col, Select, Input } from 'antd';
-import { Upload, message, Button } from 'antd';
-import { UploadOutlined, UserOutlined } from '@ant-design/icons';
-import CommentBox from '../Component/Comment'
-import UploadFile from '../Component/UploadFile'
-import axios from 'axios';
+import { Button, Form, Input, Select, Card } from "antd";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
+import UploadFile from "../Component/UploadFile";
+
 const { TextArea } = Input;
 
-
 let page = {
-    data: {
-        ProductData: [{
-            text: "REM",
-            value: "REM"
-        },
-        {
-            text: "PM",
-            value: "PM"
-        },
-        {
-            text: "Rental",
-            value: "Rental"
-        }
-        ],
-        PriorityData: [{
-            text: "Low",
-            id: "Low"
-        },
-        {
-            text: "Medium",
-            id: "Medium"
-        },
-        {
-            text: "High",
-            id: "High"
-        }],
-        IssueTypeData: [{
-            text: "Bug",
-            value: "Bug"
-        },
-        {
-            text: "Data",
-            value: "Data"
-        },
-        {
-            text: "Use",
-            value: "Use"
-        },
-        {
-            text: "New Requirement",
-            value: "New Requirement"
-        }
-        ],
-        ModuleData: [{
-            text: "CRM",
-            value: "CRM"
-        },
-        {
-            text: "Finance",
-            value: "Finance"
-        },
-        {
-            text: "SaleOrder",
-            value: "SaleOrder"
-        },
-        {
-            text: "Report",
-            value: "Report"
-        },
-        {
-            text: "PrintForm",
-            value: "PrintForm"
-        },
-        ]
-    },
-    loaddata: {
-        Product: [],
-        Priority: [],
-        IssueType: [],
-        Module: []
-    }
-}
+  data: {
+    ProductData: [
+      {
+        text: "REM",
+        value: "REM",
+      },
+      {
+        text: "PM",
+        value: "PM",
+      },
+      {
+        text: "Rental",
+        value: "Rental",
+      },
+    ],
+    PriorityData: [
+      {
+        text: "Low",
+        id: "Low",
+      },
+      {
+        text: "Medium",
+        id: "Medium",
+      },
+      {
+        text: "High",
+        id: "High",
+      },
+    ],
+    IssueTypeData: [
+      {
+        text: "Bug",
+        value: "Bug",
+      },
+      {
+        text: "Data",
+        value: "Data",
+      },
+      {
+        text: "Use",
+        value: "Use",
+      },
+      {
+        text: "New Requirement",
+        value: "New Requirement",
+      },
+    ],
+    ModuleData: [
+      {
+        text: "CRM",
+        value: "CRM",
+      },
+      {
+        text: "Finance",
+        value: "Finance",
+      },
+      {
+        text: "SaleOrder",
+        value: "SaleOrder",
+      },
+      {
+        text: "Report",
+        value: "Report",
+      },
+      {
+        text: "PrintForm",
+        value: "PrintForm",
+      },
+    ],
+  },
+  loaddata: {
+    Product: [],
+    Priority: [],
+    IssueType: [],
+    Module: [],
+  },
+};
+
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
 
 /// Binding DropDown
-page.loaddata.Product = page.data.ProductData.map(x => ({ name: x.text, value: x.value }))
-page.loaddata.IssueType = page.data.IssueTypeData.map(x => ({ name: x.text, value: x.value }))
-page.loaddata.Module = page.data.ModuleData.map(x => ({ name: x.text, value: x.value }))
-
+page.loaddata.Product = page.data.ProductData.map((x) => ({
+  name: x.text,
+  value: x.value,
+}));
+page.loaddata.IssueType = page.data.IssueTypeData.map((x) => ({
+  name: x.text,
+  value: x.value,
+}));
+page.loaddata.Module = page.data.ModuleData.map((x) => ({
+  name: x.text,
+  value: x.value,
+}));
 
 export default function Customer() {
-    const history = useHistory();
-    const uploadRef = useRef(null);
-    const [product,setProduct] = useState("");
-    // const url = new URL(window.location.href);
-    // const CompanyParam = url.searchParams.get("CompanyId")
-    // const UserIdParam = url.searchParams.get("UserId")
-    // const EmailParam = url.searchParams.get("Email")
+  const history = useHistory();
 
-    //#region function
-    const loadmaster = async () => {
-        try {
-            let products = await axios({
-                url: process.env.REACT_APP_API_URL + "/master/products",
-                method: "GET"
-            });
+  const [product, setProduct] = useState("");
 
-            let issueType = await axios({
-                url: process.env.REACT_APP_API_URL + "/master/issue-types",
-                method: "GET"
-            });
+  const uploadRef = useRef(null);
 
-            let module = await axios({
-                url: process.env.REACT_APP_API_URL + "/master/modules",
-                method: "GET",
-                params:{
-                    product_id: "REM"
-                }
-            });
-            console.log("products", products.data)
-            console.log("issueType", issueType.data)
-            console.log("module", module.data)
-            
+  //#region function
+  const loadmaster = async () => {
+    try {
+      let products = await axios({
+        url: process.env.REACT_APP_API_URL + "/master/products",
+        method: "GET",
+      });
 
-        } catch (error) {
-            console.log("xxx")
+      let issueType = await axios({
+        url: process.env.REACT_APP_API_URL + "/master/issue-types",
+        method: "GET",
+      });
 
-        }
+      let module = await axios({
+        url: process.env.REACT_APP_API_URL + "/master/modules",
+        method: "GET",
+        params: {
+          product_id: "REM",
+        },
+      });
+      console.log("products", products.data);
+      console.log("issueType", issueType.data);
+      console.log("module", module.data);
+    } catch (error) {
+      console.log("xxx");
     }
-    const onFinish = async (values) => {
-        console.log("values",values)
-        //  console.log("dataUpload", uploadRef.current.getFiles());
-        try {
-            let createTicket = await axios({
-                url: process.env.REACT_APP_API_URL + "",
-                method: "POST",
-                // headers: {
-                //     "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImJhbmtfY29kZSI6IkJCTCIsInRva2VuIjpudWxsLCJ0b2tlbl9leHBpcmUiOm51bGwsImZpcnN0bmFtZV90aCI6bnVsbCwibGFzdG5hbWVfdGgiOm51bGwsImZpcnN0bmFtZV9lbiI6bnVsbCwibGFzdG5hbWVfZW4iOm51bGwsIm1vYmlsZV9ubyI6bnVsbCwicm9sZV9pZCI6MSwiaWF0IjoxNTk2NTMzNDYyLCJleHAiOjE1OTY1NzY2NjJ9.QM6GEzXP-5ZwrQk43snThcJxY3Z5pLKasnYGsXzEQUDANy2S_WW0-BAk0b3LGwUNvScJr-bBS4U33MBuQaL8Bg" 
-                // },
-                data: {
-                    product: values.Product,
-                    module: values.Module,
-                    issuetype: values.IssueType,
-                    topic: values.Topic,
-                    details: values.Details,
-                    attachment: []
-                }
-            });
-            console.log("data", createTicket.data)
+  };
 
-            ////////////////////////////////////////////////
+  const onFinish = async (values) => {
+    history.push("/customer/issue/inprogress");
 
-            //////////////////////////////////////////////////////
-        } catch (error) {
-            alert(error);
-            history.push({ pathname: "/customer/issue/inprogress" })
+    // console.log("values", values);
+    // //  console.log("dataUpload", uploadRef.current.getFiles());
+    // try {
+    //   let createTicket = await axios({
+    //     url: process.env.REACT_APP_API_URL + "",
+    //     method: "POST",
+    //     // headers: {
+    //     //     "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImJhbmtfY29kZSI6IkJCTCIsInRva2VuIjpudWxsLCJ0b2tlbl9leHBpcmUiOm51bGwsImZpcnN0bmFtZV90aCI6bnVsbCwibGFzdG5hbWVfdGgiOm51bGwsImZpcnN0bmFtZV9lbiI6bnVsbCwibGFzdG5hbWVfZW4iOm51bGwsIm1vYmlsZV9ubyI6bnVsbCwicm9sZV9pZCI6MSwiaWF0IjoxNTk2NTMzNDYyLCJleHAiOjE1OTY1NzY2NjJ9.QM6GEzXP-5ZwrQk43snThcJxY3Z5pLKasnYGsXzEQUDANy2S_WW0-BAk0b3LGwUNvScJr-bBS4U33MBuQaL8Bg"
+    //     // },
+    //     data: {
+    //       product: values.Product,
+    //       module: values.Module,
+    //       issuetype: values.IssueType,
+    //       topic: values.Topic,
+    //       details: values.Details,
+    //       attachment: [],
+    //     },
+    //   });
+    //   console.log("data", createTicket.data);
+    //   ////////////////////////////////////////////////
+    //   //////////////////////////////////////////////////////
+    // } catch (error) {
+    //   alert(error);
+    //   history.push({ pathname: "/customer/issue/inprogress" });
+    // }
+  };
+  //#endregion
 
-        }
-    };
-    //#endregion
+  useEffect(() => {
+    // loadmaster();
+  }, []);
 
-    useEffect(() => {
-        loadmaster()
-    }, [])
-    return (
-        <div style={{
-            display: "flex",
-            height: "100vh%",
-            width: "100%",
-            justifyContent: "center",
-            background: "-webkit-linear-gradient(bottom, #0250c5, #d43f8d)",
-            padding: 20
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
+        padding: "36px 0px",
+        height: "100vh",
+      }}
+    >
+      <Card style={{ width: "500px" }}>
+        <h3 style={{ marginTop: 10 }}>แจ้งปัญหาการใช้งาน</h3>
+        <hr />
+        <Form
+          {...layout}
+          name="issue"
+          initialValues={{
+            product: "REM",
+            module: "CRM",
+            issue_type: "Bug",
+          }}
+          onFinish={onFinish}
+        >
+          <Form.Item
+            label="Product"
+            name="product"
+            rules={[
+              {
+                // required: true,
+                message: "กรุณาระบุ Product!",
+              },
+            ]}
+          >
+            <Select
+              options={page.loaddata.Product}
+              onChange={(value) => setProduct(value)}
+            ></Select>
+          </Form.Item>
+          <Form.Item label="Module" name="module">
+            <Select placeholder="None" options={page.loaddata.Module}></Select>
+          </Form.Item>
+          <Form.Item
+            label="IssueType"
+            name="issue_type"
+            rules={[
+              {
+                // required: true,
+                message: "กรุณาระบุ IssueType!",
+              },
+            ]}
+          >
+            <Select
+              placeholder="None"
+              options={page.loaddata.IssueType}
+            ></Select>
+          </Form.Item>
 
-        }}>
+          <Form.Item
+            label="หัวข้อ"
+            name="subject"
+            rules={[
+              {
+                // required: true,
+                message: "กรุณาระบุ หัวข้อ!",
+              },
+            ]}
+          >
+            <Input placeholder="หัวข้อ" />
+          </Form.Item>
 
-            <Form
-                style={{ padding: 20, minWidth: 500, maxWidth: 500, backgroundColor: "white" }}
-                name="Issue"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <h3 style={{ marginTop: 10 }}>แจ้งปัญหาการใช้งาน</h3>
-                <hr />
-                <Form.Item
-                    style={{ minWidth: 200, maxWidth: 300 }}
-                    label="Product"
-                    name="Product"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'กรุณาระบุ Product!',
-                        },
-                    ]}
-                >
-                    <Select style={{ width: '95%', marginLeft: 10 }} placeholder="None" options={page.loaddata.Product} onChange={(value) => setProduct(value)}>
-                    </Select>
-                </Form.Item>
-                <Form.Item
-                    style={{ minWidth: 200, maxWidth: 300 }}
-                    label="Module"
-                    name="Module"
-                >
-                    <Select style={{ width: '91%', marginLeft: 20 }} placeholder="None" options={page.loaddata.Module}>
-                    </Select>
-                </Form.Item>
-                <Form.Item
-                    style={{ minWidth: 200, maxWidth: 300 }}
-                    label="IssueType"
-                    name="IssueType"
-                    rules={[
-                        {
-                            // required: true,
-                            message: 'กรุณาระบุ IssueType!',
-                        },
-                    ]}
-                >
-                    <Select style={{ width: '100%' }} placeholder="None" options={page.loaddata.IssueType}>
-                    </Select>
-                </Form.Item>
+          <Form.Item
+            label="รายละเอียด"
+            name="description"
+            rules={[
+              {
+                // required: true,
+                message: "กรุณาระบุ รายละเอียด!",
+              },
+            ]}
+          >
+            <TextArea rows={5} placeholder="รายละเอียด" />
+          </Form.Item>
 
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 500 }}
-                    label="หัวข้อ"
-                    name="."
-                    rules={[
-                        {
-                            // required: true,
-                            message: 'กรุณาระบุ หัวข้อ!',
-                        },
-                    ]}
-                >
-                </Form.Item>
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 500, marginTop: -30 }}
-                    name="Topic"
-                    rules={[
-                        {
-                            // required: true,
-                            message: 'กรุณาระบุ หัวข้อ!',
-                        },
-                    ]}
-                >
-                    <Input placeholder="Username" style={{ width: '100%', marginLeft: 0 }} />
-                </Form.Item>
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 500 }}
-                    label="รายละเอียด"
-                    name="x"
-                    rules={[
-                        {
-                            // required: true,
-                            message: 'กรุณาระบุ รายละเอียด!',
-                        },
-                    ]}
-                >
-
-                </Form.Item>
-
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 500 }}
-                    name="Details"
-                    rules={[
-                        {
-                            // required: true,
-                            message: 'กรุณาระบุ รายละเอียด!',
-
-                        },
-                    ]}
-                >
-                    <TextArea rows={4} style={{ marginTop: -30 }} />
-                </Form.Item>
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 500 }}
-                    label="Attachment"
-                    name="Attachment"
-
-                >
-                    <UploadFile ref={uploadRef} />
-                </Form.Item>
-                <Form.Item style={{ textAlign: "right" }}>
-                    <Button type="primary" htmlType="submit" onClick={onFinish}>
-                        Send
-                     </Button>
-                </Form.Item>
-            </Form>
-
-
-        </div>
-    );
+          <Form.Item label="ไฟล์แนบ" name="attach">
+            <UploadFile ref={uploadRef} />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" onClick={onFinish}>
+              ยื่นเรื่อง
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
+  );
 }

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Row, Col, Layout, Collapse, DatePicker, Select } from 'antd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { LeftCircleOutlined } from '@ant-design/icons';
-import { ArrowLeftCircleFill } from 'react-bootstrap-icons';
 import {  Avatar, Form, Button, List, Input, Modal } from 'antd';
 
 import MasterPage from '../MasterPage';
@@ -140,7 +139,7 @@ export default function Subject() {
             <div style={{ marginLeft: 0, marginRight: 0, backgroundColor: "white" }}>
                 <Row style={{ marginLeft: 50 }}>
                     <Col span={2} onClick={() => history.goBack()}>
-                        <a><ArrowLeftCircleFill /> &nbsp;&nbsp;Back</a>
+                        <a>Back</a>
                     </Col>
                 </Row>
                 <hr style={{ marginLeft: 50, marginRight: 50 }} />
