@@ -145,7 +145,7 @@ export default function InProgress() {
     {
       key: "1",
       CompanyID: "ICON",
-      IssueID: "IssueREM001",
+      IssueID: "ISSUE-00001",
       Subject: "Subject : แจ้งปัญหา Link Error",
       tags: ["InProgress"],
       product: "REM",
@@ -162,12 +162,12 @@ export default function InProgress() {
     {
       key: "2",
       CompanyID: "ICON",
-      IssueID: "IssueREM002",
+      IssueID: "ISSUE-00002",
       Subject: "Subject : Error บันทึกข้อมูลไม่ได้",
       tags: ["InProgress"],
       product: "REM",
       module: "CRM",
-      issuetype: "Bug",
+      issuetype: "Cr",
       IssueBy: "Admin System",
       IssueDate: "04/07/2020",
       Detail: "รายละเอียดเพิ่มเติม",
@@ -236,19 +236,15 @@ export default function InProgress() {
                       onClick={(e) => {
                         e.preventDefault();
                         history.push({
-                          pathname:
-                            "/Customer/Issue/Subject/" +
-                            record.IssueID +
-                            "-" +
-                            record.Subject,
+                          pathname: "/Customer/Issue/Subject/" + record.IssueID,
                         });
                       }}
                     >
                       {record.IssueID + "-" + record.Subject}
                     </a>
 
-                    <div style={{ marginTop: 4, fontSize: "small" }}>
-                      <Tag color="#f50">{record.issuetype}</Tag>
+                    <div style={{ marginTop: 4, fontSize: "smaller" }}>
+                      {record.issuetype == 'Bug' ? <Tag color="#f50">{record.issuetype}</Tag>: <Tag color="#108ee9">{record.issuetype}</Tag>}
                       <span>{record.product}</span>
                       <Divider type="vertical" />
                       <span>{record.module}</span>
@@ -257,9 +253,8 @@ export default function InProgress() {
                 );
               }}
             />
-            <Column title="Module" dataIndex="module" />
-            <Column title="IssueType" dataIndex="issuetype" />
-            <Column title="IssueDate" dataIndex="IssueDate" />
+            <Column title="Issue Date" dataIndex="IssueDate" />
+            <Column title="Due Date" dataIndex="DueDate" />
             <Column
               title="ProgressStatus"
               render={(record) => {
@@ -274,7 +269,8 @@ export default function InProgress() {
                       <Menu
                         onSelect={(x) => console.log(x.selectedKeys)}
                         onClick={(x) => {
-                          return setVisible(true), setProgressStatus(x.key);
+                          setVisible(true);
+                          setProgressStatus(x.key);
                         }}
                       >
                         {page.data.ProgressStatusData.filter(
@@ -291,8 +287,6 @@ export default function InProgress() {
                 );
               }}
             />
-            <Column title="DueDate" dataIndex="DueDate" />
-            <Column title="OverDue" dataIndex="OverDue" />
           </Table>
         </Col>
       </Row>
