@@ -42,16 +42,12 @@ let page = {
         value: "Bug",
       },
       {
-        text: "Data",
-        value: "Data",
+        text: "CR",
+        value: "CR",
       },
       {
-        text: "Use",
-        value: "Use",
-      },
-      {
-        text: "New Requirement",
-        value: "New Requirement",
+        text: "Memo",
+        value: "Memo",
       },
     ],
     ModuleData: [
