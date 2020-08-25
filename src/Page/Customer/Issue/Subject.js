@@ -1,12 +1,17 @@
-import { Col, DatePicker, Row, Select, Divider, Typography } from "antd";
+import { Col, DatePicker, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs } from "antd";
 import React, { useState } from "react";
+import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Customer/Comment";
 import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
+import Historylog from "../../../Component/History/Customer/Historylog";
+import Uploadfile from "../../../Component/UploadFile"
 import SubjectDetails from "../../../Component/Subject/SubjectDetail";
 import MasterPage from "../MasterPage";
+import { UsbOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 let page = {
   data: {
@@ -110,8 +115,11 @@ export default function Subject() {
   const [Priority, setPriority] = useState("");
   const [DueDate, setDueDate] = useState("");
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [container, setContainer] = useState(null);
+  const [divcollapse, setDivcollapse] = useState("block")
+  const [collapsetext, setCollapsetext] = useState("Hide details")
 
-  // Binding แบบวนลูปสร้าง html tag ของ dropdownselect
+  // Binding dropdownselect
   // page.data.PriorityData.forEach(x => page.loaddata.Priority.push(<Option value={x.id} >{x.text}</Option>))
   page.loaddata.Priority = page.data.PriorityData.map((x) => (
     <Option value={x.id}>{x.text}</Option>
@@ -123,101 +131,128 @@ export default function Subject() {
     <Option value={x.value}>{x.text}</Option>
   ));
 
-  // Binding แบบ map กำหนดค่าใส่ attribute ของ dropdownselect ได้เลย (ใช้ attribute option={obj})
-  // ใส่ obj ที่มีชื่อ name กับ value
-  page.loaddata.IssueType = page.data.IssueTypeData.map((x) => ({
-    name: x.name,
-    value: x.id,
-  }));
-  page.loaddata.Module = page.data.ModuleData.map((x) => ({
-    name: x.text,
-    value: x.value,
-  }));
+  page.loaddata.IssueType = page.data.IssueTypeData.map((x) => ({ name: x.name, value: x.id, }));
+  page.loaddata.Module = page.data.ModuleData.map((x) => ({ name: x.text, value: x.value, }));
 
   function HandleChange(value) {
     console.log(`selected ${value}`);
     setVisible(true);
     setProgressStatus(value);
+
   }
 
   return (
     <MasterPage>
-      <Row>
-        <Col>
-          <a
-            href="/#"
-            onClick={(e) => {
-              e.preventDefault();
-              history.goBack();
-            }}
-          >
-            Back
+      <div style={{ height: "100%" }} >
+        <div className="scrollable-container" ref={setContainer} >
+          <Affix target={() => container}>
+            <Row>
+              <Col>
+                <a
+                  href="/#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    history.goBack();
+                  }}
+                >
+                  Back
           </a>
-        </Col>
-      </Row>
-      <Row>
-        {/* Content */}
-        <Col span={16} style={{paddingTop: 24}}>
+              </Col>
+            </Row>
+          </Affix>
+
           <Row>
-            <Col>
-              <Typography.Title level={4}>
-                Help! This is a high priority request
-              </Typography.Title>
-              <div>
-                <p>
-                  Track the priority of requests to spot problems quickly and
-                  set tighter <strong>Service Level Agreement (SLA)</strong> goals.<br /> Customers can set their own priority when raising a
-                  request, or you can hide it from customers and let your team
-                  decide.
-                </p>
-                <p>Try it out</p>
-                <p>
-                  Assign yourself and add a comment to stop the{" "}
-                  <strong>Time to First Response</strong>
-                  <br />
-                  SLA from counting down. Resolve the request to stop all SLAs
-                  completely.
-                </p>
+            {/* Content */}
+            <Col span={16} style={{ paddingTop: 24 }}>
+              <div style={{ height: "70vh", overflowY: "scroll" }}>
+                {/* Issue Description */}
+                <Row style={{marginRight:24}}>
+                  <Col span={24}>
+                    <label className="topic-text">ISSUE-00001-Subject : แจ้งปัญหา Link Error</label>
+                    <div className="issue-detail-box">
+                      <Row>
+                        <Col span={16} style={{ display: "inline" }}>
+                          <Typography.Title level={4}>
+                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp; Help! This is a high priority request
+                        </Typography.Title>
+                        </Col>
+                        <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                          <Button type="link"
+                            onClick={
+                              () => {
+                                return (
+                                  setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                  setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
+                                )
+                              }
+                            }
+                          >{collapsetext}
+                          </Button>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <div style={{ display: divcollapse }}>
+                          <p>
+                            Track the priority of requests to spot problems quickly and
+                           set tighter <strong>Service Level Agreement (SLA)</strong> goals.<br /> Customers can set their own priority when raising a
+                            request, or you can hide it from customers and let your team
+                           decide.
+                          </p>
+
+                        </div>
+                      </Row>
+                    </div>
+                  </Col>
+                </Row>
+
+                {/* TAB */}
+                <Row style={{ marginTop: 36 ,marginRight:24}}>
+                  <Col span={24}>
+                    <label className="header-text">Activity</label>
+                    <Tabs defaultActiveKey="1">
+                      <TabPane tab="Comments" key="1">
+                        <CommentBox />
+                      </TabPane>
+                      <TabPane tab="History Log" key="2">
+                        <Historylog />
+                      </TabPane>
+                    </Tabs>
+                  </Col>
+                </Row>
               </div>
             </Col>
-          </Row>
-          <Row style={{ marginTop: 36 }}>
-            <Col>
-              <b>Comments</b>
-              <Divider style={{ marginTop: 4 }} />
-              <CommentBox />
-            </Col>
-          </Row>
-        </Col>
+            {/* Content */}
 
-        {/* SideBar */}
-        <Col
-          span={6}
-          style={{ backgroundColor: "#fafafa", padding: 24 }}
-        >
-          <Row style={{ marginBottom: 30 }}>
-            <Col span={18}>
-              Progress Status:
-              <br />
-              <Select
-                style={{ width: "100%", marginTop: 8 }}
-                placeholder="None"
-                onChange={HandleChange}
-              >
-                {page.loaddata.ProgressStatus}
-              </Select>
+            {/* SideBar */}
+            <Col
+              span={6}
+              style={{ backgroundColor: "#fafafa", padding: 24 }}
+            >
+              <Row style={{ marginBottom: 30 }}>
+                <Col span={18}>
+                  <label className="header-text">Progress Status</label>
+                  <br />
+                  <Select
+                    style={{ width: "100%", marginTop: 8 }}
+                    placeholder="None"
+                    onChange={HandleChange}
+                  >
+                    {page.loaddata.ProgressStatus}
+                  </Select>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 30 }}>
+                <Col span={18}>
+                  <label className="header-text">ICON Due Date</label>
+                  <br />
+                  <label className="value-text">30/08/2020</label>
+                </Col>
+              </Row>
             </Col>
+            {/* SideBar */}
           </Row>
-          <Row style={{ marginBottom: 30 }}>
-            <Col span={18}>
-              ICON Due Date:
-              <br />
-              <span>30/08/2020</span>
-            </Col>
-          </Row>
-        </Col>
-        {/* SideBar */}
-      </Row>
+        </div>
+      </div>
 
       <ModalSendIssue
         title={ProgressStatus}

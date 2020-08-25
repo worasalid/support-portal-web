@@ -19,6 +19,7 @@ export default function NormalLoginForm() {
       history.push("/Internal/Issue/MyTask");
     } catch (error) {
       alert("ข้อมููลไม่ถูกต้อง");
+      alert("ข้อมููลไม่ถูกต้อง");
     }
   };
 

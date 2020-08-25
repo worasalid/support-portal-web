@@ -11,8 +11,6 @@ import {
 } from '@ant-design/icons';
 
 
-const { SubMenu } = Menu;
-const { Header, Content, Sider } = Layout;
 
 
 function newpage() {
@@ -47,31 +45,56 @@ export class Menucollapsed extends Component {
 
 
 export default function MasterPage(props) {
+  const { SubMenu } = Menu;
+  const { Header, Content, Sider } = Layout;
+
   const history = useHistory();
   const [collapsed, setCollapsed] = useState(false);
+  const [show_notice,setshow_notice] = useState(true)
+
   const toggle = () => setCollapsed(!collapsed);
-  function showdivProfile() {
-    let divProfile = document.getElementById("divProfile")
-    if (divProfile.style.display !== "none") {
-      divProfile.style.display = "none";
-    }
-    else {
-      divProfile.style.display = "block";
-    }
-  }
 
   return (
-    <Layout>
-      <Header className="Header">
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['0']}>
-
-          {/* {collapsed ? <MenuUnfoldOutlined onClick={toggle} /> : <MenuFoldOutlined onClick={toggle} />}
-          <Avatar style={{ backgroundColor: '#87d068',marginLeft:500 }} icon={<UserOutlined />} /> */}
+    <Layout style={{ height: "100vh" }}>
+      <Header style={{ backgroundColor: "#0099FF" }}>
+        <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']} style={{ backgroundColor: "#0099FF" }}>
           <Row>
             <Col span={12}>
               {collapsed ? <MenuUnfoldOutlined onClick={toggle} /> : <MenuFoldOutlined onClick={toggle} />}
+              <img
+                style={{ height: "35px" }}
+                src={`${process.env.PUBLIC_URL}/logo-brand.png`}
+                alt=""
+              />
             </Col>
             <Col span={12} style={{ textAlign: "right" }}>
+
+              <Tooltip title="Notifications">
+                <Dropdown
+                  placement="bottomCenter"
+                  overlayStyle={{ width: 500, height: 400 }}
+                  overlay={(
+                    <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
+                      <Menu.Item key="1" onClick={() => alert("Profile")}>
+                        <div style={{ height: "50vh", overflowY: "scroll" }}>
+                          <Row style={{ padding: 16 }}>
+                            <Col span={24}>
+                              <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br/>
+
+                            </Col>
+                          </Row>
+                        </div>
+                      </Menu.Item>
+                    </Menu>
+                  )} trigger="click">
+
+                  <Button type="text" style={{ marginRight: 20 }} size="middle"
+                    icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
+                  >
+                  </Button>
+                </Dropdown>
+              </Tooltip>
+
               <Tooltip title="User Profile">
                 <Dropdown
                   placement="topCenter"
@@ -91,20 +114,16 @@ export default function MasterPage(props) {
                     </Menu>
                   )} trigger="click">
 
-                  <Button type="primary" danger color="red" shape="circle" icon={<UserOutlined />} >
+                  <Button type="primary" danger color="red" shape="circle" size="middle" icon={<UserOutlined />} >
                   </Button>
                 </Dropdown>
-
               </Tooltip>
             </Col>
-
           </Row>
-
         </Menu>
-
       </Header>
       <Layout>
-        <Sider theme="light" collapsed={collapsed}>
+        <Sider theme="light" style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
           <Menu theme="light" mode="inline" defaultOpenKeys={['sub1']} defaultSelectedKeys={['2']} >
             <SubMenu key="sub1" icon={<UserOutlined />} title="Issue">
               <Menu.Item key="1" onClick={() => history.push('/Internal/Issue/Unassign')}>
@@ -114,46 +133,25 @@ export default function MasterPage(props) {
                 </Badge>
               </Menu.Item>
               <Menu.Item key="2" onClick={() => history.push({ pathname: '/Internal/Issue/MyTask' })}>
-                - My Task
-                  <Badge count={3}>
-                  <span style={{ marginLeft: 77, textAlign: "right" }}></span>
-                </Badge>
+                - My Task (3)
               </Menu.Item>
               <Menu.Item key="3">
-                <span onClick={() => history.push('/Internal/Issue/InProgress')}>- InProgress</span>
-                <Badge count={1}>
-                  <span style={{ marginLeft: 61, textAlign: "right" }}></span>
-                </Badge>
+                <span onClick={() => history.push('/Internal/Issue/InProgress')}>- InProgress (1)</span>
               </Menu.Item>
               <Menu.Item key="4">
                 <span onClick={() => newpage()}>- Wait for Info</span>
-                <Badge count={0}>
-                  <span style={{ marginLeft: 49, textAlign: "right" }}></span>
-                </Badge>
               </Menu.Item>
               <Menu.Item key="5">
                 <span onClick={() => newpage()}>- On Due</span>
-                <Badge count={0}>
-                  <span style={{ marginLeft: 79, textAlign: "right" }}></span>
-                </Badge>
               </Menu.Item>
               <Menu.Item key="6">
                 <span onClick={() => newpage()}>- Over Due</span>
-                <Badge count={0}>
-                  <span style={{ marginLeft: 68, textAlign: "right" }}></span>
-                </Badge>
               </Menu.Item>
               <Menu.Item key="7">
                 <span onClick={() => this.newpage()}>- Resolved</span>
-                <Badge count={0}>
-                  <span style={{ marginLeft: 71, textAlign: "right" }}></span>
-                </Badge>
               </Menu.Item>
               <Menu.Item key="8">
                 <span onClick={() => newpage()}>- Complete</span>
-                <Badge count={0}>
-                  <span style={{ marginLeft: 66, textAlign: "right" }}></span>
-                </Badge>
               </Menu.Item>
               <Menu.Item key="9">
                 <span onClick={() => history.push('/test')}>- Test</span>
@@ -189,9 +187,10 @@ export default function MasterPage(props) {
         <Content
           className="site-layout-background"
           style={{
-            padding: 0,
+            padding: 24,
             margin: 0,
             minHeight: 280,
+            backgroundColor: "#fff",
           }}
         >
 

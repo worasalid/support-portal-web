@@ -21,9 +21,9 @@ export default function MasterPage(props) {
   const history = useHistory();
 
   return (
-    <Layout>
-      <Header style={{ backgroundColor: "#fff" }}>
-        <Menu theme="light" mode="horizontal" defaultSelectedKeys={["0"]}>
+    <Layout style={{height:"100vh"}}>
+      <Header style={{ backgroundColor: "#1a73e8" }}>
+        <Menu theme="light" mode="horizontal" defaultSelectedKeys={["0"]} style={{ backgroundColor: "#1a73e8" }}>
           <Row>
             <Col span={12}>
               <img
@@ -56,9 +56,9 @@ export default function MasterPage(props) {
                 }
                 trigger="click"
               >
-                <Button type="link">
+                <Button type="link" >
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <UserOutlined style={{ marginRight: 8 }} /> Worasalid
+                    <UserOutlined style={{ marginRight: 8, color: "white" }} /> <span style={{ color: "white" }}>Worasalid</span>
                   </div>
                 </Button>
               </Dropdown>
@@ -66,8 +66,8 @@ export default function MasterPage(props) {
           </Row>
         </Menu>
       </Header>
-      <Layout>
-        <Sider theme="light" style={{ textAlign: "center" }} width={250}>
+      <Layout >
+        <Sider theme="light" style={{ textAlign: "center",height:"100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
           <Menu
             theme="light"
             mode="inline"

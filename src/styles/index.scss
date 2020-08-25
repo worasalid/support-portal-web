@@ -1,0 +1,32 @@
+label.header-text {
+    font-size: 14px !important;
+    font-weight: bold;
+}
+label.value-text {
+    font-size: 12px !important;
+}
+
+label.topic-text{
+    font-size: 24px !important;
+    margin-bottom: 36px;
+}
+
+label.card-title-menu{
+    font-size: 18px;
+    color: rgb(0, 116, 224);
+}
+
+/// div
+div.issue-detail-box{
+    border: solid 1px;
+    border-color: rgb(223, 225, 230);
+    width: 100%;
+    display: inline-block;
+    padding:16px;
+    
+}
+///
+.card-box{
+    width: 100%;
+    margin-top: 16px;
+}

@@ -1,8 +1,9 @@
-import { Comment, Avatar, Form, Button, List, Input } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col } from 'antd';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
+import Uploadfile from "../../../Component/UploadFile"
 
 const { TabPane } = Tabs;
 
@@ -41,9 +42,22 @@ const TextEditor = ({ onChange, onSubmit, submitting, value }) => (
             />
         </Form.Item>
         <Form.Item>
-            <Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary">
+            <Row>
+                <Col span={2} style={{display:"inline"}} >
+                    Attach : 
+                </Col>
+                <Col span={4} style={{display:"inline"}} >
+                    <Uploadfile />
+                </Col>
+                <Col span={18} style={{textAlign:"right"}}>
+                <Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary">
                 Add Comment
-      </Button>
+            </Button>
+                </Col>
+            </Row>
+
+           
+
         </Form.Item>
     </>
 );
@@ -120,7 +134,7 @@ export default class CommentBox extends React.Component {
                 <Tabs defaultActiveKey="1" >
                     <TabPane tab="Reply to ICON" key="1">
                         <Comment
-                            style={{ marginRight: 50 }}
+                            style={{ marginRight: 16 }}
                             // avatar={
                             //     <Avatar
                             //         src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
