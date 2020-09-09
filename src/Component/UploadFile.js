@@ -14,9 +14,9 @@ export default forwardRef(function UploadFile(props, ref) {
 
     const Uploadprops = {
         name: 'file',
-        action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+        action: process.env.REACT_APP_API_URL + "/files",
         headers: {
-            authorization: 'authorization-text',
+            "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         onChange(info) {
             if (info.file.status !== 'uploading') {

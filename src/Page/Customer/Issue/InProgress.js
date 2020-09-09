@@ -1,21 +1,29 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker,Input } from "antd";
+import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
 
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import Axios from "axios";
+import React, { useEffect, useState, useContext, useReducer } from "react";
 import { useHistory } from "react-router-dom";
 import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import IssueSearch from "../../../Component/Search/Customer/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
 import { SearchOutlined } from "@ant-design/icons";
+import AuthenContext from "../../../utility/authenContext";
+import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
+import { issueCusReducer, productReducer, moduleReducer, issueTypeReducer, keywordReducer, initState } from "../../../utility/reducer";
 
 export default function InProgress() {
   const history = useHistory();
   const [visible, setVisible] = useState(false);
   const [loading, setLoadding] = useState(false);
-  const [loadticket, setLoadticket] = useState([]);
+
+  const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
+
+  const { state, dispatch } = useContext(AuthenContext);
+
+
   const [ProgressStatus, setProgressStatus] = useState("");
-  const { RangePicker } = DatePicker;
+
 
   let page = {
     data: {
@@ -76,115 +84,151 @@ export default function InProgress() {
     },
   ];
 
-  const loadIssue = () => {
+  const loadIssue = async (value) => {
     // setLoadding(true);
-    axios({
-      url: "http://10.207.0.244/api/tickets",
-      method: "GET",
-      headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IuC4p-C4o-C4quC4pOC4qeC4juC4tOC5jCDguIjguLjguYnguKLguYDguIjguKPguLTguI0iLCJuYW1laWQiOiIxNiIsIlVzZXJJZCI6IjE2IiwibmJmIjoxNTk3Mjg4MDMxLCJleHAiOjE1OTc4OTI4MzEsImlhdCI6MTU5NzI4ODAzMX0.MORhQP-p0LsM-sPNGwG8IvCDjQWjwWNvZrPetejl6Dg",
-      },
-    })
-      .then((res) => {
-        setLoadding(false);
-        setLoadticket(res.data);
-      })
-      .catch((err) => {
-        setLoadding(false);
+    try {
+      const results = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          issue_type: customerstate.filter.TypeState,
+          productId: customerstate.filter.productState,
+          moduleId: customerstate.filter.moduleState,
+          startdate: customerstate.filter.date.startdate,
+          enddate: customerstate.filter.date.enddate,
+          keyword: customerstate.filter.keyword
+        }
       });
+
+      if (results.status === 200) {
+        customerdispatch({type: "LOAD_ISSUE" , payload: results.data})
+
+      }
+    } catch (error) {
+
+    }
   };
 
   useEffect(() => {
-    // loadIssue();
-  }, []);
+    customerdispatch({ type: "LOADING", payload: true })
+    setTimeout(() => {
+      loadIssue();
+      customerdispatch({ type: "LOADING", payload: false })
+    }, 1000)
 
+
+    customerdispatch({ type: "SEARCH", payload: false })
+  }, [customerstate.search]);
+
+  console.log("searchdata", customerstate.search)
+  console.log("date", customerstate.filter.date)
   return (
-    <MasterPage>
-      <Row style={{ marginBottom: 16,textAlign:"left" }}>
-        <Col span={24}>
-          <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
-        </Col>
-      </Row>
-      <IssueSearch/>
-      <Row>
-        <Col span={24}>
-          <Table dataSource={dataSource} loading={loading}>
-            <Column
-              title="Subject"
-              render={(record) => {
-                return (
-                  <div>
-                    <a href="/#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        history.push({
-                          pathname: "/Customer/Issue/Subject/" + record.IssueID,
-                        });
-                      }}
-                    >
-                      {record.IssueID + "-" + record.Subject}
-                    </a>
-
-                    <div style={{ marginTop: 4, fontSize: "smaller" }}>
-                      {record.issuetype == 'Bug' ? <Tag color="#f50">{record.issuetype}</Tag> : <Tag color="#108ee9">{record.issuetype}</Tag>}
-                      <span>{record.product}</span>
-                      <Divider type="vertical" />
-                      <span>{record.module}</span>
-                    </div>
-                  </div>
-                );
-              }}
-            />
-            <Column title="Issue Date" dataIndex="IssueDate" />
-            <Column title="Due Date" dataIndex="DueDate" />
-            <Column
-
-              title="ProgressStatus"
-              render={(record) => {
-                return (
-                  <Dropdown
-                    overlayStyle={{
-                      width: 300,
-                      boxShadow:
-                        "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                    }}
-                    overlay={
-                      <Menu
-                        onSelect={(x) => console.log(x.selectedKeys)}
-                        onClick={(x) => {
-                          setVisible(true);
-                          setProgressStatus(x.key);
+    <IssueContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
+      <MasterPage>
+        <Row style={{ marginBottom: 16, textAlign: "left" }}>
+          <Col span={24}>
+            <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
+          </Col>
+        </Row>
+        <IssueSearch />
+        <Row>
+          <Col span={24}>
+            <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}>
+              <Column
+                title="Subject"
+                render={(record) => {
+                  return (
+                    <div>
+                      <a href="/#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          history.push({
+                            pathname: "/Customer/Issue/Subject/" + record.Number,
+                          });
                         }}
                       >
-                        {page.data.ProgressStatusData.filter(
-                          (x) => x.text !== record.ProgressStatus
-                        ).map((x) => (
-                          <Menu.Item key={x.text}>{x.text}</Menu.Item>
-                        ))}
-                      </Menu>
-                    }
-                    trigger="click"
-                  >
-                    {/* <Button type="link">{record.ProgressStatus}</Button> */}
-                    <a href="/#">{record.ProgressStatus}</a>
-                  </Dropdown>
-                );
-              }}
-            />
-          </Table>
-        </Col>
-      </Row>
-      <ModalSendIssue
-        title={ProgressStatus}
-        visible={visible}
-        onCancel={() => setVisible(false)}
-        onOk={() => {
-          setVisible(false);
-          loadIssue();
-        }}
-      />
-      {/* </Spin> */}
-    </MasterPage>
+                        <label className="text-hover">{`[${record.Number}] - ` + record.Title}</label>
+                      </a>
+
+                      <div style={{ marginTop: 10, fontSize: "smaller" }}>
+                        {
+                          record.IssueType === 'Bug' ?
+                            <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
+                            <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
+                        }
+                        <Divider type="vertical" />
+                        <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
+                        <Divider type="vertical" />
+                        <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+              <Column title="Product" dataIndex="ProductName"></Column>
+              <Column title="Module" dataIndex="ModuleName"></Column>
+              <Column title="Issue Date"
+                render={(record) => {
+                  return (
+                    <>
+                      {new Date(record.CreateDate).toLocaleDateString('en-US')}
+                    </>
+                  )
+                }
+
+                }
+              />
+              <Column title="Due Date" dataIndex="" />
+              <Column
+                title="ProgressStatus"
+                render={(record) => {
+                  return (
+                    <Dropdown
+                      overlayStyle={{
+                        width: 300,
+                        boxShadow:
+                          "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
+                      }}
+                      overlay={
+                        <Menu
+                          onSelect={(x) => console.log(x.selectedKeys)}
+                          onClick={(x) => {
+                            setVisible(true);
+                            setProgressStatus(x.key);
+                          }}
+                        >
+                          {page.data.ProgressStatusData.filter(
+                            (x) => x.text !== record.GroupStatus
+                          ).map((x) => (
+                            <Menu.Item key={x.text}>{x.text}</Menu.Item>
+                          ))}
+                        </Menu>
+                      }
+                      trigger="click"
+                    >
+                      {/* <Button type="link">{record.ProgressStatus}</Button> */}
+                      <a href="/#">{record.GroupStatus}</a>
+                    </Dropdown>
+                  );
+                }}
+              />
+            </Table>
+          </Col>
+        </Row>
+        <ModalSendIssue
+          title={ProgressStatus}
+          visible={visible}
+          onCancel={() => setVisible(false)}
+          onOk={() => {
+            setVisible(false);
+            loadIssue();
+          }}
+        />
+        {/* </Spin> */}
+      </MasterPage>
+    </IssueContext.Provider>
   );
 }

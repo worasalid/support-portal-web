@@ -1,27 +1,44 @@
-import { UserOutlined } from "@ant-design/icons";
-import {
-  Avatar,
-  Badge,
-  Button,
-  Col,
-  Dropdown,
-  Layout,
-  Menu,
-  Row,
-  Tooltip,
-  Divider,
-} from "antd";
-import React from "react";
+import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, } from "antd";
+import React, { useState, useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import axios from 'axios'
+import AuthenContext from "../../utility/authenContext";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 export default function MasterPage(props) {
   const history = useHistory();
+  const [show_notice, setshow_notice] = useState(true);
+  const { state, dispatch } = useContext(AuthenContext);
+  const userlogin = state.user
+  console.log(localStorage.getItem("sp-ssid"));
+
+  const getuser = async () => {
+    try {
+      const result = await axios({
+        url: process.env.REACT_APP_API_URL + "/auth/customer/me",
+        method: "get",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+      });
+      dispatch({ type: 'Authen', payload: true });
+      dispatch({ type: 'LOGIN', payload: result.data.users });
+    } catch (error) {
+
+    }
+  }
+
+  useEffect(() => {
+    if (!state.authen) {
+      getuser()
+    }
+  }, [])
 
   return (
-    <Layout style={{height:"100vh"}}>
+    <Layout style={{ height: "100vh" }}>
       <Header style={{ backgroundColor: "#1a73e8" }}>
         <Menu theme="light" mode="horizontal" defaultSelectedKeys={["0"]} style={{ backgroundColor: "#1a73e8" }}>
           <Row>
@@ -33,6 +50,31 @@ export default function MasterPage(props) {
               />
             </Col>
             <Col span={12} style={{ textAlign: "right" }}>
+              <Tooltip title="Notifications">
+                <Dropdown
+                  placement="bottomCenter"
+                  overlayStyle={{ width: 500, height: 400 }}
+                  overlay={(
+                    <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
+                      <Menu.Item key="1" onClick={() => alert("Profile")}>
+                        <div style={{ height: "50vh", overflowY: "scroll" }}>
+                          <Row style={{ padding: 16 }}>
+                            <Col span={24}>
+                              <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
+
+                            </Col>
+                          </Row>
+                        </div>
+                      </Menu.Item>
+                    </Menu>
+                  )} trigger="click">
+
+                  <Button type="text" style={{ marginRight: 5 }} size="middle"
+                    icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
+                  >
+                  </Button>
+                </Dropdown>
+              </Tooltip>
               <Dropdown
                 placement="topCenter"
                 overlayStyle={{
@@ -57,8 +99,25 @@ export default function MasterPage(props) {
                 trigger="click"
               >
                 <Button type="link" >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <UserOutlined style={{ marginRight: 8, color: "white" }} /> <span style={{ color: "white" }}>Worasalid</span>
+                  {/* <div style={{ display: "flex", alignItems: "center" }}>
+                    <label className="user-login">
+                      {state.user && state.user.users.first_name + ' ' + state.user.users.last_name}
+                    </label>
+                    <Avatar size="default" icon={<UserOutlined/>}>
+
+                    </Avatar>
+                 
+                  </div> */}
+                  <div
+                    style={{
+                      textAlign: "right",
+                      padding: "16px",
+                    }}>
+                    <label className="user-login">
+                      {userlogin && userlogin.first_name + ' ' + userlogin.last_name}
+                    </label>
+                    <Avatar size="default" icon={<UserOutlined />}></Avatar>
+
                   </div>
                 </Button>
               </Dropdown>
@@ -67,7 +126,7 @@ export default function MasterPage(props) {
         </Menu>
       </Header>
       <Layout >
-        <Sider theme="light" style={{ textAlign: "center",height:"100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
+        <Sider theme="light" style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
           <Menu
             theme="light"
             mode="inline"
@@ -81,7 +140,7 @@ export default function MasterPage(props) {
                 size="large"
                 ghost
                 onClick={() =>
-                  history.push({ pathname: "/customer/issue/create" })
+                  history.push({ pathname: "/customer/servicedesk" })
                 }
               >
                 แจ้งปัญหาการใช้งาน

@@ -9,16 +9,15 @@ export default function NormalLoginForm() {
 
   const onFinish = async (value) => {
     try {
-      //   const result = await axios({
-      //     url: process.env.REACT_APP_API_URL + "/auth",
-      //     method: "POST",
-      //     data: { email: value.username },
-      //   });
+        const result = await axios({
+          url: process.env.REACT_APP_API_URL + "/auth",
+          method: "POST",
+          data: { email: value.username },
+        });
 
-      //   localStorage.setItem("sp-ssid", result.data);
+      localStorage.setItem("sp-ssid", result.data);
       history.push("/Internal/Issue/MyTask");
     } catch (error) {
-      alert("ข้อมููลไม่ถูกต้อง");
       alert("ข้อมููลไม่ถูกต้อง");
     }
   };

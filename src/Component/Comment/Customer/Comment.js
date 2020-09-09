@@ -131,8 +131,8 @@ export default class CommentBox extends React.Component {
                 </Comment>
                 {/* // */}
                 {comments.length > 0 && <CommentList comments={comments} />}
-                <Tabs defaultActiveKey="1" >
-                    <TabPane tab="Reply to ICON" key="1">
+                <Tabs defaultActiveKey="1">
+                    <TabPane tab="Reply To ICON" key="1">
                         <Comment
                             style={{ marginRight: 16 }}
                             // avatar={
@@ -151,8 +151,7 @@ export default class CommentBox extends React.Component {
                                 />
                             }
                         />
-                    </TabPane>
-
+                    </TabPane> 
                 </Tabs>
 
             </>

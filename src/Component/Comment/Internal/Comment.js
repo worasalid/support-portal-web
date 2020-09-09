@@ -53,15 +53,15 @@ export default class CommentBox extends React.Component {
         comments: [],
         submitting: false,
         value: '',
+        usertype: "Dev"
     };
-    handleSubmit = () => {
+    handleSubmit = (value) => {
         if (!this.state.value) {
-            return;
         }
-
         this.setState({
-            submitting: true,
+            submitting: true,   
         });
+        console.log("usertype",this.state.usertype)
 
         setTimeout(() => {
             this.setState({
@@ -69,7 +69,7 @@ export default class CommentBox extends React.Component {
                 value: '',
                 comments: [
                     {
-                        author: 'ICON Support',
+                        author: this.state.usertype,
                         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
                         content: <p dangerouslySetInnerHTML={{ __html: this.state.value }}></p>,
                         // datetime: moment().fromNow(),
@@ -89,7 +89,7 @@ export default class CommentBox extends React.Component {
     };
 
     render() {
-        const { comments, submitting, value } = this.state;
+        const { comments, submitting, value,usertype } = this.state;
 
         return (
             <>
@@ -117,10 +117,32 @@ export default class CommentBox extends React.Component {
                 </Comment>
                 {/* // */}
                 {comments.length > 0 && <CommentList comments={comments} />}
-                <Tabs defaultActiveKey="1" >
-                    <TabPane tab="Reply to ICON" key="1">
+                <Tabs defaultActiveKey="2" onChange={(values) => this.setState({usertype: values === "1" ? "support" : "Dev"})}>
+                    <TabPane tab="Reply To Customer" key="1" forceRender>
+                            <Comment
+                                style={{ marginRight: 50 }}
+                                // avatar={
+                                //     <Avatar
+                                //         src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                                //         alt="ICON Support"
+                                //     />
+                                // }
+                                content={
+                                    <TextEditor
+                                        key="Editor1"
+                                        onChange={this.handleChange}
+                                        onSubmit={this.handleSubmit}
+                                        submitting={submitting}
+                                        value={value}
+                                    />
+                                }
+                            />
+                    </TabPane>
+
+
+                    <TabPane tab="Reply To Internal" key="2" onClick={() => this.setState({usertype: "Dev"})}>
                         <Comment
-                            style={{ marginRight: 50 }}
+                            style={{ marginRight: 16 }}
                             // avatar={
                             //     <Avatar
                             //         src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
@@ -138,7 +160,6 @@ export default class CommentBox extends React.Component {
                             }
                         />
                     </TabPane>
-
                 </Tabs>
 
             </>

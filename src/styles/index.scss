@@ -1,32 +1,63 @@
+/// label
 label.header-text {
     font-size: 14px !important;
     font-weight: bold;
 }
+
 label.value-text {
     font-size: 12px !important;
 }
+label.text-hover:hover {
+    text-decoration: underline;
+    text-decoration-color: #1890ff;
+    cursor: pointer;
+}
 
-label.topic-text{
+label.topic-text {
     font-size: 24px !important;
     margin-bottom: 36px;
 }
 
-label.card-title-menu{
-    font-size: 18px;
+label.card-title-menu {
+    font-size: 14px;
     color: rgb(0, 116, 224);
+}
+label.user-login{
+    font-size: 14px;
+    color: #fff;
+    margin-right: 16px;
 }
 
 /// div
-div.issue-detail-box{
+div.issue-detail-box {
     border: solid 1px;
     border-color: rgb(223, 225, 230);
     width: 100%;
     display: inline-block;
-    padding:16px;
-    
+    padding: 16px;
+
 }
-///
+div.sd-page-header{
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+div.sd-page-topic{
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/// Card
 .card-box{
     width: 100%;
+    // margin-top: 16px;
+    min-height: 50px;
+}
+.issue-card-box {
+    width: 100%;
     margin-top: 16px;
+    min-height: 200px;
+}
+.issue-active:hover {
+    border:1px solid;
+    color: #1890ff;
 }

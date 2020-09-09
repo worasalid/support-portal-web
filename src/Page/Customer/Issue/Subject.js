@@ -2,13 +2,13 @@ import { Col, DatePicker, Row, Select, Divider, Typography, Affix, Button, Avata
 import React, { useState } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import CommentBox from "../../../Component/Comment/Customer/Comment";
+import CommentBox from "../../../Component/Comment/Internal/Comment";
 import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import Uploadfile from "../../../Component/UploadFile"
 import SubjectDetails from "../../../Component/Subject/SubjectDetail";
 import MasterPage from "../MasterPage";
-import { UsbOutlined, UserOutlined } from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -109,7 +109,7 @@ let page = {
 
 export default function Subject() {
   const match = useRouteMatch();
-
+console.log("match",match.params.id)
   const history = useHistory();
   const [visible, setVisible] = useState(false);
   const [Priority, setPriority] = useState("");
@@ -210,7 +210,7 @@ export default function Subject() {
                   <Col span={24}>
                     <label className="header-text">Activity</label>
                     <Tabs defaultActiveKey="1">
-                      <TabPane tab="Comments" key="1">
+                      <TabPane tab="Comment" key="1">
                         <CommentBox />
                       </TabPane>
                       <TabPane tab="History Log" key="2">

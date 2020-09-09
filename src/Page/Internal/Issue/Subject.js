@@ -2,7 +2,7 @@ import { Col, DatePicker, Row, Select, Divider, Typography, Affix, Button, Avata
 import React, { useState } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import CommentBox from "../../../Component/Comment/Customer/Comment";
+import CommentBox from "../../../Component/Comment/Internal/Comment";
 import ModalSupport from '../../../Component/Dialog/Internal/modalSupport'
 import Historylog from "../../../Component/History/Customer/Historylog";
 import Uploadfile from "../../../Component/UploadFile"
@@ -67,12 +67,12 @@ let page = {
     ],
     ProgressStatusData: [
       {
-        text: "Cancel",
-        value: "Cancel",
+        text: "Send To Dev",
+        value: "sendtodev",
       },
       {
-        text: "Complete",
-        value: "Complete",
+        text: "Resolved",
+        value: "resolved",
       },
     ],
     ModuleData: [
