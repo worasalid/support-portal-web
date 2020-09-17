@@ -1,14 +1,15 @@
 import { Col, DatePicker, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import CommentBox from "../../../Component/Comment/Internal/Comment";
+import CommentBox from "../../../Component/Comment/Customer/Comment";
 import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import Uploadfile from "../../../Component/UploadFile"
 import SubjectDetails from "../../../Component/Subject/SubjectDetail";
 import MasterPage from "../MasterPage";
 import { UserOutlined } from "@ant-design/icons";
+import Axios from "axios";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -109,7 +110,6 @@ let page = {
 
 export default function Subject() {
   const match = useRouteMatch();
-console.log("match",match.params.id)
   const history = useHistory();
   const [visible, setVisible] = useState(false);
   const [Priority, setPriority] = useState("");
@@ -119,28 +119,49 @@ console.log("match",match.params.id)
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
 
-  // Binding dropdownselect
-  // page.data.PriorityData.forEach(x => page.loaddata.Priority.push(<Option value={x.id} >{x.text}</Option>))
-  page.loaddata.Priority = page.data.PriorityData.map((x) => (
-    <Option value={x.id}>{x.text}</Option>
-  ));
-  page.loaddata.AssignTo = page.data.AssignTodata.map((x) => (
-    <Option value={x.value}>{x.text}</Option>
-  ));
-  page.loaddata.ProgressStatus = page.data.ProgressStatusData.map((x) => (
-    <Option value={x.value}>{x.text}</Option>
-  ));
+  const [ticketdata, setTicketdata] = useState([]);
 
-  page.loaddata.IssueType = page.data.IssueTypeData.map((x) => ({ name: x.name, value: x.id, }));
-  page.loaddata.Module = page.data.ModuleData.map((x) => ({ name: x.text, value: x.value, }));
+  const getdetail = async () => {
+    try {
+      const ticket_detail = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/loaddetail",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticketId: match.params.id
+        }
+      });
+      if (ticket_detail.status === 200) {
+        setTicketdata(ticket_detail.data.map((values) => {
+          return {
+            ticket_number: values.Number,
+            type: values.Type,
+            title: values.Title,
+            description: values.Description,
+            ticket_date: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
+            customer_name: values.CustomerName
+          }
+        }));
+
+      }
+    } catch (error) {
+
+    }
+  }
 
   function HandleChange(value) {
-    console.log(`selected ${value}`);
     setVisible(true);
     setProgressStatus(value);
 
   }
 
+  useEffect(() => {
+    getdetail()
+  }, [])
+
+  // console.log("ticket_detail", ticket_details[0].ticket_number);
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -163,17 +184,17 @@ console.log("match",match.params.id)
 
           <Row>
             {/* Content */}
-            <Col span={16} style={{ paddingTop: 24 }}>
-              <div style={{ height: "70vh", overflowY: "scroll" }}>
+            <Col span={16} style={{ paddingTop: 0 }}>
+              <div style={{ height: "80vh", overflowY: "scroll" }}>
                 {/* Issue Description */}
-                <Row style={{marginRight:24}}>
+                <Row style={{ marginRight: 24 }}>
                   <Col span={24}>
-                    <label className="topic-text">ISSUE-00001-Subject : แจ้งปัญหา Link Error</label>
+                <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label>
                     <div className="issue-detail-box">
                       <Row>
                         <Col span={16} style={{ display: "inline" }}>
                           <Typography.Title level={4}>
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp; Help! This is a high priority request
+                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {ticketdata[0] && ticketdata[0].title}
                         </Typography.Title>
                         </Col>
                         <Col span={8} style={{ display: "inline", textAlign: "right" }}>
@@ -193,10 +214,7 @@ console.log("match",match.params.id)
                       <Row>
                         <div style={{ display: divcollapse }}>
                           <p>
-                            Track the priority of requests to spot problems quickly and
-                           set tighter <strong>Service Level Agreement (SLA)</strong> goals.<br /> Customers can set their own priority when raising a
-                            request, or you can hide it from customers and let your team
-                           decide.
+                           {ticketdata[0] && ticketdata[0].description}
                           </p>
 
                         </div>
@@ -206,7 +224,7 @@ console.log("match",match.params.id)
                 </Row>
 
                 {/* TAB */}
-                <Row style={{ marginTop: 36 ,marginRight:24}}>
+                <Row style={{ marginTop: 36, marginRight: 24 }}>
                   <Col span={24}>
                     <label className="header-text">Activity</label>
                     <Tabs defaultActiveKey="1">

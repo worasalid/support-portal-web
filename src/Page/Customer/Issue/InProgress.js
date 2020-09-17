@@ -7,7 +7,7 @@ import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import IssueSearch from "../../../Component/Search/Customer/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import { issueCusReducer, productReducer, moduleReducer, issueTypeReducer, keywordReducer, initState } from "../../../utility/reducer";
@@ -104,7 +104,7 @@ export default function InProgress() {
       });
 
       if (results.status === 200) {
-        customerdispatch({type: "LOAD_ISSUE" , payload: results.data})
+        customerdispatch({ type: "LOAD_ISSUE", payload: results.data })
 
       }
     } catch (error) {
@@ -136,23 +136,25 @@ export default function InProgress() {
         <IssueSearch />
         <Row>
           <Col span={24}>
-            <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}>
+            <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}  >
+
               <Column
-                title="Subject"
+                title="Issue No"
+                width="25%"
                 render={(record) => {
                   return (
                     <div>
-                      <a href="/#"
+                      {/* <a href="/#"
                         onClick={(e) => {
                           e.preventDefault();
                           history.push({
-                            pathname: "/Customer/Issue/Subject/" + record.Number,
+                            pathname: "/Customer/Issue/Subject/" + record.Id,
                           });
                         }}
                       >
-                        <label className="text-hover">{`[${record.Number}] - ` + record.Title}</label>
-                      </a>
-
+                      
+                      </a> */}
+                      <label className="table-column-text">{record.Number}</label>
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
                         {
                           record.IssueType === 'Bug' ?
@@ -168,22 +170,46 @@ export default function InProgress() {
                   );
                 }}
               />
-              <Column title="Product" dataIndex="ProductName"></Column>
-              <Column title="Module" dataIndex="ModuleName"></Column>
-              <Column title="Issue Date"
+
+              <Column title="Subject"
                 render={(record) => {
                   return (
                     <>
-                      {new Date(record.CreateDate).toLocaleDateString('en-US')}
+                      <div>
+                        <label className="table-column-text">{record.Title}</label>
+                      </div>
+                      <div>
+                        <label 
+                        onClick ={() => history.push({pathname: "/Customer/Issue/Subject/" + record.Id})}
+                        className="table-column-detail">รายละเอียด</label>
+                      </div>
+
+                    </>
+                  )
+                }
+                }
+              />
+              <Column title="Issue Date"
+                align="center"
+                width="10%"
+                render={(record) => {
+                  return (
+                    <>
+                      <label className="table-column-text">
+                        {new Date(record.CreateDate).toLocaleDateString('en-GB')}
+                      </label>
                     </>
                   )
                 }
 
                 }
               />
+
               <Column title="Due Date" dataIndex="" />
               <Column
                 title="ProgressStatus"
+                width="10%"
+                align="center"
                 render={(record) => {
                   return (
                     <Dropdown
@@ -214,6 +240,22 @@ export default function InProgress() {
                     </Dropdown>
                   );
                 }}
+              />
+              <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
+                width="10%"
+                align="center"
+                render={(record) => {
+                  return (
+                    <>
+                      <Button type="link"
+                        onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                      >
+                        {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                      </Button>
+                    </>
+                  )
+                }
+                }
               />
             </Table>
           </Col>

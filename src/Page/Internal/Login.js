@@ -1,10 +1,12 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import axios from "axios";
-import React from "react";
+import React, {useContext, useEffect } from 'react'
 import { useHistory } from "react-router-dom";
+import AuthenContext from '../../utility/authenContext';
 
 export default function NormalLoginForm() {
+  const { state, dispatch } = useContext(AuthenContext);
   const history = useHistory();
 
   const onFinish = async (value) => {
@@ -16,6 +18,8 @@ export default function NormalLoginForm() {
         });
 
       localStorage.setItem("sp-ssid", result.data);
+      dispatch({ type: 'Authen', payload: true});
+      dispatch({ type: 'LOGIN', payload: result.data.users});
       history.push("/Internal/Issue/MyTask");
     } catch (error) {
       alert("ข้อมููลไม่ถูกต้อง");
@@ -38,6 +42,7 @@ export default function NormalLoginForm() {
         name="normal_login"
         className="login-form"
         initialValues={{
+          username: "thidarath@iconframework.com",
           remember: true,
         }}
         onFinish={onFinish}

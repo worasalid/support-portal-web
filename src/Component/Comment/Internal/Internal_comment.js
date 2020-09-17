@@ -1,12 +1,12 @@
 import { Comment, Avatar, Form, Button, List, Row, Col, Tooltip, Divider, Modal } from 'antd';
 import moment from 'moment';
-import React, { useState, useEffect, useRef, createElement } from 'react';
-import { useHistory, useRouteMatch, Redirect, Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
-import { DislikeOutlined, LikeOutlined, DislikeFilled, LikeFilled, FileOutlined } from '@ant-design/icons';
+import { FileOutlined } from '@ant-design/icons';
 
 
 const { TabPane } = Tabs;
@@ -20,7 +20,7 @@ export default function CommentBox() {
     const history = useHistory();
     const match = useRouteMatch();
 
-    const loadCustomerComment = async () => {
+    const loadInternalComment = async () => {
         try {
             const commment_list = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/loadcomment",
@@ -30,7 +30,7 @@ export default function CommentBox() {
                 },
                 params: {
                     ticketId: match.params.id,
-                    type: "customer"
+                    type: "internal"
 
                 }
             });
@@ -64,7 +64,7 @@ export default function CommentBox() {
                 data: {
                     ticketId: match.params.id,
                     comment_text: commenttext,
-                    comment_type: "customer",
+                    comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
                 }
             });
@@ -93,14 +93,14 @@ export default function CommentBox() {
 
     useEffect(() => {
         setTimeout(() => {
-            loadCustomerComment()
             setLoading(false)
+            loadInternalComment()
         }, 1000)
     }, [])
 
     useEffect(() => {
         setTimeout(() => {
-            loadCustomerComment()
+            loadInternalComment()
             setLoading(false)
         }, 1000)
 
@@ -145,28 +145,29 @@ export default function CommentBox() {
                                     </div>
                                 }
                             </>
+
                         }
-                    // actions={[
-                    //     (item.filename === null ? "" : (
-                    //         <>
-                    //             <div>
-                    //                 <Row>
-                    //                     <Col span={24}>
-                    //                         <label
-                    //                             onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                    //                             className="text-link-hover">
-                    //                             <FileOutlined /> {item.filename}
-                    //                         </label>
-                    //                     </Col>
+                        actions={[
+                            // (item.filename === null ? "" : (
+                            //     <>
+                            //         <div>
+                            //             <Row>
+                            //                 <Col span={24}>
+                            //                     <label
+                            //                         onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
+                            //                         className="text-link-hover">
+                            //                         <FileOutlined /> {item.filename}
+                            //                     </label>
+                            //                 </Col>
 
-                    //                 </Row>
+                            //             </Row>
 
-                    //             </div>
-                    //         </>
-                    //     )
-                    //     )
-                    // ]
-                    // }
+                            //         </div>
+                            //     </>
+                            // )
+                            // )
+                        ]
+                        }
                     >
 
                     </Comment>
@@ -174,9 +175,9 @@ export default function CommentBox() {
             />
 
             <Tabs defaultActiveKey="1">
-                <TabPane tab="Reply To Customer" key="1">
+                <TabPane tab="Internal Note" key="1">
                     <Form
-                        name="Customer"
+                        name="Internal"
                         initialValues={{
                             // product: "REM",
                             // module: "CRM",
@@ -185,7 +186,7 @@ export default function CommentBox() {
                         layout="vertical"
                         onFinish={onFinish}
                     >
-                        <Form.Item name="customer_comment">
+                        <Form.Item name="Internal_comment">
 
                             {/* <TextArea rows={4} onChange={onChange} value={value} style={{ marginRight: 50 }} /> */}
                             <Editor
@@ -209,7 +210,7 @@ export default function CommentBox() {
                                 onEditorChange={(content, editor) => { return (console.log("onEditorChange", editor), setCommenttext(content)) }}
                             />
                         </Form.Item>
-                        <Form.Item name="customer_fileattach">
+                        <Form.Item name="Internal_fileattach">
                             <Row>
                                 <Col span={2} style={{ display: "inline" }} >
                                     Attach :
@@ -227,6 +228,8 @@ export default function CommentBox() {
                         </Form.Item>
                     </Form>
                 </TabPane>
+
+
             </Tabs>
         </>
     );

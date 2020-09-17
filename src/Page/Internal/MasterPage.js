@@ -1,17 +1,16 @@
 import 'antd/dist/antd.css';
-import React, { Component, useState } from 'react';
+import React, { Component, useState,useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Breadcrumb, Button, Tooltip, Dropdown } from 'antd';
 import { Avatar, Badge } from 'antd';
-import { UserOutlined, LaptopOutlined, NotificationOutlined, TwitterOutlined, SlidersTwoTone } from '@ant-design/icons';
+import { UserOutlined, LaptopOutlined, NotificationOutlined, SettingOutlined, SlidersTwoTone } from '@ant-design/icons';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   SearchOutlined
 } from '@ant-design/icons';
-
-
-
+import Axios from 'axios';
+import AuthenContext from "../../utility/authenContext";
 
 function newpage() {
   alert();
@@ -49,11 +48,38 @@ export default function MasterPage(props) {
   const { Header, Content, Sider } = Layout;
 
   const history = useHistory();
+  const { state, dispatch } = useContext(AuthenContext);
   const [collapsed, setCollapsed] = useState(false);
   const [show_notice,setshow_notice] = useState(true)
 
+
   const toggle = () => setCollapsed(!collapsed);
 
+  const getuser = async () => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/auth/customer/me",
+        method: "get",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+      });
+      dispatch({ type: 'Authen', payload: true });
+      dispatch({ type: 'LOGIN', payload: result.data.users });
+    } catch (error) {
+
+    }
+  }
+  useEffect(() => {
+    if (!state.authen) {
+      getuser()
+    }
+  }, [])
+  useEffect(() => {
+      getuser()
+  }, [])
+
+console.log("user",state.user)
   return (
     <Layout style={{ height: "100vh" }}>
       <Header style={{ backgroundColor: "#0099FF" }}>
@@ -115,65 +141,51 @@ export default function MasterPage(props) {
                   )} trigger="click">
 
                   <Button type="primary" danger color="red" shape="circle" size="middle" icon={<UserOutlined />} >
+                 
                   </Button>
+                  
                 </Dropdown>
+                &nbsp;<label className="user-login">{state.user && `${state.user.first_name} ${state.user.last_name}`}</label>
               </Tooltip>
+                
             </Col>
           </Row>
         </Menu>
       </Header>
       <Layout>
         <Sider theme="light" style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
-          <Menu theme="light" mode="inline" defaultOpenKeys={['sub1']} defaultSelectedKeys={['2']} >
+          <Menu theme="light" mode="inline" defaultOpenKeys={['sub1']} defaultSelectedKeys={['2']} 
+        
+          >
             <SubMenu key="sub1" icon={<UserOutlined />} title="Issue">
-              <Menu.Item key="1" onClick={() => history.push('/Internal/Issue/Unassign')}>
-                Unassign
-                  <Badge count={0}>
-                  <span style={{ marginLeft: 70, textAlign: "right" }}></span>
-                </Badge>
-              </Menu.Item>
               <Menu.Item key="2" onClick={() => history.push({ pathname: '/Internal/Issue/MyTask' })}>
                 - My Task (3)
               </Menu.Item>
               <Menu.Item key="3">
                 <span onClick={() => history.push('/Internal/Issue/InProgress')}>- InProgress (1)</span>
               </Menu.Item>
-              <Menu.Item key="4">
-                <span onClick={() => newpage()}>- Wait for Info</span>
-              </Menu.Item>
-              <Menu.Item key="5">
-                <span onClick={() => newpage()}>- On Due</span>
-              </Menu.Item>
-              <Menu.Item key="6">
-                <span onClick={() => newpage()}>- Over Due</span>
-              </Menu.Item>
+            
               <Menu.Item key="7">
                 <span onClick={() => this.newpage()}>- Resolved</span>
               </Menu.Item>
               <Menu.Item key="8">
                 <span onClick={() => newpage()}>- Complete</span>
               </Menu.Item>
-              <Menu.Item key="9">
-                <span onClick={() => history.push('/test')}>- Test</span>
-                <Badge count={0}>
-                  <span style={{ marginLeft: 66, textAlign: "right" }}></span>
-                </Badge>
-              </Menu.Item>
+             
             </SubMenu>
             <SubMenu key="sub2" icon={<UserOutlined />} title="Report">
-              <Menu.Item key="1" onClick={() => history.push('/Issue/Unassign')}>
+              <Menu.Item key="10" onClick={() => history.push('/Issue/Unassign')}>
                 - InProgress
                   <Badge count={1}>
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 </Badge>
               </Menu.Item>
-              <Menu.Item key="1" onClick={() => history.push('/Issue/Unassign')}>
-                - Complete
-                  <Badge count={1}>
-                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                </Badge>
+            </SubMenu>
+            <SubMenu key="sub3" icon={<SettingOutlined  />} title="Setting">
+            <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mapcompany')}>
+                - Mapping Company
+                
               </Menu.Item>
-
             </SubMenu>
 
           </Menu>

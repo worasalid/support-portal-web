@@ -7,15 +7,27 @@ label.header-text {
 label.value-text {
     font-size: 12px !important;
 }
+
+label.table-column-text {
+    font-size: 14px !important;
+}
+
 label.text-hover:hover {
     text-decoration: underline;
     text-decoration-color: #1890ff;
     cursor: pointer;
 }
+label.text-link-hover:hover {
+    text-decoration: underline;
+    text-decoration-color: #1890ff;
+    color: #1890ff;
+    cursor: pointer;
+}
+
 
 label.topic-text {
     font-size: 24px !important;
-    margin-bottom: 36px;
+    margin-bottom: 16px;
 }
 
 label.card-title-menu {
@@ -26,6 +38,27 @@ label.user-login{
     font-size: 14px;
     color: #fff;
     margin-right: 16px;
+}
+
+label.text-hover-blue:hover{
+    text-decoration: underline;
+    text-decoration-color: #1890ff;
+    cursor: pointer;
+} 
+
+label.table-column-detail{
+    color: orange;
+    text-decoration-color:orange !important;
+    font-size: 12px !important;
+    cursor: pointer;
+}
+
+label.table-column-detail:hover{
+  
+    text-decoration: underline;
+    text-decoration-color:orange;
+    font-size: 12px !important;
+    cursor: pointer;
 }
 
 /// div
@@ -61,3 +94,4 @@ div.sd-page-topic{
     border:1px solid;
     color: #1890ff;
 }
+

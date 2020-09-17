@@ -1,160 +1,235 @@
-import { Comment, Avatar, Form, Button, List, Row, Col } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col, Tooltip, Divider, Modal } from 'antd';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, createElement } from 'react';
+import { useHistory, useRouteMatch, Redirect, Link } from "react-router-dom";
 import { Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import Uploadfile from "../../../Component/UploadFile"
+import Axios from 'axios';
+import { DislikeOutlined, LikeOutlined, DislikeFilled, LikeFilled, FileOutlined } from '@ant-design/icons';
+
 
 const { TabPane } = Tabs;
 
-const CommentList = ({ comments }) => (
+export default function CommentBox() {
+    const editorRef = useRef(null)
+    const [commentdata, setCommentdata] = useState([]);
+    const [commenttext, setCommenttext] = useState("xxxxxxx");
+    const [loading, setLoading] = useState(true);
+    const uploadRef = useRef(null);
+    const history = useHistory();
+    const match = useRouteMatch();
 
-    <List
-        dataSource={comments}
-        // header={`${comments.length} ${comments.length > 1 ? 'replies' : 'reply'}`}
-        itemLayout="horizontal"
-        renderItem={props => <Comment {...props} />}
-    />
-);
+    const loadComment = async () => {
+        try {
+            const commment_list = await Axios({
+                url: process.env.REACT_APP_API_URL + "/tickets/loadcomment",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    ticketId: match.params.id,
+                    type: "customer"
 
-
-const TextEditor = ({ onChange, onSubmit, submitting, value }) => (
-    <>
-        <Form.Item>
-
-            {/* <TextArea rows={4} onChange={onChange} value={value} style={{ marginRight: 50 }} /> */}
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={onChange}
-
-            />
-        </Form.Item>
-        <Form.Item>
-            <Row>
-                <Col span={2} style={{display:"inline"}} >
-                    Attach : 
-                </Col>
-                <Col span={4} style={{display:"inline"}} >
-                    <Uploadfile />
-                </Col>
-                <Col span={18} style={{textAlign:"right"}}>
-                <Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary">
-                Add Comment
-            </Button>
-                </Col>
-            </Row>
-
-           
-
-        </Form.Item>
-    </>
-);
-
-export default class CommentBox extends React.Component {
-    state = {
-        comments: [],
-        submitting: false,
-        value: '',
-    };
-    handleSubmit = () => {
-        if (!this.state.value) {
-            return;
-        }
-
-        this.setState({
-            submitting: true,
-        });
-
-        setTimeout(() => {
-            this.setState({
-                submitting: false,
-                value: '',
-                comments: [
-                    {
-                        author: 'ICON Support',
-                        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-                        content: <p dangerouslySetInnerHTML={{ __html: this.state.value }}></p>,
-                        // datetime: moment().fromNow(),
-                        datetime: new Date().toLocaleDateString() + " : " + new Date().toLocaleTimeString(),
-                        author2: 'ICON Support'
-                    },
-                    ...this.state.comments,
-                ],
+                }
             });
-        }, 1000);
-    };
-
-    handleChange = e => {
-        this.setState({
-            value: e,
-        });
-    };
-
-    render() {
-        const { comments, submitting, value } = this.state;
-
-        return (
-            <>
-                {/* // */}
-                <Comment
-                    author={
-                        'ICON Support'
+            if (commment_list.status === 200) {
+                setCommentdata(commment_list.data.map((values) => {
+                    return {
+                        author: values.CreateName,
+                        datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
+                        content: values.Text,
+                        fileId: values.FileId,
+                        filename: values.FileName
                     }
-                    datetime={
-                        new Date().toLocaleDateString() + " : " + new Date().toLocaleTimeString()
-                    }
-                    avatar={
-                        <Avatar
-                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                            alt="ICON Support"
-                        />
-                    }
-                    content={
-                        <p>
-                            We supply a series of design principles, practical patterns and high quality design
-                            resources (Sketch and Axure), to help people create their product prototypes beautifully
-                            and efficiently.
-                                 </p>
-                    }>
-                </Comment>
-                {/* // */}
-                {comments.length > 0 && <CommentList comments={comments} />}
-                <Tabs defaultActiveKey="1">
-                    <TabPane tab="Reply To ICON" key="1">
-                        <Comment
-                            style={{ marginRight: 16 }}
-                            // avatar={
-                            //     <Avatar
-                            //         src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                            //         alt="ICON Support"
-                            //     />
-                            // }
-                            content={
-                                <TextEditor
-                                    key="Editor1"
-                                    onChange={this.handleChange}
-                                    onSubmit={this.handleSubmit}
-                                    submitting={submitting}
-                                    value={value}
-                                />
-                            }
-                        />
-                    </TabPane> 
-                </Tabs>
+                })
+                );
+            }
+        } catch (error) {
 
-            </>
-        );
+        }
     }
+
+    const onFinish = async (values) => {
+        // console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
+        try {
+
+            const createcomment = await Axios({
+                url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ticketId: match.params.id,
+                    comment_text: commenttext,
+                    comment_type: "customer",
+                    files: uploadRef.current.getFiles().map((n) => n.response.id),
+                }
+            });
+
+            if (createcomment.status === 200) {
+                Modal.info({
+                    title: 'บันทึกข้อมูลสำเร็จ',
+                    content: (
+                        <div>
+                            <p>บันทึกข้อมูลสำเร็จ</p>
+                        </div>
+                    ),
+                    onOk() {
+                        editorRef.current.editor.setContent("")
+                        setLoading(true);
+
+                    },
+                });
+
+
+            }
+        } catch (error) {
+            alert("บันทึกไม่สำเร็จ")
+        }
+    }
+
+    useEffect(() => {
+        setTimeout(() => {
+            loadComment()
+            setLoading(false)
+        }, 1000)
+    }, [])
+
+    useEffect(() => {
+        setTimeout(() => {
+            loadComment()
+            setLoading(false)
+        }, 1000)
+
+    }, [loading])
+
+    console.log(editorRef.current)
+    return (
+        <>
+            <List
+                loading={loading}
+                itemLayout="horizontal"
+                dataSource={commentdata}
+                renderItem={item => (
+                    <Comment
+                        author={
+                            <p><b>{item.author}</b></p>
+                        }
+                        datetime={
+                            <p>{item.datetime}</p>
+                        }
+                        avatar={
+                            <Avatar
+                                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                                alt="ICON Support"
+                            />
+                        }
+                        content={
+                            <>
+                                <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
+                                <Divider style={{ margin:0, marginBottom:10}}/>
+                                {item.filename === null ? "" :
+                                    <div>
+                                        <Row>
+                                            <Col span={24}>
+                                                <label
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
+                                                    className="text-link-hover">
+                                                    <FileOutlined /> {item.filename}
+                                                </label>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                }
+                            </>
+
+                        }
+                        // actions={[
+                        //     (item.filename === null ? "" : (
+                        //         <>
+                        //             <div>
+                        //                 <Row>
+                        //                     <Col span={24}>
+                        //                         <label
+                        //                             onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
+                        //                             className="text-link-hover">
+                        //                             <FileOutlined /> {item.filename}
+                        //                         </label>
+                        //                     </Col>
+
+                        //                 </Row>
+
+                        //             </div>
+                        //         </>
+                        //     )
+                        //     )
+                        // ]
+                        // }
+                    >
+
+                    </Comment>
+                )}
+            />
+
+            <Tabs defaultActiveKey="1">
+                <TabPane tab="Reply To ICON" key="1">
+                    <Form
+                        name="issue"
+                        initialValues={{
+                            // product: "REM",
+                            // module: "CRM",
+                            // issue_type: "Bug",
+                        }}
+                        layout="vertical"
+                        onFinish={onFinish}
+                    >
+                        <Form.Item name="comment">
+
+                            {/* <TextArea rows={4} onChange={onChange} value={value} style={{ marginRight: 50 }} /> */}
+                            <Editor
+                            ref={editorRef}
+                        
+                                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                                initialValue=""
+                                init={{
+
+                                    height: 300,
+                                    menubar: false,
+                                    plugins: [
+                                        'advlist autolink lists link image charmap print preview anchor',
+                                        'searchreplace visualblocks code fullscreen',
+                                        'insertdatetime media table paste code help wordcount'
+                                    ],
+                                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                                }}
+
+                                onEditorChange={(content, editor) => { return (console.log("onEditorChange", editor), setCommenttext(content)) }}
+                            />
+                        </Form.Item>
+                        <Form.Item name="fileattach">
+                            <Row>
+                                <Col span={2} style={{ display: "inline" }} >
+                                    Attach :
+                            </Col>
+                                <Col span={4} style={{ display: "inline" }} >
+                                    <Uploadfile ref={uploadRef} />
+                                </Col>
+                                <Col span={18} style={{ textAlign: "right" }}>
+                                    <Button htmlType="submit" type="primary">
+                                        Add Comment
+                                    </Button>
+                                </Col>
+                               
+                            </Row>
+                        </Form.Item>
+                    </Form>
+                </TabPane>
+            </Tabs>
+        </>
+    );
 }
+

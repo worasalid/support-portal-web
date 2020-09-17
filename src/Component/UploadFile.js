@@ -20,21 +20,23 @@ export default forwardRef(function UploadFile(props, ref) {
         },
         onChange(info) {
             if (info.file.status !== 'uploading') {
-                // console.log("uploadData", info.file, "B", info.fileList);
-                // console.log("uploadListData", info.fileList);
                 setFileList(info.fileList)
             }
             if (info.file.status === 'done') {
                 message.success(`${info.file.name} file uploaded successfully`);
+                console.log("info",info)
             } else if (info.file.status === 'error') {
                 message.error(`${info.file.name} file upload failed.`);
             }
         },
+        onRemove(info){
+            console.log("removeinfo",info)
+        }
     };
 
     return (
    
-            <Upload {...Uploadprops}>
+            <Upload {...Uploadprops} >
                 <Button>
                     <UploadOutlined /> Click to Upload
                  </Button>

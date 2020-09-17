@@ -146,9 +146,9 @@ export default function IssueCreate() {
     const handleEditorChange = (content, editor) => {
         console.log('Content was updated:', content);
     }
-
+console.log("state",state)
     const onFinish = async (values) => {
-        console.log("onFinish", values);
+        console.log("onFinish", values.description);
         console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
         try {
             let createTicket = await Axios({
@@ -158,13 +158,13 @@ export default function IssueCreate() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    type: title,
+                    type: 1,
                     product_id: values.product,
                     module_id: values.module,
                     title: values.subject,
                     description: values.description,
-                    attachment: [],
-                    company_id: 1
+                    files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    company_id: state.user.company_id
                 },
             });
 
@@ -383,7 +383,7 @@ export default function IssueCreate() {
                         ]}
                     >
                         <TextArea rows={5} placeholder="รายละเอียด" />
-                        {/* <Editor
+                         {/* <Editor
                             apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                             initialValue=""
                             init={{
@@ -398,7 +398,7 @@ export default function IssueCreate() {
                                 toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
                                 toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
                             }}
-                            onEditorChange={handleEditorChange}
+                            onEditorChange={handleEditorChange} 
 
                         /> */}
                     </Form.Item>

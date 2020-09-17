@@ -91,7 +91,6 @@ export default function Issuesearch() {
 
         }
     }, [customerstate.filter.productState]);
-    console.log("filter", customerstate.filter.productState)
     return (
         <>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>

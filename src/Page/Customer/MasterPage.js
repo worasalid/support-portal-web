@@ -140,7 +140,7 @@ export default function MasterPage(props) {
                 size="large"
                 ghost
                 onClick={() =>
-                  history.push({ pathname: "/customer/servicedesk" })
+                  history.push({ pathname: "/customer/servicedesk/issuemenu" })
                 }
               >
                 แจ้งปัญหาการใช้งาน
