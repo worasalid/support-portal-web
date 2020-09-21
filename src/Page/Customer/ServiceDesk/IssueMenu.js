@@ -25,7 +25,7 @@ export default function IssueMenu() {
                     <SendOutlined style={{ fontSize: 30 }} />&nbsp;&nbsp;&nbsp;
                 <label className="header-text">เลือกประเภทปัญหาการใช้งาน</label>
                 </div>
-                <Card className="card-box issue-active" bordered hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/bug" })}>
+                <Card className="card-box issue-active" bordered hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/1" })}>
                     <Meta
                         avatar={
                             <BugOutlined style={{ fontSize: 30 }} />
@@ -34,7 +34,7 @@ export default function IssueMenu() {
                         description="แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด"
                     />
                 </Card>
-                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/changerequest" })}>
+                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/2" })}>
                     <Meta
                         avatar={
                             <FileOutlined style={{ fontSize: 30 }} />
@@ -43,7 +43,7 @@ export default function IssueMenu() {
                         description="แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ"
                     />
                 </Card>
-                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/data" })}>
+                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/3" })}>
                     <Meta
                         avatar={
                             <DatabaseOutlined style={{ fontSize: 30 }} />
@@ -52,7 +52,7 @@ export default function IssueMenu() {
                         description="แจ้งปรับปรุงข้อมูลในระบบ"
                     />
                 </Card>
-                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/use" })}>
+                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/4" })}>
                     <Meta
                         avatar={
                             <PhoneOutlined style={{ fontSize: 30 }} />

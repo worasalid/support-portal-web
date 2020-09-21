@@ -22,6 +22,9 @@ export default function Issuesearch() {
         if (e.target.name === "module") {
             customerdispatch({ type: "SELECT_MODULE", payload: e.target.value })
         }
+        if (e.target.name === "priority") {
+            customerdispatch({ type: "SELECT_PRIORITY", payload: e.target.value })
+        }
         if (e.target.name === "date") {
              customerdispatch({ type: "SELECT_DATE", payload: {startdate : e.target.value[0], enddate: e.target.value[1]}})
         }
@@ -37,7 +40,6 @@ export default function Issuesearch() {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
         });
-        // productdispatch({ type: "SET", payload: products.data });
         customerdispatch({ type: "LOAD_PRODUCT", payload: products.data });
     }
 
@@ -52,7 +54,6 @@ export default function Issuesearch() {
                 productId: customerstate.filter.productState
             }
         });
-        // moduledispatch({ type: "SET", payload: module.data });
         customerdispatch({ type: "LOAD_MODULE", payload: module.data });
 
     }
@@ -60,14 +61,24 @@ export default function Issuesearch() {
     const getissue_type = async () => {
         const issue_type = await Axios({
             url: process.env.REACT_APP_API_URL + "/master/issue-types",
-            method: "get",
+            method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
         });
-        // issue_typedispatch({ type: "SET", payload: issue_type.data });
         customerdispatch({ type: "LOAD_TYPE", payload: issue_type.data });
 
+    }
+
+    const getpriority = async () => {
+        const priority = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/priority",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+        });
+        customerdispatch({ type: "LOAD_PRIORITY", payload: priority.data });
     }
 
     const getMasterdata = async () => {
@@ -75,6 +86,7 @@ export default function Issuesearch() {
             getproducts();
             getmodule();
             getissue_type();
+            getpriority();
         } catch (error) {
 
         }
@@ -147,8 +159,16 @@ export default function Issuesearch() {
                     </Button>
                 </Col>
             </Row>
-            <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
-                <Col span={10}>
+            <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+                <Col span={6}>
+                </Col>
+                <Col span={4}>
+                <Select placeholder="Priority" style={{ width: "100%" }}
+                        allowClear
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
+                        options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        onClear={() => alert()}
+                    />
                 </Col>
                 <Col span={10}>
                     <Input placeholder="Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", name: 'keyword' } })}></Input>

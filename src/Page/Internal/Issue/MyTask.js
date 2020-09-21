@@ -3,24 +3,23 @@ import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Sele
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
 import { useHistory } from "react-router-dom";
-import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
+import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
 import { DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
+import MasterContext from "../../../utility/masterContext";
 
-export default function InProgress() {
+export default function Mytask() {
   const history = useHistory();
   const [visible, setVisible] = useState(false);
   const [loading, setLoadding] = useState(false);
 
   const [userstate, userdispatch] = useReducer(userReducer, userState);
-
   const { state, dispatch } = useContext(AuthenContext);
-
-
+  const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
 
 
@@ -62,13 +61,15 @@ export default function InProgress() {
           moduleId: userstate.filter.moduleState,
           startdate: userstate.filter.date.startdate,
           enddate: userstate.filter.date.enddate,
-          keyword: userstate.filter.keyword
+          keyword: userstate.filter.keyword,
+          task: "mytask"
         }
       });
 
       if (results.status === 200) {
+      
+        masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
         userdispatch({ type: "LOAD_ISSUE", payload: results.data })
-
       }
     } catch (error) {
 
@@ -86,7 +87,6 @@ export default function InProgress() {
     userdispatch({ type: "SEARCH", payload: false })
   }, [userstate.search]);
 
-  console.log("issuedata", userstate.issuedata)
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
@@ -98,8 +98,9 @@ export default function InProgress() {
         <IssueSearch />
         <Row>
           <Col span={24}>
-            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}  
-            style={{padding: "5px 5px"}}
+            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
+            // scroll={{y:350}}
+              style={{ padding: "5px 5px" }}
             >
 
               <Column
@@ -108,22 +109,11 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <div>
-                      {/* <a href="/#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          history.push({
-                            pathname: "/Customer/Issue/Subject/" + record.Id,
-                          });
-                        }}
-                      >
-                      
-                      </a> */}
                       <label className="table-column-text">{record.Number}</label>
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        {/* <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip> */}
                         {
-                          record.IssueType === 'Bug' ?
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip> :
+                          record.IssueType === 'ChangeRequest' ?
+                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
                             <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                         }
                         {/* <Divider type="vertical" /> */}
@@ -162,13 +152,13 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                     
+
                       <div>
                         <label className="table-column-text">
                           {record.CreateBy}
                         </label>
                       </div>
-                    
+
                       <div>
                         <label className="table-column-text">
                           {new Date(record.CreateDate).toLocaleDateString('en-GB')}
@@ -238,7 +228,7 @@ export default function InProgress() {
             </Table>
           </Col>
         </Row>
-        <ModalSendIssue
+        <ModalSupport
           title={ProgressStatus}
           visible={visible}
           onCancel={() => setVisible(false)}

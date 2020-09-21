@@ -143,7 +143,9 @@ export default function Subject() {
             title: values.Title,
             description: values.Description,
             ticket_date: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
-            customer_name: values.CustomerName
+            customer_name: values.CustomerName,
+            company_name: values.CompanyName,
+            priority: values.Priority
           }
         }));
 

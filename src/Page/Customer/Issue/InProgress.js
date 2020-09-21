@@ -99,7 +99,9 @@ export default function InProgress() {
           moduleId: customerstate.filter.moduleState,
           startdate: customerstate.filter.date.startdate,
           enddate: customerstate.filter.date.enddate,
-          keyword: customerstate.filter.keyword
+          priority: customerstate.filter.priorityState,
+          keyword: customerstate.filter.keyword,
+          task: "inprogress"
         }
       });
 
@@ -124,7 +126,7 @@ export default function InProgress() {
   }, [customerstate.search]);
 
   console.log("searchdata", customerstate.search)
-  console.log("date", customerstate.filter.date)
+  console.log("priorityState", customerstate.filter.priorityState)
   return (
     <IssueContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
       <MasterPage>

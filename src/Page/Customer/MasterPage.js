@@ -13,7 +13,7 @@ export default function MasterPage(props) {
   const [show_notice, setshow_notice] = useState(true);
   const { state, dispatch } = useContext(AuthenContext);
   const userlogin = state.user
-  console.log(localStorage.getItem("sp-ssid"));
+  // console.log(localStorage.getItem("sp-ssid"));
 
   const getuser = async () => {
     try {
@@ -146,9 +146,18 @@ export default function MasterPage(props) {
                 แจ้งปัญหาการใช้งาน
               </Button>
             </div>
+
             <SubMenu key="sub1" title="Issues">
               <Menu.Item
                 key="1"
+                onClick={() =>
+                  history.push({ pathname: "/customer/issue/mytask" })
+                }
+              >
+                My Task <span>(1)</span>
+              </Menu.Item>
+              <Menu.Item
+                key="2"
                 onClick={() =>
                   history.push({ pathname: "/Customer/Issue/InProgress" })
                 }
@@ -156,7 +165,7 @@ export default function MasterPage(props) {
                 In progress <span>(1)</span>
               </Menu.Item>
               <Menu.Item
-                key="2"
+                key="3"
                 onClick={() =>
                   history.push({ pathname: "/Customer/Issue/Complete" })
                 }

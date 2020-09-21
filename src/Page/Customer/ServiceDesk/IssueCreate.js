@@ -9,6 +9,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import classNames from 'classnames'
 import AuthenContext from '../../../utility/authenContext';
 import Reducer, { productReducer, moduleReducer, initState } from '../../../utility/reducer';
+import { customerReducer, customerState } from '../../../utility/issueContext';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -20,89 +21,13 @@ const layout = {
 const tailLayout = {
     wrapperCol: { offset: 8, span: 24 },
 };
-let page = {
-    data: {
-        ProductData: [
-            {
-                text: "REM",
-                value: "REM",
-            },
-            {
-                text: "PM",
-                value: "PM",
-            },
-            {
-                text: "Rental",
-                value: "Rental",
-            },
-        ],
-        PriorityData: [
-            {
-                text: "Low",
-                id: "Low",
-            },
-            {
-                text: "Medium",
-                id: "Medium",
-            },
-            {
-                text: "High",
-                id: "High",
-            },
-        ],
-        IssueTypeData: [
-            {
-                text: "Bug",
-                value: "Bug",
-            },
-            {
-                text: "Data",
-                value: "Data",
-            },
-            {
-                text: "Use",
-                value: "Use",
-            },
-            {
-                text: "New Requirement",
-                value: "New Requirement",
-            },
-        ],
-        ModuleData: [
-            {
-                text: "CRM",
-                value: "CRM",
-            },
-            {
-                text: "Finance",
-                value: "Finance",
-            },
-            {
-                text: "SaleOrder",
-                value: "SaleOrder",
-            },
-            {
-                text: "Report",
-                value: "Report",
-            },
-            {
-                text: "PrintForm",
-                value: "PrintForm",
-            },
-        ],
-    },
-    loaddata: {
-        Product: [],
-        Priority: [],
-        IssueType: [],
-        Module: [],
-    },
-};
+
 export default function IssueCreate() {
     const history = useHistory();
     const { state, dispatch } = useContext(AuthenContext);
-    const [productstate, productdispatch] = useReducer(productReducer, initState.productState);
-    const [modulestate, moduledispatch] = useReducer(moduleReducer, initState.moduleState);
+    const [customerstate, customerdispatch] = useReducer(customerReducer, customerState)
+
+
 
     const match = useRouteMatch();
     const [hiddenForm, sethiddenForm] = useState(false);
@@ -118,7 +43,7 @@ export default function IssueCreate() {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
         });
-        productdispatch({ type: "SET", payload: products.data });
+        customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
     }
 
     const getmodule = async () => {
@@ -129,16 +54,28 @@ export default function IssueCreate() {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
-                productId: productstate.search
+                productId: customerstate.filter.productState
             }
         });
-        moduledispatch({ type: "SET", payload: module.data });
+        customerdispatch({ type: "LOAD_MODULE", payload: module.data })
+    }
+
+    const getpriority = async () => {
+        const priority = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/priority",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            }
+        });
+        customerdispatch({ type: "LOAD_PRIORITY", payload: priority.data })
     }
 
     const getMasterdata = async () => {
         try {
             getproducts();
             getmodule();
+            getpriority();
         } catch (error) {
 
         }
@@ -146,7 +83,8 @@ export default function IssueCreate() {
     const handleEditorChange = (content, editor) => {
         console.log('Content was updated:', content);
     }
-console.log("state",state)
+
+
     const onFinish = async (values) => {
         console.log("onFinish", values.description);
         console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
@@ -158,13 +96,15 @@ console.log("state",state)
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    type: 1,
+                    company_id: state.user.company_id,
+                    type: match.params.id,
                     product_id: values.product,
                     module_id: values.module,
+                    priority: values.priority,
                     title: values.subject,
                     description: values.description,
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
-                    company_id: state.user.company_id
+                    
                 },
             });
 
@@ -178,7 +118,7 @@ console.log("state",state)
                         </div>
                     ),
                     onOk() {
-                        history.push("/customer/issue/inprogress");
+                        history.push("/customer/issue/mytask");
                     },
                 });
             }
@@ -196,7 +136,7 @@ console.log("state",state)
         setDescription(
             `${title}` === "bug" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด" :
                 `${title}` === "changerequest" ? "แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ" :
-                    `${title}` === "data" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
+                    `${title}` === "memo" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
                         `${title}` === "use" ? "สอบถามข้อมูลทั่วไป / การใช้งานระบบ" : ""
         );
 
@@ -212,7 +152,7 @@ console.log("state",state)
         if (state.authen) {
             getmodule();
         }
-    }, [productstate.search]);
+    }, [customerstate.filter.productState]);
 
     const images_upload_handler = (blobInfo, success, failure) => {
         setTimeout(function () {
@@ -221,7 +161,6 @@ console.log("state",state)
         }, 2000);
     }
 
-    console.log(productstate.search)
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>
@@ -237,7 +176,7 @@ console.log("state",state)
                     initialValues={{
                         // product: "REM",
                         // module: "CRM",
-                        // issue_type: "Bug",
+                        priority: "None"
                     }}
                     layout="vertical"
                     onFinish={onFinish}
@@ -258,7 +197,7 @@ console.log("state",state)
                             overlay={
                                 <Menu mode="inline" theme="light" onMouseOver="" >
                                     <Menu.Item key="1" onClick={
-                                        () => { return (setTitle("bug"), history.push("/customer/servicedesk/issuecreate/bug")) }}>
+                                        () => { return (setTitle("bug"), history.push("/customer/servicedesk/issuecreate/1")) }}>
                                         <Card className="issue-active" hoverable>
                                             <Meta
                                                 avatar={
@@ -270,7 +209,7 @@ console.log("state",state)
                                         </Card>
                                     </Menu.Item>
                                     <Menu.Item key="2" onClick={
-                                        () => { return (setTitle("changerequest"), history.push("/customer/servicedesk/issuecreate/changerequest")) }}>
+                                        () => { return (setTitle("changerequest"), history.push("/customer/servicedesk/issuecreate/2")) }}>
                                         <Card className="issue-active" hoverable >
                                             <Meta
                                                 avatar={
@@ -282,7 +221,7 @@ console.log("state",state)
                                         </Card>
                                     </Menu.Item>
                                     <Menu.Item key="3" onClick={
-                                        () => { return (setTitle("data"), history.push("/customer/servicedesk/issuecreate/data")) }}>
+                                        () => { return (setTitle("data"), history.push("/customer/servicedesk/issuecreate/3")) }}>
                                         <Card className="issue-active" hoverable>
                                             <Meta
                                                 avatar={
@@ -294,7 +233,7 @@ console.log("state",state)
                                         </Card>
                                     </Menu.Item>
                                     <Menu.Item key="4" onClick={
-                                        () => { return (setTitle("use"), history.push("/customer/servicedesk/issuecreate/use")) }}>
+                                        () => { return (setTitle("use"), history.push("/customer/servicedesk/issuecreate/4")) }}>
                                         <Card className="issue-active" hoverable style={{ width: "100%", marginTop: 16 }} >
                                             <Meta
                                                 avatar={
@@ -347,15 +286,23 @@ console.log("state",state)
                     >
                         <Select
                             placeholder="Product"
-                            onChange={(values) => productdispatch({type: "SELECT", payload: values}) }
-                            options={productstate && productstate.data.map((x) => ({ value: x.Id, label: x.Name }))}
+                            onChange={(value) => customerdispatch({ type: "SELECT_PRODUCT", payload: value })}
+                            options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.Id, label: x.Name }))}
                         />
                     </Form.Item>
 
                     <Form.Item label="Module" name="module">
                         <Select
                             placeholder="Module"
-                            options={modulestate && modulestate.data.map(x => ({ value: x.id, label: x.name }))}>
+                            options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.id, label: x.name }))}>
+
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item label="Priority" name="priority">
+                        <Select
+                            placeholder="Priority"
+                            options={customerstate && customerstate.masterdata.priorityState.map(x => ({ value: x.Id, label: x.Name }))}>
 
                         </Select>
                     </Form.Item>
@@ -383,7 +330,7 @@ console.log("state",state)
                         ]}
                     >
                         <TextArea rows={5} placeholder="รายละเอียด" />
-                         {/* <Editor
+                        {/* <Editor
                             apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                             initialValue=""
                             init={{

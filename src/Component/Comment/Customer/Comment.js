@@ -14,7 +14,7 @@ const { TabPane } = Tabs;
 export default function CommentBox() {
     const editorRef = useRef(null)
     const [commentdata, setCommentdata] = useState([]);
-    const [commenttext, setCommenttext] = useState("xxxxxxx");
+    const [commenttext, setCommenttext] = useState("");
     const [loading, setLoading] = useState(true);
     const uploadRef = useRef(null);
     const history = useHistory();
@@ -83,8 +83,6 @@ export default function CommentBox() {
 
                     },
                 });
-
-
             }
         } catch (error) {
             alert("บันทึกไม่สำเร็จ")
@@ -106,7 +104,6 @@ export default function CommentBox() {
 
     }, [loading])
 
-    console.log(editorRef.current)
     return (
         <>
             <List

@@ -1,12 +1,11 @@
 import { Col, DatePicker, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs } from "antd";
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useReducer } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Customer/Comment";
 import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
-import Uploadfile from "../../../Component/UploadFile"
-import SubjectDetails from "../../../Component/Subject/SubjectDetail";
+import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import MasterPage from "../MasterPage";
 import { UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
@@ -14,112 +13,33 @@ import Axios from "axios";
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-let page = {
-  data: {
-    PriorityData: [
-      {
-        text: "Low",
-        id: "Low",
-      },
-      {
-        text: "Medium",
-        id: "Medium",
-      },
-      {
-        text: "High",
-        id: "High",
-      },
-    ],
-    IssueTypeData: [
-      {
-        name: "Bug",
-        id: "Bug",
-      },
-      {
-        name: "Data",
-        id: "Data",
-      },
-      {
-        name: "Use",
-        id: "Use",
-      },
-      {
-        name: "New Requirement",
-        id: "New Requirement",
-      },
-    ],
-    AssignTodata: [
-      {
-        text: "Worasalid",
-        value: "Worasalid",
-      },
-      {
-        text: "Admin",
-        value: "Admin",
-      },
-      {
-        text: "Support",
-        value: "Support",
-      },
-      {
-        text: "Developer",
-        value: "Developer",
-      },
-    ],
-    ProgressStatusData: [
-      {
-        text: "Cancel",
-        value: "Cancel",
-      },
-      {
-        text: "Complete",
-        value: "Complete",
-      },
-    ],
-    ModuleData: [
-      {
-        text: "CRM",
-        value: "CRM",
-      },
-      {
-        text: "Finance",
-        value: "Finance",
-      },
-      {
-        text: "SaleOrder",
-        value: "SaleOrder",
-      },
-      {
-        text: "Report",
-        value: "Report",
-      },
-      {
-        text: "PrintForm",
-        value: "PrintForm",
-      },
-    ],
-  },
-  loaddata: {
-    Priority: [],
-    IssueType: [],
-    AssignTo: [],
-    ProgressStatus: [],
-    Module: [],
-  },
-};
 
 export default function Subject() {
   const match = useRouteMatch();
   const history = useHistory();
+  const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+
   const [visible, setVisible] = useState(false);
-  const [Priority, setPriority] = useState("");
-  const [DueDate, setDueDate] = useState("");
   const [ProgressStatus, setProgressStatus] = useState("");
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
 
   const [ticketdata, setTicketdata] = useState([]);
+
+  const getflow_output = async (trans_id) => {
+    const flow_output = await Axios({
+      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        trans_id
+      }
+    });
+    customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+  }
 
   const getdetail = async () => {
     try {
@@ -133,24 +53,15 @@ export default function Subject() {
           ticketId: match.params.id
         }
       });
-      if (ticket_detail.status === 200) {
-        setTicketdata(ticket_detail.data.map((values) => {
-          return {
-            ticket_number: values.Number,
-            type: values.Type,
-            title: values.Title,
-            description: values.Description,
-            ticket_date: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
-            customer_name: values.CustomerName
-          }
-        }));
 
+      if (ticket_detail.status === 200) {
+         customerdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
+         getflow_output(ticket_detail.data[0].TransId)
       }
     } catch (error) {
 
     }
   }
-
   function HandleChange(value) {
     setVisible(true);
     setProgressStatus(value);
@@ -158,10 +69,17 @@ export default function Subject() {
   }
 
   useEffect(() => {
-    getdetail()
+    getdetail();
   }, [])
 
-  // console.log("ticket_detail", ticket_details[0].ticket_number);
+// console.log(customerstate)
+//   // useEffect(() => {
+//   //   // getflow_output();
+//   // }, [customerstate])
+
+  console.log("ticket_detail", customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus);
+  console.log("ticket_datarow", customerstate.issuedata.details[0] && customerstate.issuedata.details[0].TransId);
+  console.log("ACTION_FLOW", customerstate.actionflow && customerstate.actionflow)
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -189,13 +107,14 @@ export default function Subject() {
                 {/* Issue Description */}
                 <Row style={{ marginRight: 24 }}>
                   <Col span={24}>
-                <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label>
+                    {/* <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label> */}
+                    <label className="topic-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</label>
                     <div className="issue-detail-box">
                       <Row>
                         <Col span={16} style={{ display: "inline" }}>
                           <Typography.Title level={4}>
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {ticketdata[0] && ticketdata[0].title}
-                        </Typography.Title>
+                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Title}
+                          </Typography.Title>
                         </Col>
                         <Col span={8} style={{ display: "inline", textAlign: "right" }}>
                           <Button type="link"
@@ -214,7 +133,7 @@ export default function Subject() {
                       <Row>
                         <div style={{ display: divcollapse }}>
                           <p>
-                           {ticketdata[0] && ticketdata[0].description}
+                            {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Description}
                           </p>
 
                         </div>
@@ -253,9 +172,10 @@ export default function Subject() {
                   <Select
                     style={{ width: "100%", marginTop: 8 }}
                     placeholder="None"
-                    onChange={HandleChange}
+                    onChange={(value,index) => HandleChange(index.label)}
+                    defaultValue= ""
+                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng }))}
                   >
-                    {page.loaddata.ProgressStatus}
                   </Select>
                 </Col>
               </Row>
@@ -266,8 +186,14 @@ export default function Subject() {
                   <label className="value-text">30/08/2020</label>
                 </Col>
               </Row>
+              <Row style={{ marginBottom: 30 }}>
+                <Col span={18}>
+                  <label className="header-text">Priority</label>
+                  <br />
+                  <label className="value-text">{ticketdata[0] && ticketdata[0].priority}</label>
+                </Col>
+              </Row>
             </Col>
-            {/* SideBar */}
           </Row>
         </div>
       </div>
@@ -275,6 +201,7 @@ export default function Subject() {
       <ModalSendIssue
         title={ProgressStatus}
         visible={visible}
+        width={700}
         onCancel={() => setVisible(false)}
         onOk={() => {
           setVisible(false);

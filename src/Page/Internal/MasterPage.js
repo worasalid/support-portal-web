@@ -1,5 +1,5 @@
 import 'antd/dist/antd.css';
-import React, { Component, useState,useContext, useEffect } from 'react';
+import React, { Component, useState,useContext, useEffect,useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Breadcrumb, Button, Tooltip, Dropdown } from 'antd';
 import { Avatar, Badge } from 'antd';
@@ -11,11 +11,11 @@ import {
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
+import MasterContext, { masterReducer, masterState } from "../../utility/masterContext";
 
 function newpage() {
   alert();
 }
-
 
 export class Menucollapsed extends Component {
   state = {
@@ -41,16 +41,16 @@ export class Menucollapsed extends Component {
   }
 }
 
-
-
 export default function MasterPage(props) {
   const { SubMenu } = Menu;
   const { Header, Content, Sider } = Layout;
 
   const history = useHistory();
   const { state, dispatch } = useContext(AuthenContext);
+  const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
+
   const [collapsed, setCollapsed] = useState(false);
-  const [show_notice,setshow_notice] = useState(true)
+  const [show_notice, setshow_notice] = useState(true)
 
 
   const toggle = () => setCollapsed(!collapsed);
@@ -79,7 +79,6 @@ export default function MasterPage(props) {
       getuser()
   }, [])
 
-console.log("user",state.user)
   return (
     <Layout style={{ height: "100vh" }}>
       <Header style={{ backgroundColor: "#0099FF" }}>
@@ -156,10 +155,10 @@ console.log("user",state.user)
         <Sider theme="light" style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
           <Menu theme="light" mode="inline" defaultOpenKeys={['sub1']} defaultSelectedKeys={['2']} 
         
-          >
+          >/
             <SubMenu key="sub1" icon={<UserOutlined />} title="Issue">
               <Menu.Item key="2" onClick={() => history.push({ pathname: '/Internal/Issue/MyTask' })}>
-                - My Task (3)
+               {`- My task (${masterstate.toolbar.sider_menu.issue.mytask.count})`}
               </Menu.Item>
               <Menu.Item key="3">
                 <span onClick={() => history.push('/Internal/Issue/InProgress')}>- InProgress (1)</span>

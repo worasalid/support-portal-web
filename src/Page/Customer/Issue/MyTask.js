@@ -3,47 +3,26 @@ import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Sele
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
 import { useHistory } from "react-router-dom";
-import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
-import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
+import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
+import IssueSearch from "../../../Component/Search/Customer/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
 import { DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
-import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
-import MasterContext from "../../../utility/masterContext";
+import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
+
 
 export default function InProgress() {
   const history = useHistory();
   const [visible, setVisible] = useState(false);
   const [loading, setLoadding] = useState(false);
 
-  const [userstate, userdispatch] = useReducer(userReducer, userState);
+  // const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
+  const {state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const { state, dispatch } = useContext(AuthenContext);
-  const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
-
-
-  let page = {
-    data: {
-      ProgressStatusData: [
-        {
-          text: "InProgress",
-          value: "InProgress",
-        },
-        {
-          text: "Cancel",
-          value: "Complete",
-        },
-        {
-          text: "Complete",
-          value: "Complete",
-        },
-      ],
-    },
-    loaddata: {
-      loadProgressStatus: [],
-    },
-  };
+  const [mailboxid, setMailboxid] = useState();
+  const [outputnode_id, setOutputnode_id] = useState()
 
   const loadIssue = async (value) => {
     // setLoadding(true);
@@ -55,40 +34,52 @@ export default function InProgress() {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         params: {
-          companyId: userstate.filter.companyState,
-          issue_type: userstate.filter.TypeState,
-          productId: userstate.filter.productState,
-          moduleId: userstate.filter.moduleState,
-          startdate: userstate.filter.date.startdate,
-          enddate: userstate.filter.date.enddate,
-          keyword: userstate.filter.keyword,
-          task: "inprogress"
+          issue_type: customerstate.filter.TypeState,
+          productId: customerstate.filter.productState,
+          moduleId: customerstate.filter.moduleState,
+          startdate: customerstate.filter.date.startdate,
+          enddate: customerstate.filter.date.enddate,
+          priority: customerstate.filter.priorityState,
+          keyword: customerstate.filter.keyword,
+          task: "mytask"
         }
       });
 
       if (results.status === 200) {
-      
-        masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
-        userdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        customerdispatch({ type: "LOAD_ISSUE", payload: results.data })
+
       }
     } catch (error) {
 
     }
   };
 
+  const getflow_output = async (value) => {
+    const flow_output = await Axios({
+      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        trans_id: value
+      }
+    });
+    customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+  }
+
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
+    customerdispatch({ type: "LOADING", payload: true })
     setTimeout(() => {
       loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
+      customerdispatch({ type: "LOADING", payload: false })
     }, 1000)
 
-
-    userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search]);
+    customerdispatch({ type: "SEARCH", payload: false })
+  }, [customerstate.search, visible]);
 
   return (
-    <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
+    // <IssueContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
       <MasterPage>
         <Row style={{ marginBottom: 16, textAlign: "left" }}>
           <Col span={24}>
@@ -98,27 +89,24 @@ export default function InProgress() {
         <IssueSearch />
         <Row>
           <Col span={24}>
-            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
-            // scroll={{y:350}}
-              style={{ padding: "5px 5px" }}
-            >
+            <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}  >
 
               <Column
                 title="Issue No"
-                width="20%"
+                width="25%"
                 render={(record) => {
                   return (
                     <div>
                       <label className="table-column-text">{record.Number}</label>
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
                         {
-                          record.IssueType === 'ChangeRequest' ?
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
+                          record.IssueType === 'Bug' ?
+                            <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
                             <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                         }
-                        {/* <Divider type="vertical" /> */}
+                        <Divider type="vertical" />
                         <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
-                        {/* <Divider type="vertical" /> */}
+                        <Divider type="vertical" />
                         <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
                       </div>
                     </div>
@@ -135,10 +123,14 @@ export default function InProgress() {
                       </div>
                       <div>
                         <label
-                          onClick={() => history.push({ pathname: "/internal/issue/subject/" + record.Id })}
-                          className="table-column-detail">
-                          รายละเอียด
-                          </label>
+                          onClick={() => {
+                            return (
+                              customerdispatch({ type: "SELECT_DATAROW", payload: record }),
+                              history.push({ pathname: "/Customer/Issue/Subject/" + record.Id })
+                            )
+                          }
+                          }
+                          className="table-column-detail">รายละเอียด</label>
                       </div>
 
                     </>
@@ -146,26 +138,15 @@ export default function InProgress() {
                 }
                 }
               />
-              <Column title="Issue By"
+              <Column title="Issue Date"
                 align="center"
-                width="15%"
+                width="10%"
                 render={(record) => {
                   return (
                     <>
-
-                      <div>
-                        <label className="table-column-text">
-                          {record.CreateBy}
-                        </label>
-                      </div>
-
-                      <div>
-                        <label className="table-column-text">
-                          {new Date(record.CreateDate).toLocaleDateString('en-GB')}
-                        </label>
-                      </div>
-                      <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
-
+                      <label className="table-column-text">
+                        {new Date(record.CreateDate).toLocaleDateString('en-GB')}
+                      </label>
                     </>
                   )
                 }
@@ -191,20 +172,29 @@ export default function InProgress() {
                           onSelect={(x) => console.log(x.selectedKeys)}
                           onClick={(x) => {
                             setVisible(true);
-                            setProgressStatus(x.key);
+                            setProgressStatus(x.item.props.children[1]);
+                            setOutputnode_id(x.key)
+
                           }}
                         >
-                          {page.data.ProgressStatusData.filter(
-                            (x) => x.text !== record.GroupStatus
-                          ).map((x) => (
-                            <Menu.Item key={x.text}>{x.text}</Menu.Item>
-                          ))}
+
+                          {customerstate.actionflow && customerstate.actionflow.map((x) => {
+                            return (
+                              <Menu.Item key={x.ToNodeId}>{x.TextEng}</Menu.Item>
+                            )
+                          })}
                         </Menu>
                       }
                       trigger="click"
                     >
-                      {/* <Button type="link">{record.ProgressStatus}</Button> */}
-                      <a href="/#">{record.GroupStatus}</a>
+                      <Button type="link"
+                        onClick={() => {
+                          getflow_output(record.TransId)
+
+                          customerdispatch({ type: "SELECT_DATAROW", payload: record })
+                          setMailboxid(record.MailId);
+                        }}
+                      >{record.GroupStatus}</Button>
                     </Dropdown>
                   );
                 }}
@@ -228,17 +218,16 @@ export default function InProgress() {
             </Table>
           </Col>
         </Row>
-        <ModalSupport
+        <ModalSendIssue
           title={ProgressStatus}
           visible={visible}
           onCancel={() => setVisible(false)}
-          onOk={() => {
-            setVisible(false);
-            loadIssue();
-          }}
+          width={700}
+          onOk={() => setVisible(false)}
+          datarow={{ data: customerstate.issuedata.datarow, outputnode_id: outputnode_id }}
         />
         {/* </Spin> */}
       </MasterPage>
-    </IssueContext.Provider>
+    // </IssueContext.Provider>
   );
 }
