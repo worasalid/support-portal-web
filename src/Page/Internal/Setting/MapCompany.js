@@ -93,7 +93,7 @@ export default function MapCompany() {
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectCompanylist(selectedRowKeys);
-            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
             
         },
     };

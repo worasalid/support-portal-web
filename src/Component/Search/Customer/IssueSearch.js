@@ -26,7 +26,7 @@ export default function Issuesearch() {
             customerdispatch({ type: "SELECT_PRIORITY", payload: e.target.value })
         }
         if (e.target.name === "date") {
-             customerdispatch({ type: "SELECT_DATE", payload: {startdate : e.target.value[0], enddate: e.target.value[1]}})
+            customerdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })
         }
         if (e.target.name === "keyword") {
             customerdispatch({ type: "SELECT_KEYWORD", payload: e.target.value })
@@ -110,6 +110,9 @@ export default function Issuesearch() {
                 </Col>
                 <Col span={4}>
                     <Select placeholder="IssueType" mode="multiple" allowClear
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", name: "issuetype" } })}
                         options={customerstate.masterdata && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
@@ -121,6 +124,9 @@ export default function Issuesearch() {
 
                     <Select placeholder="Product" style={{ width: "100%" }}
                         allowClear
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'product' } })}
                         options={customerstate.masterdata && customerstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})`, group: "Product" }))}
                         dropdownRender={(value) => (
@@ -140,15 +146,19 @@ export default function Issuesearch() {
                 </Col>
                 <Col span={4}>
                     <Select placeholder="Module" style={{ width: "100%" }}
+                        showSearch
                         allowClear
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'module' } })}
-                        options={customerstate.masterdata && customerstate.masterdata.moduleState.map((x) => ({ value: x.id, label: x.name }))}
+                        options={customerstate.masterdata && customerstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
                         onClear={() => alert()}
                     />
                 </Col>
                 <Col span={6} >
                     <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
-                        onChange={(date,dateString) => handleChange({ target: { value: dateString || "", name: 'date' } })}
+                        onChange={(date, dateString) => handleChange({ target: { value: dateString || "", name: 'date' } })}
                     />
                 </Col>
                 <Col span={2}>
@@ -163,7 +173,7 @@ export default function Issuesearch() {
                 <Col span={6}>
                 </Col>
                 <Col span={4}>
-                <Select placeholder="Priority" style={{ width: "100%" }}
+                    <Select placeholder="Priority" style={{ width: "100%" }}
                         allowClear
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
                         options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}

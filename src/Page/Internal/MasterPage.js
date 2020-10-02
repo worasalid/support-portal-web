@@ -126,7 +126,7 @@ export default function MasterPage(props) {
                   overlayStyle={{ width: 200, boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px" }}
                   overlay={(
                     <Menu mode="inline" theme="light" onMouseOver="">
-                      <Button type="text">UserName</Button> <br />
+                      <Button type="text">{state.user && `${state.user.first_name} ${state.user.last_name}`}</Button> <br />
                       <hr />
                       <Menu.Item key="1" onClick={() => alert("Profile")}>
                         Profile
@@ -173,8 +173,8 @@ export default function MasterPage(props) {
              
             </SubMenu>
             <SubMenu key="sub2" icon={<UserOutlined />} title="Report">
-              <Menu.Item key="10" onClick={() => history.push('/Issue/Unassign')}>
-                - InProgress
+              <Menu.Item key="10" onClick={() => history.push('/internal/report/charts')}>
+                - Report
                   <Badge count={1}>
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 </Badge>
@@ -182,8 +182,10 @@ export default function MasterPage(props) {
             </SubMenu>
             <SubMenu key="sub3" icon={<SettingOutlined  />} title="Setting">
             <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mapcompany')}>
-                - Mapping Company
-                
+                - Mapping Support
+              </Menu.Item>
+              <Menu.Item key="12" onClick={() => history.push('/internal/issue/setting/mapdeveloper')}>
+                - Mapping Developer
               </Menu.Item>
             </SubMenu>
 

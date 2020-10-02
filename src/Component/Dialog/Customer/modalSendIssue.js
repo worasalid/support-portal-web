@@ -1,17 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import { Modal } from 'antd';
-import Comment from '../../Comment'
 import { Editor } from '@tinymce/tinymce-react';
-import { Upload, message, Button } from 'antd';
-import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 
 
-export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow, ...props }) {
+export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow,details, ...props }) {
   const uploadRef = useRef(null);
   const editorRef = useRef(null)
   const [textValue, setTextValue] = useState("")
+  const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+
   const handleEditorChange = (content, editor) => {
     setTextValue(content);
   }
@@ -26,7 +26,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
           },
           data: {
-            ticketId: datarow.data.Id,
+            ticketId: details && details.ticketId,
             comment_text: textValue,
             comment_type: "customer",
             files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -48,8 +48,8 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         data: {
-          mailbox_id: datarow.data.MailId,
-          output_id: datarow.outputnode_id
+          mailbox_id: details && details.mailboxId,
+          output_id: details && details.nodeoutput_id
         }
       });
 
@@ -73,12 +73,15 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
 
   }
 
+  useEffect(() => {
+
+  }, [])
 
   return (
     <Modal
       // title={title}
       visible={visible}
-      onOk={() => { return (SaveComment(),SendFlow(), onOk()) }}
+      onOk={() => { return (SaveComment(),SendFlow()) }}
       onCancel={() => { return (editorRef.current.editor.setContent(""), onCancel()) }}
       {...props}
     >

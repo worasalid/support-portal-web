@@ -104,7 +104,7 @@ export default function IssueCreate() {
                     title: values.subject,
                     description: values.description,
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
-                    
+
                 },
             });
 
@@ -134,11 +134,25 @@ export default function IssueCreate() {
 
     useEffect(() => {
         setDescription(
-            `${title}` === "bug" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด" :
-                `${title}` === "changerequest" ? "แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ" :
-                    `${title}` === "memo" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
-                        `${title}` === "use" ? "สอบถามข้อมูลทั่วไป / การใช้งานระบบ" : ""
+            match.params.id === "1" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด" :
+                match.params.id === "2" ? "แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ" :
+                    match.params.id === "3" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
+                        match.params.id === "4" ? "สอบถามข้อมูลทั่วไป / การใช้งานระบบ" : ""
         );
+
+        setTitle(
+            match.params.id === "1" ? "Bug" :
+                match.params.id === "2" ? "ChageRequest" :
+                    match.params.id === "3" ? "Memo" :
+                        match.params.id === "4" ? "Use" : ""
+        );
+
+        // setDescription(
+        //     `${title}` === "Bug" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด" :
+        //         `${title}` === "CR" ? "แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ" :
+        //             `${title}` === "Memo" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
+        //                 `${title}` === "Use" ? "สอบถามข้อมูลทั่วไป / การใช้งานระบบ" : ""
+        // );
 
     }, [title]);
 
@@ -175,8 +189,8 @@ export default function IssueCreate() {
                     name="issue"
                     initialValues={{
                         // product: "REM",
-                        // module: "CRM",
-                        priority: "None"
+                        module: 2,
+                        priority: 4
                     }}
                     layout="vertical"
                     onFinish={onFinish}
@@ -197,7 +211,7 @@ export default function IssueCreate() {
                             overlay={
                                 <Menu mode="inline" theme="light" onMouseOver="" >
                                     <Menu.Item key="1" onClick={
-                                        () => { return (setTitle("bug"), history.push("/customer/servicedesk/issuecreate/1")) }}>
+                                        () => { return (setTitle("Bug"), history.push("/customer/servicedesk/issuecreate/1")) }}>
                                         <Card className="issue-active" hoverable>
                                             <Meta
                                                 avatar={
@@ -209,7 +223,7 @@ export default function IssueCreate() {
                                         </Card>
                                     </Menu.Item>
                                     <Menu.Item key="2" onClick={
-                                        () => { return (setTitle("changerequest"), history.push("/customer/servicedesk/issuecreate/2")) }}>
+                                        () => { return (setTitle("CR"), history.push("/customer/servicedesk/issuecreate/2")) }}>
                                         <Card className="issue-active" hoverable >
                                             <Meta
                                                 avatar={
@@ -221,7 +235,7 @@ export default function IssueCreate() {
                                         </Card>
                                     </Menu.Item>
                                     <Menu.Item key="3" onClick={
-                                        () => { return (setTitle("data"), history.push("/customer/servicedesk/issuecreate/3")) }}>
+                                        () => { return (setTitle("Memo"), history.push("/customer/servicedesk/issuecreate/3")) }}>
                                         <Card className="issue-active" hoverable>
                                             <Meta
                                                 avatar={
@@ -233,7 +247,7 @@ export default function IssueCreate() {
                                         </Card>
                                     </Menu.Item>
                                     <Menu.Item key="4" onClick={
-                                        () => { return (setTitle("use"), history.push("/customer/servicedesk/issuecreate/4")) }}>
+                                        () => { return (setTitle("Use"), history.push("/customer/servicedesk/issuecreate/4")) }}>
                                         <Card className="issue-active" hoverable style={{ width: "100%", marginTop: 16 }} >
                                             <Meta
                                                 avatar={
@@ -252,19 +266,14 @@ export default function IssueCreate() {
                             <Card className="card-box issue-active" hoverable>
                                 <Meta
                                     avatar={
-                                        `${title}` === "bug" ? <BugOutlined style={{ fontSize: 30 }} /> :
-                                            `${title}` === "changequest" ? <FileOutlined style={{ fontSize: 30 }} /> :
-                                                `${title}` === "data" ? <DatabaseOutlined style={{ fontSize: 30 }} /> :
+                                        `${title}` === "Bug" ? <BugOutlined style={{ fontSize: 30 }} /> :
+                                            `${title}` === "CR" ? <FileOutlined style={{ fontSize: 30 }} /> :
+                                                `${title}` === "Memo" ? <DatabaseOutlined style={{ fontSize: 30 }} /> :
                                                     <PhoneOutlined style={{ fontSize: 30 }} />
                                     }
                                     title={
                                         <label className="card-title-menu">
-                                            {
-                                                `${title}` === "bug" ? "Bug" :
-                                                    `${title}` === "changerequest" ? "Change Request" :
-                                                        `${title}` === "data" ? "Data" :
-                                                            `${title}` === "use" ? "Use" : ""
-                                            }
+                                            {title}
                                         </label>
                                     }
                                     description={description}
@@ -287,20 +296,27 @@ export default function IssueCreate() {
                         <Select
                             placeholder="Product"
                             onChange={(value) => customerdispatch({ type: "SELECT_PRODUCT", payload: value })}
-                            options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.Id, label: x.Name }))}
+                            options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
                         />
                     </Form.Item>
 
                     <Form.Item label="Module" name="module">
                         <Select
                             placeholder="Module"
-                            options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.id, label: x.name }))}>
+                            defaultValue="None"
+                            showSearch
+                            allowClear
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.Id, label: x.Name }))}>
 
                         </Select>
                     </Form.Item>
 
                     <Form.Item label="Priority" name="priority">
                         <Select
+                            defaultValue={4}
                             placeholder="Priority"
                             options={customerstate && customerstate.masterdata.priorityState.map(x => ({ value: x.Id, label: x.Name }))}>
 
@@ -312,7 +328,7 @@ export default function IssueCreate() {
                         name="subject"
                         rules={[
                             {
-                                // required: true,
+                                required: true,
                                 message: "กรุณาระบุ หัวข้อ!",
                             },
                         ]}

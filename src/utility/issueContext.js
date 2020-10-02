@@ -29,7 +29,11 @@ export const customerState = {
         datarow: [],
         details: []
     },
-    actionflow: []
+    actionflow: [],
+    node: {
+        input_id: 0,
+        output_id: 0
+    }
 }
 
 export const userState = {
@@ -59,7 +63,11 @@ export const userState = {
         datarow: [],
         details: []
     },
-    actionflow: []
+    actionflow: [],
+    node: {
+        input_id: 0,
+        output_id: 0
+    }
     
 }
 
@@ -73,6 +81,7 @@ export const customerReducer = createReducer(customerState, {
     SEARCH: (state, { payload }) => { state.search = payload },
     LOADING: (state, { payload }) => { state.loading = payload },
     SELECT_DATAROW: (state, {payload}) => {state.issuedata.datarow = payload},
+    SELECT_NODE_OUTPUT: (state, { payload }) => { state.node.output_id = payload },
 
     LOAD_ISSUE: (state, { payload }) => { state.issuedata.data = payload },
     LOAD_ISSUEDETAIL: (state, {payload}) => {state.issuedata.details = payload},
@@ -94,6 +103,7 @@ export const userReducer = createReducer(userState, {
     SEARCH: (state, { payload }) => { state.search = payload },
     LOADING: (state, { payload }) => { state.loading = payload },
     SELECT_DATAROW: (state, {payload}) => {state.issuedata.datarow = payload},
+    SELECT_NODE_OUTPUT: (state, { payload }) => { state.node.output_id = payload },
 
     LOAD_ISSUE: (state, { payload }) => { state.issuedata.data = payload },
     LOAD_ISSUEDETAIL: (state, {payload}) => {state.issuedata.details = payload},

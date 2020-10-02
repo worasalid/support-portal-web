@@ -1,41 +1,20 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Input, Select, Button } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-import IssueContext from '../../../utility/issueContext';
 
-
-export default function ModalSupport({ visible = false, onOk, onCancel, datarow, details, ...props }) {
-    const uploadRef = useRef(null);
-    const [formRef, setFormRef] = useState(null);
+export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const uploadRef_unittest = useRef(null);
+    const uploadRef_filedeploy = useRef(null);
+    const uploadRef_document = useRef(null);
+    const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
-    const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
-    // page.loaddata.IssueType = page.data.IssueTypeData.map(x => ({ name: x.name, value: x.id }))
-    // page.loaddata.Module = page.data.ModuleData.map(x => ({ name: x.text, value: x.value }))
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
-    }
-
-    const LoadModule = async () => {
-        try {
-            const module = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/modules",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    productId: details.productId
-                }
-            });
-            userdispatch({ type: "LOAD_MODULE", payload: module.data })
-        } catch (error) {
-
-        }
     }
 
     const SaveComment = async () => {
@@ -51,9 +30,11 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         ticketId: details && details.ticketId,
                         comment_text: textValue,
                         comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        //files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
+
+
             }
         } catch (error) {
 
@@ -73,6 +54,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     output_id: details && details.nodeoutput_id
                 }
             });
+
             if (sendflow.status === 200) {
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -82,9 +64,8 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("");
-                        onOk();
-                        formRef.resetFields();
+                        editorRef.current.editor.setContent("")
+                        onOk()
                     },
                 });
             }
@@ -93,85 +74,121 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         }
     }
 
+    const SaveUnitTest = async () => {
+        const unittest = await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketId: details && details.ticketId,
+                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+            }
+        })
+    }
+
+    const SaveFileDeploy = async () => {
+        const filedeploy = await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/save_filedeploy",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketId: details && details.ticketId,
+                files: uploadRef_filedeploy.current.getFiles().map((n) => n.response.id),
+            }
+        })
+    }
+
+    const SaveDeployDocument = async () => {
+        const document = await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/save_deploydocument",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketId: details && details.ticketId,
+                files: uploadRef_document.current.getFiles().map((n) => n.response.id),
+            }
+        })
+    }
+
     const onFinish = (values) => {
+        console.log('Success:', values);
+        SaveUnitTest();
+        SaveFileDeploy();
+        SaveDeployDocument();
         SaveComment();
         SendFlow();
+        onOk();
     };
-    useEffect(() => {
-        LoadModule();
-    }, [])
+
 
     return (
         <Modal
             visible={visible}
-            onOk={() => formRef.submit()}
-            okText="Save"
+            onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
-            onCancel={() => {
-                return (formRef.resetFields(), onCancel(), editorRef.current.editor.setContent(""))
-            }
-            }
+            okText= "Send"
+            okType="dashed"
+            onCancel={() => { return (form.resetFields(), onCancel()) }}
+
             {...props}
 
         >
-            <Form ref={setFormRef} style={{ padding: 0, maxWidth: 450, backgroundColor: "white" }}
+            <Form form={form} style={{ padding: 0, maxWidth: 450, backgroundColor: "white" }}
                 name="normal_login"
                 className="login-form"
+                initialValues={{
+                    remember: true,
+                }}
                 onFinish={onFinish}
             >
-                IssueType
+                Unit Test: <UploadFile ref={uploadRef_unittest}/>
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
-                    name="IssueType"
+                    name="unittest"
                     rules={[
                         {
-                            required: true,
-                            message: 'Please input your IssueType!',
+                            required: false,
+                            message: 'Please input your UnitTest!',
                         },
                     ]}
                 >
-                    <Select style={{ width: '100%' }} placeholder="None"
-                        showSearch
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        options={
-                            userstate.masterdata && userstate.masterdata.issueTypeState.map((item) => ({
-                                value: item.Id,
-                                label: item.Name
-                            }))
-                        }
-                    >
-                    </Select>
+
                 </Form.Item>
 
-                Module
+                File Deploy: <UploadFile ref={uploadRef_filedeploy}/>
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
-                    name="module"
+                    name="filedeploy"
                     rules={[
                         {
-                            required: true,
-                            message: 'Please Select module!',
+                            required: false,
+                            message: 'Please input your UnitTest!',
                         },
                     ]}
                 >
-                    <Select style={{ width: '100%' }} placeholder="None"
-                        showSearch
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        options={
-                            userstate.masterdata.moduleState && userstate.masterdata.moduleState.map((item) => ({
-                                value: item.Id,
-                                label: item.Name
-                            }))
-                        }
-                    >
-                    </Select>
+
+                </Form.Item>
+
+                Deploy Document: <UploadFile ref={uploadRef_document}/>
+                <Form.Item
+                    style={{ minWidth: 300, maxWidth: 300 }}
+                    name="document"
+                    rules={[
+                        {
+                            required: false,
+                            message: 'Please input your UnitTest!',
+                        },
+                    ]}
+                >
+
                 </Form.Item>
             </Form>
-             Remark :
             <Editor
                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                 ref={editorRef}
@@ -189,8 +206,6 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 }}
                 onEditorChange={handleEditorChange}
             />
-            <br />
-             AttachFile : <UploadFile ref={uploadRef} />
         </Modal>
-    );
+    )
 }

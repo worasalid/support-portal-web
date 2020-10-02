@@ -11,13 +11,16 @@ import { SearchOutlined, DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import { issueCusReducer, productReducer, moduleReducer, issueTypeReducer, keywordReducer, initState } from "../../../utility/reducer";
+import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 
 export default function InProgress() {
   const history = useHistory();
   const [visible, setVisible] = useState(false);
+  const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [loading, setLoadding] = useState(false);
 
   const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
+  const [ticketid, setTicketid] = useState(null);
 
   const { state, dispatch } = useContext(AuthenContext);
 
@@ -46,43 +49,6 @@ export default function InProgress() {
       loadProgressStatus: [],
     },
   };
-
-  const dataSource = [
-    {
-      key: "1",
-      CompanyID: "ICON",
-      IssueID: "ISSUE-00001",
-      Subject: "Subject : แจ้งปัญหา Link Error",
-      tags: ["InProgress"],
-      product: "REM",
-      module: "Finance",
-      issuetype: "Bug",
-      IssueBy: "Admin System",
-      IssueDate: "04/07/2020",
-      Detail: "รายละเอียดเพิ่มเติม",
-      AssignTo: "ICON",
-      ProgressStatus: "Waiting for Support",
-      DueDate: "31/08/2020",
-      OverDue: 0,
-    },
-    {
-      key: "2",
-      CompanyID: "ICON",
-      IssueID: "ISSUE-00002",
-      Subject: "Subject : Error บันทึกข้อมูลไม่ได้",
-      tags: ["InProgress"],
-      product: "REM",
-      module: "CRM",
-      issuetype: "Cr",
-      IssueBy: "Admin System",
-      IssueDate: "04/07/2020",
-      Detail: "รายละเอียดเพิ่มเติม",
-      AssignTo: "ICON",
-      ProgressStatus: "InProgress",
-      DueDate: "31/08/2020",
-      OverDue: 0,
-    },
-  ];
 
   const loadIssue = async (value) => {
     // setLoadding(true);
@@ -125,8 +91,6 @@ export default function InProgress() {
     customerdispatch({ type: "SEARCH", payload: false })
   }, [customerstate.search]);
 
-  console.log("searchdata", customerstate.search)
-  console.log("priorityState", customerstate.filter.priorityState)
   return (
     <IssueContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
       <MasterPage>
@@ -181,9 +145,9 @@ export default function InProgress() {
                         <label className="table-column-text">{record.Title}</label>
                       </div>
                       <div>
-                        <label 
-                        onClick ={() => history.push({pathname: "/Customer/Issue/Subject/" + record.Id})}
-                        className="table-column-detail">รายละเอียด</label>
+                        <label
+                          onClick={() => history.push({ pathname: "/Customer/Issue/Subject/" + record.Id })}
+                          className="table-column-detail">รายละเอียด</label>
                       </div>
 
                     </>
@@ -207,7 +171,33 @@ export default function InProgress() {
                 }
               />
 
-              <Column title="Due Date" dataIndex="" />
+              <Column title="Due Date"
+                align="center"
+                render={(record) => {
+                  return (
+                    <>
+                      <label className="table-column-text">
+                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                      </label>
+                      <br />
+                      {record.cntDueDate > 1 ?
+                        <Tag style={{ marginLeft: 16 }} color="warning"
+                          onClick={() => {
+                            return (
+                              setTicketid(record.Id),
+                              setHistoryduedate_visible(true))
+                          }
+                          }
+                        >
+                          DueDate ถูกเลื่อน
+                       </Tag> : ""
+                      }
+
+                    </>
+                  )
+                }
+                }
+              />
               <Column
                 title="ProgressStatus"
                 width="10%"
@@ -262,7 +252,18 @@ export default function InProgress() {
             </Table>
           </Col>
         </Row>
-        <ModalSendIssue
+
+        <DuedateLog
+          title="ประวัติ DueDate"
+          visible={historyduedate_visible}
+          onCancel={() => setHistoryduedate_visible(false)}
+          details={{
+            ticketId: ticketid
+          }}
+        >
+        </DuedateLog>
+
+        {/* <ModalSendIssue
           title={ProgressStatus}
           visible={visible}
           onCancel={() => setVisible(false)}
@@ -270,7 +271,7 @@ export default function InProgress() {
             setVisible(false);
             loadIssue();
           }}
-        />
+        /> */}
         {/* </Spin> */}
       </MasterPage>
     </IssueContext.Provider>

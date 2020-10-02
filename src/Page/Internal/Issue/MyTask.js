@@ -1,9 +1,10 @@
 import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
-
+import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
 import { useHistory } from "react-router-dom";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
+import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
@@ -11,39 +12,28 @@ import { DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
+import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
+import ModalQA from "../../../Component/Dialog/Internal/modalQA";
+import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 
 export default function Mytask() {
   const history = useHistory();
-  const [visible, setVisible] = useState(false);
   const [loading, setLoadding] = useState(false);
 
+  //modal
+  const [visible, setVisible] = useState(false);
+  const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
+  const [modalQA_visible, setModalQA_visible] = useState(false);
+  const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
+  const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+
+  // data
   const [userstate, userdispatch] = useReducer(userReducer, userState);
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [recHover, setRecHover] = useState(-1);
 
-
-  let page = {
-    data: {
-      ProgressStatusData: [
-        {
-          text: "InProgress",
-          value: "InProgress",
-        },
-        {
-          text: "Cancel",
-          value: "Complete",
-        },
-        {
-          text: "Complete",
-          value: "Complete",
-        },
-      ],
-    },
-    loaddata: {
-      loadProgressStatus: [],
-    },
-  };
 
   const loadIssue = async (value) => {
     // setLoadding(true);
@@ -59,22 +49,58 @@ export default function Mytask() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
-          startdate: userstate.filter.date.startdate,
-          enddate: userstate.filter.date.enddate,
+          startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate,"DD/MM/YYYY").format("YYYY-MM-DD"),
+          enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate,"DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
           task: "mytask"
         }
       });
 
       if (results.status === 200) {
-      
-        masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
+
+        // masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
         userdispatch({ type: "LOAD_ISSUE", payload: results.data })
       }
     } catch (error) {
 
     }
   };
+
+  const getflow_output = async (value) => {
+    const flow_output = await Axios({
+      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        trans_id: value
+      }
+    });
+    userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+  }
+
+  const UpdateStatusMailbox = async (value) => {
+    const mailbox = await Axios({
+      url: process.env.REACT_APP_API_URL + "/tickets/read",
+      method: "PATCH",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        mailbox_id: value
+      }
+    });
+  }
+
+
+  function HandleChange(items) {
+    console.log("Menu", items.item.props.node)
+    if (items.item.props.node === "support") { setVisible(true) }
+    if (items.item.props.node === "developer_1") { setModaldeveloper_visible(true) }
+    if (items.item.props.node === "qa" || items.item.props.node === "developer_2") { setModalQA_visible(true) }
+
+  }
 
   useEffect(() => {
     userdispatch({ type: "LOADING", payload: true })
@@ -83,9 +109,8 @@ export default function Mytask() {
       userdispatch({ type: "LOADING", payload: false })
     }, 1000)
 
-
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search]);
+  }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -99,8 +124,24 @@ export default function Mytask() {
         <Row>
           <Col span={24}>
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
-            // scroll={{y:350}}
+              // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
+              onRow={(record, rowIndex) => {
+                // console.log(record, rowIndex)
+                return {
+                  onClick: event => { }, // click row
+                  onDoubleClick: event => { }, // double click row
+                  onContextMenu: event => { }, // right button click row
+                  onMouseEnter: event => { setRecHover(rowIndex) }, // mouse enter row
+                  onMouseLeave: event => { setRecHover(-1) }, // mouse leave row
+                };
+              }}
+              rowClassName={(record, index) => {
+                return (
+                  (index === recHover ? "table-hover" : "")
+                )
+              }
+              }
             >
 
               <Column
@@ -109,7 +150,10 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <div>
-                      <label className="table-column-text">{record.Number}</label>
+                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        {record.Number}
+                      </label>
+
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
                         {
                           record.IssueType === 'ChangeRequest' ?
@@ -131,11 +175,19 @@ export default function Mytask() {
                   return (
                     <>
                       <div>
-                        <label className="table-column-text">{record.Title}</label>
+                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                          {record.Title}
+                        </label>
                       </div>
                       <div>
                         <label
-                          onClick={() => history.push({ pathname: "/internal/issue/subject/" + record.Id })}
+                          onClick={() => {
+                            return (
+                              history.push({ pathname: "/internal/issue/subject/" + record.Id }),
+                              (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+                             )
+                            }
+                          }
                           className="table-column-detail">
                           รายละเอียด
                           </label>
@@ -154,13 +206,13 @@ export default function Mytask() {
                     <>
 
                       <div>
-                        <label className="table-column-text">
+                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
                           {record.CreateBy}
                         </label>
                       </div>
 
                       <div>
-                        <label className="table-column-text">
+                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
                           {new Date(record.CreateDate).toLocaleDateString('en-GB')}
                         </label>
                       </div>
@@ -173,7 +225,32 @@ export default function Mytask() {
                 }
               />
 
-              <Column title="Due Date" dataIndex="" />
+              <Column title="Due Date"
+                align="center"
+                render={(record) => {
+                  return (
+                    <>
+                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                      </label>
+                      <br />
+                      {record.cntDueDate > 1 ?
+                        <Tag style={{ marginLeft: 16 }} color="warning"
+                          onClick={() => {
+                            userdispatch({ type: "SELECT_DATAROW", payload: record })
+                            setHistoryduedate_visible(true)
+                          }
+                          }
+                        >
+                          DueDate ถูกเลื่อน
+                       </Tag> : ""
+                      }
+
+                    </>
+                  )
+                }
+                }
+              />
               <Column
                 title="ProgressStatus"
                 width="10%"
@@ -190,21 +267,26 @@ export default function Mytask() {
                         <Menu
                           onSelect={(x) => console.log(x.selectedKeys)}
                           onClick={(x) => {
-                            setVisible(true);
-                            setProgressStatus(x.key);
+                            HandleChange(x)
+                            setProgressStatus(x.item.props.children[1]);
+                            userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
+                            userdispatch({ type: "SELECT_DATAROW", payload: record })
                           }}
                         >
-                          {page.data.ProgressStatusData.filter(
+                          {userstate.actionflow.filter(
                             (x) => x.text !== record.GroupStatus
                           ).map((x) => (
-                            <Menu.Item key={x.text}>{x.text}</Menu.Item>
+                            <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
                           ))}
                         </Menu>
                       }
                       trigger="click"
                     >
-                      {/* <Button type="link">{record.ProgressStatus}</Button> */}
-                      <a href="/#">{record.GroupStatus}</a>
+                      <Button type="link"
+                        onClick={() => {
+                          getflow_output(record.TransId)
+                        }}
+                      >{record.GroupStatus}</Button>
                     </Dropdown>
                   );
                 }}
@@ -216,9 +298,16 @@ export default function Mytask() {
                   return (
                     <>
                       <Button type="link"
-                        onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                        // onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                        onClick={() => {
+                          return (
+                            userdispatch({ type: "SELECT_DATAROW", payload: record }),
+                            setModalfiledownload_visible(true)
+                          )
+                        }
+                        }
                       >
-                        {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                        {record.cntFile === 0 ? "" : <DownloadOutlined  style={{ fontSize: 30, color: "#007bff" }} />}
                       </Button>
                     </>
                   )
@@ -228,15 +317,84 @@ export default function Mytask() {
             </Table>
           </Col>
         </Row>
+
+        {/* Modal */}
+        <DuedateLog
+          title="ประวัติ DueDate"
+          visible={historyduedate_visible}
+          onCancel={() => setHistoryduedate_visible(false)}
+          details={{
+            ticketId: userstate.issuedata.datarow.Id
+          }}
+        >
+        </DuedateLog>
+
         <ModalSupport
           title={ProgressStatus}
           visible={visible}
           onCancel={() => setVisible(false)}
+          width={800}
           onOk={() => {
             setVisible(false);
             loadIssue();
           }}
+          details={{
+            ticketId: userstate.issuedata.datarow.Id,
+            mailboxId: userstate.issuedata.datarow.MailBoxId,
+            productId: userstate.issuedata.datarow.ProductId,
+            nodeoutput_id: userstate.node.output_id
+          }}
         />
+
+        <ModalDeveloper
+          title={ProgressStatus}
+          visible={modaldeveloper_visible}
+          onCancel={() => setModaldeveloper_visible(false)}
+          width={800}
+          onOk={() => {
+            setModaldeveloper_visible(false);
+            loadIssue();
+          }}
+          details={{
+            ticketId: userstate.issuedata.datarow.Id,
+            mailboxId: userstate.issuedata.datarow.MailBoxId,
+            nodeoutput_id: userstate.node.output_id
+          }}
+        />
+
+        <ModalQA
+          title={ProgressStatus}
+          visible={modalQA_visible}
+          onCancel={() => { return (setModalQA_visible(false)) }}
+          width={800}
+          onOk={() => {
+            setModalQA_visible(false);
+
+          }}
+          details={{
+            ticketId: userstate.issuedata.datarow.Id,
+            mailboxId: userstate.issuedata.datarow.MailBoxId,
+            nodeoutput_id: userstate.node.output_id
+          }}
+        />
+
+        <ModalFileDownload
+          title="File Download"
+          visible={modalfiledownload_visible}
+          onCancel={() => { return (setModalfiledownload_visible(false)) }}
+          width={600}
+          onOk={() => {
+            setModalfiledownload_visible(false);
+
+          }}
+          details={{
+            refId: userstate.issuedata.datarow.Id,
+            reftype: "Master_Ticket",
+            grouptype: "attachment"
+          }}
+
+        />
+
         {/* </Spin> */}
       </MasterPage>
     </IssueContext.Provider>

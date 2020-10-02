@@ -8,6 +8,11 @@ label.value-text {
     font-size: 12px !important;
 }
 
+label.table-column-text-unread {
+    font-size: 14px !important;
+    font-weight: bold;
+}
+
 label.table-column-text {
     font-size: 14px !important;
 }
@@ -17,6 +22,7 @@ label.text-hover:hover {
     text-decoration-color: #1890ff;
     cursor: pointer;
 }
+
 label.text-link-hover:hover {
     text-decoration: underline;
     text-decoration-color: #1890ff;
@@ -34,29 +40,31 @@ label.card-title-menu {
     font-size: 14px;
     color: rgb(0, 116, 224);
 }
-label.user-login{
+
+label.user-login {
     font-size: 14px;
     color: #fff;
     margin-right: 16px;
 }
 
-label.text-hover-blue:hover{
+label.text-hover-blue:hover {
     text-decoration: underline;
     text-decoration-color: #1890ff;
     cursor: pointer;
-} 
-
-label.table-column-detail{
-    color: orange;
-    text-decoration-color:orange !important;
-    font-size: 12px !important;
-    cursor: pointer;
 }
 
-label.table-column-detail:hover{
-  
+label.table-column-detail {
+    color: orange;
+    text-decoration-color: orange !important;
+    font-size: 12px !important;
+    cursor: pointer;
+
+}
+
+label.table-column-detail:hover {
+
     text-decoration: underline;
-    text-decoration-color:orange;
+    text-decoration-color: orange;
     font-size: 12px !important;
     cursor: pointer;
 }
@@ -70,28 +78,41 @@ div.issue-detail-box {
     padding: 16px;
 
 }
-div.sd-page-header{
+
+div.sd-page-header {
     margin-top: 10px;
     margin-bottom: 30px;
 }
-div.sd-page-topic{
+
+div.sd-page-topic {
     margin-top: 10px;
     margin-bottom: 20px;
 }
 
 /// Card
-.card-box{
+.card-box {
     width: 100%;
     // margin-top: 16px;
     min-height: 50px;
 }
+
 .issue-card-box {
     width: 100%;
     margin-top: 16px;
     min-height: 200px;
 }
+
 .issue-active:hover {
-    border:1px solid;
+    border: 1px solid;
     color: #1890ff;
 }
 
+// table
+.table-hover,
+.table-hover > td  {
+     background-color:#c2dbff !important;
+}
+
+.table-unread {
+    font-weight: bold;
+}

@@ -40,8 +40,7 @@ export default function CommentBox() {
                         author: values.CreateName,
                         datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
                         content: values.Text,
-                        fileId: values.FileId,
-                        filename: values.FileName
+                        cntfile: values.cntFile
                     }
                 })
                 );
@@ -128,7 +127,7 @@ export default function CommentBox() {
                             <>
                                 <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
                                 <Divider style={{ margin:0, marginBottom:10}}/>
-                                {item.filename === null ? "" :
+                                {item.cntfile === 0 ? "" :
                                     <div>
                                         <Row>
                                             <Col span={24}>

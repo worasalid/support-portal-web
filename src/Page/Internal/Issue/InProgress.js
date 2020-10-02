@@ -11,10 +11,12 @@ import { DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
+import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 
 export default function InProgress() {
   const history = useHistory();
   const [visible, setVisible] = useState(false);
+  // const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [loading, setLoadding] = useState(false);
 
   const [userstate, userdispatch] = useReducer(userReducer, userState);
@@ -67,7 +69,7 @@ export default function InProgress() {
       });
 
       if (results.status === 200) {
-      
+
         masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
         userdispatch({ type: "LOAD_ISSUE", payload: results.data })
       }
@@ -99,7 +101,7 @@ export default function InProgress() {
         <Row>
           <Col span={24}>
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
-            // scroll={{y:350}}
+              // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
             >
 
@@ -173,7 +175,28 @@ export default function InProgress() {
                 }
               />
 
-              <Column title="Due Date" dataIndex="" />
+              <Column title="Due Date"
+                align="center"
+                render={(record) => {
+                  return (
+                    <>
+                      <label className="table-column-text">
+                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                      </label>
+                      <br />
+                      {record.cntDueDate > 1 ?
+                        <Tag style={{ marginLeft: 16 }} color="warning"
+                        onClick={() => alert()}
+                        >
+                          DueDate ถูกเลื่อน
+                       </Tag> : ""
+                      }
+
+                    </>
+                  )
+                }
+                }
+              />
               <Column
                 title="ProgressStatus"
                 width="10%"
@@ -228,6 +251,9 @@ export default function InProgress() {
             </Table>
           </Col>
         </Row>
+
+       
+
         <ModalSupport
           title={ProgressStatus}
           visible={visible}

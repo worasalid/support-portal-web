@@ -15,7 +15,7 @@ export default function Issuesearch() {
     const handleChange = (e) => {
         if (e.target.group === "company") {
             userdispatch({ type: "SELECT_COMPANY", payload: e.target.value })
-            
+
         }
         if (e.target.group === "issuetype") {
             userdispatch({ type: "SELECT_TYPE", payload: e.target.value })
@@ -112,22 +112,25 @@ export default function Issuesearch() {
                 </Col>
                 <Col span={4} >
                     <Select placeholder="Company" mode="multiple" allowClear
-                    // filterOption={(input, option) =>
-                    //    console.log(input)
-                    //   }
-                    style={{ width: "100%" }}
-                    // onKeyUp={(e) => {console.log(e.target)}}
-                     onChange={(value,option) => handleChange({ target: { value: value || "", group: "company" } })}
-                     options={userstate.masterdata && userstate.masterdata.companyState.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        style={{ width: "100%" }}
+                        // onKeyUp={(e) => {console.log(e.target)}}
+                        onChange={(value, option) => handleChange({ target: { value: value || "", group: "company" } })}
+                        options={userstate.masterdata && userstate.masterdata.companyState.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
                     >
 
                     </Select>
                 </Col>
                 <Col span={4}>
                     <Select placeholder="IssueType" mode="multiple" allowClear
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", group: "issuetype" } })}
-                        options={userstate.masterdata && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name}))}
+                        options={userstate.masterdata && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
                     >
 
                     </Select>
@@ -136,8 +139,12 @@ export default function Issuesearch() {
 
                     <Select placeholder="Product" style={{ width: "100%" }}
                         allowClear
+                        mode="multiple"
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
-                        options={userstate.masterdata && userstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})`}))}
+                        options={userstate.masterdata && userstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
                         dropdownRender={(value) => (
                             <div >
                                 <Row>
@@ -154,14 +161,19 @@ export default function Issuesearch() {
                     />
                 </Col>
                 <Col span={4}>
-                    <Select placeholder="Module" style={{ width: "100%" }}
+                    <Select placeholder="Module"
+                        mode="multiple"
+                        style={{ width: "100%" }}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                         allowClear
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'module' } })}
-                        options={userstate.masterdata && userstate.masterdata.moduleState.map((x) => ({ value: x.id, label: x.name }))}
+                        options={userstate.masterdata && userstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
                         onClear={() => alert()}
                     />
                 </Col>
-               
+
                 <Col span={2}>
                     <Button type="primary" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
                         onClick={() => userdispatch({ type: "SEARCH", payload: true })}
