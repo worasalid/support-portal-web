@@ -92,7 +92,6 @@ export default function Subject() {
       if (ticket_detail.status === 200) {
         userdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
         getflow_output(ticket_detail.data[0].TransId)
-
       }
     } catch (error) {
 
@@ -133,29 +132,48 @@ export default function Subject() {
 
       }
     });
+    if (issuetype.status === 200) {
+
+      Modal.info({
+        title: 'บันทึกข้อมูลเรียบร้อย',
+        content: (
+          <div>
+            <p></p>
+          </div>
+        ),
+        onOk() {
+          getdetail();
+        },
+      });
+    }
+
   }
 
   function HandleChange(value, item) {
-    if (item.node === "support") { setVisible(true) }
+    setProgressStatus(item.label);
+    userdispatch({ type: "SELECT_NODE_OUTPUT", payload: value })
+    if (item.node === "support") { return (setVisible(true)) }
     if (item.node === "developer_1") { setModaldeveloper_visible(true) }
     if (item.node === "developer_2") { setModalleaderqc_visible(true) }
     if (item.node === "qa") { setModalQA_visible(true) }
 
-    setProgressStatus(item.label);
-    userdispatch({ type: "SELECT_NODE_OUTPUT", payload: value })
+    
+    
 
   }
 
   useEffect(() => {
     getdetail();
-  }, [visible])
-
-  useEffect(() => {
     getIssueType();
-    getdetail();
-    getDueDateHistory();
+  }, [])
 
-  }, [modalduedate_visible, historyduedate_visible])
+
+  // useEffect(() => {
+  //   getdetail();
+  //   getDueDateHistory();
+
+  // }, [modalduedate_visible, historyduedate_visible])
+
 
   return (
     <MasterPage>
@@ -279,13 +297,13 @@ export default function Subject() {
                     style={{ width: '100%' }}
                     allowClear
                     showSearch
-                    defaultValue={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalIssueType}
+                    // defaultValue={2}
                     filterOption={(input, option) =>
                       option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                     }
                     options={userstate.masterdata.issueTypeState && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
                     onChange={(value) => SaveIssueType(value)}
-
+                    value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId}
                   />
 
                   {/* <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalIssueType}</label> */}
@@ -376,6 +394,7 @@ export default function Subject() {
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
           productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
           nodeoutput_id: userstate.node.output_id
         }}
       />

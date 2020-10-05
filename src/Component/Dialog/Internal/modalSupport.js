@@ -60,7 +60,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         }
     }
 
-    const SendFlow = async () => {
+    const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -70,7 +70,10 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 },
                 data: {
                     mailbox_id: details && details.mailboxId,
-                    output_id: details && details.nodeoutput_id
+                    output_id: details && details.nodeoutput_id,
+                    product_id: details && details.productId,
+                    issuetype: values.issuetype,
+                    module_id: values.module
                 }
             });
             if (sendflow.status === 200) {
@@ -95,12 +98,20 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
 
     const onFinish = (values) => {
         SaveComment();
-        SendFlow();
+        SendFlow(values);
+        console.log("onFinish",values)
     };
     useEffect(() => {
         LoadModule();
-    }, [])
+    }, [visible])
 
+    useEffect(() => {
+        if (formRef && visible) {
+            formRef.setFieldsValue({ issuetype: details.internaltype })
+        }
+    }, [details.internaltype, visible, formRef])
+
+    console.log("detail",details)
     return (
         <Modal
             visible={visible}
@@ -117,18 +128,22 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
             <Form ref={setFormRef} style={{ padding: 0, maxWidth: 450, backgroundColor: "white" }}
                 name="normal_login"
                 className="login-form"
+                // initialValues={{
+                //     issuetype: details.internaltype
+                // }}
                 onFinish={onFinish}
             >
                 IssueType
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
-                    name="IssueType"
+                    name="issuetype"
                     rules={[
                         {
                             required: true,
                             message: 'Please input your IssueType!',
                         },
                     ]}
+
                 >
                     <Select style={{ width: '100%' }} placeholder="None"
                         showSearch

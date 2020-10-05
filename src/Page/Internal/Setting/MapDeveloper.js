@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import MasterPage from '../MasterPage'
 import Axios from 'axios';
-import { Button, Table, Modal, Tabs } from 'antd';
+import { Button, Table, Modal, Tabs, message } from 'antd';
 import MapCompany from './MapCompany';
 
 const { Column } = Table;
@@ -11,6 +11,7 @@ export default function MapDeveloper() {
 
     const [visible, setVisible] = useState(false);
     const [product_visible, setProduct_visible] = useState(false);
+    const [module_visible, setModule_visible] = useState(false);
     const [expandedRow, setExpandedRow] = useState(false);
 
 
@@ -19,13 +20,16 @@ export default function MapDeveloper() {
     const [username, setUsername] = useState(null);
     const [developerlist, setDeveloperlist] = useState([]);
     const [productlist, setProductlist] = useState([]);
-    const [devproduct, setDevproduct] = useState([]);
+    const [modulelist, setModulelist] = useState([]);
+    const [productid, setProductid] = useState(null);
     const [devmodule, setDevmodule] = useState([]);
+
     const [selectproduct, setSelectproduct] = useState([]);
+    const [selectmodule, setSelectmodule] = useState([]);
 
     const GetProduct = async () => {
         const products = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/developer_product",
+            url: process.env.REACT_APP_API_URL + "/master/developer-product",
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -37,15 +41,20 @@ export default function MapDeveloper() {
         setProductlist(products.data)
     }
 
-    const getmodule = async () => {
+    const GetModule = async () => {
         try {
             const module = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/modules",
+                url: process.env.REACT_APP_API_URL + "/master/developer-module",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    userId: userid,
+                    productId: productid
                 }
             });
+            setModulelist(module.data)
 
         } catch (error) {
 
@@ -75,7 +84,7 @@ export default function MapDeveloper() {
     const GetDeveloperModule = async (productId) => {
         try {
             const developermodule = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/developer_module",
+                url: process.env.REACT_APP_API_URL + "/master/developer-module-list",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -99,10 +108,18 @@ export default function MapDeveloper() {
         },
     };
 
+    const rowModuleSelection = {
+        onChange: (selectedRowKeys, selectedRows) => {
+            setSelectmodule(selectedRowKeys);
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+
+        },
+    };
+
     const MappingProduct = async () => {
         try {
             const product = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/mapping_developer_product",
+                url: process.env.REACT_APP_API_URL + "/master/mapping-developer-product",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -112,10 +129,73 @@ export default function MapDeveloper() {
                     productId: selectproduct
                 }
             });
+
+            if (product.status === 200) {
+                GetDeveloperModule();
+                setProduct_visible(false);
+                Success();
+
+            }
         } catch (error) {
 
         }
     }
+
+    const MappingModule = async () => {
+        try {
+            const product = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/mapping-developer-module",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    userId: userid,
+                    productId: productid,
+                    moduleId: selectmodule
+                }
+            });
+
+            if (product.status === 200) {
+                GetDeveloperModule();
+                setModule_visible(false);
+                Success();
+
+            }
+        } catch (error) {
+
+        }
+    }
+
+    const DeleteModule = async (moduleId,productId) => {
+        const result = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/delete-developer-module",
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                userId: userid,
+                productId: productId,
+                moduleId: moduleId
+            }
+        });
+
+        if(result.status === 200){
+            Success();
+            GetDeveloperModule();
+        }
+    }
+
+    const Success = () => {
+        message.success({
+            content: 'บันทึกข้อมูลสำเร็จ',
+            className: 'custom-class',
+            style: {
+                marginTop: '5vh',
+            },
+        });
+    };
 
     useEffect(() => {
         GetDeveloper();
@@ -124,6 +204,7 @@ export default function MapDeveloper() {
     useEffect(() => {
         GetDeveloperModule()
         GetProduct();
+
     }, [userid])
 
 
@@ -156,7 +237,7 @@ export default function MapDeveloper() {
                                         }
                                         }
                                     >
-                                        <label>Delete</label>
+                                        <label>View</label>
                                     </Button>
                                 </>
                             )
@@ -180,23 +261,54 @@ export default function MapDeveloper() {
             >
                 <Button type="primary"
                     onClick={() => setProduct_visible(true)}
-                >Add Prduct</Button>
+                >Add Product</Button>
                 <Table dataSource={devmodule}
 
                     expandable={{
                         expandedRowRender: record => {
 
                             return (
-                                <Table dataSource={record.modules}>
-                                    <Column title="Module" dataIndex="ModuleName" key="ModuleId"></Column>
-                                </Table>
+                                <>
+                                    <Button type="primary"
+                                        onClick={() => { return (setModule_visible(true), GetModule()) }}
+                                    >Add Module</Button>
+                                    <Table dataSource={record.modules} size="small">
+                                        <Column title="" width="10%"></Column>
+                                        <Column title="No"
+                                            width="10%"
+                                            render={(value, record, index) => {
+                                                console.log(record)
+                                                return (
+                                                    <p>{index + 1}</p>
+
+                                                )
+                                            }}
+                                        >
+
+                                        </Column>
+                                        <Column title="Module" dataIndex="ModuleName" key="ModuleId"></Column>
+                                        <Column title=""
+                                            width="10%"
+                                            render={(value, record, index) => {
+                                                return (
+                                                   <Button type="link" 
+                                                   onClick= {() => DeleteModule(record.ModuleId,record.ProductId) }
+                                                   >Delete</Button>
+                                                //    console.log("delete",userid,record.ModuleId,record.ProductId)
+                                                )
+                                            }}
+                                        ></Column>
+                                    </Table>
+                                </>
                             )
                         }
 
                     }}
                     onExpand={(visible, record) => {
                         return (
-                            GetDeveloperModule(record.ProductId)
+                            GetDeveloperModule(record.ProductId),
+                            console.log("ProductId", record.ProductId),
+                            setProductid(record.ProductId)
 
                         )
                     }}
@@ -222,9 +334,9 @@ export default function MapDeveloper() {
                 title="Product"
                 visible={product_visible}
                 width={800}
-                onOk={() => { return (MappingProduct(), setProduct_visible(false)) }}
+                onOk={() => { return (MappingProduct()) }}
                 okText="Add"
-                onCancel={() => { return (setProduct_visible(false), console.log("userid", userid)) }}
+                onCancel={() => { return (setProduct_visible(false)) }}
             >
                 <Table dataSource={productlist}
                     rowSelection={{
@@ -234,6 +346,26 @@ export default function MapDeveloper() {
                 >
                     <Column title="ProductName" dataIndex="Name" key="key"></Column>
                     <Column title="ProductFullName" dataIndex="FullName" key="key"></Column>
+                </Table>
+            </Modal>
+
+
+            {/* Modal Add Module */}
+            <Modal
+                title="Module"
+                visible={module_visible}
+                width={800}
+                onOk={() => { return (MappingModule()) }}
+                okText="Add"
+                onCancel={() => { return (setModule_visible(false)) }}
+            >
+                <Table dataSource={modulelist} size="small"
+                    rowSelection={{
+                        type: "checkbox",
+                        ...rowModuleSelection,
+                    }}
+                >
+                    <Column title="ModuleName" dataIndex="Name" key="key"></Column>
                 </Table>
             </Modal>
         </MasterPage>
