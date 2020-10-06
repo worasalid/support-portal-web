@@ -16,6 +16,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import ModalDocument from "../../../Component/Dialog/Internal/modalDocument";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalLeaderQC from "../../../Component/Dialog/Internal/modalLeaderQC";
+import ModalLeaderAssign from "../../../Component/Dialog/Internal/modalLeaderAssign";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -31,6 +32,7 @@ export default function Subject() {
   const [visible, setVisible] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
+  const [modalleaderassign_visible, setModalleaderassign_visible] = useState(false);
   const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
   const [modalleaderqc_visible, setModalleaderqc_visible] = useState(false);
   const [modalQA_visible, setModalQA_visible] = useState(false);
@@ -153,12 +155,13 @@ export default function Subject() {
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: value })
     if (item.node === "support") { return (setVisible(true)) }
-    if (item.node === "developer_1") { setModaldeveloper_visible(true) }
-    if (item.node === "developer_2") { setModalleaderqc_visible(true) }
+    if (item.node === "developer_2" && item.nodevalue === "LeaderAssign") { setModalleaderassign_visible(true) }
+    if (item.node === "developer_1") { setModaldeveloper_visible(true) } 
+    if (item.node === "developer_2" && item.nodevalue === "LeaderQC") { setModalleaderqc_visible(true) }
     if (item.node === "qa") { setModalQA_visible(true) }
 
-    
-    
+
+
 
   }
 
@@ -268,7 +271,7 @@ export default function Subject() {
                     style={{ width: '100%' }} placeholder="None"
                     // onChange={(value, item) => HandleChange({target: {value: value, item: item}})}
                     onChange={(value, item) => HandleChange(value, item)}
-                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, node: x.NodeName }))}
+                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, node: x.NodeName, nodevalue: x.value }))}
 
 
                   />
@@ -321,7 +324,7 @@ export default function Subject() {
                 <Col span={18}>
                   <label className="header-text">Module</label>
                   <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Module}</label>
+                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
@@ -399,6 +402,24 @@ export default function Subject() {
         }}
       />
 
+      <ModalLeaderAssign
+        title={ProgressStatus}
+        visible={modalleaderassign_visible}
+        onCancel={() => { return (setModalleaderassign_visible(false), setSelected(null)) }}
+        width={800}
+        onOk={() => {
+          setModalleaderassign_visible(false);
+          setSelected(null);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
+          nodeoutput_id: userstate.node.output_id
+        }}
+      />
+
       <ModalDeveloper
         title={ProgressStatus}
         visible={modaldeveloper_visible}
@@ -407,6 +428,22 @@ export default function Subject() {
         onOk={() => {
           setModaldeveloper_visible(false);
           setSelected(null);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          nodeoutput_id: userstate.node.output_id
+        }}
+      />
+
+      <ModalLeaderQC
+        title={ProgressStatus}
+        visible={modalleaderqc_visible}
+        onCancel={() => { return (setModalleaderqc_visible(false), setSelected(null)) }}
+        width={800}
+        onOk={() => {
+          setModalleaderqc_visible(false);
+
         }}
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
@@ -441,21 +478,7 @@ export default function Subject() {
         }}
       />
 
-      <ModalLeaderQC
-        title={ProgressStatus}
-        visible={modalleaderqc_visible}
-        onCancel={() => { return (setModalleaderqc_visible(false), setSelected(null)) }}
-        width={800}
-        onOk={() => {
-          setModalleaderqc_visible(false);
 
-        }}
-        details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          nodeoutput_id: userstate.node.output_id
-        }}
-      />
 
       <ModalDocument
         title="Document"

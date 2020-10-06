@@ -254,15 +254,7 @@ export default function InProgress() {
 
        
 
-        <ModalSupport
-          title={ProgressStatus}
-          visible={visible}
-          onCancel={() => setVisible(false)}
-          onOk={() => {
-            setVisible(false);
-            loadIssue();
-          }}
-        />
+      
         {/* </Spin> */}
       </MasterPage>
     </IssueContext.Provider>

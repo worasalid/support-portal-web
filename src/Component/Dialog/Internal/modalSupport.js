@@ -111,7 +111,6 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         }
     }, [details.internaltype, visible, formRef])
 
-    console.log("detail",details)
     return (
         <Modal
             visible={visible}
