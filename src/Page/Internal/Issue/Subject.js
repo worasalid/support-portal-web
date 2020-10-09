@@ -17,6 +17,7 @@ import ModalDocument from "../../../Component/Dialog/Internal/modalDocument";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalLeaderQC from "../../../Component/Dialog/Internal/modalLeaderQC";
 import ModalLeaderAssign from "../../../Component/Dialog/Internal/modalLeaderAssign";
+import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -36,6 +37,7 @@ export default function Subject() {
   const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
   const [modalleaderqc_visible, setModalleaderqc_visible] = useState(false);
   const [modalQA_visible, setModalQA_visible] = useState(false);
+  const [modalresolved_visible, setModalresolved_visible] = useState(false);
   const [unittestlog_visible, setUnittestlog_visible] = useState(false);
 
   //div
@@ -93,14 +95,14 @@ export default function Subject() {
 
       if (ticket_detail.status === 200) {
         userdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
-        getflow_output(ticket_detail.data[0].TransId)
+        // getflow_output(ticket_detail.data[0].TransId)
       }
     } catch (error) {
 
     }
   }
 
-  const getDueDateHistory = async () => {
+  const GetDueDateHistory = async () => {
     try {
       const history = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/log_duedate",
@@ -152,31 +154,39 @@ export default function Subject() {
   }
 
   function HandleChange(value, item) {
+
     setProgressStatus(item.label);
-    userdispatch({ type: "SELECT_NODE_OUTPUT", payload: value })
-    if (item.node === "support") { return (setVisible(true)) }
-    if (item.node === "developer_2" && item.nodevalue === "LeaderAssign") { setModalleaderassign_visible(true) }
-    if (item.node === "developer_1") { setModaldeveloper_visible(true) } 
-    if (item.node === "developer_2" && item.nodevalue === "LeaderQC") { setModalleaderqc_visible(true) }
-    if (item.node === "qa") { setModalQA_visible(true) }
-
-
-
+    // userdispatch({ type: "SELECT_NODE_OUTPUT", payload: value })
+    userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
+    if (item.data.NodeName === "support" && item.data.value === "SendIssue") { return (setVisible(true)) }
+    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+    if (item.data.NodeName === "developer_1") { setModaldeveloper_visible(true) }
+    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
+    if (item.data.NodeName === "qa") { setModalQA_visible(true) }
+    if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
 
   }
 
   useEffect(() => {
     getdetail();
-    getIssueType();
+    // getIssueType();
+
   }, [])
+
+  useEffect(() => {
+    if(historyduedate_visible){
+      GetDueDateHistory();
+
+    }
+  
+  }, [historyduedate_visible])
+
 
 
   // useEffect(() => {
-  //   getdetail();
   //   getDueDateHistory();
 
   // }, [modalduedate_visible, historyduedate_visible])
-
 
   return (
     <MasterPage>
@@ -243,17 +253,46 @@ export default function Subject() {
                 <Row style={{ marginTop: 36, marginRight: 24 }}>
                   <Col span={24}>
                     <label className="header-text">Activity</label>
-                    <Tabs defaultActiveKey="1">
+
+                    {
+                      userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
+                        ?
+                        <Tabs defaultActiveKey="2" >
+                          <TabPane tab="Comment" key="1">
+                            <CommentBox />
+                          </TabPane>
+                          <TabPane tab="Internal Note" key="2" >
+                            <InternalComment />
+                          </TabPane>
+                          <TabPane tab="History Log" key="3">
+                            <Historylog />
+                          </TabPane>
+                        </Tabs>
+
+                        :
+                        <Tabs defaultActiveKey="1" >
+                          <TabPane tab="Internal Note" key="1" >
+                            <InternalComment />
+                          </TabPane>
+                          <TabPane tab="History Log" key="2">
+                            <Historylog />
+                          </TabPane>
+                        </Tabs>
+
+
+                    }
+
+                    {/* <Tabs defaultActiveKey="2" >
                       <TabPane tab="Comment" key="1">
                         <CommentBox />
                       </TabPane>
-                      <TabPane tab="Internal Note" key="2">
+                      <TabPane tab="Internal Note" key="2" >
                         <InternalComment />
                       </TabPane>
                       <TabPane tab="History Log" key="3">
                         <Historylog />
                       </TabPane>
-                    </Tabs>
+                    </Tabs> */}
                   </Col>
                 </Row>
               </div>
@@ -267,11 +306,11 @@ export default function Subject() {
                   <label className="header-text">ProgressStatus</label>
                   <br />
                   <Select ref={selectRef}
-                    value={selected}
+                    value={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
-                    // onChange={(value, item) => HandleChange({target: {value: value, item: item}})}
+                    onClick= {() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
-                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, node: x.NodeName, nodevalue: x.value }))}
+                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
 
 
                   />
@@ -296,20 +335,23 @@ export default function Subject() {
                   <label className="header-text">IssueType</label>
                   <br />
 
-                  <Select
-                    style={{ width: '100%' }}
-                    allowClear
-                    showSearch
-                    // defaultValue={2}
-                    filterOption={(input, option) =>
-                      option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                    options={userstate.masterdata.issueTypeState && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
-                    onChange={(value) => SaveIssueType(value)}
-                    value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId}
-                  />
+                  {
+                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName !== "support"
+                      ? <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
+                      : <Select
+                        style={{ width: '100%' }}
+                        allowClear
+                        showSearch
 
-                  {/* <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalIssueType}</label> */}
+                        filterOption={(input, option) =>
+                          option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onClick= {() => getIssueType()}
+                        options={userstate.masterdata.issueTypeState && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        onChange={(value) => SaveIssueType(value)}
+                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}
+                      />
+                  }
 
                 </Col>
               </Row>
@@ -325,6 +367,13 @@ export default function Subject() {
                   <label className="header-text">Module</label>
                   <br />
                   <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 20 }}>
+                <Col span={18}>
+                  <label className="header-text">Assignee</label>
+                  <br />
+                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Assignee}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
@@ -397,8 +446,12 @@ export default function Subject() {
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
           productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
-          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
-          nodeoutput_id: userstate.node.output_id
+          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus
+
         }}
       />
 
@@ -416,7 +469,10 @@ export default function Subject() {
           mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
           productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
           moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
-          nodeoutput_id: userstate.node.output_id
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus
         }}
       />
 
@@ -432,7 +488,12 @@ export default function Subject() {
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          nodeoutput_id: userstate.node.output_id
+          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus
         }}
       />
 
@@ -448,7 +509,10 @@ export default function Subject() {
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          nodeoutput_id: userstate.node.output_id
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus
         }}
       />
 
@@ -474,10 +538,32 @@ export default function Subject() {
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          nodeoutput_id: userstate.node.output_id
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus
         }}
       />
 
+      <ModalResolved
+        title={ProgressStatus}
+        visible={modalresolved_visible}
+        width={800}
+        onCancel={() => { return (setModalresolved_visible(false), setSelected(null)) }}
+        onOk={() => {
+          setModalresolved_visible(false);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+        }}
+      />
 
 
       <ModalDocument

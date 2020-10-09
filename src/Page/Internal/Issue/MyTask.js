@@ -274,7 +274,7 @@ export default function Mytask() {
                           }}
                         >
                           {userstate.actionflow.filter(
-                            (x) => x.text !== record.GroupStatus
+                            (x) => x.text !== record.FlowStatus
                           ).map((x) => (
                             <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
                           ))}
@@ -286,7 +286,7 @@ export default function Mytask() {
                         onClick={() => {
                           getflow_output(record.TransId)
                         }}
-                      >{record.GroupStatus}</Button>
+                      >{record.FlowStatus}</Button>
                     </Dropdown>
                   );
                 }}

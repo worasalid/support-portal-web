@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Modal, Form, Table, Tabs } from 'antd';
+import { Button, Modal, Form, Table, Tabs, Row, Col } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -8,7 +8,7 @@ import Column from 'antd/lib/table/Column';
 
 const { TabPane } = Tabs;
 
-export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+export default function ModalResolved({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
@@ -143,8 +143,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
         }
     }
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
+    const onFinish = () => {
         SaveComment();
         SendFlow();
         onOk();
@@ -156,19 +155,21 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
             GetFileDeploy();
             GetDeployDocument();
         }
+
     }, [visible])
 
-    console.log("details", details)
     return (
         <Modal
             visible={visible}
-            okText="Send"
-            onOk={() => { return (form.submit()) }}
+            onOk={() => { return (onFinish()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
+            okText="Send"
             okType="dashed"
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
+
+
             <Tabs defaultActiveKey="1" type="card">
                 <TabPane tab="Unit Test" key="1">
                     <Table dataSource={listunittest}>
@@ -309,47 +310,26 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     </Table>
                 </TabPane>
             </Tabs>
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="qa-test"
-                layout="vertical"
-                className="login-form"
-                initialValues={{
-                    remember: true,
+            <label className="header-text">Remark</label>
+            <Editor
+                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                ref={editorRef}
+                initialValue=""
+                init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: [
+                        'advlist autolink lists link image charmap print preview anchor',
+                        'searchreplace visualblocks code fullscreen',
+                        'insertdatetime media table paste code help wordcount'
+                    ],
+                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
                 }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="remark"
-                    label="Remark :"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
+                onEditorChange={handleEditorChange}
+            />
+            <br />
                      AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form>
 
         </Modal>
     )

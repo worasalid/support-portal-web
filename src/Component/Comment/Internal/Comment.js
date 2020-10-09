@@ -6,7 +6,7 @@ import { Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
-import { DislikeOutlined, LikeOutlined, DislikeFilled, LikeFilled, FileOutlined } from '@ant-design/icons';
+import { DislikeOutlined, LikeOutlined, DislikeFilled, LikeFilled, FileOutlined, DownloadOutlined } from '@ant-design/icons';
 import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 
 
@@ -146,9 +146,10 @@ export default function CommentBox() {
                                                 <label
                                                     // onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
                                                     onClick={() => {return (setCommentid(item.id), setModalfiledownload_visible(true) )} }
-                                                    className="text-link-hover">
-                                                    <FileOutlined /> DownloadFile
+                                                    className="text-link">
+                                                    <DownloadOutlined style={{fontSize:20}}/> DownloadFile
                                                 </label>
+                                             
                                             </Col>
                                         </Row>
                                     </div>
@@ -250,7 +251,8 @@ export default function CommentBox() {
                 }}
                 details={{
                     refId: commentid,
-                    reftype: "Log_Ticket_Comment"
+                    reftype: "Log_Ticket_Comment",
+                    grouptype: "comment"
                 }}
 
             />

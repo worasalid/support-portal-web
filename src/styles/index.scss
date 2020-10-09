@@ -23,7 +23,11 @@ label.text-hover:hover {
     cursor: pointer;
 }
 
-label.text-link-hover:hover {
+// label.text-link {
+//     color: #1890ff;
+// }
+
+label.text-link:hover {
     text-decoration: underline;
     text-decoration-color: #1890ff;
     color: #1890ff;
@@ -116,3 +120,4 @@ div.sd-page-topic {
 .table-unread {
     font-weight: bold;
 }
+

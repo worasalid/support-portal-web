@@ -20,6 +20,21 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         setTextValue(content);
     }
 
+    const GetIssueType = async () => {
+        try {
+            const issuetype = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/issue-types",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+            });
+            userdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
+        } catch (error) {
+
+        }
+    }
+
     const LoadModule = async () => {
         try {
             const module = await Axios({
@@ -70,10 +85,13 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 },
                 data: {
                     mailbox_id: details && details.mailboxId,
-                    output_id: details && details.nodeoutput_id,
+                    node_output_id: details && details.node_output_id,
+                    to_node_id: details && details.to_node_id,
+                    node_action_id: details && details.to_node_action_id,
                     product_id: details && details.productId,
                     issuetype: values.issuetype,
-                    module_id: values.module
+                    module_id: values.module,
+                    flowstatus: details.flowstatus
                 }
             });
             if (sendflow.status === 200) {
@@ -99,10 +117,13 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     const onFinish = (values) => {
         SaveComment();
         SendFlow(values);
-        console.log("onFinish",values)
     };
     useEffect(() => {
-        LoadModule();
+        if (visible) {
+            GetIssueType();
+            LoadModule();
+        }
+
     }, [visible])
 
     useEffect(() => {
@@ -115,7 +136,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         <Modal
             visible={visible}
             onOk={() => formRef.submit()}
-            okText="Save"
+            okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             onCancel={() => {
                 return (formRef.resetFields(), onCancel(), editorRef.current.editor.setContent(""))

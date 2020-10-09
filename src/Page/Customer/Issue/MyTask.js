@@ -42,8 +42,8 @@ export default function InProgress() {
           issue_type: customerstate.filter.TypeState,
           productId: customerstate.filter.productState,
           moduleId: customerstate.filter.moduleState,
-          startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate,"DD/MM/YYYY").format("YYYY-MM-DD"),
-          enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate,"DD/MM/YYYY").format("YYYY-MM-DD"),
+          startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+          enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           keyword: customerstate.filter.keyword,
           task: "mytask"
@@ -167,7 +167,7 @@ export default function InProgress() {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
                             history.push({ pathname: "/Customer/Issue/Subject/" + record.Id }),
-                            (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId): "")
+                            (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
                         }
@@ -206,9 +206,15 @@ export default function InProgress() {
                     </label>
                     <br />
                     {record.cntDueDate > 1 ?
-                      <Tag style={{ marginLeft: 16 }} color="warning">
+                      <Tag style={{ marginLeft: 16 }} color="warning"
+                        onClick={() => {
+                          customerdispatch({ type: "SELECT_DATAROW", payload: record })
+                          setHistoryduedate_visible(true)
+                        }
+                        }
+                      >
                         DueDate ถูกเลื่อน
-                       </Tag> : ""
+                   </Tag> : ""
                     }
 
                   </>

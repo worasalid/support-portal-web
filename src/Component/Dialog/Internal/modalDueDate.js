@@ -66,6 +66,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
     return (
         <Modal
             visible={visible}
+            okText="Save"
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             onCancel={() => { return (form.resetFields(), onCancel()) }}

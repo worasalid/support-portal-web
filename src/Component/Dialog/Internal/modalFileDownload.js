@@ -31,8 +31,11 @@ export default function ModalFileDownload({ visible = false, onOk, onCancel, det
     }
 
     useEffect(() => {
-        getfile()
-    },[visible])
+        if (visible) {
+            getfile();
+        }
+
+    }, [visible])
 
     return (
         <Modal
@@ -45,7 +48,7 @@ export default function ModalFileDownload({ visible = false, onOk, onCancel, det
             <Table dataSource={listFiledownload}>
 
                 <Column title="No"
-                width="10%"
+                    width="10%"
                     render={(value, record, index) => {
                         return (
                             <>

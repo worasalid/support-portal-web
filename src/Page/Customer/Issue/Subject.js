@@ -195,7 +195,7 @@ export default function Subject() {
                     style={{ width: "100%", marginTop: 8 }}
                     placeholder="None"
                     onChange={(value, index) => HandleChange(value, index.label)}
-                    defaultValue=""
+                    value= {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus}
                     options={customerstate && customerstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng }))}
                   >
                   </Select>

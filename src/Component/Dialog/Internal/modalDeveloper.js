@@ -51,7 +51,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 },
                 data: {
                     mailbox_id: details && details.mailboxId,
-                    output_id: details && details.nodeoutput_id
+                    node_output_id: details && details.node_output_id,
+                    to_node_id: details && details.to_node_id,
+                    node_action_id: details && details.to_node_action_id,
+                    product_id: details && details.productId,
+                    module_id: details && details.moduleId,
+                    flowstatus: details.flowstatus
                 }
             });
 

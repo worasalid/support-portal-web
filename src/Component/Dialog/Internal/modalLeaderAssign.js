@@ -59,7 +59,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
         }
     }
 
-    const SendFlow = async () => {
+    const SendFlow = async (value) => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -69,7 +69,13 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                 },
                 data: {
                     mailbox_id: details && details.mailboxId,
-                    output_id: details && details.nodeoutput_id
+                    node_output_id: details && details.node_output_id,
+                    to_node_id: details && details.to_node_id,
+                    node_action_id: details && details.to_node_action_id,
+                    product_id: details && details.productId,
+                    module_id: details && details.moduleId,
+                    to_user_id: value,
+                    flowstatus: details.flowstatus
                 }
             });
 
@@ -95,36 +101,41 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
     const onFinish = (values) => {
         console.log('Success:', values);
         SaveComment();
-        SendFlow();
+        SendFlow(values.assignto);
         onOk();
     };
 
     useEffect(() => {
-        GetAssign();
+        if (visible) {
+            GetAssign();
+        }
 
-    },[visible])
+    }, [visible])
 
-    console.log("assignlist", assignlist);
     return (
         <Modal
             visible={visible}
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
+            okText="Send"
             okType="dashed"
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
+
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="qa-test"
+                layout="vertical"
+                name="leader-assign"
                 className="login-form"
                 initialValues={{
                     remember: true,
                 }}
                 onFinish={onFinish}
             >
-                 <Form.Item
+                <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
-                    name="UnitTest"
+                    label="AssignTo"
+                    name="assignto"
                     rules={[
                         {
                             required: false,
@@ -132,8 +143,8 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         },
                     ]}
                 >
-                    <label>Assign To </label>
-                   <Select style={{ width: '100%' }} placeholder="None"
+                    {/* <label>Assign To </label> */}
+                    <Select style={{ width: '100%' }} placeholder="None"
                         showSearch
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -149,7 +160,8 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                 </Form.Item>
                 <Form.Item
                     // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="UnitTest"
+                    name="remark"
+                    label="Remark"
                     rules={[
                         {
                             required: false,
@@ -157,7 +169,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         },
                     ]}
                 >
-                    Remark :
+                    {/* Remark : */}
                     <Editor
                         apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                         ref={editorRef}

@@ -6,19 +6,26 @@ import { Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
-import { FileOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileOutlined } from '@ant-design/icons';
+import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 
 
 const { TabPane } = Tabs;
 
 export default function CommentBox() {
     const editorRef = useRef(null)
-    const [commentdata, setCommentdata] = useState([]);
-    const [commenttext, setCommenttext] = useState("");
     const [loading, setLoading] = useState(true);
     const uploadRef = useRef(null);
     const history = useHistory();
     const match = useRouteMatch();
+
+    // data
+    const [commentdata, setCommentdata] = useState([]);
+    const [commenttext, setCommenttext] = useState("");
+    const [commentid, setCommentid] = useState(null);
+
+    // Modal
+    const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
 
     const loadInternalComment = async () => {
         try {
@@ -37,6 +44,7 @@ export default function CommentBox() {
             if (commment_list.status === 200) {
                 setCommentdata(commment_list.data.map((values) => {
                     return {
+                        id: values.Id,
                         author: values.CreateName,
                         datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
                         content: values.Text,
@@ -130,15 +138,15 @@ export default function CommentBox() {
                         content={
                             <>
                                 <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
-                                <Divider style={{ margin:0, marginBottom:10}}/>
+                                <Divider style={{ margin: 0, marginBottom: 10 }} />
                                 {item.filename === null ? "" :
                                     <div>
                                         <Row>
                                             <Col span={24}>
                                                 <label
-                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                                                    className="text-link-hover">
-                                                    <FileOutlined /> {item.filename}
+                                                    onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
+                                                    className="text-link">
+                                                   <DownloadOutlined style={{fontSize:20}}/> DownloadFile
                                                 </label>
                                             </Col>
                                         </Row>
@@ -228,9 +236,25 @@ export default function CommentBox() {
                         </Form.Item>
                     </Form>
                 </TabPane>
-
-
             </Tabs>
+
+            {/* Modal */}
+            <ModalFileDownload
+                title="File Download"
+                visible={modalfiledownload_visible}
+                onCancel={() => { return (setModalfiledownload_visible(false)) }}
+                width={600}
+                onOk={() => {
+                    setModalfiledownload_visible(false);
+
+                }}
+                details={{
+                    refId: commentid,
+                    reftype: "Log_Ticket_Comment",
+                    grouptype: "comment"
+                }}
+
+            />
         </>
     );
 }

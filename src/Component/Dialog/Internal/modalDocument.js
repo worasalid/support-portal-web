@@ -79,9 +79,12 @@ export default function ModalDocument({ visible = false, onOk, onCancel, details
     }
 
     useEffect(() => {
-        GetUnitTest();
-        GetFileDeploy();
-        GetDeployDocument();
+        if (visible) {
+            GetUnitTest();
+            GetFileDeploy();
+            GetDeployDocument();
+        }
+
     }, [visible])
 
     return (
@@ -92,7 +95,6 @@ export default function ModalDocument({ visible = false, onOk, onCancel, details
             okButtonProps={{ hidden: true }}
             {...props}
         >
-
             <Tabs defaultActiveKey="1" type="card">
                 <TabPane tab="Unit Test" key="1">
                     <Table dataSource={listunittest}>
@@ -233,9 +235,6 @@ export default function ModalDocument({ visible = false, onOk, onCancel, details
                     </Table>
                 </TabPane>
             </Tabs>
-
-
-
         </Modal>
     )
 }
