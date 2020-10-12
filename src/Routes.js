@@ -23,6 +23,8 @@ import AuthenContext, { reducer, initState } from "./utility/authenContext";
 import MasterContext, { masterReducer, masterState } from "./utility/masterContext";
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
 import UserContext, { userReducer, userState } from "./utility/issueContext";
+import Resolved from './Page/Internal/Issue/Resolved';
+import Complete from './Page/Internal/Issue/Complete';
 
 
 export default function Routes() {
@@ -39,12 +41,14 @@ export default function Routes() {
                             <Switch>
                                 <Route path="/" exact component={Login} />
                                 <Route path="/Login" exact component={Login} />
-                                <Route path="/Internal/Issue" exact component={MyTask} />
-                                <Route path="/Internal/Issue/UnAssign" exact component={UnAssign} />
+                                <Route path="/internal/issue" exact component={MyTask} />
+                                <Route path="/issue/issue/UnAssign" exact component={UnAssign} />
                                 <Route path="/internal/issue/setting/mapcompany" exact component={MappingCompany} />
                                 <Route path="/internal/issue/setting/mapdeveloper" exact component={MappingDeveloper} />
-                                <Route path="/Internal/Issue/MyTask/:id?" exact component={MyTask} />
-                                <Route path="/Internal/Issue/InProgress/:id?" exact component={InProgress} />
+                                <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />
+                                <Route path="/internal/issue/inprogress/:id?" exact component={InProgress} />
+                                <Route path="/internal/issue/resolved" exact component={Resolved} />
+                                <Route path="/internal/issue/complete" exact component={Complete} />
                                 <Route path="/internal/issue/subject/:id?" exact component={Subject} />
                                 <Route path="/internal/report/charts" exact component={Charts} />
                                
@@ -56,7 +60,7 @@ export default function Routes() {
                                 <Route path="/customer/issue/mytask" exact component={CustomerMytask} />
                                 <Route path="/customer/issue/inprogress" exact component={CustomerInProgress} />
                                 <Route path="/customer/issue/Subject/:id?" exact component={CustomerSubject} />
-                                <Route path="/customer/issue/Complete" exact component={CustomerComplete} />
+                                <Route path="/customer/issue/complete" exact component={CustomerComplete} />
                             </Switch>
                         </Router>
                     </CustomerContext.Provider>

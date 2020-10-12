@@ -16,7 +16,7 @@ import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 
-export default function Mytask() {
+export default function Complete() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
 
@@ -52,7 +52,7 @@ export default function Mytask() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "mytask"
+          task: "Complete"
         }
       });
 
@@ -150,7 +150,8 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <div>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
+                      <label>
                         {record.Number}
                       </label>
 
@@ -175,7 +176,8 @@ export default function Mytask() {
                   return (
                     <>
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
+                        <label>
                           {record.Title}
                         </label>
                       </div>
@@ -183,8 +185,8 @@ export default function Mytask() {
                         <label
                           onClick={() => {
                             return (
-                              history.push({ pathname: "/internal/issue/subject/" + record.Id }),
-                              (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+                              history.push({ pathname: "/internal/issue/subject/" + record.Id })
+                              // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                             )
                           }
                           }
@@ -198,6 +200,7 @@ export default function Mytask() {
                 }
                 }
               />
+
               <Column title="Issue By"
                 align="center"
                 width="15%"
@@ -206,13 +209,15 @@ export default function Mytask() {
                     <>
 
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
+                        <label>
                           {record.CreateBy}
                         </label>
                       </div>
 
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
+                        <label>
                           {new Date(record.CreateDate).toLocaleDateString('en-GB')}
                         </label>
                       </div>
@@ -235,7 +240,8 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
+                      <label>
                         {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
                       </label>
                       <br />
@@ -262,37 +268,41 @@ export default function Mytask() {
                 align="center"
                 render={(record) => {
                   return (
-                    <Dropdown
-                      overlayStyle={{
-                        width: 300,
-                        boxShadow:
-                          "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                      }}
-                      overlay={
-                        <Menu
-                          onSelect={(x) => console.log(x.selectedKeys)}
-                          onClick={(x) => {
-                            HandleChange(x)
-                            setProgressStatus(x.item.props.children[1]);
-                            userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                            userdispatch({ type: "SELECT_DATAROW", payload: record })
-                          }}
-                        >
-                          {userstate.actionflow.filter(
-                            (x) => x.text !== record.FlowStatus
-                          ).map((x) => (
-                            <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
-                          ))}
-                        </Menu>
-                      }
-                      trigger="click"
-                    >
-                      <Button type="link"
-                        onClick={() => {
-                          getflow_output(record.TransId)
-                        }}
-                      >{record.FlowStatus}</Button>
-                    </Dropdown>
+                    // <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                    <label>
+                      {record.FlowStatus}
+                    </label>
+                    // <Dropdown
+                    //   overlayStyle={{
+                    //     width: 300,
+                    //     boxShadow:
+                    //       "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
+                    //   }}
+                    //   overlay={
+                    //     <Menu
+                    //       onSelect={(x) => console.log(x.selectedKeys)}
+                    //       onClick={(x) => {
+                    //         HandleChange(x)
+                    //         setProgressStatus(x.item.props.children[1]);
+                    //         userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
+                    //         userdispatch({ type: "SELECT_DATAROW", payload: record })
+                    //       }}
+                    //     >
+                    //       {userstate.actionflow.filter(
+                    //         (x) => x.text !== record.FlowStatus
+                    //       ).map((x) => (
+                    //         <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
+                    //       ))}
+                    //     </Menu>
+                    //   }
+                    //   trigger="click"
+                    // >
+                    //   <Button type="link"
+                    //     onClick={() => {
+                    //       getflow_output(record.TransId)
+                    //     }}
+                    //   >{record.FlowStatus}</Button>
+                    // </Dropdown>
                   );
                 }}
               />

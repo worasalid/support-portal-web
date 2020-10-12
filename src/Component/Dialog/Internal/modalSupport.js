@@ -110,7 +110,19 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 });
             }
         } catch (error) {
-
+            await Modal.info({
+                title: 'บันทึกไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>ไม่มี Developer ดูแล Module นี้ (กรุณาติดต่อผู้ดูแลระบบ)</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.editor.setContent("");
+                    onOk();
+                    formRef.resetFields();
+                },
+            });
         }
     }
 

@@ -1,19 +1,23 @@
 import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
 import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, } from "antd";
 import React, { useState, useContext, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import axios from 'axios'
 import AuthenContext from "../../utility/authenContext";
+import Axios from "axios";
+import MasterContext from "../../utility/masterContext";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 export default function MasterPage(props) {
   const history = useHistory();
+  const match = useRouteMatch();
   const [show_notice, setshow_notice] = useState(true);
   const { state, dispatch } = useContext(AuthenContext);
+  const {state: masterstate, dispatch: masterdispatch} = useContext(MasterContext)
   const userlogin = state.user
-  // console.log(localStorage.getItem("sp-ssid"));
+  const [activemenu, setActivemenu] = useState([])
 
   const getuser = async () => {
     try {
@@ -31,12 +35,44 @@ export default function MasterPage(props) {
     }
   }
 
+  const CountStatus = async () => {
+    try {
+      const countstatus = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/countstatus",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        }
+      });
+      masterdispatch({type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length});
+      masterdispatch({type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus !== "Complete").length});
+      masterdispatch({type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length})
+
+    } catch (error) {
+
+    }
+  }
+
+
   useEffect(() => {
     if (!state.authen) {
       getuser()
     }
+    CountStatus();
   }, [])
 
+  useEffect(() => {
+    if (match.url.search("mytask") > 0) {
+      setActivemenu(activemenu.push("1"))
+    }
+    if (match.url.search("inprogress") > 0) {
+      setActivemenu(activemenu.push("2"))
+    }
+    if (match.url.search("complete") > 0) {
+      setActivemenu(activemenu.push("3"))
+    }
+  }, [])
+  // console.log("state", masterstate && masterstate.toolbar.sider_menu.issue)
   return (
     <Layout style={{ height: "100vh" }}>
       <Header style={{ backgroundColor: "#1a73e8" }}>
@@ -131,7 +167,8 @@ export default function MasterPage(props) {
             theme="light"
             mode="inline"
             defaultOpenKeys={["sub1"]}
-            defaultSelectedKeys={["1"]}
+            // defaultSelectedKeys={["3"]}
+            defaultSelectedKeys={activemenu}
           >
             <div style={{ padding: 16, paddingTop: 24 }}>
               <Button
@@ -154,23 +191,36 @@ export default function MasterPage(props) {
                   history.push({ pathname: "/customer/issue/mytask" })
                 }
               >
-                My Task <span>(1)</span>
+                My Task 
+                {
+                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
+                  ? ""
+                  : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
+
+                }
+              
               </Menu.Item>
               <Menu.Item
                 key="2"
                 onClick={() =>
-                  history.push({ pathname: "/Customer/Issue/InProgress" })
+                  history.push({ pathname: "/customer/issue/inprogress" })
                 }
               >
-                In progress <span>(1)</span>
+                In progress 
+                {
+                  masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                  ? ""
+                  : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+
+                }
               </Menu.Item>
               <Menu.Item
                 key="3"
                 onClick={() =>
-                  history.push({ pathname: "/Customer/Issue/Complete" })
+                  history.push({ pathname: "/customer/issue/complete" })
                 }
               >
-                Completed
+                Completed 
               </Menu.Item>
             </SubMenu>
           </Menu>

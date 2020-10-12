@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { Modal, Form, Input, Select, Table, Button, Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
@@ -10,6 +11,7 @@ const { TabPane } = Tabs;
 
 
 export default function ModalQA({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
@@ -134,8 +136,9 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk()
+                        editorRef.current.editor.setContent("");
+                        onOk();
+                        history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }

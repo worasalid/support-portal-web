@@ -20,7 +20,7 @@ export default function NormalLoginForm() {
       localStorage.setItem("sp-ssid", result.data);
       dispatch({ type: 'Authen', payload: true});
       dispatch({ type: 'LOGIN', payload: result.data.users});
-      history.push("/Internal/Issue/MyTask");
+      history.push("/internal/issue/mytask");
     } catch (error) {
       alert("ข้อมููลไม่ถูกต้อง");
     }

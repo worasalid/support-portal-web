@@ -33,7 +33,10 @@ export const masterState = {
 }
 
 export const masterReducer = createReducer(masterState, {
-    COUNT_MYTASK: (state, {payload}) => {state.toolbar.sider_menu.issue.mytask.count = payload}
+    COUNT_MYTASK: (state, {payload}) => {state.toolbar.sider_menu.issue.mytask.count = payload},
+    COUNT_INPROGRESS: (state, {payload}) => {state.toolbar.sider_menu.issue.inprogress.count = payload},
+    COUNT_RESOLVED: (state, {payload}) => {state.toolbar.sider_menu.issue.resolved.count = payload},
+    COUNT_COMPLETE: (state, {payload}) => {state.toolbar.sider_menu.issue.complete.count = payload}
 })
 
 export default MasterContext;

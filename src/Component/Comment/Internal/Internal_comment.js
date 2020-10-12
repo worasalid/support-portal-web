@@ -12,9 +12,9 @@ import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 
 const { TabPane } = Tabs;
 
-export default function CommentBox() {
+export default function CommentBox({ loadingComment = false }) {
     const editorRef = useRef(null)
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const uploadRef = useRef(null);
     const history = useHistory();
     const match = useRouteMatch();
@@ -48,8 +48,7 @@ export default function CommentBox() {
                         author: values.CreateName,
                         datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
                         content: values.Text,
-                        fileId: values.FileId,
-                        filename: values.FileName
+                        cntfile: values.cntFile
                     }
                 })
                 );
@@ -114,7 +113,18 @@ export default function CommentBox() {
 
     }, [loading])
 
-    console.log(editorRef.current)
+    // useEffect(() => {
+    //     if (loadingComment) {
+    //         setLoading(true)
+    //         setTimeout(() => {
+    //             loadInternalComment()
+    //             setLoading(false)
+    //         }, 1000)
+    //     }
+
+
+    // }, [loadingComment])
+
     return (
         <>
             <List
@@ -139,14 +149,14 @@ export default function CommentBox() {
                             <>
                                 <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
                                 <Divider style={{ margin: 0, marginBottom: 10 }} />
-                                {item.filename === null ? "" :
+                                {item.cntfile === 0 ? "" :
                                     <div>
                                         <Row>
                                             <Col span={24}>
                                                 <label
                                                     onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
                                                     className="text-link">
-                                                   <DownloadOutlined style={{fontSize:20}}/> DownloadFile
+                                                    <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
                                                 </label>
                                             </Col>
                                         </Row>

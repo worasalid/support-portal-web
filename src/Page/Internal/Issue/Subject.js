@@ -51,6 +51,7 @@ export default function Subject() {
   const [selected, setSelected] = useState()
 
 
+
   const getIssueType = async () => {
     try {
       const issuetype = await Axios({
@@ -174,11 +175,11 @@ export default function Subject() {
   }, [])
 
   useEffect(() => {
-    if(historyduedate_visible){
+    if (historyduedate_visible) {
       GetDueDateHistory();
 
     }
-  
+
   }, [historyduedate_visible])
 
 
@@ -308,10 +309,10 @@ export default function Subject() {
                   <Select ref={selectRef}
                     value={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
-                    onClick= {() => getflow_output(userstate.issuedata.details[0].TransId)}
+                    onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
-
+                    disabled={userstate.issuedata.details[0] && userstate.issuedata.details[0].GroupStatus === "Complete" ? true : false}
 
                   />
                 </Col>
@@ -346,7 +347,7 @@ export default function Subject() {
                         filterOption={(input, option) =>
                           option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        onClick= {() => getIssueType()}
+                        onClick={() => getIssueType()}
                         options={userstate.masterdata.issueTypeState && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
                         onChange={(value) => SaveIssueType(value)}
                         value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}
@@ -458,7 +459,9 @@ export default function Subject() {
       <ModalLeaderAssign
         title={ProgressStatus}
         visible={modalleaderassign_visible}
-        onCancel={() => { return (setModalleaderassign_visible(false), setSelected(null)) }}
+        onCancel={() => {
+          return (setModalleaderassign_visible(false), setSelected(null))
+        }}
         width={800}
         onOk={() => {
           setModalleaderassign_visible(false);

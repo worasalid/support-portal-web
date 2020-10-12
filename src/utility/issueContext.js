@@ -32,7 +32,8 @@ export const customerState = {
     actionflow: [],
     node: {
         input_id: 0,
-        output_id: 0
+        output_id: 0,
+        output_data:[]
     }
 }
 

@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Input, Select, Button } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
 export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const history = useHistory();
     const uploadRef_unittest = useRef(null);
     const uploadRef_filedeploy = useRef(null);
     const uploadRef_document = useRef(null);
@@ -70,7 +72,8 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        onOk()
+                        onOk();
+                        history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }

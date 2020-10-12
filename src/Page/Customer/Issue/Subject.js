@@ -87,10 +87,10 @@ export default function Subject() {
     }
   }
 
-  function HandleChange(value, text) {
+  function HandleChange(value, item) {
     setVisible(true);
-    setProgressStatus(text);
-    customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: value })
+    setProgressStatus(item.label);
+    customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
   }
 
   useEffect(() => {
@@ -99,9 +99,6 @@ export default function Subject() {
   }, [historyduedate_visible])
 
 
-  console.log("ticket_detail", customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus);
-  console.log("ticket_datarow", customerstate.issuedata.details[0] && customerstate.issuedata.details[0].TransId);
-  console.log("ACTION_FLOW", customerstate.actionflow && customerstate.actionflow)
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -194,18 +191,19 @@ export default function Subject() {
                   <Select
                     style={{ width: "100%", marginTop: 8 }}
                     placeholder="None"
-                    onChange={(value, index) => HandleChange(value, index.label)}
-                    value= {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus}
-                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng }))}
+                    onChange={(value, item) => HandleChange(value, item)}
+                    value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus}
+                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
+                    disabled={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus === "Complete" ? true : false}
                   >
                   </Select>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 30 }}>
                 <Col span={18}>
-                  <label className="header-text">ICON Due Date</label>
+                  <label className="header-text">IssueType</label>
                   <br />
-                  <label className="value-text">30/08/2020</label>
+                  <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].IssueType}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 30 }}>
@@ -213,6 +211,20 @@ export default function Subject() {
                   <label className="header-text">Priority</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority}</label>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 30 }}>
+                <Col span={18}>
+                  <label className="header-text">Product</label>
+                  <br />
+                  <label className="value-text">{customerstate.issuedata.details[0] && `${customerstate.issuedata.details[0].ProductName} (${customerstate.issuedata.details[0].ProductFullName})` }</label>
+                </Col>
+              </Row>
+              <Row style={{ marginBottom: 30 }}>
+                <Col span={18}>
+                  <label className="header-text">Module</label>
+                  <br />
+                  <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleName}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 30 }}>
@@ -265,7 +277,10 @@ export default function Subject() {
         details={{
           ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
           mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          nodeoutput_id: customerstate.node.output_id
+          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
+          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
+          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
+          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus
         }}
       />
     </MasterPage>

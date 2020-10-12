@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Input, Select, Button } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
+import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
 export default function ModalLeaderAssign({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
@@ -88,8 +90,9 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk()
+                        editorRef.current.editor.setContent("");
+                        onOk();
+                        history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }

@@ -1,6 +1,6 @@
 import 'antd/dist/antd.css';
-import React, { Component, useState,useContext, useEffect,useReducer } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { Component, useState, useContext, useEffect, useReducer } from 'react';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Breadcrumb, Button, Tooltip, Dropdown } from 'antd';
 import { Avatar, Badge } from 'antd';
 import { UserOutlined, LaptopOutlined, NotificationOutlined, SettingOutlined, SlidersTwoTone } from '@ant-design/icons';
@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
-import MasterContext, { masterReducer, masterState } from "../../utility/masterContext";
+import MasterContext from "../../utility/masterContext";
 
 function newpage() {
   alert();
@@ -46,11 +46,13 @@ export default function MasterPage(props) {
   const { Header, Content, Sider } = Layout;
 
   const history = useHistory();
+  const match = useRouteMatch();
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
 
   const [collapsed, setCollapsed] = useState(false);
   const [show_notice, setshow_notice] = useState(true)
+  const [activemenu, setActivemenu] = useState([])
 
 
   const toggle = () => setCollapsed(!collapsed);
@@ -70,14 +72,50 @@ export default function MasterPage(props) {
 
     }
   }
+
+  const CountStatus = async () => {
+    try {
+      const countstatus = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/countstatus",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        }
+      });
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus === "InProgress").length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress").length });
+      masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.GroupStatus === "Resolved").length });
+      masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.GroupStatus === "Complete").length })
+
+    } catch (error) {
+
+    }
+  }
+
   useEffect(() => {
     if (!state.authen) {
       getuser()
     }
+    getuser();
+    CountStatus();
   }, [])
+
   useEffect(() => {
-      getuser()
+
+    if (match.url.search("mytask") > 0) {
+      setActivemenu(activemenu.push("1"))
+    }
+    if (match.url.search("inprogress") > 0) {
+      setActivemenu(activemenu.push("2"))
+    }
+    if (match.url.search("resolved") > 0) {
+      setActivemenu(activemenu.push("3"))
+    }
+    if (match.url.search("complete") > 0) {
+      setActivemenu(activemenu.push("4"))
+    }
   }, [])
+
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -104,7 +142,7 @@ export default function MasterPage(props) {
                         <div style={{ height: "50vh", overflowY: "scroll" }}>
                           <Row style={{ padding: 16 }}>
                             <Col span={24}>
-                              <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br/>
+                              <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
 
                             </Col>
                           </Row>
@@ -140,37 +178,55 @@ export default function MasterPage(props) {
                   )} trigger="click">
 
                   <Button type="primary" danger color="red" shape="circle" size="middle" icon={<UserOutlined />} >
-                 
+
                   </Button>
-                  
+
                 </Dropdown>
                 &nbsp;<label className="user-login">{state.user && `${state.user.first_name} ${state.user.last_name}`}</label>
               </Tooltip>
-                
+
             </Col>
           </Row>
         </Menu>
       </Header>
       <Layout>
         <Sider theme="light" style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
-          <Menu theme="light" mode="inline" defaultOpenKeys={['sub1']} defaultSelectedKeys={['2']} 
-        
+          <Menu theme="light" mode="inline" defaultOpenKeys={['sub1']} defaultSelectedKeys={activemenu}
+
           >/
             <SubMenu key="sub1" icon={<UserOutlined />} title="Issue">
-              <Menu.Item key="2" onClick={() => history.push({ pathname: '/Internal/Issue/MyTask' })}>
-               {`- My task (${masterstate.toolbar.sider_menu.issue.mytask.count})`}
+              <Menu.Item key="1" onClick={() => history.push({ pathname: '/internal/issue/mytask' })}>
+                My Task
+                {
+                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
+
+                }
               </Menu.Item>
-              <Menu.Item key="3">
-                <span onClick={() => history.push('/Internal/Issue/InProgress')}>- InProgress (1)</span>
+              <Menu.Item key="2" onClick={() => history.push('/internal/issue/inprogress')}>
+                In progress
+                {
+                  masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+
+                }
               </Menu.Item>
-            
-              <Menu.Item key="7">
-                <span onClick={() => this.newpage()}>- Resolved</span>
+
+              <Menu.Item key="3" onClick={() => history.push('/internal/issue/resolved')}>
+                Resolved
+                {
+                  masterstate.toolbar.sider_menu.issue.resolved.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.resolved.count})`}</span>
+
+                }
               </Menu.Item>
-              <Menu.Item key="8">
-                <span onClick={() => newpage()}>- Complete</span>
+              <Menu.Item key="4" onClick={() => history.push('/internal/issue/complete')}>
+                <span >Complete</span>
               </Menu.Item>
-             
+
             </SubMenu>
             <SubMenu key="sub2" icon={<UserOutlined />} title="Report">
               <Menu.Item key="10" onClick={() => history.push('/internal/report/charts')}>
@@ -180,8 +236,8 @@ export default function MasterPage(props) {
                 </Badge>
               </Menu.Item>
             </SubMenu>
-            <SubMenu key="sub3" icon={<SettingOutlined  />} title="Setting">
-            <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mapcompany')}>
+            <SubMenu key="sub3" icon={<SettingOutlined />} title="Setting">
+              <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mapcompany')}>
                 - Mapping Support
               </Menu.Item>
               <Menu.Item key="12" onClick={() => history.push('/internal/issue/setting/mapdeveloper')}>

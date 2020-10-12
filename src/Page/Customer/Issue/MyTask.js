@@ -14,7 +14,7 @@ import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
 
 
-export default function InProgress() {
+export default function MyTask() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
 
@@ -309,9 +309,13 @@ export default function InProgress() {
         width={700}
         onOk={() => setVisible(false)}
         details={{
-          ticketId: customerstate.issuedata.datarow.Id,
-          mailboxId: customerstate.issuedata.datarow.MailBoxId,
-          nodeoutput_id: customerstate.node.output_id
+          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
+          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
+          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
+          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus
+          
         }}
       />
 

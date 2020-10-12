@@ -4,9 +4,11 @@ import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
+import { useHistory } from 'react-router-dom';
 
 
 export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow,details, ...props }) {
+  const history = useHistory();
   const uploadRef = useRef(null);
   const editorRef = useRef(null)
   const [textValue, setTextValue] = useState("")
@@ -49,7 +51,11 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
         },
         data: {
           mailbox_id: details && details.mailboxId,
-          output_id: details && details.nodeoutput_id
+          node_output_id: details && details.node_output_id,
+          to_node_id: details && details.to_node_id,
+          node_action_id: details && details.to_node_action_id,
+          product_id: details && details.productId,
+          flowstatus: details.flowstatus
         }
       });
 
@@ -63,7 +69,14 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           ),
           onOk() {
             editorRef.current.editor.setContent("")
-            onOk()
+            onOk();
+            if(details.flowstatus === "Waiting ICON Support"){
+              history.push({pathname: "/customer/issue/inprogress"})
+            }
+            if(details.flowstatus === "Complete"){
+              history.push({pathname: "/customer/issue/complete"})
+            }
+           
           },
         });
       }
@@ -76,7 +89,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
   useEffect(() => {
 
   }, [])
-
+console.log("detail",details)
   return (
     <Modal
       // title={title}
