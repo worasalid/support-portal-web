@@ -268,41 +268,17 @@ export default function Complete() {
                 align="center"
                 render={(record) => {
                   return (
-                    // <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                    <label>
-                      {record.FlowStatus}
-                    </label>
-                    // <Dropdown
-                    //   overlayStyle={{
-                    //     width: 300,
-                    //     boxShadow:
-                    //       "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                    //   }}
-                    //   overlay={
-                    //     <Menu
-                    //       onSelect={(x) => console.log(x.selectedKeys)}
-                    //       onClick={(x) => {
-                    //         HandleChange(x)
-                    //         setProgressStatus(x.item.props.children[1]);
-                    //         userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                    //         userdispatch({ type: "SELECT_DATAROW", payload: record })
-                    //       }}
-                    //     >
-                    //       {userstate.actionflow.filter(
-                    //         (x) => x.text !== record.FlowStatus
-                    //       ).map((x) => (
-                    //         <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
-                    //       ))}
-                    //     </Menu>
-                    //   }
-                    //   trigger="click"
-                    // >
-                    //   <Button type="link"
-                    //     onClick={() => {
-                    //       getflow_output(record.TransId)
-                    //     }}
-                    //   >{record.FlowStatus}</Button>
-                    // </Dropdown>
+                    <>
+                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
+                      <div>
+                        <label>
+                          {record.FlowStatus}
+                        </label>
+                      </div>
+                      <div>
+                        {record.CompleteDate === null ? "" : new Date(record.CompleteDate).toLocaleDateString('en-GB')}
+                      </div>
+                    </>
                   );
                 }}
               />

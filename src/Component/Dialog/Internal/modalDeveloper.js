@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Input, Select, Button } from 'antd';
+import { Modal, Form, Input, Select, Button, Row, Col } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
@@ -140,7 +140,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             visible={visible}
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
-            okText= "Send"
+            okText="Send"
             okType="dashed"
             onCancel={() => { return (form.resetFields(), onCancel()) }}
 
@@ -155,7 +155,15 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 }}
                 onFinish={onFinish}
             >
-                Unit Test: <UploadFile ref={uploadRef_unittest}/>
+                <Row>
+                    <Col span={4}>
+                        Unit Test:
+                    </Col>
+                    <Col>
+                        <UploadFile ref={uploadRef_unittest} />
+                    </Col>
+                </Row>
+
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="unittest"
@@ -169,7 +177,15 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
                 </Form.Item>
 
-                File Deploy: <UploadFile ref={uploadRef_filedeploy}/>
+                <Row>
+                    <Col span={4}>
+                        File Deploy:
+                    </Col>
+                    <Col>
+                        <UploadFile ref={uploadRef_filedeploy} />
+                    </Col>
+                </Row>
+
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="filedeploy"
@@ -183,7 +199,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
                 </Form.Item>
 
-                Deploy Document: <UploadFile ref={uploadRef_document}/>
+                Deploy Document: <UploadFile ref={uploadRef_document} />
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="document"

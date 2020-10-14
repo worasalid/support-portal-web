@@ -232,7 +232,14 @@ export default function Complete() {
               align="center"
               render={(record) => {
                 return (
-                <label>{record.GroupStatus}</label>
+                  <>
+                    <div>
+                      <label>{record.GroupStatus}</label>
+                    </div>
+                    <div>
+                      {record.ResolvedDate === null ? "" : new Date(record.ResolvedDate).toLocaleDateString('en-GB')}
+                    </div>
+                  </>
                 );
               }}
             />
@@ -285,7 +292,7 @@ export default function Complete() {
           to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
           to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
           flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus
-          
+
         }}
       />
 

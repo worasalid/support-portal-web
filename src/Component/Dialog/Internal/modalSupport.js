@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { Modal, Form, Input, Select, Button } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
@@ -8,6 +9,7 @@ import IssueContext from '../../../utility/issueContext';
 
 
 export default function ModalSupport({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const history = useHistory();
     const uploadRef = useRef(null);
     const [formRef, setFormRef] = useState(null);
     const [textValue, setTextValue] = useState("");
@@ -106,6 +108,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         editorRef.current.editor.setContent("");
                         onOk();
                         formRef.resetFields();
+                        history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }

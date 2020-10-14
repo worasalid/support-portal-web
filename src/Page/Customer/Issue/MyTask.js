@@ -229,40 +229,47 @@ export default function MyTask() {
               align="center"
               render={(record) => {
                 return (
-                  <Dropdown
-                    overlayStyle={{
-                      width: 300,
-                      boxShadow:
-                        "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                    }}
-                    overlay={
-                      <Menu
-                        onSelect={(x) => console.log(x.selectedKeys)}
-                        onClick={(x) => {
-                          setVisible(true);
-                          setProgressStatus(x.item.props.children[1]);
-
-                          customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                          customerdispatch({ type: "SELECT_DATAROW", payload: record })
-
-                        }}
-                      >
-
-                        {customerstate.actionflow && customerstate.actionflow.map((x) => {
-                          return (
-                            <Menu.Item key={x.ToNodeId}>{x.TextEng}</Menu.Item>
-                          )
-                        })}
-                      </Menu>
-                    }
-                    trigger="click"
-                  >
-                    <Button type="link"
-                      onClick={() => {
-                        getflow_output(record.TransId)
+                  <>
+                    <Dropdown
+                      overlayStyle={{
+                        width: 300,
+                        boxShadow:
+                          "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
                       }}
-                    >{record.GroupStatus}</Button>
-                  </Dropdown>
+                      overlay={
+                        <Menu
+                          onSelect={(x) => console.log(x.selectedKeys)}
+                          onClick={(x) => {
+                            setVisible(true);
+                            setProgressStatus(x.item.props.children[1]);
+
+                            customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
+                            customerdispatch({ type: "SELECT_DATAROW", payload: record })
+
+                          }}
+                        >
+
+                          {customerstate.actionflow && customerstate.actionflow.map((x) => {
+                            return (
+                              <Menu.Item key={x.ToNodeId}>{x.TextEng}</Menu.Item>
+                            )
+                          })}
+                        </Menu>
+                      }
+                      trigger="click"
+                    >
+                      <Button type="link"
+                        onClick={() => {
+                          getflow_output(record.TransId)
+                        }}
+                      >{record.GroupStatus}</Button>
+                    </Dropdown>
+
+                
+                    <div>
+                      {record.ResolvedDate === null ? "" : new Date(record.ResolvedDate).toLocaleDateString('en-GB')}
+                    </div>
+                  </>
                 );
               }}
             />
@@ -315,7 +322,7 @@ export default function MyTask() {
           to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
           to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
           flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus
-          
+
         }}
       />
 
