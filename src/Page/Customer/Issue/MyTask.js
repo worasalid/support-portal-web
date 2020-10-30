@@ -12,6 +12,8 @@ import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
+import Clock from "../../../utility/countdownTimer";
+
 
 
 export default function MyTask() {
@@ -143,6 +145,8 @@ export default function MyTask() {
                           <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                       }
                       <Divider type="vertical" />
+                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                      <Divider type="vertical" />
                       <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                       <Divider type="vertical" />
                       <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
@@ -186,7 +190,7 @@ export default function MyTask() {
                 return (
                   <>
                     <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                      {new Date(record.CreateDate).toLocaleDateString('en-GB')}
+                      {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
                     </label>
 
                   </>
@@ -197,29 +201,52 @@ export default function MyTask() {
             />
 
             <Column title="Due Date"
+              width="10%"
               align="center"
               render={(record) => {
                 return (
                   <>
+                   {record.GroupStatus === "Wait For Progress" ? "" :
                     <label className="table-column-text">
-                      {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                      {record.SLA === null ? "" : moment(record.SLA).format("DD/MM/YYYY HH:mm")}
                     </label>
+              }
                     <br />
+                   
                     {record.cntDueDate > 1 ?
-                      <Tag style={{ marginLeft: 16 }} color="warning"
+                      <Tag color="warning"
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
                           setHistoryduedate_visible(true)
                         }
                         }
                       >
-                        DueDate ถูกเลื่อน
+                        เลื่อน DueDate
                    </Tag> : ""
                     }
 
                   </>
                 )
               }
+              }
+            />
+
+            <Column title="SLA"
+              align="center"
+              width="10%"
+              render={(record) => {
+                return (
+                  <>
+                   {record.GroupStatus === "Wait For Progress" ? "" :
+                    <Clock
+                      showseconds={true}
+                      deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
+                    />
+                }
+                  </>
+                )
+              }
+
               }
             />
 
@@ -265,9 +292,9 @@ export default function MyTask() {
                       >{record.GroupStatus}</Button>
                     </Dropdown>
 
-                
+
                     <div>
-                      {record.ResolvedDate === null ? "" : new Date(record.ResolvedDate).toLocaleDateString('en-GB')}
+                      {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY HH:mm")}
                     </div>
                   </>
                 );
@@ -321,8 +348,8 @@ export default function MyTask() {
           node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
           to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
           to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus
-
+          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
+          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
         }}
       />
 
@@ -342,6 +369,8 @@ export default function MyTask() {
         }}
 
       />
+
+
       {/* </Spin> */}
     </MasterPage >
   );

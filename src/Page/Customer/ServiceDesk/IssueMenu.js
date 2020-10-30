@@ -1,6 +1,6 @@
 import React, { useReducer, useContext, useEffect } from 'react'
-import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined } from '@ant-design/icons'
-import { Card } from 'antd'
+import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Row } from 'antd'
 import { useHistory } from "react-router-dom";
 
 import MasterPage from "./MasterPage"
@@ -17,7 +17,22 @@ export default function IssueMenu() {
         <MasterPage>
             <div style={{ padding: 24 }}>
                 <div className="sd-page-header">
-                    <h3>แจ้งปัญหาการใช้งาน</h3>
+                    <Row>
+                        <Col span={18}>
+                            <h3>แจ้งปัญหาการใช้งาน</h3>
+                        </Col>
+                        <Col span={6} style={{ textAlign: "right" }}>
+                            <Button
+                                type="link"
+                                onClick= {() => history.push({ pathname: "/customer/servicedesk"})}
+                            >
+                                <HomeOutlined style={{ fontSize: 20 }} /> กลับสู่เมนูหลัก
+                            </Button>
+                        </Col>
+                    </Row>
+
+
+
                     <hr />
                 </div>
 

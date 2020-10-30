@@ -15,6 +15,8 @@ import MasterContext from "../../../utility/masterContext";
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
+import Clock from "../../../utility/countdownTimer";
+import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
 export default function Mytask() {
   const history = useHistory();
@@ -26,6 +28,7 @@ export default function Mytask() {
   const [modalQA_visible, setModalQA_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+  const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
 
   // data
   const [userstate, userdispatch] = useReducer(userReducer, userState);
@@ -94,6 +97,7 @@ export default function Mytask() {
   }
 
 
+
   function HandleChange(items) {
     console.log("Menu", items.item.props.node)
     if (items.item.props.node === "support") { setVisible(true) }
@@ -112,6 +116,7 @@ export default function Mytask() {
     userdispatch({ type: "SEARCH", payload: false })
   }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
 
+  console.log("xxx", userState.issuedata.data && userState.issuedata.data)
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
@@ -146,7 +151,7 @@ export default function Mytask() {
 
               <Column
                 title="Issue No"
-                width="20%"
+                width="25%"
                 render={(record) => {
                   return (
                     <div>
@@ -160,6 +165,8 @@ export default function Mytask() {
                             <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
                             <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                         }
+
+                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                         {/* <Divider type="vertical" /> */}
                         <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                         {/* <Divider type="vertical" /> */}
@@ -171,6 +178,7 @@ export default function Mytask() {
               />
 
               <Column title="Subject"
+                width="30%"
                 render={(record) => {
                   return (
                     <>
@@ -200,7 +208,7 @@ export default function Mytask() {
               />
               <Column title="Issue By"
                 align="center"
-                width="15%"
+                width="10%"
                 render={(record) => {
                   return (
                     <>
@@ -213,7 +221,7 @@ export default function Mytask() {
 
                       <div>
                         <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                          {new Date(record.CreateDate).toLocaleDateString('en-GB')}
+                          {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
                       <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
@@ -224,19 +232,20 @@ export default function Mytask() {
 
                 }
               />
-              <Column
+              {/* <Column
                 title="Assignee"
                 align="center"
-                width="15%"
+                width="10%"
                 dataIndex="Assignee"
-              ></Column>
+              ></Column> */}
               <Column title="Due Date"
+                width="10%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
                       <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
                       </label>
                       <br />
                       {record.cntDueDate > 1 ?
@@ -256,46 +265,81 @@ export default function Mytask() {
                 }
                 }
               />
+
+              <Column
+                title="Time Tracking"
+                align="center"
+                width="10%"
+                render={(record) => {
+                  return (
+                    <>
+                   
+                      <Clock showseconds={false}
+                        deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
+                         createdate={record.CreateDate === null ? undefined : record.CreateDate}
+                         resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
+                        onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                      />
+                    
+                    </>
+                  )
+                }
+                }
+              />
+
               <Column
                 title="ProgressStatus"
                 width="10%"
                 align="center"
                 render={(record) => {
                   return (
-                    <Dropdown
-                      overlayStyle={{
-                        width: 300,
-                        boxShadow:
-                          "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                      }}
-                      overlay={
-                        <Menu
-                          onSelect={(x) => console.log(x.selectedKeys)}
-                          onClick={(x) => {
-                            HandleChange(x)
-                            setProgressStatus(x.item.props.children[1]);
-                            userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                            userdispatch({ type: "SELECT_DATAROW", payload: record })
-                          }}
-                        >
-                          {userstate.actionflow.filter(
-                            (x) => x.text !== record.FlowStatus
-                          ).map((x) => (
-                            <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
-                          ))}
-                        </Menu>
-                      }
-                      trigger="click"
-                    >
-                      <Button type="link"
-                        onClick={() => {
-                          getflow_output(record.TransId)
+                    <>
+                      {/* <Dropdown
+                        overlayStyle={{
+                          width: 300,
+                          boxShadow:
+                            "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
                         }}
-                      >{record.FlowStatus}</Button>
-                    </Dropdown>
+                        overlay={
+                          <Menu
+                            onSelect={(x) => console.log(x.selectedKeys)}
+                            onClick={(x) => {
+                              HandleChange(x)
+                              setProgressStatus(x.item.props.children[1]);
+                              userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
+                              userdispatch({ type: "SELECT_DATAROW", payload: record })
+                            }}
+                          >
+                            {userstate.actionflow.filter(
+                              (x) => x.text !== record.FlowStatus
+                            ).map((x) => (
+                              <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
+                            ))}
+                          </Menu>
+                        }
+                        trigger="click"
+                      >
+                        <Button type="link"
+                          onClick={() => {
+                            getflow_output(record.TransId)
+                          }}
+                        >{record.FlowStatus}</Button>
+                      </Dropdown> */}
+                      <div>
+                        <label>
+                          {record.FlowStatus}
+                        </label>
+                      </div>
+                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                      </label> */}
+                    </>
                   );
+
                 }}
               />
+
+
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
                 width="10%"
                 align="center"
@@ -398,6 +442,18 @@ export default function Mytask() {
             grouptype: "attachment"
           }}
 
+
+
+        />
+        <ModalTimetracking
+          title="Time Tracking"
+          width={600}
+          visible={modaltimetracking_visible}
+          onCancel={() => { return (setModaltimetracking_visible(false)) }}
+          details={{
+            transgroupId: userstate.issuedata.datarow.TransGroupId,
+
+          }}
         />
 
         {/* </Spin> */}

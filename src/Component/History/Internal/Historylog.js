@@ -23,7 +23,7 @@ export default function Historylog() {
                 }
             });
             if (historylog.status === 200) {
-                setHistorylog(historylog.data.filter((x) => x.HistoryType === "Customer" ).map((values) => {
+                setHistorylog(historylog.data.map((values) => {
                     return {
                         createname: values.CreateName,
                         createdate: values.CreateDate,
@@ -55,10 +55,10 @@ export default function Historylog() {
                         avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
                         title={
                             <>
-                            {(item.usertype === "user" ? <label style={{marginRight: "6px"}}>(ICON)</label>  :"") }
+                                {item.usertype === "customer" ? "(Customer)" : "(ICON)"}&nbsp;&nbsp;
                                 <b>{item.createname}</b> &nbsp;&nbsp;
-                                <label style={{color: "#fa8c16"}} > {item.description}</label>&nbsp;&nbsp;&nbsp;&nbsp;
-                                <ClockCircleOutlined style={{fontSize: 18}}/>&nbsp;&nbsp;
+                                <label style={{ color: "#fa8c16" }} > {item.description}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <ClockCircleOutlined style={{ fontSize: 18 }} />&nbsp;&nbsp;
                                 <label>{moment(item.createdate).format("DD/MM/YYYY H:mm")}</label>
                             </>
                         }
@@ -66,11 +66,15 @@ export default function Historylog() {
                         description=
                         {
                             <>
-                                {item.value === "" || item.value === null ? "" :
+                                {(item.value === "" || item.value === null) ? "" :
                                     <>
                                         { item.value} &nbsp;&nbsp;
-                                        < SwapRightOutlined />&nbsp;&nbsp;
-                                        { item.value2}
+                                        {item.value2 === "" ? "" :
+                                            <>
+                                                < SwapRightOutlined /> <label> {item.value2}</label>
+
+                                            </>
+                                        }
                                     </>
                                 }
                             </>

@@ -46,7 +46,8 @@ export default function CommentBox({ loadingComment = false }) {
                     return {
                         id: values.Id,
                         author: values.CreateName,
-                        datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
+                        // datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
+                        datetime: moment(values.CreateDate).format("DD/MM/YYYY H:mm"),
                         content: values.Text,
                         cntfile: values.cntFile
                     }

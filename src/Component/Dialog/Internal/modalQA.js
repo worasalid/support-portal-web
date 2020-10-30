@@ -17,9 +17,11 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
 
+    //data
     const [listunittest, setListunittest] = useState([]);
     const [listfiledeploy, setFiledeploy] = useState([]);
     const [listdocument, setDocument] = useState([]);
+    const [historyvalue, setHistoryvalue] = useState(null);
 
     const GetUnitTest = async () => {
         try {
@@ -123,7 +125,14 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                     node_output_id: details && details.node_output_id,
                     to_node_id: details && details.to_node_id,
                     node_action_id: details && details.to_node_action_id,
-                    flowstatus: details.flowstatus
+                    flowstatus: details.flowstatus,
+                    groupstatus: details.groupstatus,
+                    history: {
+                        historytype: "Internal",
+                        description: details.flowaction,
+                        value: historyvalue ,
+                        value2: ""
+                      }
                 }
             });
 
@@ -159,6 +168,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             GetUnitTest();
             GetFileDeploy();
             GetDeployDocument();
+            if(details.flowstatus === "Waiting QA CheckResult"){setHistoryvalue("ส่งผล Test ให้หัวหน้าทีมตรวจสอบ")}
+           
         }
 
     }, [visible])
@@ -174,8 +185,9 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
         >
             <Tabs defaultActiveKey="1" type="card">
                 <TabPane tab="Unit Test" key="1">
-                    <Table dataSource={listunittest}>
+                    <Table dataSource={listunittest} style={{ width: "100%" }}pagination={false}>
                         <Column title="No"
+                         width="5%"
                             render={(value, record, index) => {
                                 return (
                                     <>
@@ -186,9 +198,25 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                             }
                             }
                         />
-                        <Column title="ไฟล์ Unit Test" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
+                        <Column title="ไฟล์ Unit Test" dataIndex="FileName"    width="25%"></Column>
+                        <Column title="URL" dataIndex="" width="25%"
+                        align="left"
+                        render={(value, record, index) => {
+                            return (
+                                <>
+                                    <Button type="link"
+                                    onClick= {() => window.open(record.Url, "_blank")}
+                                    >
+                                        {record.Url}
+                                    </Button>
+                                </>
+                            )
+                        }
+                        }
+                    />
+                        <Column title="OwnerName" dataIndex="OwnerName"    width="15%"></Column>
                         <Column title="วันที่"
+                         width="10%"
                             align="center"
                             render={(value, record, index) => {
                                 return (
@@ -202,6 +230,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                             }
                         />
                         <Column title=""
+                         width="10%"
                             render={(value, record, index) => {
                                 return (
                                     <>
@@ -219,7 +248,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         />
                     </Table>
                 </TabPane>
-                <TabPane tab="File Deploy" key="2">
+                {/* <TabPane tab="File Deploy" key="2">
                     <Table dataSource={listfiledeploy}>
                         <Column title="No"
                             render={(value, record, index) => {
@@ -264,9 +293,9 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                             }
                         />
                     </Table>
-                </TabPane>
-                <TabPane tab="Document Deploy" key="3">
-                    <Table dataSource={listdocument}>
+                </TabPane> */}
+                <TabPane tab="Document Deploy" key="2">
+                    <Table dataSource={listdocument} style={{ width: "100%" }} pagination={false}>
                         <Column title="No"
                             render={(value, record, index) => {
                                 return (
@@ -312,7 +341,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                     </Table>
                 </TabPane>
             </Tabs>
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+
+            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" ,marginTop: 40 }}
                 name="qa-test"
                 className="login-form"
                 initialValues={{

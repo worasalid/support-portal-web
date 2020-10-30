@@ -4,12 +4,17 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import CustomerMytask from './Page/Customer/Issue/MyTask';
 import CustomerComplete from './Page/Customer/Issue/Complete';
 import CustomerInProgress from './Page/Customer/Issue/InProgress';
+import CustomerCancel from './Page/Customer/Issue/Cancel';
 import CustomerSubject from './Page/Customer/Issue/Subject';
 import Customerlogin from './Page/Customer/login';
 
 import InProgress from './Page/Internal/Issue/InProgress';
 import MyTask from './Page/Internal/Issue/MyTask';
 import Subject from './Page/Internal/Issue/Subject';
+import Resolved from './Page/Internal/Issue/Resolved';
+import Complete from './Page/Internal/Issue/Complete';
+import Cancel from './Page/Internal/Issue/Cancel';
+
 import UnAssign from './Page/Internal/Issue/UnAssign';
 import Login from './Page/Internal/Login';
 import MappingCompany from './Page/Internal/Setting/MapCompany';
@@ -23,8 +28,6 @@ import AuthenContext, { reducer, initState } from "./utility/authenContext";
 import MasterContext, { masterReducer, masterState } from "./utility/masterContext";
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
 import UserContext, { userReducer, userState } from "./utility/issueContext";
-import Resolved from './Page/Internal/Issue/Resolved';
-import Complete from './Page/Internal/Issue/Complete';
 
 
 export default function Routes() {
@@ -37,17 +40,18 @@ export default function Routes() {
             <MasterContext.Provider value={{ state: masterstate, dispatch: masterdispatch }}>
                 <UserContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
                     <CustomerContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
-                        <Router>
+                        <Router basename="space">
                             <Switch>
                                 <Route path="/" exact component={Login} />
-                                <Route path="/Login" exact component={Login} />
+                                <Route path="/login" exact component={Login} />
                                 <Route path="/internal/issue" exact component={MyTask} />
-                                <Route path="/issue/issue/UnAssign" exact component={UnAssign} />
+                                <Route path="/internal/issue/unassign" exact component={UnAssign} />
                                 <Route path="/internal/issue/setting/mapcompany" exact component={MappingCompany} />
                                 <Route path="/internal/issue/setting/mapdeveloper" exact component={MappingDeveloper} />
                                 <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />
                                 <Route path="/internal/issue/inprogress/:id?" exact component={InProgress} />
                                 <Route path="/internal/issue/resolved" exact component={Resolved} />
+                                <Route path="/internal/issue/cancel" exact component={Cancel} />
                                 <Route path="/internal/issue/complete" exact component={Complete} />
                                 <Route path="/internal/issue/subject/:id?" exact component={Subject} />
                                 <Route path="/internal/report/charts" exact component={Charts} />
@@ -61,6 +65,7 @@ export default function Routes() {
                                 <Route path="/customer/issue/inprogress" exact component={CustomerInProgress} />
                                 <Route path="/customer/issue/Subject/:id?" exact component={CustomerSubject} />
                                 <Route path="/customer/issue/complete" exact component={CustomerComplete} />
+                                <Route path="/customer/issue/cancel" exact component={CustomerCancel} />
                             </Switch>
                         </Router>
                     </CustomerContext.Provider>

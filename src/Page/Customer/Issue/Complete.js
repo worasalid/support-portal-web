@@ -143,6 +143,7 @@ export default function Complete() {
                           <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
                           <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                       }
+                       <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                       <Divider type="vertical" />
                       <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                       <Divider type="vertical" />
@@ -189,7 +190,7 @@ export default function Complete() {
                   <>
                     {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                     <label>
-                      {new Date(record.CreateDate).toLocaleDateString('en-GB')}
+                    {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
                     </label>
 
                   </>
@@ -237,7 +238,7 @@ export default function Complete() {
                       <label>{record.GroupStatus}</label>
                     </div>
                     <div>
-                      {record.ResolvedDate === null ? "" : new Date(record.ResolvedDate).toLocaleDateString('en-GB')}
+                      {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY HH:mm")}
                     </div>
                   </>
                 );

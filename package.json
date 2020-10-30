@@ -1,5 +1,6 @@
 {
   "name": "my-app",
+  "homepage": "http://203.154.95.147/space",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

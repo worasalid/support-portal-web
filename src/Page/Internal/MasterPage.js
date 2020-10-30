@@ -85,6 +85,7 @@ export default function MasterPage(props) {
       masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus === "InProgress").length });
       masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress").length });
       masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.GroupStatus === "Resolved").length });
+      masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length});
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.GroupStatus === "Complete").length })
 
     } catch (error) {
@@ -111,8 +112,11 @@ export default function MasterPage(props) {
     if (match.url.search("resolved") > 0) {
       setActivemenu(activemenu.push("3"))
     }
-    if (match.url.search("complete") > 0) {
+    if (match.url.search("cancel") > 0) {
       setActivemenu(activemenu.push("4"))
+    }
+    if (match.url.search("complete") > 0) {
+      setActivemenu(activemenu.push("5"))
     }
   }, [])
 
@@ -223,7 +227,16 @@ export default function MasterPage(props) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="4" onClick={() => history.push('/internal/issue/complete')}>
+              <Menu.Item key="4" onClick={() => history.push('/internal/issue/cancel')}>
+                Cancel
+                {
+                  masterstate.toolbar.sider_menu.issue.cancel.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+
+                }
+              </Menu.Item>
+              <Menu.Item key="5" onClick={() => history.push('/internal/issue/complete')}>
                 <span >Complete</span>
               </Menu.Item>
 

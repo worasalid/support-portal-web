@@ -15,6 +15,8 @@ import MasterContext from "../../../utility/masterContext";
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
+import Clock from "../../../utility/countdownTimer";
+import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
 export default function Complete() {
   const history = useHistory();
@@ -26,6 +28,7 @@ export default function Complete() {
   const [modalQA_visible, setModalQA_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+  const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
 
   // data
   const [userstate, userdispatch] = useReducer(userReducer, userState);
@@ -146,7 +149,7 @@ export default function Complete() {
 
               <Column
                 title="Issue No"
-                width="20%"
+                width="25%"
                 render={(record) => {
                   return (
                     <div>
@@ -161,6 +164,7 @@ export default function Complete() {
                             <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
                             <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                         }
+                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                         {/* <Divider type="vertical" /> */}
                         <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                         {/* <Divider type="vertical" /> */}
@@ -172,6 +176,7 @@ export default function Complete() {
               />
 
               <Column title="Subject"
+                width="30%"
                 render={(record) => {
                   return (
                     <>
@@ -203,7 +208,7 @@ export default function Complete() {
 
               <Column title="Issue By"
                 align="center"
-                width="15%"
+                width="10%"
                 render={(record) => {
                   return (
                     <>
@@ -218,7 +223,7 @@ export default function Complete() {
                       <div>
                         {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                         <label>
-                          {new Date(record.CreateDate).toLocaleDateString('en-GB')}
+                        {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
                       <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
@@ -229,13 +234,14 @@ export default function Complete() {
 
                 }
               />
-              <Column
+              {/* <Column
                 title="Assignee"
                 align="center"
-                width="15%"
+                width="10%"
                 dataIndex="Assignee"
-              ></Column>
+              ></Column> */}
               <Column title="Due Date"
+                width="10%"
                 align="center"
                 render={(record) => {
                   return (
@@ -281,6 +287,25 @@ export default function Complete() {
                     </>
                   );
                 }}
+              />
+              <Column
+                title="Time Tracking"
+                align="center"
+                width="10%"
+                render={(record) => {
+                  return (
+                    <>
+                      <Clock
+                        showseconds={false}
+                        deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
+                        createdate={record.CreateDate}
+                        resolvedDate={record.ResolvedDate}
+                        onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                      />
+                    </>
+                  )
+                }
+                }
               />
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
                 width="10%"
@@ -384,6 +409,17 @@ export default function Complete() {
             grouptype: "attachment"
           }}
 
+        />
+
+        <ModalTimetracking
+          title="Time Tracking"
+          width={600}
+          visible={modaltimetracking_visible}
+          onCancel={() => { return (setModaltimetracking_visible(false)) }}
+          details={{
+            transgroupId: userstate.issuedata.datarow.TransGroupId,
+
+          }}
         />
 
         {/* </Spin> */}

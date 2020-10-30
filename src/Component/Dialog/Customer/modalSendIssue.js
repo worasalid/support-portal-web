@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Modal } from 'antd';
+import { Modal, Rate } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -7,7 +7,7 @@ import IssueContext, { customerReducer, customerState } from "../../../utility/i
 import { useHistory } from 'react-router-dom';
 
 
-export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow,details, ...props }) {
+export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow, details, ...props }) {
   const history = useHistory();
   const uploadRef = useRef(null);
   const editorRef = useRef(null)
@@ -55,7 +55,12 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           to_node_id: details && details.to_node_id,
           node_action_id: details && details.to_node_action_id,
           product_id: details && details.productId,
-          flowstatus: details.flowstatus
+          flowstatus: details.flowstatus,
+          groupstatus: details.groupstatus,
+          history: {
+            historytype: "Customer",
+            description: details.flowaction,
+          }
         }
       });
 
@@ -70,34 +75,48 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           onOk() {
             editorRef.current.editor.setContent("")
             onOk();
-            if(details.flowstatus === "Waiting ICON Support"){
-              history.push({pathname: "/customer/issue/inprogress"})
+            if (details.flowstatus === "Waiting ICON Support") {
+              history.push({ pathname: "/customer/issue/inprogress" })
             }
-            if(details.flowstatus === "Complete"){
-              history.push({pathname: "/customer/issue/complete"})
+            if (details.flowstatus === "Complete") {
+              history.push({ pathname: "/customer/issue/complete" })
             }
-           
+
           },
         });
       }
+
     } catch (error) {
+      await Modal.info({
+        title: 'บันทึกข้อมูลไม่สำเร็จ',
+        content: (
+          <div>
+            <p>{error.message}</p>
+            <p>{error.response.data}</p>
+          </div>
+        ),
+        onOk() {
+          editorRef.current.editor.setContent("")
+          onOk();
+        },
+      });
 
     }
-
   }
 
   useEffect(() => {
 
   }, [])
-console.log("detail",details)
+
   return (
     <Modal
       // title={title}
       visible={visible}
-      onOk={() => { return (SaveComment(),SendFlow()) }}
+      onOk={() => { return (SaveComment(), SendFlow()) }}
       onCancel={() => { return (editorRef.current.editor.setContent(""), onCancel()) }}
       {...props}
     >
+
       <Editor
         apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
         ref={editorRef}

@@ -60,10 +60,12 @@ export default function MasterPage(props) {
 
                 </div>
             </div>
-            <Card size="default"  style={{
+            <Card size="default"  bordered hoverable
+             style={{
                 width: "700px",
                 top: 50,
-                position: "absolute"
+                position: "absolute",
+
             }}>
                 <div style={{marginBottom:30}}>
                     {props.children}

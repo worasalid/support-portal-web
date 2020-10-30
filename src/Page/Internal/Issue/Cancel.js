@@ -15,10 +15,8 @@ import MasterContext from "../../../utility/masterContext";
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
-import Clock from "../../../utility/countdownTimer";
-import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
-export default function InProgress() {
+export default function Cancel() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
 
@@ -28,8 +26,6 @@ export default function InProgress() {
   const [modalQA_visible, setModalQA_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
-  const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
-  
 
   // data
   const [userstate, userdispatch] = useReducer(userReducer, userState);
@@ -56,7 +52,7 @@ export default function InProgress() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "InProgress"
+          task: "Cancel"
         }
       });
 
@@ -150,7 +146,7 @@ export default function InProgress() {
 
               <Column
                 title="Issue No"
-                width="25%"
+                width="20%"
                 render={(record) => {
                   return (
                     <div>
@@ -165,7 +161,7 @@ export default function InProgress() {
                             <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
                             <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                         }
-                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                         <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                         {/* <Divider type="vertical" /> */}
                         <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                         {/* <Divider type="vertical" /> */}
@@ -206,6 +202,7 @@ export default function InProgress() {
                 }
                 }
               />
+
               <Column title="Issue By"
                 align="center"
                 width="10%"
@@ -223,7 +220,7 @@ export default function InProgress() {
                       <div>
                         {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                         <label>
-                        {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
+                          {new Date(record.CreateDate).toLocaleDateString('en-GB')}
                         </label>
                       </div>
                       <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
@@ -247,9 +244,9 @@ export default function InProgress() {
                   return (
                     <>
                       {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-              
-                      {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
-               
+                      <label>
+                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                      </label>
                       <br />
                       {record.cntDueDate > 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
@@ -275,39 +272,19 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
+                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                       <div>
                         <label>
                           {record.FlowStatus}
                         </label>
                       </div>
-                      {/* <div>
-                        {record.FlowDate === null ? "" : new Date(record.FlowDate).toLocaleDateString('en-GB')}
-                      </div> */}
-
+                      <div>
+                        {record.CompleteDate === null ? "" : new Date(record.CompleteDate).toLocaleDateString('en-GB')}
+                      </div>
                     </>
                   );
                 }}
               />
-              <Column
-                title="Time Tracking"
-                align="center"
-                width="10%"
-                render={(record) => {
-                  return (
-                    <>
-                      <Clock 
-                      showseconds= {false}
-                      deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                      createdate={record.CreateDate === null ? undefined : record.CreateDate}
-                      resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                      onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
-                      />
-                    </>
-                  )
-                }
-                }
-              />
-
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
                 width="10%"
                 align="center"
@@ -409,16 +386,7 @@ export default function InProgress() {
             reftype: "Master_Ticket",
             grouptype: "attachment"
           }}
-        />
-        <ModalTimetracking
-          title="Time Tracking"
-          width={600}
-          visible={modaltimetracking_visible}
-          onCancel={() => { return (setModaltimetracking_visible(false)) }}
-          details={{
-            transgroupId: userstate.issuedata.datarow.TransGroupId,
 
-          }}
         />
 
         {/* </Spin> */}

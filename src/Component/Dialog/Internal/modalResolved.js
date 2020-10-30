@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Modal, Form, Table, Tabs, Row, Col } from 'antd';
+import { Button, Modal, Form, Table, Tabs, Row, Col, Upload } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import Column from 'antd/lib/table/Column';
 
 const { TabPane } = Tabs;
@@ -12,6 +12,7 @@ const { TabPane } = Tabs;
 export default function ModalResolved({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
+    const uploadRef_testresult = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
@@ -109,6 +110,26 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         }
     }
 
+    const SaveTestResult = async () => {
+        try {
+            const comment = await Axios({
+                url: process.env.REACT_APP_API_URL + "/tickets/save-document",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ticketId: details && details.ticketId,
+                    files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
+                    reftype: "Master_Ticket",
+                    grouptype: "testResult"
+                }
+            });
+        } catch (error) {
+
+        }
+    }
+
     const SendFlow = async () => {
         try {
             const sendflow = await Axios({
@@ -122,7 +143,13 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     node_output_id: details && details.node_output_id,
                     to_node_id: details && details.to_node_id,
                     node_action_id: details && details.to_node_action_id,
-                    flowstatus: details.flowstatus
+                    flowstatus: details.flowstatus,
+                    groupstatus: details.groupstatus,
+                    history: {
+                        historytype: "Customer",
+                        description: details.flowaction,
+                        value: "Send Test Result (ส่งผล Test ให้ลูกค้า)" 
+                      }
                 }
             });
 
@@ -146,11 +173,25 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         }
     }
 
-    const onFinish = () => {
+    // const normFile = e => {
+    //     console.log('Upload event:', e);
+    //     if (Array.isArray(e)) {
+    //         return e;
+    //     }
+    //     return e && e.fileList;
+    // };
+
+    const onFinish = (values) => {
+        console.log('onFinish:', values);
         SaveComment();
+        SaveTestResult();
         SendFlow();
         onOk();
     };
+    // const onFinishFailed = errorInfo => {
+    //     console.log('Failed:', errorInfo);
+    //     normFile();
+    // };
 
     useEffect(() => {
         if (visible) {
@@ -161,10 +202,15 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
 
     }, [visible])
 
+
+
+    // if(uploadRef_testresult && uploadRef_testresult.current.getFiles().map((n) => n.response.id) !== null){
+    //     console.log("file", uploadRef_testresult.current.getFiles().map((n) => n.response.id))
+    // }
     return (
         <Modal
             visible={visible}
-            onOk={() => { return (onFinish()) }}
+            onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
@@ -172,10 +218,40 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
             {...props}
         >
 
+            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                layout="vertical"
+                name="form-resolved"
+                className="login-form"
+                initialValues={{
+                    remember: true,
+                }}
+                onFinish={onFinish}
+                // onFinishFailed={onFinishFailed}
+            >
 
-            <Tabs defaultActiveKey="1" type="card">
+                <Form.Item
+                    style={{ minWidth: 300, maxWidth: 800 }}
+                    // valuePropName="fileList"
+                    // getValueFromEvent={uploadRef_testresult.current}
+                    label="Test Result (ใบส่งมอบงาน)"
+                    name="uploadresult"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'กรุณาแนบ (ใบส่งมอบงาน)'
+                        },
+                    ]}
+                >
+                    <UploadFile ref={uploadRef_testresult} />
+
+                </Form.Item>
+            </Form>
+
+
+
+            <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 100 }}>
                 <TabPane tab="Unit Test" key="1">
-                    <Table dataSource={listunittest}>
+                    <Table dataSource={listunittest} style={{ width: "100%" }} pagination={false}>
                         <Column title="No"
                             render={(value, record, index) => {
                                 return (
@@ -220,7 +296,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                         />
                     </Table>
                 </TabPane>
-                <TabPane tab="File Deploy" key="2">
+                {/* <TabPane tab="File Deploy" key="2">
                     <Table dataSource={listfiledeploy}>
                         <Column title="No"
                             render={(value, record, index) => {
@@ -265,9 +341,9 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                             }
                         />
                     </Table>
-                </TabPane>
-                <TabPane tab="Document Deploy" key="3">
-                    <Table dataSource={listdocument}>
+                </TabPane> */}
+                <TabPane tab="Document Deploy" key="2">
+                    <Table dataSource={listdocument} style={{ width: "100%" }} pagination={false}>
                         <Column title="No"
                             render={(value, record, index) => {
                                 return (

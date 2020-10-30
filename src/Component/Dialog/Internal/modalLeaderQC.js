@@ -122,7 +122,14 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     node_output_id: details && details.node_output_id,
                     to_node_id: details && details.to_node_id,
                     node_action_id: details && details.to_node_action_id,
-                    flowstatus: details.flowstatus
+                    flowstatus: details.flowstatus,
+                    groupstatus: details.groupstatus,
+                    history: {
+                        historytype: "Internal",
+                        description: details.flowaction,
+                        value: "",
+                        value2: ""
+                      }
                 }
             });
 
@@ -218,7 +225,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                         />
                     </Table>
                 </TabPane>
-                <TabPane tab="File Deploy" key="2">
+                {/* <TabPane tab="File Deploy" key="2">
                     <Table dataSource={listfiledeploy}>
                         <Column title="No"
                             render={(value, record, index) => {
@@ -263,8 +270,8 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                             }
                         />
                     </Table>
-                </TabPane>
-                <TabPane tab="Document Deploy" key="3">
+                </TabPane> */}
+                <TabPane tab="Document Deploy" key="2">
                     <Table dataSource={listdocument}>
                         <Column title="No"
                             render={(value, record, index) => {

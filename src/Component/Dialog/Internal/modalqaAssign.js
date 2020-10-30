@@ -1,23 +1,41 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Input, Select, Button, Row, Col } from 'antd';
+import { Modal, Form, Input, Select, Button, Checkbox, Row, Col } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-import TextArea from 'antd/lib/input/TextArea';
 
-export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
-    const uploadRef_unittest = useRef(null);
-    // const uploadRef_filedeploy = useRef(null);
-    const uploadRef_document = useRef(null);
+    const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
 
+    //data
+    const [assignlist, setAssignlist] = useState([]);
+    const [qa_assign, setQA_assign] = useState(null);
+
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
+    }
+
+    const GetAssign = async () => {
+        try {
+            const assign = await Axios({
+                url: process.env.REACT_APP_API_URL + "/workflow/assign-qa",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                }
+
+            });
+            setAssignlist(assign.data)
+
+        } catch (error) {
+
+        }
+
     }
 
     const SaveComment = async () => {
@@ -33,18 +51,16 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         ticketId: details && details.ticketId,
                         comment_text: textValue,
                         comment_type: "internal",
-                        //files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
-
-
             }
         } catch (error) {
 
         }
     }
 
-    const SendFlow = async (values) => {
+    const SendFlow = async (value) => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -57,17 +73,18 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     node_output_id: details && details.node_output_id,
                     to_node_id: details && details.to_node_id,
                     node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
+                    // product_id: details && details.productId,
+                    // module_id: details && details.moduleId,
+                    to_user_id: value.assignto,
                     flowstatus: details.flowstatus,
                     groupstatus: details.groupstatus,
-                    url: values.urltest,
+                    recheck: value.recheck,
                     history: {
                         historytype: "Internal",
                         description: details.flowaction,
-                        value: "",
+                        value: "Assign Task To " + qa_assign,
                         value2: ""
-                    }
+                      }
                 }
             });
 
@@ -80,70 +97,33 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
+                        editorRef.current.editor.setContent("");
                         onOk();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
         } catch (error) {
-
+            alert(error)
         }
-    }
-
-    const SaveUnitTest = async (values) => {
-        const unittest = await Axios({
-            url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            data: {
-                ticketId: details && details.ticketId,
-                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.urltest
-            }
-        })
-    }
-
-    // const SaveFileDeploy = async () => {
-    //     const filedeploy = await Axios({
-    //         url: process.env.REACT_APP_API_URL + "/workflow/save_filedeploy",
-    //         method: "POST",
-    //         headers: {
-    //             "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //         },
-    //         data: {
-    //             ticketId: details && details.ticketId,
-    //             files: uploadRef_filedeploy.current.getFiles().map((n) => n.response.id),
-    //         }
-    //     })
-    // }
-
-    const SaveDeployDocument = async () => {
-        const document = await Axios({
-            url: process.env.REACT_APP_API_URL + "/workflow/save_deploydocument",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            data: {
-                ticketId: details && details.ticketId,
-                files: uploadRef_document.current.getFiles().map((n) => n.response.id),
-            }
-        })
     }
 
     const onFinish = (values) => {
         console.log('Success:', values);
-        SaveUnitTest(values);
-        // SaveFileDeploy();
-        SaveDeployDocument();
         SaveComment();
         SendFlow(values);
         onOk();
     };
 
+    useEffect(() => {
+        if (visible) {
+            GetAssign();
+        }
+
+    }, [visible])
+
+   
+   
     return (
         <Modal
             visible={visible}
@@ -152,12 +132,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             okText="Send"
             okType="dashed"
             onCancel={() => { return (form.resetFields(), onCancel()) }}
-
             {...props}
-
         >
+
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="normal_login"
+                layout="vertical"
+                name="leader-assign"
                 className="login-form"
                 initialValues={{
                     remember: true,
@@ -165,79 +145,62 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 onFinish={onFinish}
             >
                 <Form.Item
-                    label="URL"
-                    name="urltest"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'กรุณาใส่ Url ที่ใช้ test ',
-                        },
-                    ]}
-                >
-                    {/* <Row>
-                        <Col span={4}>  
-                            Unit Test:
-                    </Col>
-                        <Col span={20}>
-                           <TextArea rows="2" style={{width: "100%"}}  />
-                        </Col>
-                    </Row> */}
-
-                    <TextArea rows="2" style={{ width: "100%" }} />
-                </Form.Item>
-
-             
-
-                <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Unit Test"
-                    name="unittest"
+                    label="AssignTo"
+                    name="assignto"
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your UnitTest!',
+                            message: 'Please Select Assign',
                         },
                     ]}
                 >
-                    <UploadFile ref={uploadRef_unittest} />
+                    {/* <label>Assign To </label> */}
+                    <Select style={{ width: '100%' }} placeholder="None"
+                        showSearch
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange= {(value,item) => setQA_assign(item.label)}
+                        options={
+                            assignlist && assignlist.map((item) => ({
+                                value: item.UserId,
+                                label: item.UserName
+                            }))
+                        }
+                    >
+                    </Select>
                 </Form.Item>
-
                 {/* <Row>
-                    <Col span={4}>
-                        File Deploy:
-                    </Col>
-                    <Col>
-                        <UploadFile ref={uploadRef_filedeploy} />
-                    </Col>
-                </Row>
 
+                    <Col> */}
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
-                    name="filedeploy"
+                    name="recheck"
+                    valuePropName="checked"
                     rules={[
                         {
                             required: false,
-                            message: 'Please input your UnitTest!',
+                            message: 'Please Select Assign',
                         },
                     ]}
                 >
-
-                </Form.Item> */}
-
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Deploy Document"
-                    name="document"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_document} />
+                    <Checkbox >
+                        ReCheck (ส่งกลับมาให้ Leader ตรวจสอบ)
+                         </Checkbox>
                 </Form.Item>
+                {/* </Col>
+                </Row> */}
             </Form>
+
+            {/* Remark : */}
+
+            <br />
+            <br />
+
+            Remark :
+            <br />
+            <br />
             <Editor
                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                 ref={editorRef}
@@ -255,6 +218,9 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 }}
                 onEditorChange={handleEditorChange}
             />
+            <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
+
         </Modal>
     )
 }

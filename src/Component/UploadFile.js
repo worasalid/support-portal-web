@@ -10,7 +10,7 @@ export default forwardRef(function UploadFile(props, ref) {
     useImperativeHandle(ref, () => ({
         getFiles: () => fileList,
         display: (text) => alert(text)
-      }));  
+    }));
 
     const Uploadprops = {
         name: 'file',
@@ -24,23 +24,23 @@ export default forwardRef(function UploadFile(props, ref) {
             }
             if (info.file.status === 'done') {
                 message.success(`${info.file.name} file uploaded successfully`);
-                console.log("info",info)
+                console.log("info", info)
             } else if (info.file.status === 'error') {
                 message.error(`${info.file.name} file upload failed.`);
             }
         },
-        onRemove(info){
-            console.log("removeinfo",info)
+        onRemove(info) {
+            console.log("removeinfo", info)
         }
     };
 
     return (
-   
-            <Upload {...Uploadprops} >
-                <Button>
-                    <UploadOutlined /> Click to Upload
+
+        <Upload  {...Uploadprops} {...props} onChange={(info) => { if(props.onChange){ props.onChange(info);} Uploadprops.onChange(info) }} >
+            <Button>
+                <UploadOutlined /> Click to Upload
                  </Button>
-            </Upload>
-   
+        </Upload>
+
     )
 })

@@ -5,39 +5,18 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
-export default function ModalLeaderAssign({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+export default function ModalLeaderReject({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
-    const [select_assign,setSelect_assign] = useState(null);
+
     const editorRef = useRef(null)
 
     const [assignlist, setAssignlist] = useState([]);
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
-    }
-
-    const GetAssign = async () => {
-        try {
-            const assign = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/assign-developer",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    productId: details.productId,
-                    moduleId: details.moduleId
-                }
-            });
-            setAssignlist(assign.data)
-
-        } catch (error) {
-
-        }
-
     }
 
     const SaveComment = async () => {
@@ -62,7 +41,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
         }
     }
 
-    const SendFlow = async (value) => {
+    const SendFlow = async () => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -75,16 +54,12 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     node_output_id: details && details.node_output_id,
                     to_node_id: details && details.to_node_id,
                     node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
-                    to_user_id: value,
+                    to_user_id: details.assigneeId,
                     flowstatus: details.flowstatus,
                     groupstatus: details.groupstatus,
                     history: {
                         historytype: "Internal",
-                        description: details.flowaction,
-                        value: "Assign Task To " + select_assign,
-                        value2: ""
+                        description: details.flowaction
                       }
                 }
             });
@@ -94,7 +69,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>Reject Task To Developer</p>
                         </div>
                     ),
                     onOk() {
@@ -112,13 +87,13 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
     const onFinish = (values,item) => {
         console.log('Success:', values, item);
         SaveComment();
-        SendFlow(values.assignto);
+        SendFlow();
         onOk();
     };
 
     useEffect(() => {
         if (visible) {
-            GetAssign();
+
         }
 
     }, [visible])
@@ -136,40 +111,14 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
 
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
                 layout="vertical"
-                name="leader-assign"
+                name="leader-reject"
                 className="login-form"
                 initialValues={{
                     remember: true,
                 }}
                 onFinish={onFinish}
             >
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="AssignTo"
-                    name="assignto"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please Select Assign',
-                        },
-                    ]}
-                >
-                    {/* <label>Assign To </label> */}
-                    <Select style={{ width: '100%' }} placeholder="None"
-                        showSearch
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange= {(value,item) => setSelect_assign(item.label)}
-                        options={
-                            assignlist && assignlist.map((item) => ({
-                                value: item.UserId,
-                                label: item.UserName
-                            }))
-                        }
-                    >
-                    </Select>
-                </Form.Item>
+
                 <Form.Item
                     // style={{ minWidth: 300, maxWidth: 300 }}
                     name="remark"

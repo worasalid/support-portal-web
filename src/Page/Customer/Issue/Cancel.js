@@ -14,7 +14,7 @@ import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
 
 
-export default function InProgress() {
+export default function Cancel() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
 
@@ -46,7 +46,7 @@ export default function InProgress() {
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           keyword: customerstate.filter.keyword,
-          task: "InProgress"
+          task: "Cancel"
         }
       });
 
@@ -73,18 +73,18 @@ export default function InProgress() {
     customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
   }
 
-  const UpdateStatusMailbox = async (value) => {
-    const mailbox = await Axios({
-      url: process.env.REACT_APP_API_URL + "/tickets/read",
-      method: "PATCH",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        mailbox_id: value
-      }
-    });
-  }
+  // const UpdateStatusMailbox = async (value) => {
+  //   const mailbox = await Axios({
+  //     url: process.env.REACT_APP_API_URL + "/tickets/read",
+  //     method: "PATCH",
+  //     headers: {
+  //       "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+  //     },
+  //     params: {
+  //       mailbox_id: value
+  //     }
+  //   });
+  // }
 
   useEffect(() => {
     customerdispatch({ type: "LOADING", payload: true })
@@ -143,6 +143,7 @@ export default function InProgress() {
                           <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
                           <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                       }
+                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                       <Divider type="vertical" />
                       <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                       <Divider type="vertical" />
@@ -168,8 +169,8 @@ export default function InProgress() {
                         onClick={() => {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id }),
-                            (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id })
+                            // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
                         }
@@ -189,7 +190,7 @@ export default function InProgress() {
                   <>
                     {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                     <label>
-                    {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                      {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
                     </label>
 
                   </>
@@ -232,42 +233,31 @@ export default function InProgress() {
               align="center"
               render={(record) => {
                 return (
-                  <label>{record.GroupStatus}</label>
-                  // <Dropdown
-
-                  //   overlayStyle={{
-                  //     width: 300,
-                  //     boxShadow:
-                  //       "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                  //   }}
-                  //   overlay={
-                  //     <Menu
-                  //       onSelect={(x) => console.log(x.selectedKeys)}
-                  //       onClick={(x) => {
-                  //         setVisible(true);
-                  //         setProgressStatus(x.item.props.children[1]);
-
-                  //         customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                  //         customerdispatch({ type: "SELECT_DATAROW", payload: record })
-
-                  //       }}
-                  //     >
-
-                  //       {customerstate.actionflow && customerstate.actionflow.map((x) => {
-                  //         return (
-                  //           <Menu.Item key={x.ToNodeId}>{x.TextEng}</Menu.Item>
-                  //         )
-                  //       })}
-                  //     </Menu>
-                  //   }
-                  //   trigger="click"
-                  // >
-                  //   <Button type="link"
-                  //     onClick={() => {
-                  //       getflow_output(record.TransId)
-                  //     }}
-                  //   >{record.GroupStatus}</Button>
-                  // </Dropdown>
+                  <>
+                    <div>
+                      <label>{record.GroupStatus}</label>
+                    </div>
+                    <div>
+                      {record.CanceldDate === null ? "" : moment(record.CanceldDate).format("DD/MM/YYYY HH:mm")}
+                    </div>
+                  </>
+                );
+              }}
+            />
+            <Column
+              title="เหตุผลการยกเลิก"
+              width="-0%"
+              align="center"
+              render={(record) => {
+                return (
+                  <>
+                    <div>
+                      <label>{record.CancelReasonText}</label>
+                    </div>
+                    <div>
+                      <label>{record.CancelDescription}</label>
+                    </div>
+                  </>
                 );
               }}
             />
@@ -306,23 +296,6 @@ export default function InProgress() {
         }}
       >
       </DuedateLog>
-
-      <ModalSendIssue
-        title={ProgressStatus}
-        visible={visible}
-        onCancel={() => setVisible(false)}
-        width={700}
-        onOk={() => setVisible(false)}
-        details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus
-
-        }}
-      />
 
       <ModalFileDownload
         title="File Download"

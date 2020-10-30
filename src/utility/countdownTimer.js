@@ -1,0 +1,159 @@
+import { ClockCircleOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import React, { Component } from "react";
+import moment from 'moment'
+
+class Clock extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      overdue: false
+    };
+  }
+  componentWillMount() {
+    const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
+    // this.getTimeUntil(deadline, createdate, resolvedDate);
+    // this.getTimeWorking(node_receivedate, node_senddate)
+  }
+  componentDidMount() {
+    const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
+    if (type === "timeworking") {
+      this.getTimeWorking(node_receivedate, node_senddate)
+    }
+
+    if (this.props.resolvedDate === undefined && type === undefined) {
+      setInterval(() => this.getTimeUntil(this.props.deadline), 1000);
+    }
+    if (this.props.resolvedDate !== undefined && type === undefined) {
+      this.getTimeUntil(deadline, createdate, resolvedDate);
+    }
+
+  }
+  leading0(num) {
+    //return num < 10 ? "0" + num : num;
+    return num;
+  }
+
+  getTimeUntil(deadline, createdate, resolvedDate) {
+    let time;
+    if (resolvedDate !== undefined && createdate !== undefined) {
+      time = Date.parse(createdate) - Date.parse(resolvedDate);
+
+    } else {
+      time = Date.parse(deadline) - Date.parse(new Date());
+
+    }
+    // const time = Date.parse(deadline) - Date.parse(new Date());
+
+    // console.log("time", Date.parse(new Date()), "over", Date.parse(deadline))
+    // console.log("timeOver", Math.floor(timeOver / (1000 * 60 * 60 * 24)))
+    // console.log("time",moment(deadline).format('H:mm'))
+    // console.log("Datename",moment(deadline).format('dddd'))
+    if (time < 0) {
+
+      const seconds = Math.floor((time / 1000) % 60);
+      const minutes = Math.floor((time / 1000 / 60) % 60) - (-1);
+      const hours = Math.floor((time / (1000 * 60 * 60)) % 24) - (-1);
+      const days = Math.floor(time / (1000 * 60 * 60 * 24)) - (-1);
+      const overdue = true
+      this.setState({ days, hours, minutes, seconds, overdue });
+
+
+    } else {
+      const seconds = Math.floor((time / 1000) % 60);
+      const minutes = Math.floor((time / 1000 / 60) % 60);
+      const hours = Math.floor((time / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(time / (1000 * 60 * 60 * 24));
+      const overdue = false
+      this.setState({ days, hours, minutes, seconds, overdue });
+    }
+  }
+
+  getTimeWorking(node_receivedate, node_senddate) {
+    if (node_senddate && node_senddate !== undefined) {
+      let time;
+      time = Date.parse(node_receivedate) - Date.parse(node_senddate);
+      const seconds = Math.floor((time / 1000) % 60);
+      const minutes = Math.floor((time / 1000 / 60) % 60) - (-1);
+      const hours = Math.floor((time / (1000 * 60 * 60)) % 24) - (-1);
+      const days = Math.floor(time / (1000 * 60 * 60 * 24)) - (-1);
+      const overdue = false
+      this.setState({ days, hours, minutes, seconds, overdue });
+    }
+  }
+
+
+  render() {
+
+    const { showday = true, showhour = true, showminute = true, showseconds = true, timeformat = "en" } = this.props;
+
+    // console.log(this.state)
+
+    return (
+      <>
+        <Button
+          type="default"
+          onClick={this.props.onClick}
+          className={this.state.overdue === true ? "sla-overdue" : "sla-warning"}
+          size="middle"
+          shape="round"
+          ghost={this.state.overdue === false ? true : false}
+        >
+          {this.state.overdue === false ? "" : " - "}
+          {
+            showday && (
+              <>
+                {timeformat === "en"
+                  ? this.state.days === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.days))}d`}&nbsp;</span>
+                  : this.state.days === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.days))}วัน`}&nbsp;</span>
+                }
+              </>
+            )
+          }
+          {
+            showhour && (
+              <>
+                {timeformat === "en"
+                  ? this.state.hours === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.hours))}h`}&nbsp;</span>
+                  : this.state.hours === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.hours))}ชั่วโมง`}&nbsp;</span>
+                }
+              </>
+            )
+          }
+          {
+            showminute && (
+              <>
+                {timeformat === "en"
+                  ? this.state.minutes === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.minutes))}m`}&nbsp;</span>
+                  : this.state.minutes === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.minutes))}นาที`}&nbsp;</span>
+                }
+              </>
+            )
+          }
+          {
+            showseconds && (
+              <>
+                {timeformat === "en"
+                  ? `${this.leading0(Math.abs(this.state.seconds))}s`
+                  : `${this.leading0(Math.abs(this.state.seconds))}วินาที`
+                } &nbsp;&nbsp;
+                </>
+            )
+          }
+          {
+            this.props.type === "timeworking" && this.state.seconds === 0 ? "กำลังดำเนินการ" : ""
+          }
+          <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+
+
+        </Button>
+      </>
+
+    );
+  }
+}
+export default Clock;

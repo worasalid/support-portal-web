@@ -1,4 +1,4 @@
-import { Comment, Avatar, Form, Button, List, Row, Col, Tooltip, Divider, Modal } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col, Tooltip, Divider, Modal, Popconfirm } from 'antd';
 import moment from 'moment';
 import React, { useState, useEffect, useRef, createElement } from 'react';
 import { useHistory, useRouteMatch, Redirect, Link } from "react-router-dom";
@@ -17,6 +17,7 @@ export default function CommentBox() {
     const uploadRef = useRef(null);
     const history = useHistory();
     const match = useRouteMatch();
+    const [form] = Form.useForm();
     const [loading, setLoading] = useState(true);
 
     // data
@@ -26,7 +27,7 @@ export default function CommentBox() {
 
     // Modal
     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
-    
+
 
     const loadCustomerComment = async () => {
         try {
@@ -61,8 +62,12 @@ export default function CommentBox() {
 
     const onFinish = async (values) => {
         // console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
+        console.log("commenttext", commenttext)
         try {
 
+            if (commenttext === "") {
+                throw ("")
+            }
             const createcomment = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                 method: "POST",
@@ -90,12 +95,31 @@ export default function CommentBox() {
                         setLoading(true);
 
                     },
+                    onCancel() {
+
+                    }
                 });
 
 
             }
         } catch (error) {
-            alert("บันทึกไม่สำเร็จ")
+            Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                
+                okText: "Close",
+                // okCancel:true,
+                content: (
+                    <div>
+                        <p>กรุณาระบุ Comment!</p>
+                    </div>
+                ),
+                onOk(){
+
+                },
+                onCancel() {
+
+                }
+            });
         }
     }
 
@@ -145,11 +169,11 @@ export default function CommentBox() {
                                             <Col span={24}>
                                                 <label
                                                     // onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                                                    onClick={() => {return (setCommentid(item.id), setModalfiledownload_visible(true) )} }
+                                                    onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
                                                     className="text-link">
-                                                    <DownloadOutlined style={{fontSize:20}}/> DownloadFile
+                                                    <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
                                                 </label>
-                                             
+
                                             </Col>
                                         </Row>
                                     </div>
@@ -186,6 +210,7 @@ export default function CommentBox() {
             <Tabs defaultActiveKey="1">
                 <TabPane tab="Reply To Customer" key="1">
                     <Form
+                        form={form}
                         name="Customer"
                         initialValues={{
                             // product: "REM",
@@ -228,9 +253,16 @@ export default function CommentBox() {
                                     <Uploadfile ref={uploadRef} />
                                 </Col>
                                 <Col span={18} style={{ textAlign: "right" }}>
-                                    <Button htmlType="submit" type="primary">
-                                        Add Comment
+                                    <Popconfirm title="Comment หาลูกค้า ใช่หรือไม่"
+                                        okText="Yes" cancelText="No"
+                                        onConfirm={form.submit}
+                                        style={{ width: "300px" }}
+                                    >
+                                        <Button htmlType="submit" type="primary">
+                                            Add Comment
                                     </Button>
+                                    </Popconfirm>
+
                                 </Col>
 
                             </Row>

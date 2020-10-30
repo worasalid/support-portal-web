@@ -93,7 +93,12 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     product_id: details && details.productId,
                     issuetype: values.issuetype,
                     module_id: values.module,
-                    flowstatus: details.flowstatus
+                    flowstatus: details.flowstatus,
+                    groupstatus: details.groupstatus,
+                    history: {
+                        historytype: "Customer",
+                        description: details.flowaction
+                      }
                 }
             });
             if (sendflow.status === 200) {
@@ -113,11 +118,13 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 });
             }
         } catch (error) {
+            console.log("error",error.response)
             await Modal.info({
                 title: 'บันทึกไม่สำเร็จ',
                 content: (
                     <div>
-                        <p>ไม่มี Developer ดูแล Module นี้ (กรุณาติดต่อผู้ดูแลระบบ)</p>
+                         <p>{error.message}</p>
+                        <p>{error.response.data}</p>
                     </div>
                 ),
                 onOk() {
@@ -132,6 +139,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     const onFinish = (values) => {
         SaveComment();
         SendFlow(values);
+  
     };
     useEffect(() => {
         if (visible) {
@@ -143,7 +151,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
 
     useEffect(() => {
         if (formRef && visible) {
-            formRef.setFieldsValue({ issuetype: details.internaltype })
+            formRef.setFieldsValue({ issuetype: details.internaltype, module: details.moduleId })
         }
     }, [details.internaltype, visible, formRef])
 
