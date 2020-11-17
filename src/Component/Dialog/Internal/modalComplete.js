@@ -20,56 +20,6 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
         setTextValue(content);
     }
 
-
-    const SendFlow = async (values) => {
-        try {
-            const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send",
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    ticketId: details && details.ticketId,
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    url: values.urltest,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction,
-                        value: "",
-                        value2: ""
-                    }
-                }
-            });
-
-            if (sendflow.status === 200) {
-                await Modal.info({
-                    title: 'บันทึกข้อมูลสำเร็จ',
-                    content: (
-                        <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
-                        </div>
-                    ),
-                    onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk();
-                        history.push({ pathname: "/internal/issue/inprogress" })
-                    },
-                });
-            }
-        } catch (error) {
-
-        }
-    }
-
-    
     const CompleteFlow = async (values) => {
         try {
             const completeflow = await Axios({
@@ -80,9 +30,14 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                 },
                 data: {
                     ticketId: details && details.ticketId,
+                    mailbox_id: details && details.mailboxId,
+                    to_node_id: details && details.to_node_id,
                     url: values.url,
                     description: values.description,
                     node_output_id: details && details.node_output_id,
+                    flowstatus: details.flowstatus,
+                    groupstatus: details.groupstatus,
+                    type: "Internal",
                     history: {
                         historytype: "Customer",
                         description: details.flowaction
@@ -119,13 +74,9 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
         }
     }
 
-
-
-
-
     const onFinish = (values) => {
         console.log('Success:', values);
-        CompleteFlow();
+        CompleteFlow(values);
         // SaveUnitTest(values);
         // SaveFileDeploy();
         // SendFlow(values);

@@ -246,11 +246,11 @@ export default function Resolved() {
                 render={(record) => {
                   return (
                     <>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                       <label>
-                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                        {moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
                       </label>
                       <br />
+
                       {record.cntDueDate > 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
@@ -259,10 +259,10 @@ export default function Resolved() {
                           }
                           }
                         >
-                          DueDate ถูกเลื่อน
-                       </Tag> : ""
+                          เลื่อน Due
+                       </Tag> 
+                       : ""
                       }
-
                     </>
                   )
                 }
@@ -299,8 +299,8 @@ export default function Resolved() {
                       <Clock 
                       showseconds= {false}
                       deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                      createdate={record.CreateDate}
-                      resolvedDate={record.ResolvedDate}
+                      createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
+                      resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
                       onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                       />
                     </>

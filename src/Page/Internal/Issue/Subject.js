@@ -24,6 +24,7 @@ import ModalqaAssign from "../../../Component/Dialog/Internal/modalqaAssign";
 import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import ModalComplete from "../../../Component/Dialog/Internal/modalComplete";
+import ModalLeaderReject from "../../../Component/Dialog/Internal/modalLeaderReject";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -48,6 +49,7 @@ export default function Subject() {
   const [unittestlog_visible, setUnittestlog_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
+  const [modalleaderreject_visible, setModalleaderreject_visible] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -271,14 +273,16 @@ export default function Subject() {
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
     if (item.data.NodeName === "support" && item.data.value === "SendIssue") { return (setVisible(true)) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
+    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderReject") { setModalleaderreject_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
     if (item.data.NodeName === "developer_1") { setModaldeveloper_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
+
     if (item.data.NodeName === "qa_leader" && item.data.value === "QaAssign") { setModalQAassign_visible(true) }
     if (item.data.NodeName === "qa_leader" && item.data.value !== "QaAssign") { setModalQA_visible(true) }
     if (item.data.NodeName === "qa") { setModalQA_visible(true) }
     if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
-    
+
   }
 
   function renderColorPriority(param) {
@@ -491,9 +495,10 @@ export default function Subject() {
                   {
                     userstate.issuedata.details[0] &&
                     <Clock
-                      deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].SLA}
-                      // createdate={userstate.issuedata.details[0] && userstate.issuedata.details[0].CreateDate}
-                      // resolvedDate={userstate.issuedata.details[0] && userstate.issuedata.details[0].ResolvedDate}
+                    showseconds={false}
+                      deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].DueDate}
+                      createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
+                         resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
                       onClick={() => { setModaltimetracking_visible(true) }}
                     />
                   }
@@ -581,7 +586,7 @@ export default function Subject() {
                   <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Assignee}</label>
                 </Col>
               </Row>
-              
+
 
               {/* <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
@@ -713,6 +718,28 @@ export default function Subject() {
         }}
       />
 
+      <ModalLeaderReject
+        title={ProgressStatus}
+        visible={modalleaderreject_visible}
+        onCancel={() => { return (setModalleaderreject_visible(false)) }}
+        width={800}
+        onOk={() => {
+          setModalleaderreject_visible(false);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          assigneeId: userstate.issuedata.details[0] && userstate.issuedata.details[0].AssigneeId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+
+      />
+
       <ModalDueDate
         title="DueDate"
         visible={modalduedate_visible}
@@ -802,9 +829,17 @@ export default function Subject() {
         width={600}
         visible={modalcomplete_visible}
         onCancel={() => { return (setModalcomplete_visible(false)) }}
+        onOk={() => {
+          setModalcomplete_visible(false);
+        }}
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
         }}
       />
 

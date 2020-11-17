@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext, useReducer } from 'react'
 import { Button, Form, Input, Select, Card, Avatar, Dropdown, Menu, Row, Col, Modal } from "antd";
-import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined } from '@ant-design/icons'
+import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from "react-router-dom";
 import MasterPage from "./MasterPage"
 import UploadFile from "../../../Component/UploadFile";
@@ -179,9 +179,22 @@ export default function IssueCreate() {
         <MasterPage>
             <div style={{ padding: 24 }}>
                 <div className="sd-page-header">
-                    <h3>แจ้งปัญหาการใช้งาน</h3>
-                    <hr />
+                <Row>
+                        <Col span={18}>
+                            <h3>แจ้งปัญหาการใช้งาน</h3>
+                        </Col>
+                        <Col span={6} style={{ textAlign: "right" }}>
+                            <Button
+                                type="link"
+                                onClick={() => history.push({ pathname: "/customer/servicedesk" })}
+                            >
+                                <HomeOutlined style={{ fontSize: 20 }} /> กลับสู่เมนูหลัก
+                            </Button>
+                        </Col>
+                    </Row>
+
                 </div>
+                
                 <Form
                     hidden={hiddenForm}
                     {...layout}

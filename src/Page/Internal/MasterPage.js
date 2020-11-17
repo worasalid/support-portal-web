@@ -82,11 +82,11 @@ export default function MasterPage(props) {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         }
       });
-      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus === "InProgress").length });
-      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress").length });
-      masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.GroupStatus === "Resolved").length });
-      masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length});
-      masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.GroupStatus === "Complete").length })
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && (x.InternalStatus === "InProgress" || x.InternalStatus === "Resolved" || x.InternalStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "InProgress" || x.InternalStatus === "ReOpen" )).length });
+      masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && x.InternalStatus === "Resolved").length });
+      masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length});
+      masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.InternalStatus === "Complete").length })
 
     } catch (error) {
 
@@ -250,10 +250,13 @@ export default function MasterPage(props) {
               </Menu.Item>
             </SubMenu>
             <SubMenu key="sub3" icon={<SettingOutlined />} title="Setting">
-              <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mapcompany')}>
+            <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mastercompany')}>
+                - ข้อมูลบริษัท
+              </Menu.Item>
+              <Menu.Item key="12" onClick={() => history.push('/internal/issue/setting/mapcompany')}>
                 - Mapping Support
               </Menu.Item>
-              <Menu.Item key="12" onClick={() => history.push('/internal/issue/setting/mapdeveloper')}>
+              <Menu.Item key="13" onClick={() => history.push('/internal/issue/setting/mapdeveloper')}>
                 - Mapping Developer
               </Menu.Item>
             </SubMenu>

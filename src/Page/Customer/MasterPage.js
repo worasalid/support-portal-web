@@ -45,7 +45,7 @@ export default function MasterPage(props) {
         }
       });
       masterdispatch({type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length});
-      masterdispatch({type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress").length});
+      masterdispatch({type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length});
       masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length});
       masterdispatch({type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length})
 

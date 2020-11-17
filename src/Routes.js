@@ -17,6 +17,7 @@ import Cancel from './Page/Internal/Issue/Cancel';
 
 import UnAssign from './Page/Internal/Issue/UnAssign';
 import Login from './Page/Internal/Login';
+import MasterCompany from './Page/Internal/Setting/MasterCompany';
 import MappingCompany from './Page/Internal/Setting/MapCompany';
 import MappingDeveloper from './Page/Internal/Setting/MapDeveloper';
 import Charts from './Page/Internal/Report/charts';
@@ -46,6 +47,7 @@ export default function Routes() {
                                 <Route path="/login" exact component={Login} />
                                 <Route path="/internal/issue" exact component={MyTask} />
                                 <Route path="/internal/issue/unassign" exact component={UnAssign} />
+                                <Route path="/internal/issue/setting/mastercompany" exact component={MasterCompany} />
                                 <Route path="/internal/issue/setting/mapcompany" exact component={MappingCompany} />
                                 <Route path="/internal/issue/setting/mapdeveloper" exact component={MappingDeveloper} />
                                 <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />

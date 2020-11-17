@@ -13,6 +13,7 @@ import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
 import ModalCompleteIssue from "../../../Component/Dialog/Customer/modalCompleteIssue";
 import ModalCancelIssue from "../../../Component/Dialog/Customer/modalCancelIssue";
+import ModalReOpen from "../../../Component/Dialog/Customer/modalReOpen";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -367,15 +368,31 @@ export default function Subject() {
         details={{
           ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
           ticketnumber: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number,
-          //productId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProductId,
-          //moduleId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleId,
           mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
           node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
           to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          // to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
           flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
           groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
           flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
+        }}
+      />
+
+      <ModalReOpen
+        title={ProgressStatus}
+        visible={modalreopen_visible}
+        onCancel={() => setModalreopen_visible(false)}
+        width={700}
+        onOk={() => setModalreopen_visible(false)}
+        details={{
+          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
+          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
+          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
+          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
+          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
+          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
+
         }}
       />
 

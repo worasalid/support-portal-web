@@ -231,7 +231,7 @@ export default function MyTask() {
               }
             />
 
-            <Column title="SLA"
+            {/* <Column title="SLA"
               align="center"
               width="10%"
               render={(record) => {
@@ -239,7 +239,7 @@ export default function MyTask() {
                   <>
                    {record.GroupStatus === "Wait For Progress" ? "" :
                     <Clock
-                      showseconds={true}
+                      showseconds={false}
                       deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
                     />
                 }
@@ -248,7 +248,7 @@ export default function MyTask() {
               }
 
               }
-            />
+            /> */}
 
             <Column
               title="ProgressStatus"

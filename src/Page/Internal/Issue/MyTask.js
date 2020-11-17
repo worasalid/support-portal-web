@@ -116,7 +116,6 @@ export default function Mytask() {
     userdispatch({ type: "SEARCH", payload: false })
   }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
 
-  console.log("xxx", userState.issuedata.data && userState.issuedata.data)
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
@@ -256,7 +255,7 @@ export default function Mytask() {
                           }
                           }
                         >
-                          DueDate ถูกเลื่อน
+                           เลื่อน Due
                        </Tag> : ""
                       }
 
@@ -275,10 +274,10 @@ export default function Mytask() {
                     <>
                    
                       <Clock showseconds={false}
-                        deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                         createdate={record.CreateDate === null ? undefined : record.CreateDate}
+                        deadline={record.DueDate}
+                         createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                        onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                         onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                       />
                     
                     </>

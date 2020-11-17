@@ -248,7 +248,7 @@ export default function Complete() {
                     <>
                       {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                       <label>
-                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
                       </label>
                       <br />
                       {record.cntDueDate > 1 ?
@@ -282,7 +282,7 @@ export default function Complete() {
                         </label>
                       </div>
                       <div>
-                        {record.CompleteDate === null ? "" : new Date(record.CompleteDate).toLocaleDateString('en-GB')}
+                        {moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
                       </div>
                     </>
                   );
@@ -298,8 +298,8 @@ export default function Complete() {
                       <Clock
                         showseconds={false}
                         deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                        createdate={record.CreateDate}
-                        resolvedDate={record.ResolvedDate}
+                        createdate={record.CreateDate === null ? undefined : record.CreateDate}
+                         resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
                         onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                       />
                     </>

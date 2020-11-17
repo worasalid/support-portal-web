@@ -19,7 +19,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   const FlowComplete = async (values) => {
     try {
       const completeflow = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/complete",
+        url: process.env.REACT_APP_API_URL + "/workflow/complete",
         method: "POST",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -35,6 +35,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           module_id: details && details.moduleId,
           flowstatus: details.flowstatus,
           groupstatus: details.groupstatus,
+          type: "Customer",
           history: {
             historytype: "Customer",
             description: details.flowaction

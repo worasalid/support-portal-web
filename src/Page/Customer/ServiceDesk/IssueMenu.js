@@ -1,18 +1,60 @@
-import React, { useReducer, useContext, useEffect } from 'react'
+import React, { useReducer, useContext, useEffect, useState } from 'react'
 import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Row } from 'antd'
+import { Button, Card, Col, Row,Typography,List } from 'antd'
 import { useHistory } from "react-router-dom";
 
 import MasterPage from "./MasterPage"
 import AuthenContext from '../../../utility/authenContext';
 import { userReducer, userState } from '../../../utility/reducer';
+import Axios from 'axios';
+
 
 const { Meta } = Card;
 
 export default function IssueMenu() {
     const history = useHistory();
     const { state, dispatch } = useContext(AuthenContext);
-    // console.log(localStorage.getItem("sp-ssid"))
+    const [issuedata, setIssuedata] = useState([])
+
+    const data = [
+        'Racing car sprays burning fuel into crowd.',
+        'Japanese princess to wed commoner.',
+        'Australian walks 100km after outback crash.',
+        'Man charged over missing wedding girl.',
+        'Los Angeles battles huge wildfires.',
+      ];
+
+    const GetIssueType = async () => {
+        try {
+            const issuetype = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/issue-types",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                }
+            });
+            if (issuetype.status === 200) {
+                setIssuedata(issuetype.data.map((value) => {
+                    return {
+                        id: value.Id,
+                        name: value.Name,
+                        description: value.Description
+                    }
+                }))
+            }
+        } catch (error) {
+
+        }
+    }
+
+
+    useEffect(() => {
+        GetIssueType();
+    }, [])
+
+
+
+    console.log("issuedata", issuedata && issuedata)
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>
@@ -24,13 +66,12 @@ export default function IssueMenu() {
                         <Col span={6} style={{ textAlign: "right" }}>
                             <Button
                                 type="link"
-                                onClick= {() => history.push({ pathname: "/customer/servicedesk"})}
+                                onClick={() => history.push({ pathname: "/customer/servicedesk" })}
                             >
                                 <HomeOutlined style={{ fontSize: 20 }} /> กลับสู่เมนูหลัก
                             </Button>
                         </Col>
                     </Row>
-
 
 
                     <hr />
@@ -40,42 +81,28 @@ export default function IssueMenu() {
                     <SendOutlined style={{ fontSize: 30 }} />&nbsp;&nbsp;&nbsp;
                 <label className="header-text">เลือกประเภทปัญหาการใช้งาน</label>
                 </div>
-                <Card className="card-box issue-active" bordered hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/1" })}>
-                    <Meta
-                        avatar={
-                            <BugOutlined style={{ fontSize: 30 }} />
-                        }
-                        title={<label className="card-title-menu">Bug</label>}
-                        description="แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด"
-                    />
-                </Card>
-                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/2" })}>
-                    <Meta
-                        avatar={
-                            <FileOutlined style={{ fontSize: 30 }} />
-                        }
-                        title={<label className="card-title-menu">Change Request</label>}
-                        description="แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ"
-                    />
-                </Card>
-                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/3" })}>
-                    <Meta
-                        avatar={
-                            <DatabaseOutlined style={{ fontSize: 30 }} />
-                        }
-                        title={<label className="card-title-menu">Memo</label>}
-                        description="แจ้งปรับปรุงข้อมูลในระบบ"
-                    />
-                </Card>
-                <Card className="card-box issue-active" hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/4" })}>
-                    <Meta
-                        avatar={
-                            <PhoneOutlined style={{ fontSize: 30 }} />
-                        }
-                        title={<label style={{ color: "rgb(0, 116, 224)" }}>Use</label>}
-                        description="สอบถามข้อมูลทั่วไป / การใช้งานระบบ"
-                    />
-                </Card>
+
+                <List
+                    itemLayout="horizontal"
+                    dataSource={issuedata}
+                    renderItem={item => (
+                        <Card className="card-box issue-active" bordered hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/" + item.id })}>
+                            <Meta
+                                avatar={
+                                   
+                                    item.name === "Bug" ?  <BugOutlined style={{ fontSize: 30 }} /> :
+                                    item.name === "ChangeRequest" ?  <FileOutlined style={{ fontSize: 30 }} /> :
+                                    item.name === "Memo" ?  <DatabaseOutlined style={{ fontSize: 30 }} /> : 
+                                    item.name === "Use" ?  <PhoneOutlined style={{ fontSize: 30 }} /> : 
+                                    item.name === "None" ?  <FileOutlined style={{ fontSize: 30 }} /> : ""
+                                   
+                                }
+                                title={<label className="card-title-menu">{item.name}</label>}
+                                description={item.description}
+                            />
+                        </Card>
+                    )}
+                />
             </div>
         </MasterPage>
     )

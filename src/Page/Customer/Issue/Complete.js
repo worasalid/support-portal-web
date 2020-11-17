@@ -202,11 +202,12 @@ export default function Complete() {
 
             <Column title="Due Date"
               align="center"
+              width="10%"
               render={(record) => {
                 return (
                   <>
                     <label className="table-column-text">
-                      {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
+                      {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
                     </label>
                     <br />
                     {record.cntDueDate > 1 ?
@@ -217,7 +218,7 @@ export default function Complete() {
                         }
                         }
                       >
-                        DueDate ถูกเลื่อน
+                        เลื่อน Due
                    </Tag> : ""
                     }
 
@@ -238,7 +239,7 @@ export default function Complete() {
                       <label>{record.GroupStatus}</label>
                     </div>
                     <div>
-                      {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY HH:mm")}
+                      {record.CompleteDate === null ? "" : moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
                     </div>
                   </>
                 );
