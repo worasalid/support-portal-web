@@ -42,7 +42,7 @@ export default function Historylog() {
 
     useEffect(() => {
         GetHistoryLog();
-    }, [])
+    }, [historylog])
 
     return (
         <List
@@ -69,7 +69,7 @@ export default function Historylog() {
                                 {(item.value === "" || item.value === null) ? "" :
                                     <>
                                         { item.value} &nbsp;&nbsp;
-                                        {item.value2 === "" ? "" :
+                                        {(item.value2 === "" || item.value2 === null) ? "" :
                                             <>
                                                 < SwapRightOutlined /> <label> {item.value2}</label>
 

@@ -33,7 +33,7 @@ export default function Complete() {
     // setLoadding(true);
     try {
       const results = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        url: process.env.REACT_APP_API_URL + "/tickets/loadticket-customer",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")

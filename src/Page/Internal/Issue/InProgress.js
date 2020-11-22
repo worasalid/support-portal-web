@@ -43,7 +43,7 @@ export default function InProgress() {
     // setLoadding(true);
     try {
       const results = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")

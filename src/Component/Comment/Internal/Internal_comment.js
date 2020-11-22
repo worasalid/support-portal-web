@@ -164,7 +164,6 @@ export default function CommentBox({ loadingComment = false }) {
 
     }, [loading])
 
-    console.log("mailTo", mailto)
     return (
         <>
             <List

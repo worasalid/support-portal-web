@@ -4,33 +4,40 @@ import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Internal/Comment";
 import InternalComment from "../../../Component/Comment/Internal/Internal_comment";
+import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
 import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, PoweroffOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
+import Issuesearch from "../../../Component/Search/Internal/IssueSearch";
+import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
+// import ModalDocument from "../../../Component/Dialog/Internal/modalDocument";
+import ModalQA from "../../../Component/Dialog/Internal/modalQA";
+import ModalLeaderQC from "../../../Component/Dialog/Internal/modalLeaderQC";
+import ModalLeaderAssign from "../../../Component/Dialog/Internal/modalLeaderAssign";
+import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
 import Clock from "../../../utility/countdownTimer";
 import moment from "moment";
+import ModalqaAssign from "../../../Component/Dialog/Internal/modalqaAssign";
 import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
-import ListSubTask from "../../../Component/Subject/Internal/listSubTask";
-import ModalCreateTask from "../../../Component/Dialog/Internal/modalCreateTask";
-
+import ModalComplete from "../../../Component/Dialog/Internal/modalComplete";
+import ModalLeaderReject from "../../../Component/Dialog/Internal/modalLeaderReject";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
 
 
-export default function Subject() {
+export default function SubTask() {
   const match = useRouteMatch();
   const history = useHistory();
   const selectRef = useRef(null)
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
   //modal
-  // const [visible, setVisible] = useState(false);
-  const [modaladdtask, setModaladdtask] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalleaderassign_visible, setModalleaderassign_visible] = useState(false);
@@ -264,7 +271,7 @@ export default function Subject() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "support" && item.data.value === "SendIssue") { return (setModaladdtask(true)) }
+    if (item.data.NodeName === "support" && item.data.value === "SendIssue") { return (setVisible(true)) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderReject") { setModalleaderreject_visible(true) }
@@ -292,9 +299,29 @@ export default function Subject() {
     }
   }
 
+  //////////////////////////////////////////////// NEW ทำ subtask /////////////////////
+  const GetTaskDetail = async () => {
+    try {
+      const ticket_detail = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/load-taskdetail",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          taskId: match.params.task
+        }
+      });
+
+      
+    } catch (error) {
+
+    }
+  }
+
   useEffect(() => {
     getdetail();
-
+    GetTaskDetail();
   }, [])
 
   useEffect(() => {
@@ -309,7 +336,7 @@ export default function Subject() {
 
   }, [historyduedate_visible])
 
-
+console.log("match",match.params)
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -382,21 +409,6 @@ export default function Subject() {
                         reftype: "Master_Ticket",
                       }}
                     />
-                  </Col>
-                </Row>
-
-                {/* SubTask */}
-                <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
-                  <Col span={24}>
-                   <Button type="primary" 
-                    onClick= {() => setModaladdtask(true)}
-                   > CreateTask
-                   </Button>
-                  </Col>
-                </Row>
-                <Row style={{ marginTop: 26, marginRight: 24 }}>
-                  <Col span={24}>
-                    <ListSubTask subject={match.params.id} />
                   </Col>
                 </Row>
 
@@ -503,10 +515,10 @@ export default function Subject() {
                   {
                     userstate.issuedata.details[0] &&
                     <Clock
-                      showseconds={false}
+                    showseconds={false}
                       deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].DueDate}
                       createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
-                      resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
+                         resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
                       onClick={() => { setModaltimetracking_visible(true) }}
                     />
                   }
@@ -595,6 +607,18 @@ export default function Subject() {
                 </Col>
               </Row>
 
+
+              {/* <Row style={{ marginBottom: 20 }}>
+                <Col span={18}>
+                  <label className="header-text">Document</label>
+                  <Button icon={<FileAddOutlined />}
+                    type="link"
+                    onClick={() => setUnittestlog_visible(true)}
+                  />
+
+                </Col>
+              </Row> */}
+
             </Col>
             {/* SideBar */}
           </Row>
@@ -622,22 +646,120 @@ export default function Subject() {
         </Timeline>
       </Modal>
 
-      <ModalCreateTask
+      <ModalSupport
         title={ProgressStatus}
-        visible={modaladdtask}
+        visible={visible}
         width={800}
-        onCancel={() => { return (setModaladdtask(false), setSelected(null)) }}
+        onCancel={() => { return (setVisible(false), setSelected(null)) }}
         onOk={() => {
-          setModaladdtask(false);
+          setVisible(false);
         }}
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId
-         
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
+          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
         }}
       />
 
-     
+      <ModalLeaderAssign
+        title={ProgressStatus}
+        visible={modalleaderassign_visible}
+        onCancel={() => {
+          return (setModalleaderassign_visible(false), setSelected(null))
+        }}
+        width={800}
+        onOk={() => {
+          setModalleaderassign_visible(false);
+          setSelected(null);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+      />
+
+      <ModalDeveloper
+        title={ProgressStatus}
+        visible={modaldeveloper_visible}
+        onCancel={() => { return (setModaldeveloper_visible(false), setSelected(null)) }}
+        width={800}
+        onOk={() => {
+          setModaldeveloper_visible(false);
+          setSelected(null);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+      />
+
+      <ModalLeaderQC
+        title={ProgressStatus}
+        visible={modalleaderqc_visible}
+        onCancel={() => { return (setModalleaderqc_visible(false), setSelected(null)) }}
+        width={800}
+        onOk={() => {
+          setModalleaderqc_visible(false);
+
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+      />
+
+      <ModalLeaderReject
+        title={ProgressStatus}
+        visible={modalleaderreject_visible}
+        onCancel={() => { return (setModalleaderreject_visible(false)) }}
+        width={800}
+        onOk={() => {
+          setModalleaderreject_visible(false);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          assigneeId: userstate.issuedata.details[0] && userstate.issuedata.details[0].AssigneeId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+
+      />
+
       <ModalDueDate
         title="DueDate"
         visible={modalduedate_visible}
@@ -645,6 +767,69 @@ export default function Subject() {
         onCancel={() => setModalduedate_visible(false)}
         onOk={() => {
           setModalduedate_visible(false);
+        }}
+      />
+
+      <ModalqaAssign
+        title={ProgressStatus}
+        visible={modalQAassign_visible}
+        width={800}
+        onCancel={() => { return (setModalQAassign_visible(false)) }}
+        onOk={() => {
+          setModalQAassign_visible(false);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+      />
+
+      <ModalQA
+        title={ProgressStatus}
+        visible={modalQA_visible}
+        onCancel={() => { return (setModalQA_visible(false), setSelected(null)) }}
+        width={900}
+        onOk={() => {
+          setModalQA_visible(false);
+
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+      />
+
+      <ModalResolved
+        title={ProgressStatus}
+        visible={modalresolved_visible}
+        width={800}
+        onCancel={() => { return (setModalresolved_visible(false), setSelected(null)) }}
+        onOk={() => {
+          setModalresolved_visible(false);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
         }}
       />
 
@@ -659,7 +844,39 @@ export default function Subject() {
         }}
       />
 
-     
+      <ModalComplete
+        title={ProgressStatus}
+        width={600}
+        visible={modalcomplete_visible}
+        onCancel={() => { return (setModalcomplete_visible(false)) }}
+        onOk={() => {
+          setModalcomplete_visible(false);
+        }}
+        details={{
+          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+        }}
+      />
+
+
+      {/* <ModalDocument
+        title="Document"
+        visible={unittestlog_visible}
+        width={800}
+        onCancel={() => setUnittestlog_visible(false)}
+        onOk={() => {
+          setUnittestlog_visible(false);
+        }}
+        details={{
+          refId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          reftype: "Master_Ticket",
+        }}
+      /> */}
 
     </MasterPage>
   );

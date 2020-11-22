@@ -110,6 +110,11 @@ div.sd-page-topic {
     border: 1px solid;
     color: #1890ff;
 }
+.task-active:hover {
+    border: 1px solid;
+    color: #1890ff;
+    cursor: pointer;
+}
 
 // table
 .table-hover,

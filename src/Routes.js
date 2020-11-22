@@ -11,6 +11,7 @@ import Customerlogin from './Page/Customer/login';
 import InProgress from './Page/Internal/Issue/InProgress';
 import MyTask from './Page/Internal/Issue/MyTask';
 import Subject from './Page/Internal/Issue/Subject';
+import SubTask from './Page/Internal/Issue/SubTask'
 import Resolved from './Page/Internal/Issue/Resolved';
 import Complete from './Page/Internal/Issue/Complete';
 import Cancel from './Page/Internal/Issue/Cancel';
@@ -56,6 +57,7 @@ export default function Routes() {
                                 <Route path="/internal/issue/cancel" exact component={Cancel} />
                                 <Route path="/internal/issue/complete" exact component={Complete} />
                                 <Route path="/internal/issue/subject/:id?" exact component={Subject} />
+                                <Route path="/internal/issue/subject/:id?/task-:task?" exact component={SubTask} />
                                 <Route path="/internal/report/charts" exact component={Charts} />
                                
 

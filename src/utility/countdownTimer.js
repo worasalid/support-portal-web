@@ -79,7 +79,7 @@ class Clock extends Component {
           minute: Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute')) % 60,
           remark: 1
         })
-        console.log("1");
+
         // minute += Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute'))
       }
 
@@ -103,7 +103,7 @@ class Clock extends Component {
               : Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute')) % 60,
             remark: 2
           })
-          console.log("2");
+
         } else {
           timehistory.push({
             timestart: moment(result).format("YYYY-MM-DD 09:00"),
@@ -117,7 +117,7 @@ class Clock extends Component {
             remark: 2
           })
         }
-        console.log("2-1");
+
         minute += Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute')) % 60
       }
 
@@ -134,7 +134,7 @@ class Clock extends Component {
           minute: Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute')) % 60,
           remark: 3
         })
-        console.log("3");
+
         // minute += Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute'))
       }
 
@@ -153,10 +153,10 @@ class Clock extends Component {
           minute: Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute')) % 60,
           remark: 4
         })
-        console.log("4");
+
         // minute += Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute'))
       }
-      console.log("timehistory", timehistory);
+
     }
     // let seconds = minute % 3600;
     // let minutes = minute % 60;
