@@ -302,7 +302,7 @@ export default function SubTask() {
   //////////////////////////////////////////////// NEW ทำ subtask /////////////////////
   const GetTaskDetail = async () => {
     try {
-      const ticket_detail = await Axios({
+      const task_detail = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/load-taskdetail",
         method: "GET",
         headers: {
@@ -313,7 +313,12 @@ export default function SubTask() {
         }
       });
 
-      
+      if (task_detail.status === 200) {
+        userdispatch({ type: "LOAD_TASKDATA", payload: task_detail.data })
+        setCreateddate(task_detail.data.CreateDate);
+        setResolveddate(task_detail.data.ResolvedDate)
+      }
+
     } catch (error) {
 
     }
@@ -335,8 +340,9 @@ export default function SubTask() {
     }
 
   }, [historyduedate_visible])
-
-console.log("match",match.params)
+console.log("params",match.params.task)
+  // console.log("issuedetail", userstate.issuedata.details[0] && userstate.issuedata.details[0].Number)
+  // console.log("taskdata", userstate.taskdata.data[0] && userstate.taskdata.data[0].Priority)
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -370,7 +376,8 @@ console.log("match",match.params)
                       <Row>
                         <Col span={16} style={{ display: "inline" }}>
                           <Typography.Title level={4}>
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
+                            {/* <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title} */}
+                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.taskdata.data[0] && userstate.taskdata.data[0].Title}
                           </Typography.Title>
                         </Col>
                         <Col span={8} style={{ display: "inline", textAlign: "right" }}>
@@ -390,7 +397,7 @@ console.log("match",match.params)
                       <Row>
                         <div style={{ display: divcollapse }}>
                           <p>
-                            {userstate.issuedata.details[0] && userstate.issuedata.details[0].Description}
+                            {userstate.taskdata.data[0] && userstate.taskdata.data[0].Description}
                           </p>
 
                         </div>
@@ -418,21 +425,6 @@ console.log("match",match.params)
                     <label className="header-text">Activity</label>
 
                     {
-                      userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
-                        ?
-                        <Tabs defaultActiveKey="2" >
-                          <TabPane tab="Comment" key="1">
-                            <CommentBox />
-                          </TabPane>
-                          <TabPane tab="Internal Note" key="2" >
-                            <InternalComment />
-                          </TabPane>
-                          <TabPane tab="History Log" key="3">
-                            <Historylog />
-                          </TabPane>
-                        </Tabs>
-
-                        :
                         <Tabs defaultActiveKey="1" >
                           <TabPane tab="Internal Note" key="1" >
                             <InternalComment />
@@ -441,21 +433,9 @@ console.log("match",match.params)
                             <Historylog />
                           </TabPane>
                         </Tabs>
-
-
                     }
 
-                    {/* <Tabs defaultActiveKey="2" >
-                      <TabPane tab="Comment" key="1">
-                        <CommentBox />
-                      </TabPane>
-                      <TabPane tab="Internal Note" key="2" >
-                        <InternalComment />
-                      </TabPane>
-                      <TabPane tab="History Log" key="3">
-                        <Historylog />
-                      </TabPane>
-                    </Tabs> */}
+                  
                   </Col>
                 </Row>
               </div>
@@ -474,7 +454,7 @@ console.log("match",match.params)
                     onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
-                    disabled={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "out" ? true : false}
+                    disabled={userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out" ? true : false}
 
                   />
                 </Col>
@@ -483,28 +463,7 @@ console.log("match",match.params)
                 <Col span={18}>
                   <label className="header-text">Priority</label>
                   <br />
-                  {
-                    userstate.issuedata.details[0]
-                      && (userstate.issuedata.details[0].NodeName !== "support" || userstate.issuedata.details[0].FlowStatus !== "Waiting ICON Support")
-                      ? <label className="value-text">
-                        {renderColorPriority(userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority)}&nbsp;&nbsp;
-                           {userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority}
-                      </label>
-                      : <Select
-                        style={{ width: '100%' }}
-                        allowClear
-                        showSearch
-
-                        filterOption={(input, option) =>
-                          option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onClick={() => GetPriority()}
-
-                        options={userstate.masterdata.priorityState && userstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onChange={(value, item) => UpdatePriority(value, item)}
-                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority}
-                      />
-                  }
+                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].Priority}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
@@ -513,12 +472,12 @@ console.log("match",match.params)
                 </Col>
                 <Col span={18} >
                   {
-                    userstate.issuedata.details[0] &&
+                    userstate.taskdata.data[0] &&
                     <Clock
-                    showseconds={false}
-                      deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].DueDate}
-                      createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
-                         resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
+                      showseconds={false}
+                      deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
+                      createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
+                      resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
                       onClick={() => { setModaltimetracking_visible(true) }}
                     />
                   }
@@ -538,10 +497,10 @@ console.log("match",match.params)
                       ? <Button type="link"
                         onClick={() => setModalduedate_visible(true)}
                       >
-                        {userstate.issuedata.details[0] &&
-                          (userstate.issuedata.details[0].DueDate === null ? "None" : moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
+                        {userstate.taskdata.data[0] &&
+                          (userstate.taskdata.data[0].DueDate === null ? "None" : moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm"))}
                       </Button>
-                      : <label>&nbsp;&nbsp;{userstate.issuedata.details[0] && moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
+                      : <label>&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
                   }
                   {history_duedate_data.length > 1 ?
                     <Tag color="warning">
@@ -555,7 +514,7 @@ console.log("match",match.params)
                 <Col span={18}>
                   <label className="header-text">Company</label>
                   <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].CompanyName}</label>
+                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].CompanyName}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
@@ -563,25 +522,7 @@ console.log("match",match.params)
                   <label className="header-text">IssueType</label>
                   <br />
 
-                  {
-                    userstate.issuedata.details[0]
-                      && (userstate.issuedata.details[0].NodeName !== "support"
-                        || userstate.issuedata.details[0].FlowStatus !== "Waiting ICON Support")
-                      ? <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
-                      : <Select
-                        style={{ width: '100%' }}
-                        allowClear
-                        showSearch
-
-                        filterOption={(input, option) =>
-                          option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onClick={() => getIssueType()}
-                        options={userstate.masterdata.issueTypeState && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onChange={(value, item) => SaveIssueType(value, item)}
-                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}
-                      />
-                  }
+                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].IssueType}</label>
 
                 </Col>
               </Row>
@@ -589,35 +530,25 @@ console.log("match",match.params)
                 <Col span={18}>
                   <label className="header-text">Product</label>
                   <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && `${userstate.issuedata.details[0].ProductName} - (${userstate.issuedata.details[0].ProductFullName})`}</label>
+                 
+                  <label className="value-text">{userstate.taskdata.data[0] && `${userstate.taskdata.data[0].ProductName} - (${userstate.taskdata.data[0].ProductFullName})`}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Module</label>
                   <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
+                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].ModuleName}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Assignee</label>
                   <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Assignee}</label>
+                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].Assignee}</label>
                 </Col>
               </Row>
 
-
-              {/* <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Document</label>
-                  <Button icon={<FileAddOutlined />}
-                    type="link"
-                    onClick={() => setUnittestlog_visible(true)}
-                  />
-
-                </Col>
-              </Row> */}
 
             </Col>
             {/* SideBar */}
@@ -656,6 +587,7 @@ console.log("match",match.params)
         }}
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          taskId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
           mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
           productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
           moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,

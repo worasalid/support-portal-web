@@ -26,7 +26,10 @@ export default function Subject() {
   const match = useRouteMatch();
   const history = useHistory();
   const selectRef = useRef(null)
+  const subTaskRef = useRef(null)
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
+
+  console.log(subTaskRef);
 
   //modal
   // const [visible, setVisible] = useState(false);
@@ -388,15 +391,15 @@ export default function Subject() {
                 {/* SubTask */}
                 <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
                   <Col span={24}>
-                   <Button type="primary" 
-                    onClick= {() => setModaladdtask(true)}
-                   > CreateTask
+                    <Button type="primary"
+                      onClick={() => setModaladdtask(true)}
+                    > CreateTask
                    </Button>
                   </Col>
                 </Row>
                 <Row style={{ marginTop: 26, marginRight: 24 }}>
                   <Col span={24}>
-                    <ListSubTask subject={match.params.id} />
+                    <ListSubTask ticketId={match.params.id} ref={subTaskRef} />
                   </Col>
                 </Row>
 
@@ -629,15 +632,16 @@ export default function Subject() {
         onCancel={() => { return (setModaladdtask(false), setSelected(null)) }}
         onOk={() => {
           setModaladdtask(false);
+          subTaskRef.current.GetTask()
         }}
         details={{
           ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId
-         
+
         }}
       />
 
-     
+
       <ModalDueDate
         title="DueDate"
         visible={modalduedate_visible}
@@ -659,7 +663,7 @@ export default function Subject() {
         }}
       />
 
-     
+
 
     </MasterPage>
   );

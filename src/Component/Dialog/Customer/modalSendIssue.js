@@ -41,26 +41,82 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
 
     }
   }
+  // const SendFlow = async () => {
+  //   try {
+  //     const sendflow = await Axios({
+  //       url: process.env.REACT_APP_API_URL + "/workflow/send",
+  //       method: "POST",
+  //       headers: {
+  //         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+  //       },
+  //       data: {
+  //         mailbox_id: details && details.mailboxId,
+  //         node_output_id: details && details.node_output_id,
+  //         to_node_id: details && details.to_node_id,
+  //         node_action_id: details && details.to_node_action_id,
+  //         product_id: details && details.productId,
+  //         flowstatus: details.flowstatus,
+  //         groupstatus: details.groupstatus,
+  //         history: {
+  //           historytype: "Customer",
+  //           description: details.flowaction,
+  //         }
+  //       }
+  //     });
+
+  //     if (sendflow.status === 200) {
+  //       await Modal.info({
+  //         title: 'บันทึกข้อมูลสำเร็จ',
+  //         content: (
+  //           <div>
+  //             <p>บันทึกข้อมูลสำเร็จ</p>
+  //           </div>
+  //         ),
+  //         onOk() {
+  //           editorRef.current.editor.setContent("")
+  //           onOk();
+  //           if (details.flowstatus === "Waiting ICON Support") {
+  //             history.push({ pathname: "/customer/issue/inprogress" })
+  //           }
+  //           if (details.flowstatus === "Complete") {
+  //             history.push({ pathname: "/customer/issue/complete" })
+  //           }
+
+  //         },
+  //       });
+  //     }
+
+  //   } catch (error) {
+  //     await Modal.info({
+  //       title: 'บันทึกข้อมูลไม่สำเร็จ',
+  //       content: (
+  //         <div>
+  //           <p>{error.message}</p>
+  //           <p>{error.response.data}</p>
+  //         </div>
+  //       ),
+  //       onOk() {
+  //         editorRef.current.editor.setContent("")
+  //         onOk();
+  //       },
+  //     });
+
+  //   }
+  // }
+
   const SendFlow = async () => {
     try {
       const sendflow = await Axios({
-        url: process.env.REACT_APP_API_URL + "/workflow/send",
+        url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
         method: "POST",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         data: {
-          mailbox_id: details && details.mailboxId,
-          node_output_id: details && details.node_output_id,
-          to_node_id: details && details.to_node_id,
-          node_action_id: details && details.to_node_action_id,
-          product_id: details && details.productId,
-          flowstatus: details.flowstatus,
-          groupstatus: details.groupstatus,
-          history: {
-            historytype: "Customer",
-            description: details.flowaction,
-          }
+          ticketId: details.ticketId,
+          mailboxId: details.mailboxId,
+          flowoutputId: details.flowoutputId
+
         }
       });
 
@@ -75,10 +131,10 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           onOk() {
             editorRef.current.editor.setContent("")
             onOk();
-            if (details.flowstatus === "Waiting ICON Support") {
+            if (sendflow.data === "InProgress") {
               history.push({ pathname: "/customer/issue/inprogress" })
             }
-            if (details.flowstatus === "Complete") {
+            if (sendflow.data === "Complete") {
               history.push({ pathname: "/customer/issue/complete" })
             }
 

@@ -1,15 +1,19 @@
 
-import React, { useEffect, useState } from 'react'
-import { List, Row, Col, Button, Popconfirm,Modal } from 'antd'
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import { List, Row, Col, Button, Popconfirm, Modal } from 'antd'
 import Axios from 'axios'
 import { useRouteMatch, useHistory } from 'react-router-dom'
 import { ArrowRightOutlined, DeleteOutlined, FileOutlined } from '@ant-design/icons';
 
 
 
-export default function ListSubTask({ subject, ...props }) {
+export default forwardRef(({ ticketId, ...props }, ref) => {
     const history = useHistory();
     const [listdata, setListdata] = useState([]);
+
+    useImperativeHandle(ref, () => ({
+        GetTask: () => GetTask()
+    }));
 
     const GetTask = async () => {
         try {
@@ -20,7 +24,7 @@ export default function ListSubTask({ subject, ...props }) {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: subject
+                    ticketId: ticketId
                 }
             });
             setListdata(task.data.map((value) => {
@@ -45,7 +49,7 @@ export default function ListSubTask({ subject, ...props }) {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: subject,
+                    ticketId: ticketId,
                     taskId: value
                 }
             });
@@ -79,11 +83,16 @@ export default function ListSubTask({ subject, ...props }) {
         }
     }
 
-    useEffect(() => {
-        GetTask()
-    }, [listdata])
+    // useEffect(() => {
+    //     GetTask()
+    // }, [])
 
-    console.log("listdata", listdata && listdata);
+    // useEffect(() => {
+    //     GetTask();
+
+    // }, [listdata.length])
+    // console.log("listdata", listdata && listdata.length)
+
     return (
         <>
             <List
@@ -92,7 +101,7 @@ export default function ListSubTask({ subject, ...props }) {
                 renderItem={item => (
                     <Row align="middle">
                         <Col span={23} className="task-active"
-                            onClick={() => history.push({ pathname: "/internal/issue/subject/" + subject + "/task-" + item.Id })}
+                            onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.Id })}
                         >
                             <List.Item>
                                 <List.Item.Meta
@@ -132,4 +141,4 @@ export default function ListSubTask({ subject, ...props }) {
             />
         </>
     )
-};
+});

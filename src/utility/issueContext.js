@@ -29,6 +29,9 @@ export const customerState = {
         datarow: [],
         details: []
     },
+    taskdata:{
+        data: []
+    },
     actionflow: [],
     node: {
         input_id: 0,
@@ -93,6 +96,7 @@ export const customerReducer = createReducer(customerState, {
 
     LOAD_ISSUE: (state, { payload }) => { state.issuedata.data = payload },
     LOAD_ISSUEDETAIL: (state, {payload}) => {state.issuedata.details = payload},
+    LOAD_TASKDATA: (state, {payload}) => {state.taskdata.data = payload},
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
     LOAD_TYPE: (state, { payload }) => { state.masterdata.issueTypeState = payload },

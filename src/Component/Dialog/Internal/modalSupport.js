@@ -15,8 +15,9 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
-    // page.loaddata.IssueType = page.data.IssueTypeData.map(x => ({ name: x.name, value: x.id }))
-    // page.loaddata.Module = page.data.ModuleData.map(x => ({ name: x.text, value: x.value }))
+
+    //data
+    const [counttask,setCounttask] = useState(null)
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -77,6 +78,26 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         }
     }
 
+    const GetTask = async () => {
+        try {
+            const task = await Axios({
+                url: process.env.REACT_APP_API_URL + "/tickets/load-task",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    ticketId: details.ticketId
+                }
+            });
+            if (task.data.filter((x) => x.Status === "Waiting Progress")) {
+                
+            }
+        } catch (error) {
+
+        }
+    }
+
     const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
@@ -86,6 +107,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
+                    taskId: details.taskId,
                     mailbox_id: details && details.mailboxId,
                     node_output_id: details && details.node_output_id,
                     to_node_id: details && details.to_node_id,
@@ -98,7 +120,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     history: {
                         historytype: "Customer",
                         description: details.flowaction
-                      }
+                    }
                 }
             });
             if (sendflow.status === 200) {
@@ -113,17 +135,17 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         editorRef.current.editor.setContent("");
                         onOk();
                         formRef.resetFields();
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        // history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
         } catch (error) {
-            console.log("error",error.response)
+            console.log("error", error.response)
             await Modal.info({
                 title: 'บันทึกไม่สำเร็จ',
                 content: (
                     <div>
-                         <p>{error.message}</p>
+                        <p>{error.message}</p>
                         <p>{error.response.data}</p>
                     </div>
                 ),
@@ -139,7 +161,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     const onFinish = (values) => {
         SaveComment();
         SendFlow(values);
-  
+
     };
     useEffect(() => {
         if (visible) {
@@ -154,6 +176,9 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
             formRef.setFieldsValue({ issuetype: details.internaltype, module: details.moduleId })
         }
     }, [details.internaltype, visible, formRef])
+
+
+    console.log("detail",details && details)
 
     return (
         <Modal

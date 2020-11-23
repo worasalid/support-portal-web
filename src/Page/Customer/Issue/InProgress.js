@@ -59,32 +59,19 @@ export default function InProgress() {
     }
   };
 
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
-      }
-    });
-    customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
-  }
 
-  const UpdateStatusMailbox = async (value) => {
-    const mailbox = await Axios({
-      url: process.env.REACT_APP_API_URL + "/tickets/read",
-      method: "PATCH",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        mailbox_id: value
-      }
-    });
-  }
+  // const UpdateStatusMailbox = async (value) => {
+  //   const mailbox = await Axios({
+  //     url: process.env.REACT_APP_API_URL + "/tickets/read",
+  //     method: "PATCH",
+  //     headers: {
+  //       "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+  //     },
+  //     params: {
+  //       mailbox_id: value
+  //     }
+  //   });
+  // }
 
   useEffect(() => {
     customerdispatch({ type: "LOADING", payload: true })
@@ -168,8 +155,8 @@ export default function InProgress() {
                         onClick={() => {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id }),
-                            (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id })
+                            // (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
                         }

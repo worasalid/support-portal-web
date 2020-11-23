@@ -79,7 +79,6 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     }
 
     const onFinish = (values) => {
-        console.log(values);
         CreateTask(values);
     };
 
