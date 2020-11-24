@@ -130,6 +130,4 @@ export const userReducer = createReducer(userState, {
     LOAD_COUNT_MYTASK: (state, { payload }) => { state.toolbar.issuecount.mytask = payload },
 });
 
-
-
 export default IssueContext;

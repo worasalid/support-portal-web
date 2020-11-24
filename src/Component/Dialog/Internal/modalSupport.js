@@ -98,6 +98,66 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         }
     }
 
+    // const SendFlow = async (values) => {
+    //     try {
+    //         const sendflow = await Axios({
+    //             url: process.env.REACT_APP_API_URL + "/workflow/send",
+    //             method: "POST",
+    //             headers: {
+    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+    //             },
+    //             data: {
+    //                 taskId: details.taskId,
+    //                 mailbox_id: details && details.mailboxId,
+    //                 node_output_id: details && details.node_output_id,
+    //                 to_node_id: details && details.to_node_id,
+    //                 node_action_id: details && details.to_node_action_id,
+    //                 product_id: details && details.productId,
+    //                 issuetype: values.issuetype,
+    //                 module_id: values.module,
+    //                 flowstatus: details.flowstatus,
+    //                 groupstatus: details.groupstatus,
+    //                 history: {
+    //                     historytype: "Customer",
+    //                     description: details.flowaction
+    //                 }
+    //             }
+    //         });
+    //         if (sendflow.status === 200) {
+    //             await Modal.info({
+    //                 title: 'บันทึกข้อมูลสำเร็จ',
+    //                 content: (
+    //                     <div>
+    //                         <p>บันทึกข้อมูลสำเร็จ</p>
+    //                     </div>
+    //                 ),
+    //                 onOk() {
+    //                     editorRef.current.editor.setContent("");
+    //                     onOk();
+    //                     formRef.resetFields();
+    //                     // history.push({ pathname: "/internal/issue/inprogress" })
+    //                 },
+    //             });
+    //         }
+    //     } catch (error) {
+    //         console.log("error", error.response)
+    //         await Modal.info({
+    //             title: 'บันทึกไม่สำเร็จ',
+    //             content: (
+    //                 <div>
+    //                     <p>{error.message}</p>
+    //                     <p>{error.response.data}</p>
+    //                 </div>
+    //             ),
+    //             onOk() {
+    //                 editorRef.current.editor.setContent("");
+    //                 onOk();
+    //                 formRef.resetFields();
+    //             },
+    //         });
+    //     }
+    // }
+
     const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
@@ -107,20 +167,9 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    taskId: details.taskId,
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    issuetype: values.issuetype,
-                    module_id: values.module,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Customer",
-                        description: details.flowaction
-                    }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowid: details.flowid
                 }
             });
             if (sendflow.status === 200) {
@@ -178,7 +227,6 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     }, [details.internaltype, visible, formRef])
 
 
-    console.log("detail",details && details)
 
     return (
         <Modal
@@ -201,7 +249,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 // }}
                 onFinish={onFinish}
             >
-                IssueType
+                {/* IssueType
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="issuetype"
@@ -226,12 +274,13 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         }
                     >
                     </Select>
-                </Form.Item>
+                </Form.Item> */}
 
-                Module
-                <Form.Item
+                
+                {/* <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="module"
+                    label="Module"
                     rules={[
                         {
                             required: true,
@@ -252,7 +301,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         }
                     >
                     </Select>
-                </Form.Item>
+                </Form.Item> */}
             </Form>
              Remark :
             <Editor

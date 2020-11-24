@@ -41,10 +41,11 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId : details.ticketId,
+                    ticketid : details.ticketid,
                     title: values.title,
                     description: values.description,
-                    moduleId: values.module
+                    moduleid: values.module,
+                    mailboxid: details.mailboxid
                 }
             });
             if (createtask.status === 200) {

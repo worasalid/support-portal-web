@@ -45,9 +45,8 @@ export default function CommentBox({ loadingComment = false }) {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: match.params.id,
+                    taskId: match.params.task,
                     type: "internal"
-
                 }
             });
             if (commment_list.status === 200) {
@@ -55,7 +54,6 @@ export default function CommentBox({ loadingComment = false }) {
                     return {
                         id: values.Id,
                         author: values.CreateName,
-                        // datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
                         datetime: moment(values.CreateDate).format("DD/MM/YYYY H:mm"),
                         content: values.Text,
                         cntfile: values.cntFile
@@ -88,10 +86,11 @@ export default function CommentBox({ loadingComment = false }) {
 
     const onFinish = async (values) => {
         console.log("onFinish", values)
+        console.log("commenttext", commenttext)
         try {
 
             if (commenttext === "") {
-                throw ("")
+                throw ("กรุณาระบุ Comment!")
             }
 
             const createcomment = await Axios({
@@ -102,6 +101,7 @@ export default function CommentBox({ loadingComment = false }) {
                 },
                 data: {
                     ticketId: match.params.id,
+                    taskId: match.params.task,
                     comment_text: commenttext,
                     comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -128,7 +128,9 @@ export default function CommentBox({ loadingComment = false }) {
 
 
             }
+
         } catch (error) {
+            console.log(error.response);
             Modal.info({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
 
@@ -136,11 +138,13 @@ export default function CommentBox({ loadingComment = false }) {
                 // okCancel:true,
                 content: (
                     <div>
-                        <p>กรุณาระบุ Comment!</p>
+                        <p>{error.response?.data ? error.response?.data : error.message || error}</p>
                     </div>
                 ),
                 onOk() {
-
+                    setModalemail_visible(false)
+                    editorRef.current.editor.setContent("")
+                    form.resetFields();
                 },
                 onCancel() {
 
@@ -342,8 +346,8 @@ export default function CommentBox({ loadingComment = false }) {
                             return (
                                 setDisabled(e.target.checked)
                             )
-                              
-                               
+
+
                         }} />
                     </Form.Item>
                     <Form.Item name="sendto" label="To" >
@@ -365,27 +369,7 @@ export default function CommentBox({ loadingComment = false }) {
                             }
                         >
                         </Select>
-
                     </Form.Item>
-                    {/* <Form.Item name="email_cc" label="CC" >
-                        <Select style={{ width: '100%' }} placeholder="None"
-                            // showSearch
-                            mode="multiple"
-
-                            allowClear
-                            filterOption={(input, option) =>
-                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            // onChange={(value, item) => setListmailbox(item.value)}
-                            options={
-                                listmailbox && listmailbox.map((item) => ({
-                                    value: item.UserId,
-                                    label: item.UserName + " (" + item.Email + ")"
-                                }))
-                            }
-                        >
-                        </Select>
-                    </Form.Item> */}
                 </Form>
 
             </Modal>

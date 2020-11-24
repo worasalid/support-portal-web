@@ -29,7 +29,6 @@ export default function Subject() {
   const subTaskRef = useRef(null)
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
-  console.log(subTaskRef);
 
   //modal
   // const [visible, setVisible] = useState(false);
@@ -188,8 +187,7 @@ export default function Subject() {
         ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
         typeId: value,
         history: {
-          historytype: "Customer",
-          description: "Changed the IssueType ",
+         
           value: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText,
           value2: item.label
         }
@@ -411,14 +409,14 @@ export default function Subject() {
                     {
                       userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
                         ?
-                        <Tabs defaultActiveKey="2" >
+                        <Tabs defaultActiveKey="1" >
                           <TabPane tab="Comment" key="1">
                             <CommentBox />
                           </TabPane>
-                          <TabPane tab="Internal Note" key="2" >
+                          {/* <TabPane tab="Internal Note" key="2" >
                             <InternalComment />
-                          </TabPane>
-                          <TabPane tab="History Log" key="3">
+                          </TabPane> */}
+                          <TabPane tab="History Log" key="2">
                             <Historylog />
                           </TabPane>
                         </Tabs>
@@ -635,8 +633,9 @@ export default function Subject() {
           subTaskRef.current.GetTask()
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId
+          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId
+          // productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId
 
         }}
       />

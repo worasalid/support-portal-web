@@ -23,7 +23,7 @@ export default function Subject() {
   const match = useRouteMatch();
   const history = useHistory();
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
-
+console.log({customerstate});
   // div
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block");

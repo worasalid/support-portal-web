@@ -69,19 +69,6 @@ export default function Mytask() {
     }
   };
 
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
-      }
-    });
-    userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
-  }
 
   const UpdateStatusMailbox = async (value) => {
     const mailbox = await Axios({

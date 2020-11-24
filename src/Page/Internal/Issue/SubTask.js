@@ -340,9 +340,9 @@ export default function SubTask() {
     }
 
   }, [historyduedate_visible])
-console.log("params",match.params.task)
-  // console.log("issuedetail", userstate.issuedata.details[0] && userstate.issuedata.details[0].Number)
-  // console.log("taskdata", userstate.taskdata.data[0] && userstate.taskdata.data[0].Priority)
+
+   console.log("issuedetail", userstate.issuedata.details[0] && userstate.issuedata.details[0])
+   console.log("taskdata", userstate.taskdata.data[0] && userstate.taskdata.data[0])
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -586,18 +586,21 @@ console.log("params",match.params.task)
           setVisible(false);
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          taskId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
-          moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
-          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId
+          // ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          // taskId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          // mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          // productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
+          // moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
+          // internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
+          // node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
+          // to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
+          // to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
+          // flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
+          // groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
+          // flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
         }}
       />
 

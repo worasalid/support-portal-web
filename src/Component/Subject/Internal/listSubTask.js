@@ -1,6 +1,6 @@
 
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { List, Row, Col, Button, Popconfirm, Modal } from 'antd'
+import { List, Row, Col, Button, Popconfirm, Modal, Tag } from 'antd'
 import Axios from 'axios'
 import { useRouteMatch, useHistory } from 'react-router-dom'
 import { ArrowRightOutlined, DeleteOutlined, FileOutlined } from '@ant-design/icons';
@@ -29,10 +29,11 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
             });
             setListdata(task.data.map((value) => {
                 return {
-                    Id: value.id,
-                    title: value.title,
-                    status: value.status,
-                    description: value.description
+                    taskId: value.TaskId,
+                    title: value.Title,
+                    module: value.ModuleName,
+                    status: value.Status,
+                    description: value.Description
                 }
             }))
         } catch (error) {
@@ -83,9 +84,9 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
         }
     }
 
-    // useEffect(() => {
-    //     GetTask()
-    // }, [])
+    useEffect(() => {
+        GetTask()
+    }, [])
 
     // useEffect(() => {
     //     GetTask();
@@ -101,7 +102,7 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
                 renderItem={item => (
                     <Row align="middle">
                         <Col span={23} className="task-active"
-                            onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.Id })}
+                            onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.taskId })}
                         >
                             <List.Item>
                                 <List.Item.Meta
@@ -110,7 +111,7 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
                                             <Col span={23} >
                                                 <Row>
                                                     <Col span={1}>{<FileOutlined />}</Col>
-                                                    <Col span={17}>{item.title}</Col>
+                                                    <Col span={17}>{item.title}  <Tag color="#f50">{item.module} </Tag></Col>
                                                     <Col span={6} style={{ textAlign: "right" }} >{renderColorPriority(item.status)}{item.status}</Col>
                                                 </Row>
 
@@ -125,7 +126,7 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
                         <Col span={1} style={{ textAlign: "right" }}>
                             <Popconfirm title="ต้องการลบ Task งาน ใช่หรือไม่"
                                 okText="Yes" cancelText="No"
-                                onConfirm={() => DeleteTask(item.Id)}
+                                onConfirm={() => DeleteTask(item.taskId)}
                                 style={{ width: "300px" }}
                             >
                                 <Button type="link">
