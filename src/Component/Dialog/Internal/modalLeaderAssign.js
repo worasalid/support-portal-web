@@ -28,8 +28,9 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    productId: details.productId,
-                    moduleId: details.moduleId
+                     productId: 4,
+                     moduleId: 12
+                    //taskid: details.taskid
                 }
             });
             setAssignlist(assign.data)

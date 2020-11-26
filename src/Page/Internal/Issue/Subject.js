@@ -187,7 +187,7 @@ export default function Subject() {
         ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
         typeId: value,
         history: {
-         
+
           value: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText,
           value2: item.label
         }
@@ -388,12 +388,16 @@ export default function Subject() {
 
                 {/* SubTask */}
                 <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
-                  <Col span={24}>
-                    <Button type="primary"
-                      onClick={() => setModaladdtask(true)}
-                    > CreateTask
-                   </Button>
-                  </Col>
+                  {
+                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
+                      ? <Col span={24}>
+                        <Button type="primary" onClick={() => setModaladdtask(true)} >
+                          CreateTask
+                        </Button>
+                      </Col>
+                      : ""
+                  }
+
                 </Row>
                 <Row style={{ marginTop: 26, marginRight: 24 }}>
                   <Col span={24}>

@@ -111,9 +111,13 @@ div.sd-page-topic {
     color: #1890ff;
 }
 .task-active:hover {
-    border: 1px solid;
-    color: #1890ff;
+    // border: 1px solid;
+    // color: #1890ff;
+    background-color: rgb(214, 211, 211);
     cursor: pointer;
+    box-shadow: 5px 10px 50px rgba(0,0,0,.2);
+    padding: 3px;
+    
 }
 
 // table

@@ -1,6 +1,6 @@
 
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { List, Row, Col, Button, Popconfirm, Modal, Tag } from 'antd'
+import { List, Row, Col, Button, Popconfirm, Modal, Tag, Card } from 'antd'
 import Axios from 'axios'
 import { useRouteMatch, useHistory } from 'react-router-dom'
 import { ArrowRightOutlined, DeleteOutlined, FileOutlined } from '@ant-design/icons';
@@ -80,7 +80,7 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
             case 'Complete':
                 return <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />
             case 'InProgress':
-                return <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />
+                return <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} /> 
         }
     }
 
@@ -97,22 +97,24 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
     return (
         <>
             <List
+             
                 itemLayout="horizontal"
                 dataSource={listdata}
                 renderItem={item => (
                     <Row align="middle">
                         <Col span={23} className="task-active"
+                          style={{boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px"}}
                             onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.taskId })}
                         >
-                            <List.Item>
-                                <List.Item.Meta
+                            <List.Item >
+                                <List.Item.Meta 
                                     title={
                                         <Row >
                                             <Col span={23} >
                                                 <Row>
                                                     <Col span={1}>{<FileOutlined />}</Col>
                                                     <Col span={17}>{item.title}  <Tag color="#f50">{item.module} </Tag></Col>
-                                                    <Col span={6} style={{ textAlign: "right" }} >{renderColorPriority(item.status)}{item.status}</Col>
+                                                    <Col span={6} style={{ textAlign: "right" }} >{renderColorPriority(item.status)}&nbsp;&nbsp;&nbsp;{item.status}</Col>
                                                 </Row>
 
                                             </Col>

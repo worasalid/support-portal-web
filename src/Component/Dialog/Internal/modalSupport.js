@@ -169,7 +169,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 data: {
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
-                    flowid: details.flowid
+                    flowoutputid: details.flowoutputid
                 }
             });
             if (sendflow.status === 200) {
