@@ -47,9 +47,30 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
             GetDocument();
         }
     }, [details.refId])
-
+    console.log("listfile.length", listfile.length)
     return (
         <>
+            {
+                listfile.length === 0
+                    ?
+                    // <label className="header-text">Document</label>
+                    <span
+
+                        style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
+                        onClick={
+                            () => {
+                                return (
+                                    setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                    setCollapseicon(divcollapse === 'block' ? <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+                                )
+                            }
+                        }
+                    >
+                        {collapseicon}
+                    </span>
+                    : ""
+            }
+        
             <label className="header-text">Document</label>
             <span
 
@@ -66,9 +87,8 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                 {collapseicon}
             </span>
 
-
             <div style={{ display: divcollapse }}>
-            {
+                {
                     listfile.filter((x) => x.GroupType === "vdoUpload").length !== 0
                         ? <Tabs defaultActiveKey="1" type="card">
                             <TabPane tab="Document Deploy" key="1" >
@@ -189,7 +209,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                         render={(value, record, index) => {
                                             return (
                                                 <>
-                                                    <label className="text-hover" style={{ padding: 0,color: "#1890ff" }}
+                                                    <label className="text-hover" style={{ padding: 0, color: "#1890ff" }}
                                                         onClick={() => window.open(record.Url, "_blank")}
                                                     >
                                                         {record.Url}
@@ -199,8 +219,8 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                         }
                                         }
                                     />
-                                     <Column title="Description" dataIndex="Remark" width="30%"></Column>
-                                  
+                                    <Column title="Description" dataIndex="Remark" width="30%"></Column>
+
                                     <Column title="วันที่"
                                         align="center"
                                         width="10%"

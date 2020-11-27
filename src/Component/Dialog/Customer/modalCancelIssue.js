@@ -18,34 +18,21 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
 
     const FlowCancel = async (values) => {
         try {
-            const completeflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/cancel",
+            const cancelflow = await Axios({
+                url: process.env.REACT_APP_API_URL + "/workflow/customer-cancel",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: details && details.ticketId,
-                    ticketnumber: details && details.ticketnumber,
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    cancel_reason: 0,
-                    cancel_reasontext: "",
-                    cancel_description: values.description,
-                    //node_action_id: details && details.to_node_action_id,
-                   // product_id: details && details.productId,
-                   // module_id: details && details.moduleId,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Customer",
-                        description: details.flowaction
-                    }
+                    ticketid: details.ticketid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
+                    description: values.description
                 }
             });
 
-            if (completeflow.status === 200) {
+            if (cancelflow.status === 200) {
                 onCancel();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -55,11 +42,10 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
                         </div>
                     ),
                     onOk() {
-                        form.resetFields();
                         onOk();
-                        if (details.flowstatus === "Cancel") {
-                            history.push({ pathname: "/customer/issue/cancel" })
-                        }
+                        history.push({ pathname: "/customer/issue/cancel" })
+                        form.resetFields();
+                        
                     },
                 });
             }

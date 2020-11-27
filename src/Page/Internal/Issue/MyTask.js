@@ -69,7 +69,6 @@ export default function Mytask() {
     }
   };
 
-
   const UpdateStatusMailbox = async (value) => {
     const mailbox = await Axios({
       url: process.env.REACT_APP_API_URL + "/tickets/read",
@@ -141,7 +140,7 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <div>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Number}
                       </label>
 
@@ -169,7 +168,7 @@ export default function Mytask() {
                   return (
                     <>
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.Title}
                         </label>
                       </div>
@@ -200,13 +199,13 @@ export default function Mytask() {
                     <>
 
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.CreateBy}
                         </label>
                       </div>
 
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
@@ -230,7 +229,7 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
                       </label>
                       <br />

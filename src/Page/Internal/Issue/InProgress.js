@@ -84,19 +84,6 @@ export default function InProgress() {
     userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
   }
 
-  const UpdateStatusMailbox = async (value) => {
-    const mailbox = await Axios({
-      url: process.env.REACT_APP_API_URL + "/tickets/read",
-      method: "PATCH",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        mailbox_id: value
-      }
-    });
-  }
-
 
   function HandleChange(items) {
     console.log("Menu", items.item.props.node)

@@ -135,7 +135,7 @@ export default function MyTask() {
               render={(record, index) => {
                 return (
                   <div>
-                    <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                       {record.Number}
                     </label>
                     <div style={{ marginTop: 10, fontSize: "smaller" }}>
@@ -161,7 +161,7 @@ export default function MyTask() {
                 return (
                   <>
                     <div>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Title}
                       </label>
                     </div>
@@ -189,7 +189,7 @@ export default function MyTask() {
               render={(record) => {
                 return (
                   <>
-                    <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                       {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
                     </label>
 
@@ -230,25 +230,6 @@ export default function MyTask() {
               }
               }
             />
-
-            {/* <Column title="SLA"
-              align="center"
-              width="10%"
-              render={(record) => {
-                return (
-                  <>
-                   {record.GroupStatus === "Wait For Progress" ? "" :
-                    <Clock
-                      showseconds={false}
-                      deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                    />
-                }
-                  </>
-                )
-              }
-
-              }
-            /> */}
 
             <Column
               title="ProgressStatus"

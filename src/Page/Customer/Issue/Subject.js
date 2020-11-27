@@ -7,7 +7,7 @@ import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UnderlineOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
@@ -23,7 +23,7 @@ export default function Subject() {
   const match = useRouteMatch();
   const history = useHistory();
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
-console.log({customerstate});
+  console.log({ customerstate });
   // div
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block");
@@ -71,6 +71,38 @@ console.log({customerstate});
       if (ticket_detail.status === 200) {
         customerdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
         getflow_output(ticket_detail.data[0].TransId)
+      }
+    } catch (error) {
+
+    }
+  }
+
+  const UndoIssue = async (value) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/issue-undo",
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          mailboxid: value
+        }
+      });
+
+      if (result.status === 200) {
+        await Modal.info({
+          title: 'บันทึกข้อมูลสำเร็จ',
+          content: (
+            <div>
+              <p>ยกเลิกการส่ง Issue เลขที่ : {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</p>
+            </div>
+          ),
+          onOk() {
+            history.push({ pathname: "/customer/issue/mytask" })
+          },
+        });
+
       }
     } catch (error) {
 
@@ -225,15 +257,15 @@ console.log({customerstate});
 
             {/* SideBar */}
             <Col
-              span={6}
-              style={{ backgroundColor: "#fafafa", padding: 24 }}
+              span={8}
+              style={{ backgroundColor: "#fafafa", padding: 24, border: "1px" }}
             >
               <Row style={{ marginBottom: 30 }}>
-                <Col span={18}>
+                <Col span={24}>
                   <label className="header-text">Progress Status</label>
                   <br />
                   <Select
-                    style={{ width: "100%", marginTop: 8 }}
+                    style={{ width: "60%", marginTop: 8 }}
                     placeholder="None"
                     onChange={(value, item) => HandleChange(value, item)}
                     value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus}
@@ -244,7 +276,21 @@ console.log({customerstate});
                     }
                   >
                   </Select>
+                  {
+                    customerstate.issuedata.details[0] &&
+                      customerstate.issuedata.details[0].IsUndo === true &&
+                      customerstate.issuedata.details[0].MailType === "out" &&
+                      customerstate.issuedata.details[0].GroupStatus === "InProgress"
+                      ? <Button type="primary" icon={<UndoOutlined />} color="green" style={{ marginLeft: 20 }}
+                        onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
+                      >
+                        Undo
+                    </Button>
+                      : ""
+                  }
+
                 </Col>
+
               </Row>
               <Row style={{ marginBottom: 30 }}>
                 <Col span={18}>
@@ -326,15 +372,9 @@ console.log({customerstate});
           setVisible(false);
         }}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          flowoutputId: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
-          // to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          // to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          // flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          // groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          // flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
-
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
         }}
       />
 
@@ -345,17 +385,9 @@ console.log({customerstate});
         width={700}
         onOk={() => setModalcomplete_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          ticketnumber: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number,
-          productId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProductId,
-          moduleId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleId,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
         }}
       />
 
@@ -366,14 +398,9 @@ console.log({customerstate});
         width={700}
         onOk={() => setModalcancel_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          ticketnumber: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
         }}
       />
 

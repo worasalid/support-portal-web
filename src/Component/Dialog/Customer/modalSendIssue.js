@@ -113,9 +113,9 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         data: {
-          ticketId: details.ticketId,
-          mailboxId: details.mailboxId,
-          flowoutputId: details.flowoutputId
+          ticketid: details.ticketid,
+          mailboxid: details.mailboxid,
+          flowoutputid: details.flowoutputid
 
         }
       });
@@ -125,7 +125,8 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           title: 'บันทึกข้อมูลสำเร็จ',
           content: (
             <div>
-              <p>บันทึกข้อมูลสำเร็จ</p>
+              <p>ส่ง Issue เลขที่ : {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</p>
+              <p>ให้ ICON ดำเนินการแก้ไข</p>
             </div>
           ),
           onOk() {
@@ -153,7 +154,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
         ),
         onOk() {
           editorRef.current.editor.setContent("")
-          onOk();
+        
         },
       });
 
@@ -168,7 +169,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
     <Modal
       // title={title}
       visible={visible}
-      onOk={() => { return (SaveComment(), SendFlow()) }}
+      onOk={() => { return (SaveComment(), SendFlow(), onOk()) }}
       onCancel={() => { return (editorRef.current.editor.setContent(""), onCancel()) }}
       {...props}
     >

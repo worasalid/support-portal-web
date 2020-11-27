@@ -19,33 +19,20 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   const FlowComplete = async (values) => {
     try {
       const completeflow = await Axios({
-        url: process.env.REACT_APP_API_URL + "/workflow/complete",
+        url: process.env.REACT_APP_API_URL + "/workflow/customer-complete",
         method: "POST",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         data: {
-          ticketId: details && details.ticketId,
-          ticketnumber: details && details.ticketnumber,
-          mailbox_id: details && details.mailboxId,
-          node_output_id: details && details.node_output_id,
-          to_node_id: details && details.to_node_id,
-          node_action_id: details && details.to_node_action_id,
-          product_id: details && details.productId,
-          module_id: details && details.moduleId,
-          flowstatus: details.flowstatus,
-          groupstatus: details.groupstatus,
-          type: "Customer",
-          history: {
-            historytype: "Customer",
-            description: details.flowaction
-          },
+          ticketid: details.ticketid,
+          mailboxid: details.mailboxid,
+          flowoutputid: details.flowoutputid,
           satisfication: {
             score: values.score,
             suggestion: values.suggestion
 
           }
-
         }
       });
 
