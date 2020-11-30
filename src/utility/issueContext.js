@@ -77,6 +77,7 @@ export const userState = {
         to_node_action_id: 0,
         output_data:[]
     }
+   
     
 }
 

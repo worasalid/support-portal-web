@@ -48,21 +48,28 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
 
     return (
         <>
-            <label className="header-text">Document</label>
-            <span
+           {
+                listfile.length !== 0
+                    ?
+                    <>
+                    <label className="header-text">Document</label>
+                    <span
 
-                style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
-                onClick={
-                    () => {
-                        return (
-                            setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                            setCollapseicon(divcollapse === 'block' ? <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
-                        )
-                    }
-                }
-            >
-                {collapseicon}
-            </span>
+                        style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
+                        onClick={
+                            () => {
+                                return (
+                                    setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                    setCollapseicon(divcollapse === 'block' ? <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+                                )
+                            }
+                        }
+                    >
+                        {collapseicon}
+                    </span>
+                    </>
+                    : ""
+            }
 
             <div style={{ display: divcollapse }}>
                 {

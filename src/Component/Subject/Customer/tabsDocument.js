@@ -51,9 +51,10 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
     return (
         <>
             {
-                listfile.length === 0
+                listfile.length !== 0
                     ?
-                    // <label className="header-text">Document</label>
+                    <>
+                    <label className="header-text">Document</label>
                     <span
 
                         style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
@@ -68,10 +69,11 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                     >
                         {collapseicon}
                     </span>
+                    </>
                     : ""
             }
         
-            <label className="header-text">Document</label>
+            {/* <label className="header-text">Document</label>
             <span
 
                 style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
@@ -85,7 +87,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                 }
             >
                 {collapseicon}
-            </span>
+            </span> */}
 
             <div style={{ display: divcollapse }}>
                 {

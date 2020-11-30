@@ -100,7 +100,7 @@ export default function Subject() {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         params: {
-          trans_id
+          // trans_id
         }
       });
 
@@ -401,7 +401,11 @@ export default function Subject() {
                 </Row>
                 <Row style={{ marginTop: 26, marginRight: 24 }}>
                   <Col span={24}>
-                    <ListSubTask ticketId={match.params.id} ref={subTaskRef} />
+                    <ListSubTask
+                      ticketId={match.params.id} ref={subTaskRef}
+                      //mailtype="out"
+                       mailtype={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType}
+                    />
                   </Col>
                 </Row>
 
@@ -437,18 +441,6 @@ export default function Subject() {
 
 
                     }
-
-                    {/* <Tabs defaultActiveKey="2" >
-                      <TabPane tab="Comment" key="1">
-                        <CommentBox />
-                      </TabPane>
-                      <TabPane tab="Internal Note" key="2" >
-                        <InternalComment />
-                      </TabPane>
-                      <TabPane tab="History Log" key="3">
-                        <Historylog />
-                      </TabPane>
-                    </Tabs> */}
                   </Col>
                 </Row>
               </div>

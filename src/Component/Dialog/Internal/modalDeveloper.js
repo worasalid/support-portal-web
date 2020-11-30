@@ -53,21 +53,9 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    url: values.urltest,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction,
-                        value: "",
-                        value2: ""
-                    }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
                 }
             });
 
@@ -87,7 +75,19 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 });
             }
         } catch (error) {
-
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                       <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.editor.setContent("")
+                    onOk();
+                   
+                },
+            });
         }
     }
 
@@ -99,7 +99,8 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             data: {
-                ticketId: details && details.ticketId,
+                ticketId: details && details.ticketid,
+                taskid: details.taskid,
                 files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
                 url: values.urltest
             }
@@ -129,6 +130,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             },
             data: {
                 ticketId: details && details.ticketId,
+                taskid: details.taskid,
                 files: uploadRef_document.current.getFiles().map((n) => n.response.id),
             }
         })

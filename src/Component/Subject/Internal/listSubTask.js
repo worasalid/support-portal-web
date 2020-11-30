@@ -7,7 +7,7 @@ import { ArrowRightOutlined, DeleteOutlined, FileOutlined } from '@ant-design/ic
 
 
 
-export default forwardRef(({ ticketId, ...props }, ref) => {
+export default forwardRef(({ ticketId,mailtype, ...props }, ref) => {
     const history = useHistory();
     const [listdata, setListdata] = useState([]);
 
@@ -24,7 +24,8 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: ticketId
+                    ticketId: ticketId,
+                    mailtype: mailtype
                 }
             });
             setListdata(task.data.map((value) => {
@@ -33,6 +34,7 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
                     title: value.Title,
                     module: value.ModuleName,
                     status: value.Status,
+                    flowstatus: value.FlowStatus,
                     description: value.Description
                 }
             }))
@@ -80,41 +82,44 @@ export default forwardRef(({ ticketId, ...props }, ref) => {
             case 'Complete':
                 return <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />
             case 'InProgress':
-                return <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} /> 
+                return <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />
         }
     }
 
     useEffect(() => {
         GetTask()
-    }, [])
+    }, [mailtype])
 
     // useEffect(() => {
     //     GetTask();
 
     // }, [listdata.length])
-    // console.log("listdata", listdata && listdata.length)
+    //  console.log("mailtype", mailtype)
 
     return (
         <>
             <List
-             
+
                 itemLayout="horizontal"
                 dataSource={listdata}
                 renderItem={item => (
                     <Row align="middle">
                         <Col span={23} className="task-active"
-                          style={{boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px"}}
+                            style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px" }}
                             onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.taskId })}
                         >
                             <List.Item >
-                                <List.Item.Meta 
+                                <List.Item.Meta
                                     title={
                                         <Row >
                                             <Col span={23} >
                                                 <Row>
                                                     <Col span={1}>{<FileOutlined />}</Col>
-                                                    <Col span={17}>{item.title}  <Tag color="#f50">{item.module} </Tag></Col>
-                                                    <Col span={6} style={{ textAlign: "right" }} >{renderColorPriority(item.status)}&nbsp;&nbsp;&nbsp;{item.status}</Col>
+                                                    <Col span={15}>{item.title}  <Tag color="#f50">{item.module} </Tag></Col>
+                                                    <Col span={8} style={{ textAlign: "right" }} >{renderColorPriority(item.status)}&nbsp;&nbsp;&nbsp;{item.status}</Col>
+                                                </Row>
+                                                <Row style={{textAlign:"right"}}>
+                                                    <Col span={24}>{`(${item.flowstatus})`}</Col>
                                                 </Row>
 
                                             </Col>

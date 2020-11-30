@@ -28,7 +28,6 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 }
-
             });
             setAssignlist(assign.data)
 
@@ -69,22 +68,13 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    // product_id: details && details.productId,
-                    // module_id: details && details.moduleId,
-                    to_user_id: value.assignto,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    recheck: value.recheck,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction,
-                        value: "Assign Task To " + qa_assign,
-                        value2: ""
-                      }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        assigneeid: value.assignto,
+                        recheck: value.recheck
+                    }
                 }
             });
 
@@ -104,7 +94,18 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                 });
             }
         } catch (error) {
-            alert(error)
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.editor.setContent("");
+                    onOk();
+                },
+            });
         }
     }
 
@@ -140,7 +141,7 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                 name="leader-assign"
                 className="login-form"
                 initialValues={{
-                    remember: true,
+                    recheck: false,
                 }}
                 onFinish={onFinish}
             >

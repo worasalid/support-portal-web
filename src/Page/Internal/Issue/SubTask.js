@@ -36,6 +36,8 @@ export default function SubTask() {
   const selectRef = useRef(null)
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
+  const [defaultFlow, setDefaultFlow] = useState(undefined)
+
   //modal
   const [visible, setVisible] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
@@ -110,25 +112,22 @@ export default function SubTask() {
       });
 
       if (flow_output.status === 200) {
-        if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "qa" && userstate.issuedata.details[0].QARecheck) {
+        if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName === "qa" && userstate.taskdata.data[0].QARecheck) {
           userdispatch({
             type: "LOAD_ACTION_FLOW",
             payload: flow_output.data.filter((x) => x.value !== "QApass")
           });
         }
-        if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "qa" && !userstate.issuedata.details[0].QARecheck) {
+        if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName === "qa" && !userstate.issuedata.details[0].QARecheck) {
           userdispatch({
             type: "LOAD_ACTION_FLOW",
             payload: flow_output.data.filter((x) => x.value !== "SendQALeader")
           });
         }
-        if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName !== "qa") {
+        if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName !== "qa") {
           userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
         }
-
       }
-
-
     } catch (error) {
 
     }
@@ -181,95 +180,8 @@ export default function SubTask() {
     }
   }
 
-  const SaveIssueType = async (value, item) => {
-    const issuetype = await Axios({
-      url: process.env.REACT_APP_API_URL + "/tickets/save-issuetype",
-      method: "PATCH",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      data: {
-        ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-        typeId: value,
-        history: {
-          historytype: "Customer",
-          description: "Changed the IssueType ",
-          value: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText,
-          value2: item.label
-        }
-
-      }
-    });
-    if (issuetype.status === 200) {
-
-      Modal.info({
-        title: 'บันทึกข้อมูลเรียบร้อย',
-        content: (
-          <div>
-            <p></p>
-          </div>
-        ),
-        onOk() {
-          getdetail();
-        },
-      });
-    }
-
-  }
-
-  const UpdatePriority = async (value, item) => {
-    try {
-      const priority = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/update-priority",
-        method: "PATCH",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-        data: {
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          priority: value,
-          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
-          history: {
-            historytype: "Customer",
-            description: "Changed the Priority ",
-            value: userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority,
-            value2: item.label
-          }
-        }
-      });
-
-      if (priority.status === 200) {
-        Modal.info({
-          title: 'บันทึกข้อมูลเรียบร้อย',
-          content: (
-            <div>
-              <p></p>
-            </div>
-          ),
-          onOk() {
-            getdetail();
-          },
-        });
-      }
-
-    } catch (error) {
-      Modal.info({
-        title: 'บันทึกข้อมูลไม่สำเร็จ',
-        content: (
-          <div>
-            <p>{error.messeage}</p>
-            <p>{error.respone.data}</p>
-          </div>
-        ),
-        onOk() {
-          getdetail();
-        },
-      });
-    }
-  }
-
   function HandleChange(value, item) {
-    console.log("HandleChange",item)
+    console.log("HandleChange", item)
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
     if (item.data.NodeName === "support" && item.data.value === "SendIssue") { return (setVisible(true)) }
@@ -279,8 +191,8 @@ export default function SubTask() {
     if (item.data.NodeName === "developer_2" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
     if (item.data.NodeName === "developer_1") { setModaldeveloper_visible(true) }
 
-    if (item.data.NodeName === "qa_leader" && item.data.value === "QaAssign") { setModalQAassign_visible(true) }
-    if (item.data.NodeName === "qa_leader" && item.data.value !== "QaAssign") { setModalQA_visible(true) }
+    if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
+    if (item.data.NodeName === "qa_leader" && item.data.value !== "QAassign") { setModalQA_visible(true) }
     if (item.data.NodeName === "qa") { setModalQA_visible(true) }
     if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
 
@@ -341,6 +253,7 @@ export default function SubTask() {
     }
 
   }, [historyduedate_visible])
+
 
   //  console.log("issuedetail", userstate.issuedata.details[0] && userstate.issuedata.details[0])
   //  console.log("taskdata", userstate.taskdata.data[0] && userstate.taskdata.data[0])
@@ -414,8 +327,8 @@ export default function SubTask() {
 
                     <TabsDocument
                       details={{
-                        refId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-                        reftype: "Master_Ticket",
+                        refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+                        reftype: "Ticket_Task",
                       }}
                     />
                   </Col>
@@ -427,17 +340,17 @@ export default function SubTask() {
                     <label className="header-text">Activity</label>
 
                     {
-                        <Tabs defaultActiveKey="1" >
-                          <TabPane tab="Internal Note" key="1" >
-                            <InternalComment />
-                          </TabPane>
-                          <TabPane tab="History Log" key="2">
-                            <Historylog />
-                          </TabPane>
-                        </Tabs>
+                      <Tabs defaultActiveKey="1" >
+                        <TabPane tab="Internal Note" key="1" >
+                          <InternalComment />
+                        </TabPane>
+                        <TabPane tab="History Log" key="2">
+                          <Historylog />
+                        </TabPane>
+                      </Tabs>
                     }
 
-                  
+
                   </Col>
                 </Row>
               </div>
@@ -451,13 +364,13 @@ export default function SubTask() {
                   <label className="header-text">ProgressStatus</label>
                   <br />
                   <Select ref={selectRef}
+                    // defaultValue={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
                     value={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
                     onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
                     disabled={userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out" ? true : false}
-
                   />
                 </Col>
               </Row>
@@ -532,7 +445,7 @@ export default function SubTask() {
                 <Col span={18}>
                   <label className="header-text">Product</label>
                   <br />
-                 
+
                   <label className="value-text">{userstate.taskdata.data[0] && `${userstate.taskdata.data[0].ProductName} - (${userstate.taskdata.data[0].ProductFullName})`}</label>
                 </Col>
               </Row>
@@ -592,18 +505,7 @@ export default function SubTask() {
           taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
           mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
           flowoutputid: userstate.node.output_data.FlowOutputId
-          // ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          // taskId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          // mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          // productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
-          // moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
-          // internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
-          // node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          // to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          // to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          // flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          // groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          // flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+
         }}
       />
 
@@ -636,16 +538,10 @@ export default function SubTask() {
           setSelected(null);
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
-          moduleId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
         }}
       />
 
@@ -656,17 +552,16 @@ export default function SubTask() {
         width={800}
         onOk={() => {
           setModalleaderqc_visible(false);
-
+        }}
+        onCancel={() => {
+          setModalleaderqc_visible(false);
+          window.location.reload("false");
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
         }}
       />
 
@@ -679,15 +574,10 @@ export default function SubTask() {
           setModalleaderreject_visible(false);
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          assigneeId: userstate.issuedata.details[0] && userstate.issuedata.details[0].AssigneeId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
         }}
 
       />
@@ -711,14 +601,10 @@ export default function SubTask() {
           setModalQAassign_visible(false);
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
         }}
       />
 
@@ -771,7 +657,8 @@ export default function SubTask() {
         visible={modaltimetracking_visible}
         onCancel={() => { return (setModaltimetracking_visible(false)) }}
         details={{
-          transgroupId: userstate.issuedata.details[0] && userstate.issuedata.details[0].TransGroupId,
+          transgroupid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TransGroupId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
 
         }}
       />
@@ -794,21 +681,6 @@ export default function SubTask() {
           flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
         }}
       />
-
-
-      {/* <ModalDocument
-        title="Document"
-        visible={unittestlog_visible}
-        width={800}
-        onCancel={() => setUnittestlog_visible(false)}
-        onOk={() => {
-          setUnittestlog_visible(false);
-        }}
-        details={{
-          refId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          reftype: "Master_Ticket",
-        }}
-      /> */}
 
     </MasterPage>
   );
