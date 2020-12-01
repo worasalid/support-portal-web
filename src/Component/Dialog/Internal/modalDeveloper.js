@@ -102,45 +102,17 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 ticketId: details && details.ticketid,
                 taskid: details.taskid,
                 files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.urltest
+                url: values.urltest,
+                grouptype: "unittest"
             }
         })
     }
 
-    // const SaveFileDeploy = async () => {
-    //     const filedeploy = await Axios({
-    //         url: process.env.REACT_APP_API_URL + "/workflow/save_filedeploy",
-    //         method: "POST",
-    //         headers: {
-    //             "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //         },
-    //         data: {
-    //             ticketId: details && details.ticketId,
-    //             files: uploadRef_filedeploy.current.getFiles().map((n) => n.response.id),
-    //         }
-    //     })
-    // }
-
-    const SaveDeployDocument = async () => {
-        const document = await Axios({
-            url: process.env.REACT_APP_API_URL + "/workflow/save_deploydocument",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            data: {
-                ticketId: details && details.ticketId,
-                taskid: details.taskid,
-                files: uploadRef_document.current.getFiles().map((n) => n.response.id),
-            }
-        })
-    }
 
     const onFinish = (values) => {
         console.log('Success:', values);
         SaveUnitTest(values);
         // SaveFileDeploy();
-        SaveDeployDocument();
         SaveComment();
         SendFlow(values);
         onOk();

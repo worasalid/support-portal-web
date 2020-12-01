@@ -6,6 +6,7 @@ import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import Column from 'antd/lib/table/Column';
 import { DownloadOutlined } from '@ant-design/icons';
+import TextArea from 'antd/lib/input/TextArea';
 
 const { TabPane } = Tabs;
 
@@ -13,6 +14,7 @@ const { TabPane } = Tabs;
 export default function ModalQA({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
+    const uploadRef_unittest = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
@@ -23,71 +25,24 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     const [listdocument, setDocument] = useState([]);
     const [historyvalue, setHistoryvalue] = useState(null);
 
-    const GetUnitTest = async () => {
-        try {
-            const unittest = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "unittest"
-                }
-            });
-
-            setListunittest(unittest.data)
-        } catch (error) {
-
-        }
-    }
-
-    const GetFileDeploy = async () => {
-        try {
-            const filedeploy = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "filedeploy"
-                }
-            });
-
-            setFiledeploy(filedeploy.data)
-        } catch (error) {
-
-        }
-    }
-
-    const GetDeployDocument = async () => {
-        try {
-            const documentdeploy = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "deploydocument"
-                }
-            });
-
-            setDocument(documentdeploy.data)
-        } catch (error) {
-
-        }
-    }
-
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
+    }
+    const SaveUnitTest = async (values) => {
+        const unittest = await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketId: details && details.ticketid,
+                taskid: details.taskid,
+                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                url: values.linkurl,
+                grouptype: "test_result_QA"
+            }
+        })
     }
 
     const SaveComment = async () => {
@@ -121,18 +76,9 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction,
-                        value: historyvalue ,
-                        value2: ""
-                      }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid
                 }
             });
 
@@ -158,22 +104,13 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
 
     const onFinish = (values) => {
         console.log('Success:', values);
+        SaveUnitTest(values);
         SaveComment();
         SendFlow();
         onOk();
     };
 
-    useEffect(() => {
-        if (visible) {
-            GetUnitTest();
-            GetFileDeploy();
-            GetDeployDocument();
-            if(details.flowstatus === "Waiting QA CheckResult"){setHistoryvalue("ส่งผล Test ให้หัวหน้าทีมตรวจสอบ")}
-           
-        }
-
-    }, [visible])
-
+  
     return (
         <Modal
             visible={visible}
@@ -183,164 +120,6 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-            <Tabs defaultActiveKey="1" type="card">
-                <TabPane tab="Unit Test" key="1">
-                    <Table dataSource={listunittest} style={{ width: "100%" }}pagination={false}>
-                        <Column title="No"
-                         width="5%"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ไฟล์ Unit Test" dataIndex="FileName"    width="25%"></Column>
-                        <Column title="URL" dataIndex="" width="25%"
-                        align="left"
-                        render={(value, record, index) => {
-                            return (
-                                <>
-                                    <Button type="link"
-                                    onClick= {() => window.open(record.Url, "_blank")}
-                                    >
-                                        {record.Url}
-                                    </Button>
-                                </>
-                            )
-                        }
-                        }
-                    />
-                        <Column title="OwnerName" dataIndex="OwnerName"    width="15%"></Column>
-                        <Column title="วันที่"
-                         width="10%"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                         width="10%"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane>
-                {/* <TabPane tab="File Deploy" key="2">
-                    <Table dataSource={listfiledeploy}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ไฟล์ Deploy" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane> */}
-                <TabPane tab="Document Deploy" key="2">
-                    <Table dataSource={listdocument} style={{ width: "100%" }} pagination={false}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ชื่อเอกสาร" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane>
-            </Tabs>
 
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" ,marginTop: 40 }}
                 name="qa-test"
@@ -352,7 +131,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             >
                 <Form.Item
                     // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="UnitTest"
+                    name="linkurl"
+                    label= "URL"
                     rules={[
                         {
                             required: false,
@@ -360,7 +140,24 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         },
                     ]}
                 >
-                    Remark :
+                    <TextArea rows="2" style={{ width: "100%" }} />
+                </Form.Item>
+                
+                <Form.Item
+                    style={{ minWidth: 300, maxWidth: 300 }}
+                    label="Unit Test"
+                    name="unittest"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input your UnitTest!',
+                        },
+                    ]}
+                >
+                    <UploadFile ref={uploadRef_unittest} />
+                </Form.Item>
+            </Form>
+                 Remark :
                     <Editor
                         apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                         ref={editorRef}
@@ -380,8 +177,6 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                     />
                     <br />
                      AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form>
 
         </Modal>
     )

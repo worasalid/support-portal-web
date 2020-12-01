@@ -19,7 +19,8 @@ export default function Historylog() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: match.params.id
+                    ticketId: match.params.id,
+                    taskid: match.params.task
                 }
             });
             if (historylog.status === 200) {
@@ -42,7 +43,7 @@ export default function Historylog() {
 
     useEffect(() => {
         GetHistoryLog();
-    }, [historylog])
+    }, [historylog.length])
 
     return (
         <List

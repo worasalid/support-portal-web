@@ -51,6 +51,8 @@ export default function Subject() {
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
 
+
+
   // data
   const [ProgressStatus, setProgressStatus] = useState("");
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
@@ -100,7 +102,7 @@ export default function Subject() {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         params: {
-          // trans_id
+           trans_id
         }
       });
 
@@ -391,7 +393,11 @@ export default function Subject() {
                   {
                     userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
                       ? <Col span={24}>
-                        <Button type="primary" onClick={() => setModaladdtask(true)} >
+                        <Button icon={<FileAddOutlined />}
+                          shape="round"
+                          // ghost
+                          // type="primary"
+                           onClick={() => setModaladdtask(true)} >
                           CreateTask
                         </Button>
                       </Col>
@@ -399,12 +405,12 @@ export default function Subject() {
                   }
 
                 </Row>
-                <Row style={{ marginTop: 26, marginRight: 24 }}>
+                <Row style={{ marginRight: 24 }}>
                   <Col span={24}>
                     <ListSubTask
                       ticketId={match.params.id} ref={subTaskRef}
                       //mailtype="out"
-                       mailtype={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType}
+                      mailtype={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType}
                     />
                   </Col>
                 </Row>
@@ -421,10 +427,7 @@ export default function Subject() {
                           <TabPane tab="Comment" key="1">
                             <CommentBox />
                           </TabPane>
-                          {/* <TabPane tab="Internal Note" key="2" >
-                            <InternalComment />
-                          </TabPane> */}
-                          <TabPane tab="History Log" key="2">
+                          <TabPane tab="Historys Log" key="2">
                             <Historylog />
                           </TabPane>
                         </Tabs>
@@ -459,7 +462,7 @@ export default function Subject() {
                     onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
-                    disabled={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "out" ? true : false}
+                   // disabled={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "out" ? true : false}
 
                   />
                 </Col>

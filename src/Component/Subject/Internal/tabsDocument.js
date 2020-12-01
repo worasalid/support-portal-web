@@ -193,7 +193,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                 </Table>
                             </TabPane>
                             <TabPane tab="Test Result" key="3">
-                                <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
+                                <Table dataSource={listfile.filter((x) => x.GroupType === "test_result_QA")} style={{ width: "100%" }} pagination={false}>
                                     <Column title="No"
                                         width="5%"
                                         render={(value, record, index) => {
@@ -290,7 +290,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                 </Table>
                             </TabPane>
                         </Tabs>
-                        : listfile.filter((x) => x.GroupType === "testResult").length !== 0
+                        : listfile.filter((x) => x.GroupType === "test_result_QA").length !== 0
                             ? <Tabs defaultActiveKey="1" type="card">
                                 <TabPane tab="Unit Test" key="1">
                                     <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
@@ -311,11 +311,11 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                             render={(value, record, index) => {
                                                 return (
                                                     <>
-                                                        <Button type="link" style={{ padding: 0 }}
+                                                        <label type="link" className="text-link"
                                                             onClick={() => window.open(record.Url, "_blank")}
                                                         >
                                                             {record.Url}
-                                                        </Button>
+                                                        </label>
                                                     </>
                                                 )
                                             }
@@ -409,8 +409,8 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                         />
                                     </Table>
                                 </TabPane>
-                                <TabPane tab="Test Result" key="3">
-                                    <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
+                                <TabPane tab="QA Test Result" key="3">
+                                    <Table dataSource={listfile.filter((x) => x.GroupType === "test_result_QA")} style={{ width: "100%" }} pagination={false}>
                                         <Column title="No"
                                             width="5%"
                                             render={(value, record, index) => {
@@ -423,25 +423,42 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                             }
                                             }
                                         />
-                                        <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
-                                        <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
-                                        <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                        <Column title="วันที่"
-                                            align="center"
-                                            width="10%"
+                                        <Column  width="25%" title="ชื่อเอกสาร" dataIndex="FileName"></Column>
+                                        <Column  width="40%" title="URL"
                                             render={(value, record, index) => {
                                                 return (
                                                     <>
-                                                        <label>
-                                                            {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
+                                                        <label className="text-link"
+                                                            onClick={() => window.open(record.Url, "_blank")}
+                                                        >
+                                                            {record.Url}
                                                         </label>
                                                     </>
                                                 )
                                             }
                                             }
                                         />
-                                        <Column title=""
-                                            width="5%"
+                                        <Column  width="15%" title="FileSize" dataIndex="FileSize" ></Column>
+                                        <Column width="15%" title="OwnerName"
+                                            width="20%"
+                                            align="center"
+                                            render={(value, record, index) => {
+                                                return (
+                                                    <>
+                                                        <labe>
+                                                            {record.OwnerName}
+                                                        </labe>
+                                                        <label>
+                                                            {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                            {moment(record.ModifyDate).format("HH:mm")}
+                                                        </label>
+                                                    </>
+                                                )
+                                            }
+                                            }
+                                        />
+                                        <Column width="5%" title=""
+                                            // width="5%"
                                             render={(value, record, index) => {
                                                 return (
                                                     <>

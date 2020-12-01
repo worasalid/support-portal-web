@@ -7,7 +7,7 @@ import InternalComment from "../../../Component/Comment/Internal/Internal_commen
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, PoweroffOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UpCircleOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
@@ -58,6 +58,7 @@ export default function SubTask() {
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
 
+
   // data
   const [ProgressStatus, setProgressStatus] = useState("");
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
@@ -66,37 +67,6 @@ export default function SubTask() {
   const [createddate, setCreateddate] = useState(null);
   const [resolveddate, setResolveddate] = useState(null);
 
-
-
-  const getIssueType = async () => {
-    try {
-      const issuetype = await Axios({
-        url: process.env.REACT_APP_API_URL + "/master/issue-types",
-        method: "GET",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-      });
-      userdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
-    } catch (error) {
-
-    }
-  }
-
-  const GetPriority = async () => {
-    try {
-      const priority = await Axios({
-        url: process.env.REACT_APP_API_URL + "/master/priority",
-        method: "GET",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-      });
-      userdispatch({ type: "LOAD_PRIORITY", payload: priority.data })
-    } catch (error) {
-
-    }
-  }
 
   const getflow_output = async (trans_id) => {
     try {
@@ -324,13 +294,12 @@ export default function SubTask() {
                 {/* TAB Document */}
                 <Row style={{ marginTop: 36, marginRight: 24 }}>
                   <Col span={24}>
-
-                    <TabsDocument
-                      details={{
-                        refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-                        reftype: "Ticket_Task",
-                      }}
-                    />
+                      <TabsDocument
+                        details={{
+                          refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+                          reftype: "Ticket_Task",
+                        }}
+                      />
                   </Col>
                 </Row>
 
@@ -572,6 +541,7 @@ export default function SubTask() {
         width={800}
         onOk={() => {
           setModalleaderreject_visible(false);
+          window.location.reload("false");
         }}
         details={{
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
@@ -599,6 +569,7 @@ export default function SubTask() {
         onCancel={() => { return (setModalQAassign_visible(false)) }}
         onOk={() => {
           setModalQAassign_visible(false);
+          window.location.reload("false");
         }}
         details={{
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
@@ -615,17 +586,16 @@ export default function SubTask() {
         width={900}
         onOk={() => {
           setModalQA_visible(false);
-
+        }}
+        onCancel={() => {
+          setModalQA_visible(false);
+          window.location.reload("false");
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
         }}
       />
 
