@@ -79,14 +79,23 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
         }
     }
 
-    function renderColorPriority(param) {
+    function renderTaskStatus(param) {
         switch (param) {
             case 'Waiting Progress':
-                return <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />
+                return <>
+                <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />&nbsp;&nbsp;
+                <label style={{ color: "#DC7633" }}>{param}</label>
+            </>
             case 'Complete':
-                return <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />
+                return <> 
+                <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
+                <label style={{ color: "#52c41a" }}>{param}</label>
+                </>
             case 'InProgress':
-                return <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />
+                return <>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#DC7633" }}>{param}</label>
+                </>
         }
     }
 
@@ -122,13 +131,15 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                         >
                             {collapseicon}
                         </span>
+                        <div>
+                            <Progress percent={30} strokeColor="#52c41a"></Progress>
+                        </div>
                     </>
                     : ""
+
             }
-            <div>
-                <Progress percent={30} strokeColor="#52c41a"></Progress>
-            </div>
-            <div style={{ display: divcollapse, marginTop:"16px" }}>
+
+            <div style={{ display: divcollapse, marginTop: "16px" }}>
                 <List
                     itemLayout="horizontal"
                     dataSource={listdata}
@@ -146,10 +157,10 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                     <Row>
                                                         <Col span={1}>{<FileOutlined />}</Col>
                                                         <Col span={15}>{item.title}  <Tag color="#f50">{item.module} </Tag></Col>
-                                                        <Col span={8} style={{ textAlign: "right" }} >{renderColorPriority(item.status)}&nbsp;&nbsp;&nbsp;{item.status}</Col>
+                                                        <Col span={8} style={{ textAlign: "right" }} >{renderTaskStatus(item.status)}</Col>
                                                     </Row>
                                                     <Row style={{ textAlign: "right" }}>
-                                                        <Col span={24}>{`(${item.flowstatus})`}</Col>
+                                                        <Col span={24}>{item.flowstatus === null ? "" : `(${item.flowstatus})`}</Col>
                                                     </Row>
 
                                                 </Col>
@@ -168,7 +179,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                 >
                                     <Button type="link">
                                         {
-                                            item.status === "InProgress" ? "" : <DeleteOutlined style={{ fontSize: "18px" }} />
+                                            item.status !== "Waiting Progress" ? "" : <DeleteOutlined style={{ fontSize: "18px" }} />
                                         }
                                     </Button>
                                 </Popconfirm>

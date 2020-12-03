@@ -334,7 +334,7 @@ export default function SubTask() {
                   <br />
                   <Select ref={selectRef}
                     // defaultValue={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
-                    value={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
+                    value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
                     onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}

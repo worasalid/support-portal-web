@@ -16,6 +16,7 @@ import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import ListSubTask from "../../../Component/Subject/Internal/listSubTask";
 import ModalCreateTask from "../../../Component/Dialog/Internal/modalCreateTask";
+import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
 
 
 const { Option } = Select;
@@ -35,16 +36,16 @@ export default function Subject() {
   const [modaladdtask, setModaladdtask] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
-  const [modalleaderassign_visible, setModalleaderassign_visible] = useState(false);
-  const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
-  const [modalleaderqc_visible, setModalleaderqc_visible] = useState(false);
-  const [modalQAassign_visible, setModalQAassign_visible] = useState(false);
-  const [modalQA_visible, setModalQA_visible] = useState(false);
+  // const [modalleaderassign_visible, setModalleaderassign_visible] = useState(false);
+  // const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
+  // const [modalleaderqc_visible, setModalleaderqc_visible] = useState(false);
+  // const [modalQAassign_visible, setModalQAassign_visible] = useState(false);
+  // const [modalQA_visible, setModalQA_visible] = useState(false);
   const [modalresolved_visible, setModalresolved_visible] = useState(false);
-  const [unittestlog_visible, setUnittestlog_visible] = useState(false);
+  // const [unittestlog_visible, setUnittestlog_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
-  const [modalleaderreject_visible, setModalleaderreject_visible] = useState(false);
+  // const [modalleaderreject_visible, setModalleaderreject_visible] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -102,30 +103,16 @@ export default function Subject() {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         params: {
-           trans_id
+          trans_id
         }
       });
 
       if (flow_output.status === 200) {
-        if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "qa" && userstate.issuedata.details[0].QARecheck) {
-          userdispatch({
-            type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value !== "QApass")
-          });
-        }
-        if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "qa" && !userstate.issuedata.details[0].QARecheck) {
-          userdispatch({
-            type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value !== "SendQALeader")
-          });
-        }
-        if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName !== "qa") {
-          userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
-        }
-
+        userdispatch({
+          type: "LOAD_ACTION_FLOW",
+          payload: flow_output.data.filter((x) => x.value === "Resolved")
+        });
       }
-
-
     } catch (error) {
 
     }
@@ -265,20 +252,11 @@ export default function Subject() {
   }
 
   function HandleChange(value, item) {
-    setProgressStatus(item.label);
+    console.log("value", value)
+    console.log("item", item)
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "support" && item.data.value === "SendIssue") { return (setModaladdtask(true)) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderReject") { setModalleaderreject_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
-    if (item.data.NodeName === "developer_1") { setModaldeveloper_visible(true) }
 
-    if (item.data.NodeName === "qa_leader" && item.data.value === "QaAssign") { setModalQAassign_visible(true) }
-    if (item.data.NodeName === "qa_leader" && item.data.value !== "QaAssign") { setModalQA_visible(true) }
-    if (item.data.NodeName === "qa") { setModalQA_visible(true) }
-    if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
-
+    if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
   }
 
   function renderColorPriority(param) {
@@ -312,7 +290,7 @@ export default function Subject() {
 
   }, [historyduedate_visible])
 
-
+  console.log("FlowOutputId", userstate.node.output_data.FlowOutputId)
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -397,7 +375,7 @@ export default function Subject() {
                           shape="round"
                           // ghost
                           // type="primary"
-                           onClick={() => setModaladdtask(true)} >
+                          onClick={() => setModaladdtask(true)} >
                           CreateTask
                         </Button>
                       </Col>
@@ -427,7 +405,7 @@ export default function Subject() {
                           <TabPane tab="Comment" key="1">
                             <CommentBox />
                           </TabPane>
-                          <TabPane tab="Historys Log" key="2">
+                          <TabPane tab="History Log" key="2">
                             <Historylog />
                           </TabPane>
                         </Tabs>
@@ -456,15 +434,21 @@ export default function Subject() {
                 <Col span={18}>
                   <label className="header-text">ProgressStatus</label>
                   <br />
-                  <Select ref={selectRef}
-                    value={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
-                    style={{ width: '100%' }} placeholder="None"
-                    onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
-                    onChange={(value, item) => HandleChange(value, item)}
-                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
-                   // disabled={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "out" ? true : false}
+                  {
+                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
+                    && userstate.issuedata.details[0].MailType === "in"
+                      ? <Select ref={selectRef}
+                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus}
+                        style={{ width: '100%' }} placeholder="None"
+                        onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
+                        onChange={(value, item) => HandleChange(value, item)}
+                        options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
+                      // disabled={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "out" ? true : false}
+                      />
 
-                  />
+                      : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus}</label>
+                  }
+
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
@@ -639,7 +623,6 @@ export default function Subject() {
         }}
       />
 
-
       <ModalDueDate
         title="DueDate"
         visible={modalduedate_visible}
@@ -657,6 +640,22 @@ export default function Subject() {
         onCancel={() => { return (setModaltimetracking_visible(false)) }}
         details={{
           transgroupId: userstate.issuedata.details[0] && userstate.issuedata.details[0].TransGroupId,
+
+        }}
+      />
+
+      <ModalResolved
+        title="Resolved"
+        visible={modalresolved_visible}
+        width={800}
+        onCancel={() => { return (setModalresolved_visible(false), setSelected(null)) }}
+        onOk={() => {
+          setModalresolved_visible(false);
+        }}
+        details={{
+          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
 
         }}
       />

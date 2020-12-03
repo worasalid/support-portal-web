@@ -42,7 +42,7 @@ export default function Resolved() {
     // setLoadding(true);
     try {
       const results = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -69,41 +69,6 @@ export default function Resolved() {
     }
   };
 
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
-      }
-    });
-    userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
-  }
-
-  const UpdateStatusMailbox = async (value) => {
-    const mailbox = await Axios({
-      url: process.env.REACT_APP_API_URL + "/tickets/read",
-      method: "PATCH",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        mailbox_id: value
-      }
-    });
-  }
-
-
-  function HandleChange(items) {
-    console.log("Menu", items.item.props.node)
-    if (items.item.props.node === "support") { setVisible(true) }
-    if (items.item.props.node === "developer_1") { setModaldeveloper_visible(true) }
-    if (items.item.props.node === "qa" || items.item.props.node === "developer_2") { setModalQA_visible(true) }
-
-  }
 
   useEffect(() => {
     userdispatch({ type: "LOADING", payload: true })
