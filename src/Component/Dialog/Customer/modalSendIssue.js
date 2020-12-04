@@ -120,7 +120,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
         }
       });
 
-      if (sendflow.status === 200) {
+      if (sendflow.status === 200 && sendflow.data === "InProgress") {
         await Modal.info({
           title: 'บันทึกข้อมูลสำเร็จ',
           content: (
@@ -135,9 +135,24 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             if (sendflow.data === "InProgress") {
               history.push({ pathname: "/customer/issue/inprogress" })
             }
-            if (sendflow.data === "Complete") {
-              history.push({ pathname: "/customer/issue/complete" })
-            }
+
+          },
+        });
+      }
+
+      if (sendflow.status === 200 && sendflow.data === "Pass") {
+        await Modal.info({
+          title: 'บันทึกข้อมูลสำเร็จ',
+          content: (
+            <div>
+              <p>ทดสอบ Issue เลขที่ : {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number} ผ่าน</p>
+              <p>รอดำเนินการ Upload File </p>
+            </div>
+          ),
+          onOk() {
+            editorRef.current.editor.setContent("")
+            onOk();
+            history.push({ pathname: "/customer/issue/pass" })
 
           },
         });

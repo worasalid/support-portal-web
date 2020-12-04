@@ -46,6 +46,7 @@ export default function MasterPage(props) {
       });
       masterdispatch({type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length});
       masterdispatch({type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length});
+      masterdispatch({type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.GroupStatus === "Pass").length});
       masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length});
       masterdispatch({type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length})
 
@@ -69,11 +70,14 @@ export default function MasterPage(props) {
     if (match.url.search("inprogress") > 0) {
       setActivemenu(activemenu.push("2"))
     }
-    if (match.url.search("cancel") > 0) {
+    if (match.url.search("pass") > 0) {
       setActivemenu(activemenu.push("3"))
     }
-    if (match.url.search("complete") > 0) {
+    if (match.url.search("cancel") > 0) {
       setActivemenu(activemenu.push("4"))
+    }
+    if (match.url.search("complete") > 0) {
+      setActivemenu(activemenu.push("5"))
     }
   }, [])
   return (
@@ -220,6 +224,20 @@ export default function MasterPage(props) {
               <Menu.Item
                 key="3"
                 onClick={() =>
+                  history.push({ pathname: "/customer/issue/pass" })
+                }
+              >
+                Pass
+                {
+                  masterstate.toolbar.sider_menu.issue.pass.count === 0
+                  ? ""
+                  : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
+
+                }
+              </Menu.Item>
+              <Menu.Item
+                key="4"
+                onClick={() =>
                   history.push({ pathname: "/customer/issue/cancel" })
                 }
               >
@@ -232,7 +250,7 @@ export default function MasterPage(props) {
                 }
               </Menu.Item>
               <Menu.Item
-                key="4"
+                key="5"
                 onClick={() =>
                   history.push({ pathname: "/customer/issue/complete" })
                 }

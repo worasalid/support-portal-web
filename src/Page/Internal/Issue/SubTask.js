@@ -158,7 +158,7 @@ export default function SubTask() {
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderReject") { setModalleaderreject_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+    if (item.data.NodeName === "developer_2" && item.data.value === "Deploy") { return (setModalcomplete_visible(true)) }
     if (item.data.NodeName === "developer_1") { setModaldeveloper_visible(true) }
 
     if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
@@ -339,7 +339,11 @@ export default function SubTask() {
                     onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
-                    disabled={userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out" ? true : false}
+                    disabled={
+                      userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out" 
+                      || (userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "in" && userstate.taskdata.data[0].Status === "Complete" &&
+                      userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus !== "Pass" ) ? true : false
+                    }
                   />
                 </Col>
               </Row>
@@ -642,13 +646,10 @@ export default function SubTask() {
           setModalcomplete_visible(false);
         }}
         details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
         }}
       />
 

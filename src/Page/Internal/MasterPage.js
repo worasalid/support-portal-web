@@ -82,9 +82,9 @@ export default function MasterPage(props) {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         }
       });
-      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && (x.InternalStatus === "InProgress" || x.InternalStatus === "Resolved" || x.InternalStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && (x.InternalStatus === "InProgress" || x.InternalStatus === "Pass" || x.InternalStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "InProgress" || x.InternalStatus === "ReOpen" )).length });
-      masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && x.InternalStatus === "Resolved").length });
+      masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "Resolved" || x.InternalStatus === "Pass")).length });
       masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length});
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.InternalStatus === "Complete").length })
 

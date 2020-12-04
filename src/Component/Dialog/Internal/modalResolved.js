@@ -83,21 +83,21 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 }
             });
 
-            // if (sendflow.status === 200) {
-            //     await Modal.info({
-            //         title: 'บันทึกข้อมูลสำเร็จ',
-            //         content: (
-            //             <div>
-            //                 <p>บันทึกข้อมูลสำเร็จ</p>
-            //             </div>
-            //         ),
-            //         onOk() {
-            //             editorRef.current.editor.setContent("")
-            //             onOk();
-            //             history.push({ pathname: "/internal/issue/resolved" })
-            //         },
-            //     });
-            // }
+            if (sendflow.status === 200) {
+                await Modal.info({
+                    title: 'บันทึกข้อมูลสำเร็จ',
+                    content: (
+                        <div>
+                            <p>บันทึกข้อมูลสำเร็จ</p>
+                        </div>
+                    ),
+                    onOk() {
+                        editorRef.current.editor.setContent("")
+                        onOk();
+                        history.push({ pathname: "/internal/issue/resolved" })
+                    },
+                });
+            }
         } catch (error) {
 
         }

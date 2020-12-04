@@ -14,7 +14,7 @@ import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
 
 
-export default function InProgress() {
+export default function Pass() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
 
@@ -46,7 +46,7 @@ export default function InProgress() {
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           keyword: customerstate.filter.keyword,
-          task: "InProgress"
+          task: "Pass"
         }
       });
 

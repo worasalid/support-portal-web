@@ -19,7 +19,8 @@ export default function Historylog() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: match.params.id
+                    ticketId: match.params.id,
+                    type: "ticket"
                 }
             });
             if (historylog.status === 200) {

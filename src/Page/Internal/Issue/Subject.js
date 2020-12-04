@@ -4,7 +4,7 @@ import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Internal/Comment";
 import InternalComment from "../../../Component/Comment/Internal/Internal_comment";
-import Historylog from "../../../Component/History/Internal/Historylog";
+import Historylog from "../../../Component/History/Customer/Historylog";
 import MasterPage from "../MasterPage";
 import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, PoweroffOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";

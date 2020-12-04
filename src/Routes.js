@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import CustomerMytask from './Page/Customer/Issue/MyTask';
 import CustomerComplete from './Page/Customer/Issue/Complete';
 import CustomerInProgress from './Page/Customer/Issue/InProgress';
+import CustomerPass from './Page/Customer/Issue/Pass';
 import CustomerCancel from './Page/Customer/Issue/Cancel';
 import CustomerSubject from './Page/Customer/Issue/Subject';
 import Customerlogin from './Page/Customer/login';
@@ -30,6 +31,7 @@ import AuthenContext, { reducer, initState } from "./utility/authenContext";
 import MasterContext, { masterReducer, masterState } from "./utility/masterContext";
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
 import UserContext, { userReducer, userState } from "./utility/issueContext";
+
 
 
 export default function Routes() {
@@ -67,6 +69,7 @@ export default function Routes() {
                                 <Route path="/customer/servicedesk/issuecreate/:id?" exact component={IssueCreate} />
                                 <Route path="/customer/issue/mytask" exact component={CustomerMytask} />
                                 <Route path="/customer/issue/inprogress" exact component={CustomerInProgress} />
+                                <Route path="/customer/issue/pass" exact component={CustomerPass} />
                                 <Route path="/customer/issue/Subject/:id?" exact component={CustomerSubject} />
                                 <Route path="/customer/issue/complete" exact component={CustomerComplete} />
                                 <Route path="/customer/issue/cancel" exact component={CustomerCancel} />

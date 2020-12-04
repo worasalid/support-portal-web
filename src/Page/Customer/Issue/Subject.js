@@ -133,7 +133,7 @@ export default function Subject() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "customer" && item.data.value === "AssignIcon") { return (setVisible(true)) }
+    if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass") { return (setVisible(true)) }
     if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
     if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
     if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }

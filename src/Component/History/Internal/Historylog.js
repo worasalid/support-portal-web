@@ -20,7 +20,8 @@ export default function Historylog() {
                 },
                 params: {
                     ticketId: match.params.id,
-                    taskid: match.params.task
+                    taskid: match.params.task,
+                    type: "task"
                 }
             });
             if (historylog.status === 200) {
