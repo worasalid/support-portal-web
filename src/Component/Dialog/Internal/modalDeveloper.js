@@ -44,6 +44,40 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
         }
     }
 
+    const SaveUnitTest = async (values) => {
+        const unittest = await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketid: details && details.ticketid,
+                taskid: details.taskid,
+                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                url: values.urltest,
+                grouptype: "unittest"
+            }
+        })
+    }
+
+    const SaveDocumentDeploy = async (values) => {
+        const unittest = await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/save_deploydocument",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketid: details && details.ticketid,
+                taskid: details.taskid,
+                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                url: values.urltest,
+                grouptype: "document_deploy"
+            }
+        })
+    }
+
     const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
@@ -91,28 +125,11 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
         }
     }
 
-    const SaveUnitTest = async (values) => {
-        const unittest = await Axios({
-            url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            data: {
-                ticketId: details && details.ticketid,
-                taskid: details.taskid,
-                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.urltest,
-                grouptype: "unittest"
-            }
-        })
-    }
-
 
     const onFinish = (values) => {
         console.log('Success:', values);
         SaveUnitTest(values);
-        // SaveFileDeploy();
+        SaveDocumentDeploy(values);
         SaveComment();
         SendFlow(values);
         onOk();

@@ -12,7 +12,7 @@ import IssueContext, { userReducer, userState } from "../../../utility/issueCont
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
 import Clock from "../../../utility/countdownTimer";
 import moment from "moment";
-import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
+import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import ListSubTask from "../../../Component/Subject/Internal/listSubTask";
 import ModalCreateTask from "../../../Component/Dialog/Internal/modalCreateTask";
@@ -110,7 +110,7 @@ export default function Subject() {
       if (flow_output.status === 200) {
         userdispatch({
           type: "LOAD_ACTION_FLOW",
-          payload: flow_output.data.filter((x) => x.value === "Resolved")
+          payload: flow_output.data.filter((x) => x.value === "Resolved" || x.value === "Deploy")
         });
       }
     } catch (error) {
@@ -256,7 +256,8 @@ export default function Subject() {
     console.log("item", item)
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
 
-    if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
+    if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" && item.data.value === "Resolved" || item.data.value === "Deploy") 
+    { return (setModalresolved_visible(true)) }
   }
 
   function renderColorPriority(param) {
@@ -290,7 +291,7 @@ export default function Subject() {
 
   }, [historyduedate_visible])
 
-  console.log("FlowOutputId", userstate.node.output_data.FlowOutputId)
+
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -360,7 +361,7 @@ export default function Subject() {
                     <TabsDocument
                       details={{
                         refId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-                        reftype: "Master_Ticket",
+                        //reftype: "Master_Ticket",
                       }}
                     />
                   </Col>
@@ -369,7 +370,10 @@ export default function Subject() {
                 {/* SubTask */}
                 <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
                   {
-                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
+                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" &&
+                    (userstate.issuedata.details[0].InternalStatus !== "Complete" &&
+                    userstate.issuedata.details[0].InternalStatus !== "Pass")
+                    // userstate.issuedata.details[0].InternalStatus !== "Resolved"
                       ? <Col span={24}>
                         <Button icon={<FileAddOutlined />}
                           shape="round"

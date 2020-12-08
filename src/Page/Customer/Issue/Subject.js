@@ -231,7 +231,7 @@ export default function Subject() {
                     <TabsDocument
                       details={{
                         refId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-                        reftype: "Master_Ticket",
+                       // reftype: "Master_Ticket",
                       }}
                     />
                   </Col>

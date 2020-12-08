@@ -149,7 +149,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                     name="unittest"
                     rules={[
                         {
-                            required: true,
+                            required: false,
                             message: 'Please input your UnitTest!',
                         },
                     ]}

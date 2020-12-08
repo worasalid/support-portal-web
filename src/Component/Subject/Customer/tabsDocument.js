@@ -25,14 +25,14 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
     const GetDocument = async () => {
         try {
             const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
+                url: process.env.REACT_APP_API_URL + "/tickets/issue-document",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
                     refId: details.refId,
-                    reftype: details.reftype
+                    //reftype: details.reftype
                 }
             });
 
@@ -93,8 +93,8 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                 {
                     listfile.filter((x) => x.GroupType === "vdoUpload").length !== 0
                         ? <Tabs defaultActiveKey="1" type="card">
-                            <TabPane tab="Document Deploy" key="1" >
-                                <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
+                            <TabPane tab="Test Result" key="1">
+                                <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
                                     <Column title="No"
                                         width="5%"
                                         render={(value, record, index) => {
@@ -143,8 +143,8 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                     />
                                 </Table>
                             </TabPane>
-                            <TabPane tab="Test Result" key="2">
-                                <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
+                            <TabPane tab="Document Deploy" key="2" >
+                                <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
                                     <Column title="No"
                                         width="5%"
                                         render={(value, record, index) => {
@@ -222,7 +222,6 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                         }
                                     />
                                     <Column title="Description" dataIndex="Remark" width="30%"></Column>
-
                                     <Column title="วันที่"
                                         align="center"
                                         width="10%"
@@ -243,10 +242,10 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                         </Tabs>
                         : listfile.filter((x) => x.GroupType === "testResult").length !== 0
                             ? <Tabs defaultActiveKey="1" type="card">
-                                <TabPane tab="Unit Test" key="1">
-                                    <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
+                                <TabPane tab="Test Result" key="1">
+                                    <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
                                         <Column title="No"
-                                            width="2%"
+                                            width="5%"
                                             render={(value, record, index) => {
                                                 return (
                                                     <>
@@ -257,34 +256,17 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                             }
                                             }
                                         />
-                                        <Column title="ไฟล์ Unit Test" width="25%" dataIndex="FileName" ></Column>
-                                        <Column title="URL" width="35%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <Button type="link" style={{ padding: 0 }}
-                                                            onClick={() => window.open(record.Url, "_blank")}
-                                                        >
-                                                            {record.Url}
-                                                        </Button>
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title="FileSize" width="15%" dataIndex="FileSize" ></Column>
-                                        <Column title="OwnerName"
-                                            width="20%"
+                                        <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
+                                        <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
+                                        <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
+                                        <Column title="วันที่"
                                             align="center"
+                                            width="10%"
                                             render={(value, record, index) => {
                                                 return (
                                                     <>
-                                                        <labe>
-                                                            {record.OwnerName}
-                                                        </labe>
                                                         <label>
-                                                            {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                            {moment(record.ModifyDate).format("HH:mm")}
+                                                            {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                         </label>
                                                     </>
                                                 )
@@ -292,7 +274,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                             }
                                         />
                                         <Column title=""
-                                            width="3%"
+                                            width="5%"
                                             render={(value, record, index) => {
                                                 return (
                                                     <>
@@ -360,56 +342,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                         />
                                     </Table>
                                 </TabPane>
-                                <TabPane tab="Test Result" key="3">
-                                    <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
-                                        <Column title="No"
-                                            width="5%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <label>{index + 1}</label>
-
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
-                                        <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
-                                        <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                        <Column title="วันที่"
-                                            align="center"
-                                            width="10%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <label>
-                                                            {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
-                                                        </label>
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title=""
-                                            width="5%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <Button type="link"
-                                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                        >
-                                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                                        </Button>
-
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                    </Table>
-                                </TabPane>
+                               
                             </Tabs>
                             : listfile.filter((x) => x.GroupType === "unittest").length !== 0
                                 ? <Tabs defaultActiveKey="1" type="card">

@@ -28,7 +28,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
           },
           data: {
-            ticketId: details && details.ticketId,
+            ticketid: details && details.ticketid,
             comment_text: textValue,
             comment_type: "customer",
             files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -41,69 +41,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
 
     }
   }
-  // const SendFlow = async () => {
-  //   try {
-  //     const sendflow = await Axios({
-  //       url: process.env.REACT_APP_API_URL + "/workflow/send",
-  //       method: "POST",
-  //       headers: {
-  //         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-  //       },
-  //       data: {
-  //         mailbox_id: details && details.mailboxId,
-  //         node_output_id: details && details.node_output_id,
-  //         to_node_id: details && details.to_node_id,
-  //         node_action_id: details && details.to_node_action_id,
-  //         product_id: details && details.productId,
-  //         flowstatus: details.flowstatus,
-  //         groupstatus: details.groupstatus,
-  //         history: {
-  //           historytype: "Customer",
-  //           description: details.flowaction,
-  //         }
-  //       }
-  //     });
-
-  //     if (sendflow.status === 200) {
-  //       await Modal.info({
-  //         title: 'บันทึกข้อมูลสำเร็จ',
-  //         content: (
-  //           <div>
-  //             <p>บันทึกข้อมูลสำเร็จ</p>
-  //           </div>
-  //         ),
-  //         onOk() {
-  //           editorRef.current.editor.setContent("")
-  //           onOk();
-  //           if (details.flowstatus === "Waiting ICON Support") {
-  //             history.push({ pathname: "/customer/issue/inprogress" })
-  //           }
-  //           if (details.flowstatus === "Complete") {
-  //             history.push({ pathname: "/customer/issue/complete" })
-  //           }
-
-  //         },
-  //       });
-  //     }
-
-  //   } catch (error) {
-  //     await Modal.info({
-  //       title: 'บันทึกข้อมูลไม่สำเร็จ',
-  //       content: (
-  //         <div>
-  //           <p>{error.message}</p>
-  //           <p>{error.response.data}</p>
-  //         </div>
-  //       ),
-  //       onOk() {
-  //         editorRef.current.editor.setContent("")
-  //         onOk();
-  //       },
-  //     });
-
-  //   }
-  // }
-
+  
   const SendFlow = async () => {
     try {
       const sendflow = await Axios({

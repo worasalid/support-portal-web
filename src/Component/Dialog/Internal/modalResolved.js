@@ -57,7 +57,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: details && details.ticketId,
+                    ticketid: details && details.ticketid,
                     files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
                     reftype: "Master_Ticket",
                     grouptype: "testResult"
@@ -107,7 +107,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
     const onFinish = (values) => {
         console.log('onFinish:', values);
         // SaveComment();
-        // SaveTestResult();
+        SaveTestResult();
         SendFlow();
         onOk();
     };

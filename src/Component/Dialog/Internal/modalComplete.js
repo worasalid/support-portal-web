@@ -31,7 +31,12 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                 data: {
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
-                    flowoutputid: details.flowoutputid
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        deploy_url: values.url,
+                        deploy_description: values.description
+                    }
+
                 }
             });
 
@@ -58,7 +63,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                     </div>
                 ),
                 onOk() {
-                   
+
                 },
             });
         }
@@ -103,7 +108,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                         },
                     ]}
                 >
-                
+
                     <TextArea rows="2" style={{ width: "100%" }} />
                 </Form.Item>
 
@@ -111,7 +116,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                     label="Description"
                     name="description"
                 >
-                
+
                     <TextArea rows="5" style={{ width: "100%" }} />
                 </Form.Item>
             </Form>
