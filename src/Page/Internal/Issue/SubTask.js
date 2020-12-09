@@ -17,7 +17,6 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalLeaderQC from "../../../Component/Dialog/Internal/modalLeaderQC";
 import ModalLeaderAssign from "../../../Component/Dialog/Internal/modalLeaderAssign";
-import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
 import Clock from "../../../utility/countdownTimer";
 import moment from "moment";
 import ModalqaAssign from "../../../Component/Dialog/Internal/modalqaAssign";
@@ -154,7 +153,7 @@ export default function SubTask() {
     console.log("HandleChange", item)
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "support" && item.data.value === "SendIssue") { return (setVisible(true)) }
+    if (item.data.NodeName === "support" && item.data.value === "SendIssue" || item.data.value === "ResolvedTask") { return (setVisible(true)) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderReject") { setModalleaderreject_visible(true) }
@@ -603,27 +602,7 @@ export default function SubTask() {
         }}
       />
 
-      <ModalResolved
-        title={ProgressStatus}
-        visible={modalresolved_visible}
-        width={800}
-        onCancel={() => { return (setModalresolved_visible(false), setSelected(null)) }}
-        onOk={() => {
-          setModalresolved_visible(false);
-        }}
-        details={{
-          ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxId: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          productId: userstate.issuedata.details[0] && userstate.issuedata.details[0].ProductId,
-          internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
-          node_output_id: userstate.node.output_data && userstate.node.output_data.NodeOutputId,
-          to_node_id: userstate.node.output_data && userstate.node.output_data.ToNodeId,
-          to_node_action_id: userstate.node.output_data && userstate.node.output_data.ToNodeActionId,
-          flowstatus: userstate.node.output_data && userstate.node.output_data.FlowStatus,
-          groupstatus: userstate.node.output_data && userstate.node.output_data.GroupStatus,
-          flowaction: userstate.node.output_data && userstate.node.output_data.FlowAction
-        }}
-      />
+    
 
       <ModalTimetracking
         title="Time Tracking"

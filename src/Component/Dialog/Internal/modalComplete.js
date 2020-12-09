@@ -50,7 +50,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                     ),
                     onOk() {
                         onOk();
-                        history.push({ pathname: "/internal/issue/complete" })
+                        history.push({ pathname: "/internal/issue/resolved" })
                     },
                 });
             }

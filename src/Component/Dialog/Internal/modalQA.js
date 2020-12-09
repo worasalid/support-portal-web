@@ -67,7 +67,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const SendFlow = async () => {
+    const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -83,6 +83,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             });
 
             if (sendflow.status === 200) {
+                SaveUnitTest(values);
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -104,9 +105,9 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
 
     const onFinish = (values) => {
         console.log('Success:', values);
-        SaveUnitTest(values);
+      
         SaveComment();
-        SendFlow();
+        SendFlow(values);
         onOk();
     };
 

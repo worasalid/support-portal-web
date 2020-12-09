@@ -71,7 +71,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             data: {
                 ticketid: details && details.ticketid,
                 taskid: details.taskid,
-                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                files: uploadRef_document.current.getFiles().map((n) => n.response.id),
                 url: values.urltest,
                 grouptype: "document_deploy"
             }
@@ -94,6 +94,9 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             });
 
             if (sendflow.status === 200) {
+                SaveUnitTest(values);
+                SaveDocumentDeploy(values);
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -128,8 +131,8 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
     const onFinish = (values) => {
         console.log('Success:', values);
-        SaveUnitTest(values);
-        SaveDocumentDeploy(values);
+        // SaveUnitTest(values);
+        // SaveDocumentDeploy(values);
         SaveComment();
         SendFlow(values);
         onOk();
@@ -160,24 +163,13 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     name="urltest"
                     rules={[
                         {
-                            required: true,
+                            required: false,
                             message: 'กรุณาใส่ Url ที่ใช้ test ',
                         },
                     ]}
                 >
-                    {/* <Row>
-                        <Col span={4}>  
-                            Unit Test:
-                    </Col>
-                        <Col span={20}>
-                           <TextArea rows="2" style={{width: "100%"}}  />
-                        </Col>
-                    </Row> */}
-
                     <TextArea rows="2" style={{ width: "100%" }} />
                 </Form.Item>
-
-             
 
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
@@ -185,7 +177,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     name="unittest"
                     rules={[
                         {
-                            required: true,
+                            required: false,
                             message: 'Please input your UnitTest!',
                         },
                     ]}
@@ -221,7 +213,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     name="document"
                     rules={[
                         {
-                            required: true,
+                            required: false,
                             message: 'Please input your UnitTest!',
                         },
                     ]}

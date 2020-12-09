@@ -83,19 +83,25 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
         switch (param) {
             case 'Waiting Progress':
                 return <>
-                <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />&nbsp;&nbsp;
-                <label style={{ color: "#DC7633" }}>{param}</label>
-            </>
-            case 'Complete':
-                return <> 
-                <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
-                <label style={{ color: "#52c41a" }}>{param}</label>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#DC7633" }}>{param}</label>
                 </>
             case 'InProgress':
                 return <>
                     <ArrowRightOutlined style={{ fontSize: "16px", color: "#DC7633" }} />&nbsp;&nbsp;
                     <label style={{ color: "#DC7633" }}>{param}</label>
                 </>
+            case 'Done':
+                return <>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#27AE60" }}>{param}</label>
+                </>
+            case 'Complete':
+                return <>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#52c41a" }}>{param}</label>
+                </>
+
         }
     }
 
