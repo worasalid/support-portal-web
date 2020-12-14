@@ -36,16 +36,10 @@ export default function Subject() {
   const [modaladdtask, setModaladdtask] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
-  // const [modalleaderassign_visible, setModalleaderassign_visible] = useState(false);
-  // const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
-  // const [modalleaderqc_visible, setModalleaderqc_visible] = useState(false);
-  // const [modalQAassign_visible, setModalQAassign_visible] = useState(false);
-  // const [modalQA_visible, setModalQA_visible] = useState(false);
   const [modalresolved_visible, setModalresolved_visible] = useState(false);
-  // const [unittestlog_visible, setUnittestlog_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
-  // const [modalleaderreject_visible, setModalleaderreject_visible] = useState(false);
+
 
   //div
   const [container, setContainer] = useState(null);
@@ -659,7 +653,8 @@ export default function Subject() {
         details={{
           ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
+          // flowoutputid: userstate.node.output_data.FlowOutputId,
+          flowoutput: userstate.node.output_data
 
         }}
       />

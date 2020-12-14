@@ -24,30 +24,17 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     const FlowReOpen = async (values) => {
         try {
             const completeflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/reopen",
+                url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: details && details.ticketId,
-                    ticketnumber: details && details.ticketnumber,
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    type: "Customer",
-                    history: {
-                        historytype: "Customer",
-                        description: details.flowaction
-                    },
-                   reason: values.reason
+                    ticketid: details.ticketid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid
+                  }
 
-                }
             });
 
             if (completeflow.status === 200) {

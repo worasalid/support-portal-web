@@ -411,15 +411,9 @@ export default function Subject() {
         width={700}
         onOk={() => setModalreopen_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
-
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
         }}
       />
 

@@ -55,7 +55,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                      ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -78,11 +79,15 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 data: {
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
-                    flowoutputid: details.flowoutputid
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        comment_text: textValue
+                    }
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
                 SaveUnitTest(values);
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -99,16 +104,24 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 });
             }
         } catch (error) {
-
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.editor.setContent("");
+                    onOk();
+                },
+            });
         }
     }
 
     const onFinish = (values) => {
         console.log('Success:', values);
-      
-        SaveComment();
         SendFlow(values);
-        onOk();
     };
 
   

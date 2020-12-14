@@ -412,7 +412,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                 <TabPane tab="QA Test Result" key="3">
                                     <Table dataSource={listfile.filter((x) => x.GroupType === "test_result_QA")} style={{ width: "100%" }} pagination={false}>
                                         <Column title="No"
-                                            width="5%"
+                                            width="2%"
                                             render={(value, record, index) => {
                                                 return (
                                                     <>
@@ -424,7 +424,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                             }
                                         />
                                         <Column  width="25%" title="ชื่อเอกสาร" dataIndex="FileName"></Column>
-                                        <Column  width="40%" title="URL"
+                                        <Column  width="35%" title="URL"
                                             render={(value, record, index) => {
                                                 return (
                                                     <>
@@ -439,8 +439,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                             }
                                         />
                                         <Column  width="15%" title="FileSize" dataIndex="FileSize" ></Column>
-                                        <Column width="15%" title="OwnerName"
-                                            width="20%"
+                                        <Column width="30%" title="OwnerName"
                                             align="center"
                                             render={(value, record, index) => {
                                                 return (
@@ -457,7 +456,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                             }
                                             }
                                         />
-                                        <Column width="5%" title=""
+                                        <Column width="3%" title=""
                                             // width="5%"
                                             render={(value, record, index) => {
                                                 return (

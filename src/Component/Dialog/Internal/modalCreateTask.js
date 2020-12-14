@@ -159,9 +159,6 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     </Select>
                 </Form.Item>
             </Form>
-             Remark :
-
-            <br />
 
         </Modal>
     )

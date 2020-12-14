@@ -20,68 +20,6 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
     const [listfiledeploy, setFiledeploy] = useState([]);
     const [listdocument, setDocument] = useState([]);
 
-    // const GetUnitTest = async () => {
-    //     try {
-    //         const unittest = await Axios({
-    //             url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-    //             method: "GET",
-    //             headers: {
-    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //             },
-    //             params: {
-    //                 refId: details.ticketId,
-    //                 reftype: "Master_Ticket",
-    //                 grouptype: "unittest"
-    //             }
-    //         });
-
-    //         setListunittest(unittest.data)
-    //     } catch (error) {
-
-    //     }
-    // }
-
-    // const GetFileDeploy = async () => {
-    //     try {
-    //         const filedeploy = await Axios({
-    //             url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-    //             method: "GET",
-    //             headers: {
-    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //             },
-    //             params: {
-    //                 refId: details.ticketId,
-    //                 reftype: "Master_Ticket",
-    //                 grouptype: "filedeploy"
-    //             }
-    //         });
-
-    //         setFiledeploy(filedeploy.data)
-    //     } catch (error) {
-
-    //     }
-    // }
-
-    // const GetDeployDocument = async () => {
-    //     try {
-    //         const documentdeploy = await Axios({
-    //             url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-    //             method: "GET",
-    //             headers: {
-    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //             },
-    //             params: {
-    //                 refId: details.ticketId,
-    //                 reftype: "Master_Ticket",
-    //                 grouptype: "deploydocument"
-    //             }
-    //         });
-
-    //         setDocument(documentdeploy.data)
-    //     } catch (error) {
-
-    //     }
-    // }
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -97,7 +35,8 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -120,12 +59,16 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                 data: {
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
-                    flowoutputid: details.flowoutputid
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        comment_text: textValue
+                    }
                   
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -159,19 +102,10 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
 
     const onFinish = (values) => {
         console.log('Success:', values);
-        SaveComment();
         SendFlow();
-        onOk();
     };
 
-    useEffect(() => {
-        if (visible) {
-            // GetUnitTest();
-            // GetFileDeploy();
-            // GetDeployDocument();
-        }
-    }, [visible])
-    
+
     return (
         <Modal
             visible={visible}

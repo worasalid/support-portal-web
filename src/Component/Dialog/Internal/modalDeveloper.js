@@ -9,6 +9,7 @@ import TextArea from 'antd/lib/input/TextArea';
 
 export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
+    const uploadRef = useRef(null);
     const uploadRef_unittest = useRef(null);
     // const uploadRef_filedeploy = useRef(null);
     const uploadRef_document = useRef(null);
@@ -30,14 +31,13 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
-                        //files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
-
-
             }
         } catch (error) {
 
@@ -90,10 +90,14 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
+                    value: {
+                        comment_text: textValue
+                    }
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
                 SaveUnitTest(values);
                 SaveDocumentDeploy(values);
 
@@ -116,13 +120,13 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
-                       <p>{error.response.data}</p>
+                        <p>{error.response.data}</p>
                     </div>
                 ),
                 onOk() {
                     editorRef.current.editor.setContent("")
                     onOk();
-                   
+
                 },
             });
         }
@@ -131,9 +135,6 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
     const onFinish = (values) => {
         console.log('Success:', values);
-        // SaveUnitTest(values);
-        // SaveDocumentDeploy(values);
-        SaveComment();
         SendFlow(values);
         onOk();
     };
@@ -238,6 +239,8 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 }}
                 onEditorChange={handleEditorChange}
             />
+            <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
         </Modal>
     )
 }

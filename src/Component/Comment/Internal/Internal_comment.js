@@ -100,8 +100,8 @@ export default function CommentBox({ loadingComment = false }) {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: match.params.id,
-                    taskId: match.params.task,
+                    ticketid: match.params.id,
+                    taskid: match.params.task,
                     comment_text: commenttext,
                     comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),

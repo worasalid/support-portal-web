@@ -23,38 +23,38 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         setTextValue(content);
     }
 
-    const GetIssueType = async () => {
-        try {
-            const issuetype = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/issue-types",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-            });
-            userdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
-        } catch (error) {
+    // const GetIssueType = async () => {
+    //     try {
+    //         const issuetype = await Axios({
+    //             url: process.env.REACT_APP_API_URL + "/master/issue-types",
+    //             method: "GET",
+    //             headers: {
+    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+    //             },
+    //         });
+    //         userdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
+    //     } catch (error) {
 
-        }
-    }
+    //     }
+    // }
 
-    const LoadModule = async () => {
-        try {
-            const module = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/modules",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    productId: details.productId
-                }
-            });
-            userdispatch({ type: "LOAD_MODULE", payload: module.data })
-        } catch (error) {
+    // const LoadModule = async () => {
+    //     try {
+    //         const module = await Axios({
+    //             url: process.env.REACT_APP_API_URL + "/master/modules",
+    //             method: "GET",
+    //             headers: {
+    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+    //             },
+    //             params: {
+    //                 productId: details.productId
+    //             }
+    //         });
+    //         userdispatch({ type: "LOAD_MODULE", payload: module.data })
+    //     } catch (error) {
 
-        }
-    }
+    //     }
+    // }
 
     const SaveComment = async () => {
         try {
@@ -66,7 +66,8 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -98,65 +99,6 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         }
     }
 
-    // const SendFlow = async (values) => {
-    //     try {
-    //         const sendflow = await Axios({
-    //             url: process.env.REACT_APP_API_URL + "/workflow/send",
-    //             method: "POST",
-    //             headers: {
-    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //             },
-    //             data: {
-    //                 taskId: details.taskId,
-    //                 mailbox_id: details && details.mailboxId,
-    //                 node_output_id: details && details.node_output_id,
-    //                 to_node_id: details && details.to_node_id,
-    //                 node_action_id: details && details.to_node_action_id,
-    //                 product_id: details && details.productId,
-    //                 issuetype: values.issuetype,
-    //                 module_id: values.module,
-    //                 flowstatus: details.flowstatus,
-    //                 groupstatus: details.groupstatus,
-    //                 history: {
-    //                     historytype: "Customer",
-    //                     description: details.flowaction
-    //                 }
-    //             }
-    //         });
-    //         if (sendflow.status === 200) {
-    //             await Modal.info({
-    //                 title: 'บันทึกข้อมูลสำเร็จ',
-    //                 content: (
-    //                     <div>
-    //                         <p>บันทึกข้อมูลสำเร็จ</p>
-    //                     </div>
-    //                 ),
-    //                 onOk() {
-    //                     editorRef.current.editor.setContent("");
-    //                     onOk();
-    //                     formRef.resetFields();
-    //                     // history.push({ pathname: "/internal/issue/inprogress" })
-    //                 },
-    //             });
-    //         }
-    //     } catch (error) {
-    //         console.log("error", error.response)
-    //         await Modal.info({
-    //             title: 'บันทึกไม่สำเร็จ',
-    //             content: (
-    //                 <div>
-    //                     <p>{error.message}</p>
-    //                     <p>{error.response.data}</p>
-    //                 </div>
-    //             ),
-    //             onOk() {
-    //                 editorRef.current.editor.setContent("");
-    //                 onOk();
-    //                 formRef.resetFields();
-    //             },
-    //         });
-    //     }
-    // }
 
     const SendFlow = async (values) => {
         try {
@@ -169,10 +111,15 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 data: {
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
-                    flowoutputid: details.flowoutputid
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        comment_text: textValue
+                    }
+                   
                 }
             });
             if (sendflow.status === 200) {
+                SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -184,7 +131,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         editorRef.current.editor.setContent("");
                         onOk();
                         formRef.resetFields();
-                        // history.push({ pathname: "/internal/issue/inprogress" })
+                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
@@ -208,23 +155,21 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     }
 
     const onFinish = (values) => {
-        SaveComment();
         SendFlow(values);
-
     };
-    useEffect(() => {
-        if (visible) {
-            GetIssueType();
-            LoadModule();
-        }
+    // useEffect(() => {
+    //     if (visible) {
+    //         GetIssueType();
+    //         LoadModule();
+    //     }
 
-    }, [visible])
+    // }, [visible])
 
-    useEffect(() => {
-        if (formRef && visible) {
-            formRef.setFieldsValue({ issuetype: details.internaltype, module: details.moduleId })
-        }
-    }, [details.internaltype, visible, formRef])
+    // useEffect(() => {
+    //     if (formRef && visible) {
+    //         formRef.setFieldsValue({ issuetype: details.internaltype, module: details.moduleId })
+    //     }
+    // }, [details.internaltype, visible, formRef])
 
 
 

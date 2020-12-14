@@ -36,9 +36,9 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
                         comment_text: textValue,
-                        comment_type: "internal",
+                        comment_type: "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -79,11 +79,13 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 data: {
                     ticketid: details.ticketid,
                     mailboxid: details && details.mailboxid,
-                    flowoutputid: details.flowoutputid
+                    flowoutputid: details.flowoutput.FlowOutputId
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveTestResult();
+                SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -99,17 +101,26 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 });
             }
         } catch (error) {
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.editor.setContent("")
+                    onOk();
 
+                },
+            });
         }
     }
 
-  
+
     const onFinish = (values) => {
         console.log('onFinish:', values);
-        // SaveComment();
-        SaveTestResult();
         SendFlow();
-        onOk();
     };
 
     useEffect(() => {
@@ -118,7 +129,8 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
 
     }, [visible])
 
-    console.log("detail",details)
+    // console.log("details", details.flowoutput)
+    // console.log("flowoutputid",details.flowoutput.FlowOutputId)
 
     return (
         <Modal
@@ -139,30 +151,32 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     remember: true,
                 }}
                 onFinish={onFinish}
-                // onFinishFailed={onFinishFailed}
             >
-
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 800 }}
-                    // valuePropName="fileList"
-                    // getValueFromEvent={uploadRef_testresult.current}
-                    label="Test Result (ใบส่งมอบงาน)"
-                    name="uploadresult"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'กรุณาแนบ (ใบส่งมอบงาน)'
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_testresult} />
-
-                </Form.Item>
+                {
+                    details.flowoutput.value === "Deploy"
+                        ? ""
+                        : <Form.Item
+                            style={{ minWidth: 300, maxWidth: 800 }}
+                            // valuePropName="fileList"
+                            // getValueFromEvent={uploadRef_testresult.current}
+                            label="Test Result (ใบส่งมอบงาน)"
+                            name="uploadresult"
+                            rules={[
+                                {
+                                    required: false,
+                                    message: 'กรุณาแนบ (ใบส่งมอบงาน)'
+                                },
+                            ]}
+                        >
+                            <UploadFile ref={uploadRef_testresult} />
+                        </Form.Item>
+                }
             </Form>
 
 
 
-          
+
+
             <label className="header-text">Remark</label>
             <Editor
                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"

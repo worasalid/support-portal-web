@@ -1,8 +1,7 @@
 import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, } from "antd";
+import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider,List } from "antd";
 import React, { useState, useContext, useEffect } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import axios from 'axios'
 import AuthenContext from "../../utility/authenContext";
 import Axios from "axios";
 import MasterContext from "../../utility/masterContext";
@@ -15,13 +14,13 @@ export default function MasterPage(props) {
   const match = useRouteMatch();
   const [show_notice, setshow_notice] = useState(true);
   const { state, dispatch } = useContext(AuthenContext);
-  const {state: masterstate, dispatch: masterdispatch} = useContext(MasterContext)
+  const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
   const userlogin = state.user
   const [activemenu, setActivemenu] = useState([])
 
   const getuser = async () => {
     try {
-      const result = await axios({
+      const result = await Axios({
         url: process.env.REACT_APP_API_URL + "/auth/customer/me",
         method: "get",
         headers: {
@@ -44,17 +43,46 @@ export default function MasterPage(props) {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         }
       });
-      masterdispatch({type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length});
-      masterdispatch({type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length});
-      masterdispatch({type: "COUNT_PASS", payload: countstatus.data.filter((x) =>  x.MailType === "out" && x.GroupStatus === "Pass").length});
-      masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length});
-      masterdispatch({type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length})
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Pass").length });
+      masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length });
+      masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length })
 
     } catch (error) {
 
     }
   }
 
+  const GetNotifications = async() => {
+    try {
+      const notification = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/countstatus",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        }
+      });
+    } catch (error) {
+      
+    }
+  }
+
+  const data = [
+    {
+      title: 'ISSUE-001-20120020',
+      description: "มีงานใหม่ส่งถึงคุณ"
+    },
+    {
+      title: 'ISSUE-001-20120019',
+      description: "มีการ Update Comment"
+    },
+    {
+      title: 'ISSUE-001-20120018',
+      description: "มีการ Update Comment"
+    },
+   
+  ];
 
   useEffect(() => {
     if (!state.authen) {
@@ -104,7 +132,19 @@ export default function MasterPage(props) {
                           <Row style={{ padding: 16 }}>
                             <Col span={24}>
                               <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
-
+                              <List
+                                itemLayout="horizontal"
+                                dataSource={data}
+                                renderItem={item => (
+                                  <List.Item>
+                                    <List.Item.Meta
+                                      avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                      title={<a href="http://localhost:3000/space/Customer/Issue/Subject/3">{item.title}</a>}
+                                      description={item.description}
+                                    />
+                                  </List.Item>
+                                )}
+                              />
                             </Col>
                           </Row>
                         </div>
@@ -198,14 +238,14 @@ export default function MasterPage(props) {
                   history.push({ pathname: "/customer/issue/mytask" })
                 }
               >
-                My Task 
+                My Task
                 {
                   masterstate.toolbar.sider_menu.issue.mytask.count === 0
-                  ? ""
-                  : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
 
                 }
-              
+
               </Menu.Item>
               <Menu.Item
                 key="2"
@@ -213,11 +253,11 @@ export default function MasterPage(props) {
                   history.push({ pathname: "/customer/issue/inprogress" })
                 }
               >
-                In progress 
+                In progress
                 {
                   masterstate.toolbar.sider_menu.issue.inprogress.count === 0
-                  ? ""
-                  : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
 
                 }
               </Menu.Item>
@@ -230,8 +270,8 @@ export default function MasterPage(props) {
                 Pass
                 {
                   masterstate.toolbar.sider_menu.issue.pass.count === 0
-                  ? ""
-                  : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
 
                 }
               </Menu.Item>
@@ -244,8 +284,8 @@ export default function MasterPage(props) {
                 Cancel
                 {
                   masterstate.toolbar.sider_menu.issue.cancel.count === 0
-                  ? ""
-                  : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
 
                 }
               </Menu.Item>
@@ -255,7 +295,7 @@ export default function MasterPage(props) {
                   history.push({ pathname: "/customer/issue/complete" })
                 }
               >
-                Completed 
+                Completed
               </Menu.Item>
             </SubMenu>
           </Menu>

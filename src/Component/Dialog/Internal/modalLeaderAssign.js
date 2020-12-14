@@ -49,7 +49,8 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -74,13 +75,15 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
-                        assigneeid: value
+                        assigneeid: value,
+                        comment_text: textValue
                     }
 
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -114,9 +117,8 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
 
     const onFinish = (values, item) => {
         console.log('Success:', values, item);
-        SaveComment();
+        // SaveComment();
         SendFlow(values.assignto);
-        onOk();
     };
 
     useEffect(() => {

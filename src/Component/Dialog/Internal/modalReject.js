@@ -5,7 +5,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
-export default function ModalLeaderReject({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+export default function ModalReject({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
@@ -29,7 +29,8 @@ export default function ModalLeaderReject({ visible = false, onOk, onCancel, dat
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -50,26 +51,22 @@ export default function ModalLeaderReject({ visible = false, onOk, onCancel, dat
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    to_user_id: details.assigneeId,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction
-                      }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutput.FlowOutputId,
+                    value: {
+                        comment_text: textValue
+                    }
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>Reject Task To Developer</p>
+                            <p>{details.flowoutput.FlowAction}</p>
                         </div>
                     ),
                     onOk() {
@@ -86,9 +83,7 @@ export default function ModalLeaderReject({ visible = false, onOk, onCancel, dat
 
     const onFinish = (values,item) => {
         console.log('Success:', values, item);
-        SaveComment();
         SendFlow();
-        onOk();
     };
 
     useEffect(() => {

@@ -47,7 +47,8 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -73,12 +74,14 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                     flowoutputid: details.flowoutputid,
                     value: {
                         assigneeid: value.assignto,
-                        recheck: value.recheck
+                        recheck: value.recheck,
+                        comment_text: textValue
                     }
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -111,9 +114,7 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
 
     const onFinish = (values) => {
         console.log('Success:', values);
-        SaveComment();
         SendFlow(values);
-        onOk();
     };
 
     useEffect(() => {

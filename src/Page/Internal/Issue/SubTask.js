@@ -23,7 +23,7 @@ import ModalqaAssign from "../../../Component/Dialog/Internal/modalqaAssign";
 import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import ModalComplete from "../../../Component/Dialog/Internal/modalComplete";
-import ModalLeaderReject from "../../../Component/Dialog/Internal/modalLeaderReject";
+import ModalReject from "../../../Component/Dialog/Internal/modalReject";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -47,10 +47,10 @@ export default function SubTask() {
   const [modalQAassign_visible, setModalQAassign_visible] = useState(false);
   const [modalQA_visible, setModalQA_visible] = useState(false);
   const [modalresolved_visible, setModalresolved_visible] = useState(false);
-  const [unittestlog_visible, setUnittestlog_visible] = useState(false);
+
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
-  const [modalleaderreject_visible, setModalleaderreject_visible] = useState(false);
+  const [modalreject_visible, setModalreject_visible] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -156,12 +156,13 @@ export default function SubTask() {
     if (item.data.NodeName === "support" && item.data.value === "SendIssue" || item.data.value === "ResolvedTask") { return (setVisible(true)) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderReject") { setModalleaderreject_visible(true) }
+    if (item.data.NodeName === "developer_1" && item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+    if (item.data.TextEng === "Reject") { setModalreject_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "Deploy") { return (setModalcomplete_visible(true)) }
-    if (item.data.NodeName === "developer_1") { setModaldeveloper_visible(true) }
+    
 
     if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
-    if (item.data.NodeName === "qa_leader" && item.data.value !== "QAassign") { setModalQA_visible(true) }
+    if (item.data.NodeName === "qa_leader" && item.data.value === "QApass") { setModalQA_visible(true) }
     if (item.data.NodeName === "qa") { setModalQA_visible(true) }
     if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
 
@@ -332,16 +333,15 @@ export default function SubTask() {
                   <label className="header-text">ProgressStatus</label>
                   <br />
                   <Select ref={selectRef}
-                    // defaultValue={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
                     value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
                     onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
-                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
+                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                     disabled={
                       userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out" 
                       || (userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "in" && userstate.taskdata.data[0].Status === "Complete" &&
-                      userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus !== "Pass" ) ? true : false
+                      userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus !== "ReOpen" ) ? true : false
                     }
                   />
                 </Col>
@@ -527,7 +527,7 @@ export default function SubTask() {
         }}
         onCancel={() => {
           setModalleaderqc_visible(false);
-          window.location.reload("false");
+          // window.location.reload("false");
         }}
         details={{
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
@@ -537,20 +537,21 @@ export default function SubTask() {
         }}
       />
 
-      <ModalLeaderReject
+      <ModalReject
         title={ProgressStatus}
-        visible={modalleaderreject_visible}
-        onCancel={() => { return (setModalleaderreject_visible(false)) }}
+        visible={modalreject_visible}
+        onCancel={() => { return (setModalreject_visible(false)) }}
         width={800}
         onOk={() => {
-          setModalleaderreject_visible(false);
-          window.location.reload("false");
+          setModalreject_visible(false);
+          // window.location.reload("false");
         }}
         details={{
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
           taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
           mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
+          flowoutputid: userstate.node.output_data.FlowOutputId,
+          flowoutput: userstate.node.output_data
         }}
 
       />
@@ -572,7 +573,7 @@ export default function SubTask() {
         onCancel={() => { return (setModalQAassign_visible(false)) }}
         onOk={() => {
           setModalQAassign_visible(false);
-          window.location.reload("false");
+          // window.location.reload("false");
         }}
         details={{
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
@@ -592,7 +593,7 @@ export default function SubTask() {
         }}
         onCancel={() => {
           setModalQA_visible(false);
-          window.location.reload("false");
+          // window.location.reload("false");
         }}
         details={{
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
