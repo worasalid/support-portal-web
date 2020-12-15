@@ -24,6 +24,7 @@ import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import ModalComplete from "../../../Component/Dialog/Internal/modalComplete";
 import ModalReject from "../../../Component/Dialog/Internal/modalReject";
+import ModalSendTask from "../../../Component/Dialog/Internal/modalSendTask";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -41,6 +42,7 @@ export default function SubTask() {
   const [visible, setVisible] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
+  const [modalsendtask_visible, setModalsendtask_visible] = useState(false);
   const [modalleaderassign_visible, setModalleaderassign_visible] = useState(false);
   const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
   const [modalleaderqc_visible, setModalleaderqc_visible] = useState(false);
@@ -87,14 +89,9 @@ export default function SubTask() {
             payload: flow_output.data.filter((x) => x.value !== "QApass")
           });
         }
-        if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName === "qa" && !userstate.issuedata.details[0].QARecheck) {
-          userdispatch({
-            type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value !== "SendQALeader")
-          });
-        }
+
         if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName !== "qa") {
-          userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+          userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
         }
       }
     } catch (error) {
@@ -159,10 +156,11 @@ export default function SubTask() {
     if (item.data.NodeName === "developer_1" && item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
     if (item.data.TextEng === "Reject") { setModalreject_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "Deploy") { return (setModalcomplete_visible(true)) }
-    
+
 
     if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
     if (item.data.NodeName === "qa_leader" && item.data.value === "QApass") { setModalQA_visible(true) }
+    if (item.data.NodeName === "qa_leader" && item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
     if (item.data.NodeName === "qa") { setModalQA_visible(true) }
     if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
 
@@ -294,12 +292,12 @@ export default function SubTask() {
                 {/* TAB Document */}
                 <Row style={{ marginTop: 36, marginRight: 24 }}>
                   <Col span={24}>
-                      <TabsDocument
-                        details={{
-                          refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-                          reftype: "Ticket_Task",
-                        }}
-                      />
+                    <TabsDocument
+                      details={{
+                        refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+                        reftype: "Ticket_Task",
+                      }}
+                    />
                   </Col>
                 </Row>
 
@@ -339,9 +337,10 @@ export default function SubTask() {
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                     disabled={
-                      userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out" 
-                      || (userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "in" && userstate.taskdata.data[0].Status === "Complete" &&
-                      userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus !== "ReOpen" ) ? true : false
+                      userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out"
+                        || (userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "in" && userstate.taskdata.data[0].Status === "Complete" &&
+                          userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus !== "ReOpen"
+                          && userstate.issuedata.details[0].InternalStatus !== "Pass") ? true : false
                     }
                   />
                 </Col>
@@ -353,24 +352,29 @@ export default function SubTask() {
                   <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].Priority}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={3} style={{ marginTop: "10px" }}>
-                  <label className="header-text">SLA</label>
-                </Col>
-                <Col span={18} >
-                  {
-                    userstate.taskdata.data[0] &&
-                    <Clock
-                      showseconds={false}
-                      deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
-                      createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
-                      resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
-                      onClick={() => { setModaltimetracking_visible(true) }}
-                    />
-                  }
 
-                </Col>
-              </Row>
+              {
+                userstate.taskdata.data[0]?.IssueType === "ChangeRequest" ? "" :
+
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={3} style={{ marginTop: "10px" }}>
+                      <label className="header-text">SLA</label>
+                    </Col>
+                    <Col span={18} >
+                      {
+                        userstate.taskdata.data[0] &&
+                        <Clock
+                          showseconds={false}
+                          deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
+                          createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
+                          resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
+                          onClick={() => { setModaltimetracking_visible(true) }}
+                        />
+                      }
+
+                    </Col>
+                  </Row>
+              }
 
               <Row style={{ marginBottom: 20 }}>
                 <Col span={24}>
@@ -463,6 +467,23 @@ export default function SubTask() {
           })}
         </Timeline>
       </Modal>
+
+      <ModalSendTask
+        title={ProgressStatus}
+        visible={modalsendtask_visible}
+        width={800}
+        onCancel={() => { return (setModalsendtask_visible(false), setSelected(null)) }}
+        onOk={() => {
+          setModalsendtask_visible(false);
+        }}
+        details={{
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId
+
+        }}
+      />
 
       <ModalSupport
         title={ProgressStatus}
@@ -603,7 +624,6 @@ export default function SubTask() {
         }}
       />
 
-    
 
       <ModalTimetracking
         title="Time Tracking"

@@ -17,6 +17,7 @@ import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetrack
 import ListSubTask from "../../../Component/Subject/Internal/listSubTask";
 import ModalCreateTask from "../../../Component/Dialog/Internal/modalCreateTask";
 import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
+import ModalSendIssue from "../../../Component/Dialog/Internal/modalSendIssue";
 
 
 const { Option } = Select;
@@ -33,6 +34,7 @@ export default function Subject() {
 
   //modal
   // const [visible, setVisible] = useState(false);
+  const [modalsendissue_visible, setModalsendissue_visible] = useState(false);
   const [modaladdtask, setModaladdtask] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
@@ -104,7 +106,7 @@ export default function Subject() {
       if (flow_output.status === 200) {
         userdispatch({
           type: "LOAD_ACTION_FLOW",
-          payload: flow_output.data.filter((x) => x.value === "Resolved" || x.value === "Deploy")
+          payload: flow_output.data.filter((x) => x.Type === "Issue")
         });
       }
     } catch (error) {
@@ -167,14 +169,8 @@ export default function Subject() {
         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
       },
       data: {
-        ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-        typeId: value,
-        history: {
-
-          value: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText,
-          value2: item.label
-        }
-
+        ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+        typeid: value,
       }
     });
     if (issuetype.status === 200) {
@@ -248,10 +244,11 @@ export default function Subject() {
   function HandleChange(value, item) {
     console.log("value", value)
     console.log("item", item)
+    setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
 
-    if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" && item.data.value === "Resolved" || item.data.value === "Deploy") 
-    { return (setModalresolved_visible(true)) }
+    if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" && item.data.value === "Resolved" || item.data.value === "Deploy") { return (setModalresolved_visible(true)) }
+    if(userstate.issuedata.details[0]?.NodeName === "support" && item.data.value === "SendToSA"){return setModalsendissue_visible(true) }
   }
 
   function renderColorPriority(param) {
@@ -365,9 +362,9 @@ export default function Subject() {
                 <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
                   {
                     userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" &&
-                    (userstate.issuedata.details[0].InternalStatus !== "Complete" &&
-                    userstate.issuedata.details[0].InternalStatus !== "Pass")
-                    // userstate.issuedata.details[0].InternalStatus !== "Resolved"
+                      (userstate.issuedata.details[0].InternalStatus !== "Complete" &&
+                        userstate.issuedata.details[0].InternalStatus !== "Pass")
+                      // userstate.issuedata.details[0].InternalStatus !== "Resolved"
                       ? <Col span={24}>
                         <Button icon={<FileAddOutlined />}
                           shape="round"
@@ -433,8 +430,9 @@ export default function Subject() {
                   <label className="header-text">ProgressStatus</label>
                   <br />
                   {
-                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
-                    && userstate.issuedata.details[0].MailType === "in"
+                    userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "in"
+                      && (userstate.issuedata.details[0].NodeName === "support" || userstate.issuedata.details[0].NodeName === "sa")
+                    
                       ? <Select ref={selectRef}
                         value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus}
                         style={{ width: '100%' }} placeholder="None"
@@ -477,24 +475,27 @@ export default function Subject() {
                   }
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={3} style={{ marginTop: "10px" }}>
-                  <label className="header-text">SLA</label>
-                </Col>
-                <Col span={18} >
-                  {
-                    userstate.issuedata.details[0] &&
-                    <Clock
-                      showseconds={false}
-                      deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].DueDate}
-                      createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
-                      resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
-                      onClick={() => { setModaltimetracking_visible(true) }}
-                    />
-                  }
 
-                </Col>
-              </Row>
+              {
+                userstate.issuedata.details[0]?.IssueType === "ChangeRequest" ? "" :
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={3} style={{ marginTop: "10px" }}>
+                      <label className="header-text">SLA</label>
+                    </Col>
+                    <Col span={18} >
+                      {
+                        userstate.issuedata.details[0] &&
+                        <Clock
+                          showseconds={false}
+                          deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].DueDate}
+                          createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
+                          resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
+                          onClick={() => { setModaltimetracking_visible(true) }}
+                        />
+                      }
+                    </Col>
+                  </Row>
+              }
 
               <Row style={{ marginBottom: 20 }}>
                 <Col span={24}>
@@ -535,8 +536,7 @@ export default function Subject() {
 
                   {
                     userstate.issuedata.details[0]
-                      && (userstate.issuedata.details[0].NodeName !== "support"
-                        || userstate.issuedata.details[0].FlowStatus !== "Waiting ICON Support")
+                      && (userstate.issuedata.details[0].NodeName !== "support")
                       ? <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
                       : <Select
                         style={{ width: '100%' }}
@@ -642,6 +642,22 @@ export default function Subject() {
         }}
       />
 
+      <ModalSendIssue
+        title={ProgressStatus}
+        visible={modalsendissue_visible}
+        width={800}
+        onCancel={() => { return (setModalsendissue_visible(false), setSelected(null)) }}
+        onOk={() => {
+          setModalsendissue_visible(false);
+        }}
+        details={{
+          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          flowoutput: userstate.node.output_data
+
+        }}
+      />
+
       <ModalResolved
         title="Resolved"
         visible={modalresolved_visible}
@@ -653,7 +669,6 @@ export default function Subject() {
         details={{
           ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          // flowoutputid: userstate.node.output_data.FlowOutputId,
           flowoutput: userstate.node.output_data
 
         }}

@@ -96,6 +96,11 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
                     <label style={{ color: "#27AE60" }}>{param}</label>
                 </>
+            case 'Resolved':
+                return <>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#27AE60" }}>{param}</label>
+                </>
             case 'Complete':
                 return <>
                     <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
