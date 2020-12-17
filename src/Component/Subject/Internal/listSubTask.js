@@ -32,6 +32,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     mailtype: mailtype
                 }
             });
+
             setListdata(task.data.map((value) => {
                 return {
                     taskId: value.TaskId,

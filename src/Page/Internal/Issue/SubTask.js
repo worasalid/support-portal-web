@@ -25,6 +25,7 @@ import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetrack
 import ModalComplete from "../../../Component/Dialog/Internal/modalComplete";
 import ModalReject from "../../../Component/Dialog/Internal/modalReject";
 import ModalSendTask from "../../../Component/Dialog/Internal/modalSendTask";
+import ModalManday from "../../../Component/Dialog/Internal/modalManday";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -49,6 +50,7 @@ export default function SubTask() {
   const [modalQAassign_visible, setModalQAassign_visible] = useState(false);
   const [modalQA_visible, setModalQA_visible] = useState(false);
   const [modalresolved_visible, setModalresolved_visible] = useState(false);
+  const [modalmanday_visible, setModalmanday_visible] = useState(false);
 
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
@@ -156,14 +158,20 @@ export default function SubTask() {
     if (item.data.NodeName === "developer_1" && item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
     if (item.data.TextEng === "Reject") { setModalreject_visible(true) }
     if (item.data.NodeName === "developer_2" && item.data.value === "Deploy") { return (setModalcomplete_visible(true)) }
-
-
     if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
     if (item.data.NodeName === "qa_leader" && item.data.value === "QApass") { setModalQA_visible(true) }
     if (item.data.NodeName === "qa_leader" && item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
     if (item.data.NodeName === "qa") { setModalQA_visible(true) }
     if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
 
+
+    // Flow CR
+    if (item.data.NodeName === "cr_center" && item.data.value === "RequestManday") { setModalsendtask_visible(true) }
+    if (item.data.NodeName === "cr_center" &&
+      (item.data.value === "CheckManday" || item.data.value === "RejectManday")) {
+      setModalmanday_visible(true);
+    }
+    if (item.data.NodeName === "developer_2" && item.data.value === "SendManday") { setModalmanday_visible(true) }
   }
 
   function renderColorPriority(param) {
@@ -498,6 +506,23 @@ export default function SubTask() {
           taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
           mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
           flowoutputid: userstate.node.output_data.FlowOutputId
+
+        }}
+      />
+
+      <ModalManday
+        title={ProgressStatus}
+        visible={modalmanday_visible}
+        width={800}
+        onCancel={() => { return (setModalmanday_visible(false)) }}
+        onOk={() => {
+          setModalmanday_visible(false);
+        }}
+        details={{
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutput: userstate.node.output_data,
 
         }}
       />

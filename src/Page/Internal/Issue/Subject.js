@@ -18,6 +18,8 @@ import ListSubTask from "../../../Component/Subject/Internal/listSubTask";
 import ModalCreateTask from "../../../Component/Dialog/Internal/modalCreateTask";
 import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
 import ModalSendIssue from "../../../Component/Dialog/Internal/modalSendIssue";
+import ModalSA from "../../../Component/Dialog/Internal/modalSA";
+import ModalManday from "../../../Component/Dialog/Internal/modalManday";
 
 
 const { Option } = Select;
@@ -39,8 +41,10 @@ export default function Subject() {
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalresolved_visible, setModalresolved_visible] = useState(false);
+  const [modalsa_visible, setModalsa_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
+  const [modalmanday_visible, setModalmanday_visible] = useState(false);
 
 
   //div
@@ -248,7 +252,10 @@ export default function Subject() {
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
 
     if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" && item.data.value === "Resolved" || item.data.value === "Deploy") { return (setModalresolved_visible(true)) }
-    if(userstate.issuedata.details[0]?.NodeName === "support" && item.data.value === "SendToSA"){return setModalsendissue_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "support" && item.data.value === "SendCR_Center") { return setModalsendissue_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "cr_center" && item.data.value === "CheckManday" ) { return setModalmanday_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "cr_center") { return setModalsendissue_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "sa") { return setModalsa_visible(true) }
   }
 
   function renderColorPriority(param) {
@@ -361,15 +368,21 @@ export default function Subject() {
                 {/* SubTask */}
                 <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
                   {
-                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" &&
-                      (userstate.issuedata.details[0].InternalStatus !== "Complete" &&
-                        userstate.issuedata.details[0].InternalStatus !== "Pass")
-                      // userstate.issuedata.details[0].InternalStatus !== "Resolved"
+                    userstate.issuedata.details[0]?.IssueType === "ChangeRequest" && userstate.issuedata.details[0].NodeName === "cr_center"
                       ? <Col span={24}>
                         <Button icon={<FileAddOutlined />}
                           shape="round"
-                          // ghost
-                          // type="primary"
+                          onClick={() => setModaladdtask(true)} >
+                          CreateTask
+                        </Button>
+                      </Col>
+                      : ""
+                  }
+                  {
+                    userstate.issuedata.details[0]?.IssueType === "Bug" && userstate.issuedata.details[0].NodeName === "support"
+                      ? <Col span={24}>
+                        <Button icon={<FileAddOutlined />}
+                          shape="round"
                           onClick={() => setModaladdtask(true)} >
                           CreateTask
                         </Button>
@@ -381,8 +394,9 @@ export default function Subject() {
                 <Row style={{ marginRight: 24 }}>
                   <Col span={24}>
                     <ListSubTask
-                      ticketId={match.params.id} ref={subTaskRef}
-                      //mailtype="out"
+                      // ticketId={match.params.id} ref={subTaskRef}
+                      ticketId={userstate.issuedata.details[0]?.Id}
+                      ref={subTaskRef}
                       mailtype={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType}
                     />
                   </Col>
@@ -431,8 +445,8 @@ export default function Subject() {
                   <br />
                   {
                     userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "in"
-                      && (userstate.issuedata.details[0].NodeName === "support" || userstate.issuedata.details[0].NodeName === "sa")
-                    
+                      && (userstate.issuedata.details[0].NodeName === "support" || userstate.issuedata.details[0].NodeName === "sa" || userstate.issuedata.details[0].NodeName === "cr_center")
+
                       ? <Select ref={selectRef}
                         value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus}
                         style={{ width: '100%' }} placeholder="None"
@@ -654,7 +668,21 @@ export default function Subject() {
           ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
           flowoutput: userstate.node.output_data
+        }}
+      />
 
+      <ModalSA
+        title={ProgressStatus}
+        visible={modalsa_visible}
+        width={800}
+        onCancel={() => { return (setModalsa_visible(false)) }}
+        onOk={() => {
+          setModalsa_visible(false);
+        }}
+        details={{
+          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          flowoutput: userstate.node.output_data
         }}
       />
 
@@ -671,6 +699,21 @@ export default function Subject() {
           mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
           flowoutput: userstate.node.output_data
 
+        }}
+      />
+
+      <ModalManday
+        title={ProgressStatus}
+        visible={modalmanday_visible}
+        width={800}
+        onCancel={() => { return (setModalmanday_visible(false)) }}
+        onOk={() => {
+          setModalmanday_visible(false);
+        }}
+        details={{
+          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
+          flowoutput: userstate.node.output_data
         }}
       />
 
