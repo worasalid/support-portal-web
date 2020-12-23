@@ -88,7 +88,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>Assign งานให้ {select_assign}</p>
                         </div>
                     ),
                     onOk() {
@@ -117,7 +117,6 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
 
     const onFinish = (values, item) => {
         console.log('Success:', values, item);
-        // SaveComment();
         SendFlow(values.assignto);
     };
 

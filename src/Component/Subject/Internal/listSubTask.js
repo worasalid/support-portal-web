@@ -143,9 +143,9 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                         >
                             {collapseicon}
                         </span>
-                        <div>
+                        {/* <div>
                             <Progress percent={30} strokeColor="#52c41a"></Progress>
-                        </div>
+                        </div> */}
                     </>
                     : ""
 

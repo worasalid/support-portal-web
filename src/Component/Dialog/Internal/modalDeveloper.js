@@ -100,17 +100,17 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 SaveComment();
                 SaveUnitTest(values);
                 SaveDocumentDeploy(values);
+                onOk();
 
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>แก้ไขงานเสร็จ ส่งงานให้ Leader ตรวจสอบ</p>
                         </div>
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        onOk();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });

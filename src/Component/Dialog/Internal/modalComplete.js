@@ -41,6 +41,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
             });
 
             if (completeflow.status === 200) {
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -49,7 +50,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                         </div>
                     ),
                     onOk() {
-                        onOk();
+                      
                         history.push({ pathname: "/internal/issue/resolved" })
                     },
                 });

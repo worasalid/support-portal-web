@@ -69,16 +69,16 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
 
             if (sendflow.status === 200) {
                 SaveComment();
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>ส่งงานให้ทีม QA ตรวจสอบ</p>
                         </div>
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        onOk();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });

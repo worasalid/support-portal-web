@@ -52,7 +52,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const SendFlow = async () => {
+    const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
@@ -65,6 +65,10 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     mailboxid: details && details.mailboxid,
                     flowoutputid: details.flowoutput.FlowOutputId,
                     value: {
+                        check_std: values.check_std,
+                        std_version: stdversion,
+                        check_effect: values.check_effect,
+                        effect_description: values.description,
                         comment_text: textValue
                     }
 
@@ -105,10 +109,10 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        // console.log('textbox:', stdversion);
-        // console.log('Success:', values);
-        // console.log('textremark:', textValue);
-        SendFlow();
+        console.log('textbox:', stdversion);
+        console.log('Success:', values);
+        console.log('textremark:', textValue);
+         SendFlow(values);
     };
 
 
@@ -134,9 +138,9 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
             >
 
                 <Form.Item
-                    name="checkstd"
+                    name="check_std"
                     label="อยู่ใน Version STD"
-                    valuePropName="checked"
+                    // valuePropName="checked"
                     rules={[
                         {
                             required: true,
@@ -144,21 +148,19 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         },
                     ]}
                 >
-                    <Radio.Group onChange={(e) => {return setRadiovalue(e.target.value),setStdversion(null)} }>
+                    <Radio.Group onChange={(e) => { return setRadiovalue(e.target.value), setStdversion(null) }}>
                         <Radio style={radioStyle} value={1}>
                             STD
-                              {
-                                radiovalue === 1
-                                    ? <Input onChange={(e) => setStdversion(e.target.value)} style={{ width: 300, marginLeft: 10 }} />
-                                    : null
-                            }
+                            <Input placeholder="Version" onChange={(e) => setStdversion(e.target.value)}
+                                style={{ width: 300, marginLeft: 10, display: radiovalue === 1 ? "inline" : "none" }}
+                            />
                         </Radio>
                         <Radio style={radioStyle} value={2}>ไม่ใช่ STD</Radio>
                     </Radio.Group>
                 </Form.Item>
                 <Form.Item
-                    name="checkeffect"
-                    valuePropName="checked"
+                    name="check_effect"
+                    // valuePropName="checked"
                     rules={[
                         {
                             required: true,
@@ -166,30 +168,27 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         },
                     ]}
                 >
-                    <Radio.Group onChange={(e) => { return setRadiovalue2(e.target.value), form.setFieldsValue({description: null})}}>
+                    <Radio.Group onChange={(e) => { return setRadiovalue2(e.target.value), form.setFieldsValue({ description: null }) }}>
                         <Radio value={1}>
                             มีผลกระทบ
                         </Radio>
                         <Radio value={2}>ไม่มีผลกระทบ</Radio>
                     </Radio.Group>
                 </Form.Item>
-                {
-                    radiovalue2 === 1
-                        ?
-                        <Form.Item
-                            name="description"
-                            label="ประเมินผลกระทบ"
-                            rules={[
-                                {
-                                    required: false,
-                                    message: 'Please Select Assign',
-                                },
-                            ]}
-                        >
-                            <TextArea rows={5} style={{ width: "100%" }} />
-                        </Form.Item>
-                        : null
-                }
+
+                <Form.Item
+                    style={{ display: radiovalue2 === 1 ? "block" : "none" }}
+                    name="description"
+                    label="ประเมินผลกระทบ"
+                    rules={[
+                        {
+                            required: radiovalue2 === 1 ? true : false,
+                            message: 'กรุณา ประเมินผลกระทบ',
+                        },
+                    ]}
+                >
+                    <TextArea rows={5} style={{ width: "100%" }} />
+                </Form.Item>
 
 
                 <Form.Item

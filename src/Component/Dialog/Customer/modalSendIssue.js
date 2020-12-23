@@ -122,6 +122,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
     <Modal
       // title={title}
       visible={visible}
+      okText="Send"
       onOk={() => { return (SaveComment(), SendFlow(), onOk()) }}
       onCancel={() => { return (editorRef.current.editor.setContent(""), onCancel()) }}
       {...props}

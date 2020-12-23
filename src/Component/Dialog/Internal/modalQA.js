@@ -89,16 +89,16 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             if (sendflow.status === 200) {
                 SaveComment();
                 SaveUnitTest(values);
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>ตรวจสอบผ่าน</p>
                         </div>
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("");
-                        onOk();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -129,13 +129,14 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
         <Modal
             visible={visible}
             onOk={() => { return (form.submit()) }}
+            okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
 
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" ,marginTop: 40 }}
+            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" ,marginTop: 0 }}
                 name="qa-test"
                 className="login-form"
                 initialValues={{

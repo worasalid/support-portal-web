@@ -6,7 +6,7 @@ import CommentBox from "../../../Component/Comment/Internal/Comment";
 import InternalComment from "../../../Component/Comment/Internal/Internal_comment";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, PoweroffOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ConsoleSqlOutlined, FileAddOutlined, PoweroffOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
@@ -20,6 +20,8 @@ import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
 import ModalSendIssue from "../../../Component/Dialog/Internal/modalSendIssue";
 import ModalSA from "../../../Component/Dialog/Internal/modalSA";
 import ModalManday from "../../../Component/Dialog/Internal/modalManday";
+import ModalMandayLog from "../../../Component/Dialog/Internal/modalMandayLog";
+import ModalSA_Assessment from "../../../Component/Dialog/Internal/modalSA_Assessment";
 
 
 const { Option } = Select;
@@ -45,6 +47,8 @@ export default function Subject() {
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalmanday_visible, setModalmanday_visible] = useState(false);
+  const [modalmandaylog_visible, setModalmandaylog_visible] = useState(false);
+  const [modalAssessment_visible, setModalAssessment_visible] = useState(false);
 
 
   //div
@@ -195,6 +199,7 @@ export default function Subject() {
   }
 
   const UpdatePriority = async (value, item) => {
+    console.log("UpdatePriority", value)
     try {
       const priority = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/update-priority",
@@ -207,8 +212,6 @@ export default function Subject() {
           priority: value,
           internaltype: userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeId,
           history: {
-            historytype: "Customer",
-            description: "Changed the Priority ",
             value: userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority,
             value2: item.label
           }
@@ -251,10 +254,17 @@ export default function Subject() {
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
 
+    // Bug Flow
     if (userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support" && item.data.value === "Resolved" || item.data.value === "Deploy") { return (setModalresolved_visible(true)) }
+
+    //CR FLOW
     if (userstate.issuedata.details[0]?.NodeName === "support" && item.data.value === "SendCR_Center") { return setModalsendissue_visible(true) }
-    if (userstate.issuedata.details[0]?.NodeName === "cr_center" && item.data.value === "CheckManday" ) { return setModalmanday_visible(true) }
-    if (userstate.issuedata.details[0]?.NodeName === "cr_center") { return setModalsendissue_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "cr_center" && item.data.value === "SendToSA") { return setModalsendissue_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "cr_center" && item.data.value === "SendManday") { return setModalmanday_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "support" && item.data.value === "SendManday") { return setModalsendissue_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "support" && item.data.value === "ConfirmManday") { return setModalsendissue_visible(true) }
+    if (userstate.issuedata.details[0]?.NodeName === "cr_center" && item.data.value === "CheckManday") { return setModalsendissue_visible(true) }
+    if (item.data.value === "Reject") { return setModalsendissue_visible(true) }
     if (userstate.issuedata.details[0]?.NodeName === "sa") { return setModalsa_visible(true) }
   }
 
@@ -312,7 +322,7 @@ export default function Subject() {
 
           <Row>
             {/* Content */}
-            <Col span={16} style={{ paddingTop: 0 }}>
+            <Col span={16} style={{ paddingTop: 10 }}>
               <div style={{ height: "80vh", overflowY: "scroll" }}>
                 {/* Issue Description */}
                 <Row style={{ marginRight: 24 }}>
@@ -371,6 +381,7 @@ export default function Subject() {
                     userstate.issuedata.details[0]?.IssueType === "ChangeRequest" && userstate.issuedata.details[0].NodeName === "cr_center"
                       ? <Col span={24}>
                         <Button icon={<FileAddOutlined />}
+                          disabled={userstate.issuedata.details[0]?.FlowStatus === "Waiting SA" ? true : false}
                           shape="round"
                           onClick={() => setModaladdtask(true)} >
                           CreateTask
@@ -378,17 +389,14 @@ export default function Subject() {
                       </Col>
                       : ""
                   }
-                  {
-                    userstate.issuedata.details[0]?.IssueType === "Bug" && userstate.issuedata.details[0].NodeName === "support"
-                      ? <Col span={24}>
-                        <Button icon={<FileAddOutlined />}
-                          shape="round"
-                          onClick={() => setModaladdtask(true)} >
-                          CreateTask
+                  <Col span={24}
+                    style={{ display: userstate.issuedata.details[0]?.IssueType === "Bug" && userstate.issuedata.details[0].NodeName === "support" ? "block" : "none" }}>
+                    <Button icon={<FileAddOutlined />}
+                      shape="round"
+                      onClick={() => setModaladdtask(true)} >
+                      CreateTask
                         </Button>
-                      </Col>
-                      : ""
-                  }
+                  </Col>
 
                 </Row>
                 <Row style={{ marginRight: 24 }}>
@@ -442,13 +450,15 @@ export default function Subject() {
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">ProgressStatus</label>
-                  <br />
+                </Col>
+                <Col span={18} style={{ marginTop: 10 }}>
+
                   {
                     userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "in"
                       && (userstate.issuedata.details[0].NodeName === "support" || userstate.issuedata.details[0].NodeName === "sa" || userstate.issuedata.details[0].NodeName === "cr_center")
 
                       ? <Select ref={selectRef}
-                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus}
+                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
                         style={{ width: '100%' }} placeholder="None"
                         onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
                         onChange={(value, item) => HandleChange(value, item)}
@@ -456,7 +466,7 @@ export default function Subject() {
                       // disabled={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "out" ? true : false}
                       />
 
-                      : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus}</label>
+                      : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}</label>
                   }
 
                 </Col>
@@ -464,15 +474,11 @@ export default function Subject() {
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Priority</label>
-                  <br />
+                </Col>
+                <Col span={18} style={{ marginTop: 10 }}>
                   {
-                    userstate.issuedata.details[0]
-                      && (userstate.issuedata.details[0].NodeName !== "support" || userstate.issuedata.details[0].FlowStatus !== "Waiting ICON Support")
-                      ? <label className="value-text">
-                        {renderColorPriority(userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority)}&nbsp;&nbsp;
-                           {userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority}
-                      </label>
-                      : <Select
+                    (userstate.issuedata.details[0]?.MailType === "in" && userstate.issuedata.details[0]?.NodeName === "support" && userstate.issuedata.details[0]?.NodeActionText === "CheckIssue")
+                      ? <Select
                         style={{ width: '100%' }}
                         allowClear
                         showSearch
@@ -486,6 +492,13 @@ export default function Subject() {
                         onChange={(value, item) => UpdatePriority(value, item)}
                         value={userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority}
                       />
+
+
+
+                      : <label className="value-text">
+                        {renderColorPriority(userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority)}&nbsp;&nbsp;
+                         {userstate.issuedata.details[0] && userstate.issuedata.details[0].Priority}
+                      </label>
                   }
                 </Col>
               </Row>
@@ -512,20 +525,20 @@ export default function Subject() {
               }
 
               <Row style={{ marginBottom: 20 }}>
-                <Col span={24}>
+                <Col span={18}>
                   <label className="header-text">DueDate</label>
+                
+                  <ClockCircleOutlined style={{ fontSize: 18,marginLeft:12 }} onClick={() => setHistoryduedate_visible(true)} />
                   <br />
-                  <ClockCircleOutlined style={{ fontSize: 18 }} onClick={() => setHistoryduedate_visible(true)} />
-
                   {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
                   {
                     userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
-                      ? <Button type="link"
+                      ? <label className="text-link value-text"
                         onClick={() => setModalduedate_visible(true)}
                       >
                         {userstate.issuedata.details[0] &&
                           (userstate.issuedata.details[0].DueDate === null ? "None" : moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
-                      </Button>
+                      </label>
                       : <label>&nbsp;&nbsp;{userstate.issuedata.details[0] && moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
                   }
                   {history_duedate_data.length > 1 ?
@@ -546,13 +559,11 @@ export default function Subject() {
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">IssueType</label>
-                  <br />
-
+                </Col>
+                <Col span={18} style={{ marginTop: 10 }}>
                   {
-                    userstate.issuedata.details[0]
-                      && (userstate.issuedata.details[0].NodeName !== "support")
-                      ? <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
-                      : <Select
+                    (userstate.issuedata.details[0]?.MailType === "in" && userstate.issuedata.details[0]?.NodeName === "support" && userstate.issuedata.details[0]?.NodeActionText === "CheckIssue")
+                      ? <Select
                         style={{ width: '100%' }}
                         allowClear
                         showSearch
@@ -565,6 +576,8 @@ export default function Subject() {
                         onChange={(value, item) => SaveIssueType(value, item)}
                         value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}
                       />
+
+                      : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
                   }
 
                 </Col>
@@ -583,11 +596,19 @@ export default function Subject() {
                   <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 20 }}>
+
+              <Row style={{ marginBottom: 20, display: userstate.issuedata.details[0]?.IsAssessment === 1 ? "block" : "none" }}>
                 <Col span={18}>
-                  <label className="header-text">Assignee</label>
-                  <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Assignee}</label>
+                  <label className="header-text">SA ประเมินผลกระทบ</label>
+                  <Button type="link" onClick={() => setModalAssessment_visible(true)}> รายละเอียด </Button>
+                </Col>
+              </Row>
+
+              <Row style={{ marginBottom: 20, display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" ? "inline" : "none" }}>
+                <Col span={18}>
+                  <label className="header-text">Manday</label>
+                  <Button type="link" onClick={() => setModalmandaylog_visible(true)} >{userstate.issuedata.details[0]?.Manday}</Button>
+
                 </Col>
               </Row>
 
@@ -713,7 +734,31 @@ export default function Subject() {
         details={{
           ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutput: userstate.node.output_data
+          flowoutput: userstate.node.output_data,
+          costmanday: userstate.issuedata.details[0]?.CostPerManday
+        }}
+      />
+
+      <ModalMandayLog
+        title="ข้อมูล Manday"
+        visible={modalmandaylog_visible}
+        width={800}
+        onCancel={() => { return (setModalmandaylog_visible(false)) }}
+        details={{
+          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          mailtype: userstate.issuedata.details[0]?.MailType,
+          cost: userstate.issuedata.details[0]?.Cost,
+          totalmanday: userstate.issuedata.details[0]?.Manday
+        }}
+      />
+
+      <ModalSA_Assessment
+        title="ข้อมูลประเมิน ผลกระทบ"
+        visible={modalAssessment_visible}
+        width={600}
+        onCancel={() => { return (setModalAssessment_visible(false)) }}
+        details={{
+          ticketid: userstate.issuedata.details[0]?.Id,
         }}
       />
 

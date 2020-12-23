@@ -337,7 +337,8 @@ export default function SubTask() {
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">ProgressStatus</label>
-                  <br />
+                </Col>
+                <Col span={18} style={{ marginTop: 10, display: userstate.taskdata.data[0]?.MailType === "in" ? "block" : "none" }}>
                   <Select ref={selectRef}
                     value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
@@ -351,6 +352,9 @@ export default function SubTask() {
                           && userstate.issuedata.details[0].InternalStatus !== "Pass") ? true : false
                     }
                   />
+                </Col>
+                <Col span={18} style={{ display: userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none" }}>
+                  <label className="value-text">{userstate.taskdata.data[0]?.FlowStatus}</label>
                 </Col>
               </Row>
               <Row style={{ marginBottom: 20 }}>
@@ -440,12 +444,13 @@ export default function SubTask() {
                   <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].ModuleName}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 20 }}>
+
+              <Row style={{ marginBottom: 20, display: userstate.taskdata.data[0]?.IssueType === "ChangeRequest" ? "inline" : "none" }}>
                 <Col span={18}>
-                  <label className="header-text">Assignee</label>
-                  <br />
-                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].Assignee}</label>
+                  <label className="header-text">Manday</label>
+                  <label style={{ marginLeft: 10 }} className="value-text">{userstate.taskdata.data[0]?.Manday}</label>
                 </Col>
+
               </Row>
 
 

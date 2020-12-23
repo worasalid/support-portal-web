@@ -140,7 +140,7 @@ export default function Resolved() {
               />
 
               <Column title="Subject"
-              width="30%"
+                width="30%"
                 render={(record) => {
                   return (
                     <>
@@ -206,7 +206,7 @@ export default function Resolved() {
               /> */}
 
               <Column title="Due Date"
-               width="10%"
+                width="10%"
                 align="center"
                 render={(record) => {
                   return (
@@ -225,8 +225,8 @@ export default function Resolved() {
                           }
                         >
                           เลื่อน Due
-                       </Tag> 
-                       : ""
+                       </Tag>
+                        : ""
                       }
                     </>
                   )
@@ -247,8 +247,8 @@ export default function Resolved() {
                         </label>
                       </div>
                       <div>
-                      {/* {record.ResolvedDate === null ? "" : new Date(record.ResolvedDate).toLocaleDateString('en-GB')} */}
-                      {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY HH:mm")}
+                        {/* {record.ResolvedDate === null ? "" : new Date(record.ResolvedDate).toLocaleDateString('en-GB')} */}
+                        {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY HH:mm")}
                       </div>
                     </>
                   );
@@ -261,13 +261,15 @@ export default function Resolved() {
                 render={(record) => {
                   return (
                     <>
-                      <Clock 
-                      showseconds= {false}
-                      deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                      createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                      resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                      onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
-                      />
+                      <div style={{display: record.IssueType === "Bug" ? "block" : "none"}}>
+                        <Clock
+                          showseconds={false}
+                          deadline={record.DueDate}
+                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
+                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
+                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                        />
+                      </div>
                     </>
                   )
                 }
@@ -376,7 +378,7 @@ export default function Resolved() {
           }}
 
         />
-         <ModalTimetracking
+        <ModalTimetracking
           title="Time Tracking"
           width={600}
           visible={modaltimetracking_visible}

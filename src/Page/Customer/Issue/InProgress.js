@@ -175,6 +175,7 @@ export default function InProgress() {
 
             <Column title="Due Date"
               align="center"
+              width="10%"
               render={(record) => {
                 return (
                   <>
@@ -206,7 +207,7 @@ export default function InProgress() {
               align="center"
               render={(record) => {
                 return (
-                  <label>{record.GroupStatus}</label>
+                  <label>{record.ProgressStatus}</label>
                 );
               }}
             />

@@ -36,7 +36,7 @@ label.text-link:hover {
 
 
 label.topic-text {
-    font-size: 24px !important;
+    font-size: 18px !important;
     margin-bottom: 16px;
 }
 
@@ -80,6 +80,7 @@ div.issue-detail-box {
     width: 100%;
     display: inline-block;
     padding: 16px;
+    margin-top: 16px;
 
 }
 
@@ -137,4 +138,8 @@ div.sd-page-topic {
 
     background-color: #ff4d4f;
     color: #fff;
+}
+
+.ant-input-number-input {
+  text-align: right;
 }

@@ -29,7 +29,7 @@ export default function InProgress() {
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
-  
+
 
   // data
   const [userstate, userdispatch] = useReducer(userReducer, userState);
@@ -210,7 +210,7 @@ export default function InProgress() {
                       <div>
                         {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                         <label>
-                        {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
+                          {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
                       <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
@@ -228,15 +228,15 @@ export default function InProgress() {
                 dataIndex="Assignee"
               ></Column> */}
               <Column title="Due Date"
-               width="10%"
+                width="10%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
                       {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-              
+
                       {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
-               
+
                       <br />
                       {record.cntDueDate > 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
@@ -282,15 +282,17 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                      <Clock 
-                      showseconds= {false}
-                      //deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                      deadline={record.DueDate}
-                      createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                      resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                      onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
-                      />
+                      <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
+                        <Clock
+                          showseconds={false}
+                          deadline={record.DueDate}
+                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
+                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
+                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                        />
+                      </div>
                     </>
+
                   )
                 }
                 }

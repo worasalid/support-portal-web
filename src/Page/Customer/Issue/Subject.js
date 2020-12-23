@@ -137,6 +137,10 @@ export default function Subject() {
     if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
     if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
     if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
+
+    // CR FLOW
+    if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setVisible(true)) }
+    if (item.data.NodeName === "customer" && item.data.value === "Reject") { return (setVisible(true)) }
   }
 
   function renderColorPriority(param) {
@@ -231,7 +235,7 @@ export default function Subject() {
                     <TabsDocument
                       details={{
                         refId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-                       // reftype: "Master_Ticket",
+                        // reftype: "Master_Ticket",
                       }}
                     />
                   </Col>
@@ -260,15 +264,15 @@ export default function Subject() {
               span={8}
               style={{ backgroundColor: "#fafafa", padding: 24, border: "1px" }}
             >
-              <Row style={{ marginBottom: 30 }}>
-                <Col span={24}>
+              <Row style={{ marginBottom: 20 }}>
+                <Col span={16}>
                   <label className="header-text">Progress Status</label>
                   <br />
                   <Select
-                    style={{ width: "60%", marginTop: 8 }}
+                    style={{ width: "100%", marginTop: 8 }}
                     placeholder="None"
                     onChange={(value, item) => HandleChange(value, item)}
-                    value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus}
+                    value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                     options={customerstate && customerstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
                     disabled={
                       customerstate.issuedata.details[0] &&
@@ -276,30 +280,33 @@ export default function Subject() {
                     }
                   >
                   </Select>
-                  {
-                    customerstate.issuedata.details[0] &&
-                      customerstate.issuedata.details[0].IsUndo === true &&
-                      customerstate.issuedata.details[0].MailType === "out" &&
-                      customerstate.issuedata.details[0].GroupStatus === "InProgress"
-                      ? <Button type="primary" icon={<UndoOutlined />} color="green" style={{ marginLeft: 20 }}
-                        onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
-                      >
-                        Undo
-                    </Button>
-                      : ""
-                  }
+                </Col>
+                <Col span={8}>
 
+                  <Button type="primary" icon={<UndoOutlined />} color="green"
+                    style={{
+                      marginLeft: 20,
+                      width: 100,
+                      marginTop:35,
+                      display:  customerstate.issuedata.details[0]?.IsUndo === true &&
+                      customerstate.issuedata.details[0].MailType === "out" &&
+                      customerstate.issuedata.details[0].NodeActionText === "Create"  ? "block" : "none"
+                    }}
+                    onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
+                  >
+                    Undo
+                    </Button>
                 </Col>
 
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">IssueType</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].IssueType}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Priority</label>
                   <br />
@@ -310,22 +317,31 @@ export default function Subject() {
                   </label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Product</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && `${customerstate.issuedata.details[0].ProductName} (${customerstate.issuedata.details[0].ProductFullName})`}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Module</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleName}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
-                <Col span={24}>
+
+              <Row style={{ marginBottom: 20, display: customerstate.issuedata.details[0]?.IssueType === "ChangeRequest" ? "block" : "none" }}>
+                <Col span={18}>
+                  <label className="header-text">Manday</label>
+                  <label style={{ marginLeft: 10 }} className="value-text">{customerstate.issuedata.details[0]?.Manday}</label>
+                </Col>
+              </Row>
+
+              <Row style={{ marginBottom: 20 }}>
+                <Col span={18}>
                   <label className="header-text">DueDate</label>
                   <br />
 

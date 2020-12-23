@@ -241,7 +241,7 @@ export default function Mytask() {
                           }
                           }
                         >
-                           เลื่อน Due
+                          เลื่อน Due
                        </Tag> : ""
                       }
 
@@ -258,14 +258,15 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <>
-                   
-                      <Clock showseconds={false}
+
+                      <Clock
+                        showseconds={false}
                         deadline={record.DueDate}
-                         createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                         resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                         onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                        createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
+                        resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
+                        onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                       />
-                    
+
                     </>
                   )
                 }
@@ -279,37 +280,7 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <>
-                      {/* <Dropdown
-                        overlayStyle={{
-                          width: 300,
-                          boxShadow:
-                            "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                        }}
-                        overlay={
-                          <Menu
-                            onSelect={(x) => console.log(x.selectedKeys)}
-                            onClick={(x) => {
-                              HandleChange(x)
-                              setProgressStatus(x.item.props.children[1]);
-                              userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                              userdispatch({ type: "SELECT_DATAROW", payload: record })
-                            }}
-                          >
-                            {userstate.actionflow.filter(
-                              (x) => x.text !== record.FlowStatus
-                            ).map((x) => (
-                              <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
-                            ))}
-                          </Menu>
-                        }
-                        trigger="click"
-                      >
-                        <Button type="link"
-                          onClick={() => {
-                            getflow_output(record.TransId)
-                          }}
-                        >{record.FlowStatus}</Button>
-                      </Dropdown> */}
+
                       <div>
                         <label>
                           {record.FlowStatus}

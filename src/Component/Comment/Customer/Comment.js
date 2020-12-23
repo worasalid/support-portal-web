@@ -47,7 +47,7 @@ export default function CommentBox() {
                     return {
                         id: values.Id,
                         author: values.CreateName,
-                        datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
+                        datetime: moment(values.CreateDate).format("DD/MM/YYYY HH:mm"),
                         content: values.Text,
                         cntfile: values.cntFile
                     }
@@ -135,7 +135,7 @@ export default function CommentBox() {
                         content={
                             <>
                                 <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
-                                <Divider style={{ margin:0, marginBottom:10}}/>
+                                <Divider style={{ marginTop:20}}/>
                                 {item.cntfile === 0 ? "" :
                                     <div>
                                         <Row>

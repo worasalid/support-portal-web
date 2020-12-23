@@ -86,6 +86,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
             if (sendflow.status === 200) {
                 SaveTestResult();
                 SaveComment();
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -95,7 +96,6 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        onOk();
                         history.push({ pathname: "/internal/issue/resolved" })
                     },
                 });
