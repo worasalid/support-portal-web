@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState, useContext, useReducer } from 'react'
-import { Button, Form, Input, Select, Card, Avatar, Dropdown, Menu, Row, Col, Modal } from "antd";
-import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
+import { Button, Form, Input, Select, Card, Dropdown, Menu, Row, Col, Modal } from "antd";
+import { PhoneOutlined, DatabaseOutlined, FileOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from "react-router-dom";
 import MasterPage from "./MasterPage"
 import UploadFile from "../../../Component/UploadFile";
 import Axios from 'axios';
-import { Editor } from '@tinymce/tinymce-react';
-import classNames from 'classnames'
+// import { Editor } from '@tinymce/tinymce-react';
+// import classNames from 'classnames'
 import AuthenContext from '../../../utility/authenContext';
-import Reducer, { productReducer, moduleReducer, initState } from '../../../utility/reducer';
+
 import { customerReducer, customerState } from '../../../utility/issueContext';
 
 const { TextArea } = Input;
-const { Option } = Select;
+// const { Option } = Select;
 const { Meta } = Card;
 const layout = {
     labelCol: { span: 8 },
@@ -80,9 +80,9 @@ export default function IssueCreate() {
 
         }
     }
-    const handleEditorChange = (content, editor) => {
-        console.log('Content was updated:', content);
-    }
+    // const handleEditorChange = (content, editor) => {
+    //     console.log('Content was updated:', content);
+    // }
 
 
     const onFinish = async (values) => {

@@ -63,6 +63,8 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
 
             if (sendflow.status === 200) {
                 SaveComment();
+                onOk();
+                
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -72,7 +74,6 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        onOk();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });

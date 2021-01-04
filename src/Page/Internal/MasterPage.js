@@ -1,21 +1,17 @@
 import 'antd/dist/antd.css';
-import React, { Component, useState, useContext, useEffect, useReducer } from 'react';
+import React, { Component, useState, useContext, useEffect } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import { Layout, Menu, Col, Row, Breadcrumb, Button, Tooltip, Dropdown } from 'antd';
-import { Avatar, Badge } from 'antd';
-import { UserOutlined, LaptopOutlined, NotificationOutlined, SettingOutlined, SlidersTwoTone } from '@ant-design/icons';
+import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown } from 'antd';
+import { Badge } from 'antd';
+import { UserOutlined, NotificationOutlined, SettingOutlined } from '@ant-design/icons';
 import {
   MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  SearchOutlined
+  MenuFoldOutlined
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
 import MasterContext from "../../utility/masterContext";
 
-function newpage() {
-  alert();
-}
 
 export class Menucollapsed extends Component {
   state = {
@@ -80,6 +76,9 @@ export default function MasterPage(props) {
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params:{
+          type: "user"
         }
       });
       masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" ).length });
@@ -241,7 +240,21 @@ export default function MasterPage(props) {
               </Menu.Item>
 
             </SubMenu>
-            <SubMenu key="sub2" icon={<UserOutlined />} title="Report">
+            <SubMenu key="sub2" icon={<UserOutlined />} title="RICEF">
+              <Menu.Item key="6" onClick={() => history.push('/internal/ricef')}>
+                - All Task
+                  <Badge count={1}>
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                </Badge>
+              </Menu.Item>
+              <Menu.Item key="7" onClick={() => history.push('/internal/ricef/mytask')}>
+                - My Task
+                  <Badge count={1}>
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                </Badge>
+              </Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub3" icon={<UserOutlined />} title="Report">
               <Menu.Item key="10" onClick={() => history.push('/internal/report/charts')}>
                 - Report
                   <Badge count={1}>
@@ -249,7 +262,7 @@ export default function MasterPage(props) {
                 </Badge>
               </Menu.Item>
             </SubMenu>
-            <SubMenu key="sub3" icon={<SettingOutlined />} title="Setting">
+            <SubMenu key="sub4" icon={<SettingOutlined />} title="Setting">
             <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mastercompany')}>
                 - ข้อมูลบริษัท
               </Menu.Item>

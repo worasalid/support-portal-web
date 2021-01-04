@@ -16,6 +16,8 @@ import SubTask from './Page/Internal/Issue/SubTask'
 import Resolved from './Page/Internal/Issue/Resolved';
 import Complete from './Page/Internal/Issue/Complete';
 import Cancel from './Page/Internal/Issue/Cancel';
+import Ricef from './Page/Internal/Ricef/Ricef';
+import BatchRicef from './Page/Internal/Ricef/BatchRicef';
 
 import UnAssign from './Page/Internal/Issue/UnAssign';
 import Login from './Page/Internal/Login';
@@ -61,6 +63,9 @@ export default function Routes() {
                                 <Route path="/internal/issue/subject/:id?" exact component={Subject} />
                                 <Route path="/internal/issue/subject/:id?/task-:task?" exact component={SubTask} />
                                 <Route path="/internal/report/charts" exact component={Charts} />
+                                <Route path="/internal/ricef" exact component={Ricef} />
+                                <Route path="/internal/ricef/comp-:compid?" exact component={BatchRicef} />
+                                {/* <Route path="/internal/ricef/batch-:batchid?" exact component={BatchRicef} /> */}
                                
 
                                 <Route path="/customer/login" exact component={Customerlogin} />

@@ -148,7 +148,7 @@ export default function Mytask() {
                         {
                           record.IssueType === 'ChangeRequest' ?
                             <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
+                            <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip>
                         }
 
                         <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
@@ -217,12 +217,6 @@ export default function Mytask() {
 
                 }
               />
-              {/* <Column
-                title="Assignee"
-                align="center"
-                width="10%"
-                dataIndex="Assignee"
-              ></Column> */}
               <Column title="Due Date"
                 width="10%"
                 align="center"
@@ -252,28 +246,6 @@ export default function Mytask() {
               />
 
               <Column
-                title="Time Tracking"
-                align="center"
-                width="10%"
-                render={(record) => {
-                  return (
-                    <>
-
-                      <Clock
-                        showseconds={false}
-                        deadline={record.DueDate}
-                        createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                        resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                        onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
-                      />
-
-                    </>
-                  )
-                }
-                }
-              />
-
-              <Column
                 title="ProgressStatus"
                 width="10%"
                 align="center"
@@ -286,15 +258,33 @@ export default function Mytask() {
                           {record.FlowStatus}
                         </label>
                       </div>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
-                      </label> */}
                     </>
                   );
 
                 }}
               />
 
+              <Column
+                title="Time Tracking"
+                align="center"
+                width="10%"
+                render={(record) => {
+                  return (
+                    <>
+                      <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
+                        <Clock
+                          showseconds={false}
+                          deadline={record.DueDate}
+                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
+                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
+                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                        />
+                      </div>
+                    </>
+                  )
+                }
+                }
+              />
 
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
                 width="10%"

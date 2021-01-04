@@ -118,6 +118,8 @@ export default function InProgress() {
                           <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                       }
                       <Divider type="vertical" />
+                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                      <Divider type="vertical" />
                       <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                       <Divider type="vertical" />
                       <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
@@ -163,7 +165,7 @@ export default function InProgress() {
                   <>
                     {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                     <label>
-                    {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                      {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
                     </label>
 
                   </>

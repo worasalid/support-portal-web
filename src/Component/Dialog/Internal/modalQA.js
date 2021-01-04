@@ -90,6 +90,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 SaveComment();
                 SaveUnitTest(values);
                 onOk();
+                
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (

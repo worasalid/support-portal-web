@@ -1,5 +1,5 @@
-import { Col, DatePicker, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Tag, Timeline, Modal } from "antd";
-import React, { useContext, useState, useEffect, useReducer } from "react";
+import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Tag, Modal } from "antd";
+import React, { useContext, useState, useEffect } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Customer/Comment";
@@ -7,13 +7,17 @@ import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UnderlineOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
+import moment from 'moment';
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
 import ModalCompleteIssue from "../../../Component/Dialog/Customer/modalCompleteIssue";
 import ModalCancelIssue from "../../../Component/Dialog/Customer/modalCancelIssue";
 import ModalReOpen from "../../../Component/Dialog/Customer/modalReOpen";
+import ModalConfirmManday from "../../../Component/Dialog/Customer/modalConfirmManday";
+import ModalPO from "../../../Component/Dialog/Customer/modalPO";
+import ModalDueDate from "../../../Component/Dialog/Customer/modalDueDate";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -23,7 +27,7 @@ export default function Subject() {
   const match = useRouteMatch();
   const history = useHistory();
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
-  console.log({ customerstate });
+
   // div
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block");
@@ -31,10 +35,14 @@ export default function Subject() {
 
   // modal
   const [visible, setVisible] = useState(false);
+  const [modalsendissue_visible, modalSendissue_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalreopen_visible, setModalreopen_visible] = useState(false);
   const [modalcancel_visible, setModalcancel_visible] = useState(false);
+  const [modalconfirmManday_visible, setModalconfirmManday_visible] = useState(false);
+  const [modalPO_visible, setModalPO_visible] = useState(false);
+  const [modalDueDate_visible, setModalDueDate_visible] = useState(false);
 
   // data
   const [ticketdata, setTicketdata] = useState([]);
@@ -133,14 +141,26 @@ export default function Subject() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass") { return (setVisible(true)) }
+    if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
+      return (modalSendissue_visible(true))
+    }
     if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
     if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
     if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
 
     // CR FLOW
-    if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setVisible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "Reject") { return (setVisible(true)) }
+    if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setModalconfirmManday_visible(true)) }
+    if (item.data.NodeName === "customer" && item.data.value === "Reject") { 
+      modalSendissue_visible(true)
+    }
+    if (item.data.NodeName === "customer" && item.data.value === "SendPO") { return (setModalPO_visible(true)) }
+    if (item.data.NodeName === "customer" && item.data.value === "RejectDueDate") { 
+      setModalDueDate_visible(true)
+    }
+    if (item.data.NodeName === "customer" && item.data.value === "ApproveDueDate") { 
+      setModalDueDate_visible(true)
+    }
+   
   }
 
   function renderColorPriority(param) {
@@ -273,7 +293,7 @@ export default function Subject() {
                     placeholder="None"
                     onChange={(value, item) => HandleChange(value, item)}
                     value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
-                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
+                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                     disabled={
                       customerstate.issuedata.details[0] &&
                         customerstate.issuedata.details[0].MailType === "out" ? true : false
@@ -287,10 +307,10 @@ export default function Subject() {
                     style={{
                       marginLeft: 20,
                       width: 100,
-                      marginTop:35,
-                      display:  customerstate.issuedata.details[0]?.IsUndo === true &&
-                      customerstate.issuedata.details[0].MailType === "out" &&
-                      customerstate.issuedata.details[0].NodeActionText === "Create"  ? "block" : "none"
+                      marginTop: 35,
+                      display: customerstate.issuedata.details[0]?.IsUndo === true &&
+                        customerstate.issuedata.details[0].MailType === "out" &&
+                        customerstate.issuedata.details[0].NodeActionText === "Create" ? "block" : "none"
                     }}
                     onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
                   >
@@ -333,7 +353,11 @@ export default function Subject() {
                 </Col>
               </Row>
 
-              <Row style={{ marginBottom: 20, display: customerstate.issuedata.details[0]?.IssueType === "ChangeRequest" ? "block" : "none" }}>
+              <Row style={{
+                marginBottom: 20,
+                display: customerstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
+                  customerstate.issuedata.details[0]?.Manday !== null ? "block" : "none"
+              }}>
                 <Col span={18}>
                   <label className="header-text">Manday</label>
                   <label style={{ marginLeft: 10 }} className="value-text">{customerstate.issuedata.details[0]?.Manday}</label>
@@ -381,16 +405,64 @@ export default function Subject() {
 
       <ModalSendIssue
         title={ProgressStatus}
-        visible={visible}
+        visible={modalsendissue_visible}
         width={700}
-        onCancel={() => setVisible(false)}
+        onCancel={() => modalSendissue_visible(false)}
         onOk={() => {
-          setVisible(false);
+          modalSendissue_visible(false);
         }}
         details={{
           ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
           mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
           flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+        }}
+      />
+
+      <ModalConfirmManday
+        title={ProgressStatus}
+        visible={modalconfirmManday_visible}
+        width={700}
+        onCancel={() => setModalconfirmManday_visible(false)}
+        onOk={() => {
+          setModalconfirmManday_visible(false);
+        }}
+        details={{
+          ticketid: customerstate.issuedata.details[0]?.Id,
+          mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+          flowoutputid: customerstate.node.output_data?.FlowOutputId,
+          manday: customerstate.issuedata.details[0]?.Manday,
+          cost: customerstate.issuedata.details[0]?.Cost
+        }}
+      />
+
+      <ModalDueDate
+        title={ProgressStatus}
+        visible={modalDueDate_visible}
+        width={700}
+        onCancel={() => setModalDueDate_visible(false)}
+        onOk={() => {
+          setModalDueDate_visible(false);
+        }}
+        details={{
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+          duedate: moment(customerstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
+        }}
+      />
+
+      <ModalPO
+        title={ProgressStatus}
+        visible={modalPO_visible}
+        width={700}
+        onCancel={() => setModalPO_visible(false)}
+        onOk={() => {
+          setModalPO_visible(false);
+        }}
+        details={{
+          ticketid: customerstate.issuedata.details[0]?.Id,
+          mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+          flowoutputid: customerstate.node.output_data?.FlowOutputId
         }}
       />
 

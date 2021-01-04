@@ -126,7 +126,7 @@ export default function MasterCompany() {
                 <Column title="Code" width="10%" dataIndex="Code" />
                 <Column title="CompanyName" width="20%" dataIndex="Name" />
                 <Column title="FullName" width="60%" dataIndex="FullNameTH" />
-                <Column title="Module ที่ดูแล"
+                <Column title=""
                     align="center"
                     width="10%"
                     render={(record) => {

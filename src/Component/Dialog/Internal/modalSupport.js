@@ -120,6 +120,8 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
             });
             if (sendflow.status === 200) {
                 SaveComment();
+                onOk();
+                
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -129,7 +131,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("");
-                        onOk();
+                       
                         formRef.resetFields();
                          history.push({ pathname: "/internal/issue/inprogress" })
                     },

@@ -1,17 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useHistory } from "react-router-dom";
-import { Modal, Form} from 'antd';
+import React, { useState, useRef, useContext, useEffect } from 'react';
+import { Modal, Row, Col } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
+import { useHistory } from 'react-router-dom';
 
-export default function ModalResolved({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+
+export default function ModalConfirmManday({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
-    const uploadRef_testresult = useRef(null);
-    const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
+    const [textValue, setTextValue] = useState("")
+    const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -20,7 +21,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
     const SaveComment = async () => {
         try {
             if (textValue !== "") {
-                await Axios({
+                const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -33,27 +34,9 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
+
+
             }
-        } catch (error) {
-
-        }
-    }
-
-    const SaveTestResult = async () => {
-        try {
-            const comment = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/save-document",
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    ticketid: details && details.ticketid,
-                    files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
-                    reftype: "Master_Ticket",
-                    grouptype: "testResult"
-                }
-            });
         } catch (error) {
 
         }
@@ -62,105 +45,116 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
     const SendFlow = async () => {
         try {
             const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
+                url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
                     ticketid: details.ticketid,
-                    mailboxid: details && details.mailboxid,
-                    flowoutputid: details.flowoutput.FlowOutputId
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid
+
                 }
             });
 
-            if (sendflow.status === 200) {
-                SaveTestResult();
+            if (sendflow.status === 200 && sendflow.data === "InProgress") {
                 SaveComment();
                 onOk();
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>Confirm Manday</p>
                         </div>
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/resolved" })
+
+                        if (sendflow.data === "InProgress") {
+                            history.push({ pathname: "/customer/issue/inprogress" })
+                        }
+
                     },
                 });
             }
+
+            if (sendflow.status === 200 && sendflow.data === "Pass") {
+                await Modal.info({
+                    title: 'บันทึกข้อมูลสำเร็จ',
+                    content: (
+                        <div>
+                            <p>ทดสอบ Issue เลขที่ : {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number} ผ่าน</p>
+                            <p>รอดำเนินการ Upload File </p>
+                        </div>
+                    ),
+                    onOk() {
+                        editorRef.current.editor.setContent("")
+                        onOk();
+                        history.push({ pathname: "/customer/issue/pass" })
+
+                    },
+                });
+            }
+
         } catch (error) {
             await Modal.info({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
+                        <p>{error.message}</p>
                         <p>{error.response.data}</p>
                     </div>
                 ),
                 onOk() {
                     editorRef.current.editor.setContent("")
-                    onOk();
 
                 },
             });
+
         }
     }
 
-
-    const onFinish = (values) => {
-        console.log('onFinish:', values);
-        SendFlow();
-    };
-
     useEffect(() => {
-        if (visible) {
-        }
 
-    }, [visible])
+    }, [])
 
 
     return (
         <Modal
+            // title={title}
             visible={visible}
-            onOk={() => { return (form.submit()) }}
-            okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
-            okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onOk={() => { return (SaveComment(), SendFlow(), onOk()) }}
+            onCancel={() => { return (editorRef.current.editor.setContent(""), onCancel()) }}
             {...props}
         >
 
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                layout="vertical"
-                name="form-resolved"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                {
-                    details.flowoutput.value === "Deploy"
-                        ? ""
-                        : <Form.Item
-                            style={{ minWidth: 300, maxWidth: 800 }}
-                            label="Test Result (ใบส่งมอบงาน)"
-                            name="uploadresult"
-                            rules={[
-                                {
-                                    required: false,
-                                    message: 'กรุณาแนบ (ใบส่งมอบงาน)'
-                                },
-                            ]}
-                        >
-                            <UploadFile ref={uploadRef_testresult} />
-                        </Form.Item>
-                }
-            </Form>
+            <Row style={{ marginBottom: 20 }}>
+                <Col span={6} style={{ textAlign: "right" }}>
+                    <label>Manday ที่ใช้ในการแก้ไข</label>
+                </Col>
+                <Col span={4} style={{ textAlign: "right" }}>
+                    <label>{details.manday}</label>
+                </Col>
+                <Col span={12} style={{ marginLeft: 20 }}>
+                    <label>Manday</label>
+                </Col>
+            </Row>
+            <Row style={{ marginBottom: 40 }}>
+                <Col span={6} style={{ textAlign: "right" }}>
+                    <label>ค่าใช้จ่าย</label>
+                </Col>
+                <Col span={4} style={{ textAlign: "right" }}>
+                    <label>{details.cost}</label>
+                </Col>
+                <Col span={12} style={{ marginLeft: 20 }}>
+                    <label>บาท</label>
+                </Col>
+            </Row>
 
-            <label className="header-text">Remark</label>
+
             <Editor
                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                 ref={editorRef}
@@ -179,8 +173,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 onEditorChange={handleEditorChange}
             />
             <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
-
+            AttachFile : <UploadFile ref={uploadRef} />
         </Modal>
-    )
+    );
 }

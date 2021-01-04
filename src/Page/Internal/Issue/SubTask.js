@@ -152,26 +152,60 @@ export default function SubTask() {
     console.log("HandleChange", item)
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "support" && item.data.value === "SendIssue" || item.data.value === "ResolvedTask") { return (setVisible(true)) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
-    if (item.data.NodeName === "developer_1" && item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-    if (item.data.TextEng === "Reject") { setModalreject_visible(true) }
-    if (item.data.NodeName === "developer_2" && item.data.value === "Deploy") { return (setModalcomplete_visible(true)) }
-    if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
-    if (item.data.NodeName === "qa_leader" && item.data.value === "QApass") { setModalQA_visible(true) }
-    if (item.data.NodeName === "qa_leader" && item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
-    if (item.data.NodeName === "qa") { setModalQA_visible(true) }
-    if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
+    if (item.data.NodeName === "support") {
+      if (item.data.value === "SendIssue" || item.data.value === "ResolvedTask") {
+        setVisible(true)
+      }
+      if (item.data.value === "Resolved") { setModalresolved_visible(true) }
+      if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
+    }
+    if (item.data.NodeName === "developer_2") {
+      if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+      if (item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
+      if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
+    }
+    if (item.data.NodeName === "developer_1") {
+      if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+      if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
+    }
+    if (item.data.NodeName === "qa_leader") {
+      if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
+      if (item.data.value === "QApass") { setModalQA_visible(true) }
+      if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
+    }
+    if (item.data.NodeName === "qa") {
+      setModalQA_visible(true)
+    }
+    if (item.data.NodeName === "cr_center") {
+      if (item.data.value === "SendTask") { setModalsendtask_visible(true) }
+    }
+    if (item.data.TextEng === "Reject") {
+      setModalreject_visible(true)
+    }
+    // if (item.data.NodeName === "support" && item.data.value === "SendIssue" || item.data.value === "ResolvedTask") { return (setVisible(true)) }
+    //if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+    //if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
+    //if (item.data.NodeName === "developer_1" && item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+    //if (item.data.TextEng === "Reject") { setModalreject_visible(true) }
+    //if (item.data.NodeName === "developer_2" && item.data.value === "Deploy") { return (setModalcomplete_visible(true)) }
+    // if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
+    // if (item.data.NodeName === "qa_leader" && item.data.value === "QApass") { setModalQA_visible(true) }
+    // if (item.data.NodeName === "qa_leader" && item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
+    //if (item.data.NodeName === "qa") { setModalQA_visible(true) }
+    //if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
 
 
     // Flow CR
-    if (item.data.NodeName === "cr_center" && item.data.value === "RequestManday") { setModalsendtask_visible(true) }
-    if (item.data.NodeName === "cr_center" &&
-      (item.data.value === "CheckManday" || item.data.value === "RejectManday")) {
-      setModalmanday_visible(true);
+    if (item.data.NodeName === "cr_center") {
+      if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }
+      if (item.data.value === "CheckManday" || item.data.value === "RejectManday") { setModalmanday_visible(true) }
     }
-    if (item.data.NodeName === "developer_2" && item.data.value === "SendManday") { setModalmanday_visible(true) }
+    if (item.data.NodeName === "developer_2") {
+      if (item.data.value === "SendManday") { setModalmanday_visible(true) }
+      if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
+
+
+    }
   }
 
   function renderColorPriority(param) {
@@ -230,10 +264,6 @@ export default function SubTask() {
 
   }, [historyduedate_visible])
 
-
-  //  console.log("issuedetail", userstate.issuedata.details[0] && userstate.issuedata.details[0])
-  //  console.log("taskdata", userstate.taskdata.data[0] && userstate.taskdata.data[0])
-  //  console.log("output", userstate.node.output_data.FlowOutputId)
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -365,30 +395,31 @@ export default function SubTask() {
                 </Col>
               </Row>
 
-              {
-                userstate.taskdata.data[0]?.IssueType === "ChangeRequest" ? "" :
+              <Row style={{
+                marginBottom: 20,
+                display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" &&
+                  userstate.taskdata.data[0]?.DueDate !== null ? "block" : "none"
+              }}
+              >
+                <Col span={3} style={{ marginTop: "10px" }}>
+                  <label className="header-text">SLA</label>
+                </Col>
+                <Col span={18} >
+                  {
+                    userstate.taskdata.data[0] &&
+                    <Clock
+                      showseconds={false}
+                      deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
+                      createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
+                      resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
+                      onClick={() => { setModaltimetracking_visible(true) }}
+                    />
+                  }
 
-                  <Row style={{ marginBottom: 20 }}>
-                    <Col span={3} style={{ marginTop: "10px" }}>
-                      <label className="header-text">SLA</label>
-                    </Col>
-                    <Col span={18} >
-                      {
-                        userstate.taskdata.data[0] &&
-                        <Clock
-                          showseconds={false}
-                          deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
-                          createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
-                          resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
-                          onClick={() => { setModaltimetracking_visible(true) }}
-                        />
-                      }
+                </Col>
+              </Row>
 
-                    </Col>
-                  </Row>
-              }
-
-              <Row style={{ marginBottom: 20 }}>
+              <Row style={{ marginBottom: 20, display: userstate.taskdata.data[0]?.DueDate === null ? "none" : "block" }}>
                 <Col span={24}>
                   <label className="header-text">DueDate</label>
                   <br />
@@ -396,7 +427,7 @@ export default function SubTask() {
 
                   {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
                   {
-                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
+                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "cr_center"
                       ? <Button type="link"
                         onClick={() => setModalduedate_visible(true)}
                       >
@@ -445,7 +476,11 @@ export default function SubTask() {
                 </Col>
               </Row>
 
-              <Row style={{ marginBottom: 20, display: userstate.taskdata.data[0]?.IssueType === "ChangeRequest" ? "inline" : "none" }}>
+              <Row style={{
+                marginBottom: 20,
+                display: userstate.taskdata.data[0]?.IssueType === "ChangeRequest" &&
+                  userstate.taskdata.data[0]?.Manday !== null ? "block" : "none"
+              }}>
                 <Col span={18}>
                   <label className="header-text">Manday</label>
                   <label style={{ marginLeft: 10 }} className="value-text">{userstate.taskdata.data[0]?.Manday}</label>
@@ -608,12 +643,19 @@ export default function SubTask() {
       />
 
       <ModalDueDate
-        title="DueDate"
+        title={ProgressStatus}
         visible={modalduedate_visible}
-        width={600}
+        width={800}
         onCancel={() => setModalduedate_visible(false)}
         onOk={() => {
           setModalduedate_visible(false);
+        }}
+        details={{
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutput: userstate.node.output_data,
+          duedate: userstate.taskdata.data[0]?.DueDate === null ? null : moment(userstate.taskdata.data[0]?.DueDate).format("DD/MM/YYYY")
         }}
       />
 

@@ -72,6 +72,7 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
             }
 
             <div style={{ display: divcollapse }}>
+                
                 {
                     listfile.filter((x) => x.GroupType === "vdoUpload").length !== 0
                         ? <Tabs defaultActiveKey="1" type="card">
@@ -94,11 +95,11 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
                                         render={(value, record, index) => {
                                             return (
                                                 <>
-                                                    <Button type="link" style={{ padding: 0 }}
+                                                  <label type="link" className="text-link"
                                                         onClick={() => window.open(record.Url, "_blank")}
                                                     >
                                                         {record.Url}
-                                                    </Button>
+                                                    </label>
                                                 </>
                                             )
                                         }

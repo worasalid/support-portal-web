@@ -282,7 +282,7 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                      <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
+                      <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
                         <Clock
                           showseconds={false}
                           deadline={record.DueDate}

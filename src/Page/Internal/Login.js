@@ -80,7 +80,7 @@ export default function NormalLoginForm() {
           name="password"
           rules={[
             {
-              required: true,
+              required: false,
               message: "Please input your Password!",
             },
           ]}
