@@ -15,7 +15,7 @@ const { Option } = Select;
 
 export default function CommentBox({ loadingComment = false }) {
     const editorRef = useRef(null)
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const uploadRef = useRef(null);
     const history = useHistory();
     const match = useRouteMatch();
@@ -36,17 +36,16 @@ export default function CommentBox({ loadingComment = false }) {
 
     const [disabled, setDisabled] = useState(false)
 
-    const loadInternalComment = async () => {
+    const LoadComment = async () => {
         try {
             const commment_list = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/loadcomment",
+                url: process.env.REACT_APP_API_URL + "/ricef/load-comment",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    taskId: match.params.task,
-                    type: "internal"
+                    ricefid: match.params.ricefid,
                 }
             });
             if (commment_list.status === 200) {
@@ -94,16 +93,14 @@ export default function CommentBox({ loadingComment = false }) {
             }
 
             const createcomment = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                url: process.env.REACT_APP_API_URL + "/ricef/create-comment",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketid: match.params.id,
-                    taskid: match.params.task,
+                    ricefid: match.params.ricefid,
                     comment_text: commenttext,
-                    comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
                     userid: values.sendto
                 }
@@ -156,13 +153,13 @@ export default function CommentBox({ loadingComment = false }) {
     useEffect(() => {
         setTimeout(() => {
             setLoading(false)
-            loadInternalComment()
+            LoadComment()
         }, 1000)
     }, [])
 
     useEffect(() => {
         setTimeout(() => {
-            loadInternalComment()
+            LoadComment()
             setLoading(false)
         }, 1000)
 
@@ -210,24 +207,7 @@ export default function CommentBox({ loadingComment = false }) {
 
                         }
                         actions={[
-                            // (item.filename === null ? "" : (
-                            //     <>
-                            //         <div>
-                            //             <Row>
-                            //                 <Col span={24}>
-                            //                     <label
-                            //                         onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                            //                         className="text-link-hover">
-                            //                         <FileOutlined /> {item.filename}
-                            //                     </label>
-                            //                 </Col>
-
-                            //             </Row>
-
-                            //         </div>
-                            //     </>
-                            // )
-                            // )
+                           
                         ]
                         }
                     >
@@ -237,7 +217,7 @@ export default function CommentBox({ loadingComment = false }) {
             />
 
             <Tabs defaultActiveKey="1">
-                <TabPane tab="Internal Note" key="1">
+                <TabPane tab="Note" key="1">
                     <Form
                         name="Internal"
                         initialValues={{
@@ -245,7 +225,7 @@ export default function CommentBox({ loadingComment = false }) {
                         layout="vertical"
                     // onFinish={onFinish}
                     >
-                        <Form.Item name="Internal_comment">
+                        <Form.Item name="ricef_comment">
 
                             {/* <TextArea rows={4} onChange={onChange} value={value} style={{ marginRight: 50 }} /> */}
                             <Editor
@@ -269,7 +249,7 @@ export default function CommentBox({ loadingComment = false }) {
                                 onEditorChange={(content, editor) => { return (console.log("onEditorChange", editor), setCommenttext(content)) }}
                             />
                         </Form.Item>
-                        <Form.Item name="Internal_fileattach">
+                        <Form.Item name="ricef_fileattach">
                             <Row>
                                 <Col span={2} style={{ display: "inline" }} >
                                     Attach :
@@ -311,7 +291,7 @@ export default function CommentBox({ loadingComment = false }) {
                 }}
                 details={{
                     refId: commentid,
-                    reftype: "Log_Ticket_Comment",
+                    reftype: "Log_Ricef_Comment",
                     grouptype: "comment"
                 }}
             />

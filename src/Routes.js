@@ -17,7 +17,9 @@ import Resolved from './Page/Internal/Issue/Resolved';
 import Complete from './Page/Internal/Issue/Complete';
 import Cancel from './Page/Internal/Issue/Cancel';
 import Ricef from './Page/Internal/Ricef/Ricef';
-import BatchRicef from './Page/Internal/Ricef/BatchRicef';
+import RicefHeader from './Page/Internal/Ricef/RicefHeader';
+import RicefDetails from './Page/Internal/Ricef/RicefDetails';
+import RicefSubject from './Page/Internal/Ricef/Subject';
 
 import UnAssign from './Page/Internal/Issue/UnAssign';
 import Login from './Page/Internal/Login';
@@ -33,6 +35,7 @@ import AuthenContext, { reducer, initState } from "./utility/authenContext";
 import MasterContext, { masterReducer, masterState } from "./utility/masterContext";
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
 import UserContext, { userReducer, userState } from "./utility/issueContext";
+import RicefContext, { ricefReducer, ricefState } from './utility/ricefContext';
 
 
 
@@ -41,6 +44,7 @@ export default function Routes() {
     const [masterstate, masterdispatch] = useReducer(masterReducer, masterState);
     const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
     const [userstate, userdispatch] = useReducer(userReducer, userState);
+    const [ricefstate, ricefdispatch] = useReducer(ricefReducer, ricefState)
     return (
         <AuthenContext.Provider value={{ state, dispatch }}>
             <MasterContext.Provider value={{ state: masterstate, dispatch: masterdispatch }}>
@@ -63,10 +67,13 @@ export default function Routes() {
                                 <Route path="/internal/issue/subject/:id?" exact component={Subject} />
                                 <Route path="/internal/issue/subject/:id?/task-:task?" exact component={SubTask} />
                                 <Route path="/internal/report/charts" exact component={Charts} />
-                                <Route path="/internal/ricef" exact component={Ricef} />
-                                <Route path="/internal/ricef/comp-:compid?" exact component={BatchRicef} />
-                                {/* <Route path="/internal/ricef/batch-:batchid?" exact component={BatchRicef} /> */}
-                               
+
+                                <RicefContext.Provider value={{ state: ricefstate, dispatch: ricefdispatch }}>
+                                    <Route path="/internal/ricef" exact component={Ricef} />
+                                    <Route path="/internal/ricef/comp-:compid?" exact component={RicefHeader} />
+                                    <Route path="/internal/ricef/comp-:compid?/batch-:batchid?" exact component={RicefDetails} />
+                                    <Route path="/internal/ricef/subject-:ricefid?" exact component={RicefSubject} />
+                                </RicefContext.Provider>
 
                                 <Route path="/customer/login" exact component={Customerlogin} />
                                 <Route path="/customer/servicedesk" exact component={ServiceDesk} />

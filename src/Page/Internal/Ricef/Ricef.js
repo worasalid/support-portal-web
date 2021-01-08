@@ -5,7 +5,7 @@ import { EditOutlined } from '@ant-design/icons';
 import Axios from 'axios'
 import MasterPage from '../MasterPage'
 import { useHistory } from 'react-router-dom';
-import BatchRicef from './BatchRicef';
+import BatchRicef from './RicefHeader';
 
 
 export default function Ricef() {
