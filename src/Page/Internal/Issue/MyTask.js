@@ -163,7 +163,7 @@ export default function Mytask() {
               />
 
               <Column title="Subject"
-                width="30%"
+                width="25%"
                 render={(record) => {
                   return (
                     <>
@@ -193,7 +193,7 @@ export default function Mytask() {
               />
               <Column title="Issue By"
                 align="center"
-                width="10%"
+                width="15%"
                 render={(record) => {
                   return (
                     <>

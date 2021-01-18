@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import {  Modal, Form, Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
-import UploadFile from '../../UploadFile'
+import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 
 const { TabPane } = Tabs;

@@ -96,7 +96,7 @@ export default function IssueCreate() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    company_id: state.user.company_id,
+                    company_id: state.usersdata.users.company_id,
                     type: match.params.id,
                     product_id: values.product,
                     module_id: values.module,
@@ -168,6 +168,7 @@ export default function IssueCreate() {
             success('http://moxiecode.cachefly.net/tinymce/v9/images/logo.png');
         }, 2000);
     }
+
 
     return (
         <MasterPage>

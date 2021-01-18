@@ -17,7 +17,7 @@ import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetrack
 import ListSubTask from "../../../Component/Subject/Internal/listSubTask";
 import ModalCreateTask from "../../../Component/Dialog/Internal/modalCreateTask";
 import ModalResolved from "../../../Component/Dialog/Internal/modalResolved";
-import ModalSendIssue from "../../../Component/Dialog/Internal/modalSendIssue";
+import ModalSendIssue from "../../../Component/Dialog/Internal/Issue/modalSendIssue";
 import ModalSA from "../../../Component/Dialog/Internal/modalSA";
 import ModalManday from "../../../Component/Dialog/Internal/modalManday";
 import ModalMandayLog from "../../../Component/Dialog/Internal/modalMandayLog";

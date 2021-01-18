@@ -2,8 +2,8 @@ import 'antd/dist/antd.css';
 import React, { Component, useState, useContext, useEffect } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown } from 'antd';
-import { Badge } from 'antd';
-import { UserOutlined, NotificationOutlined, SettingOutlined } from '@ant-design/icons';
+import { Badge, Avatar } from 'antd';
+import { UserOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BarChartOutlined } from '@ant-design/icons';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined
@@ -49,6 +49,7 @@ export default function MasterPage(props) {
   const [collapsed, setCollapsed] = useState(false);
   const [show_notice, setshow_notice] = useState(true)
   const [activemenu, setActivemenu] = useState([])
+  const [active_submenu, setActive_submenu] = useState([])
 
 
   const toggle = () => setCollapsed(!collapsed);
@@ -63,7 +64,7 @@ export default function MasterPage(props) {
         },
       });
       dispatch({ type: 'Authen', payload: true });
-      dispatch({ type: 'LOGIN', payload: result.data.users });
+      dispatch({ type: 'LOGIN', payload: result.data.usersdata });
     } catch (error) {
 
     }
@@ -77,14 +78,14 @@ export default function MasterPage(props) {
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
-        params:{
+        params: {
           type: "user"
         }
       });
-      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" ).length });
-      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "InProgress" || x.InternalStatus === "ReOpen" )).length });
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in").length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "InProgress" || x.InternalStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "Resolved" || x.InternalStatus === "Pass" || x.InternalStatus === "Deploy")).length });
-      masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length});
+      masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length });
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.InternalStatus === "Complete").length })
 
     } catch (error) {
@@ -100,25 +101,32 @@ export default function MasterPage(props) {
     CountStatus();
   }, [])
 
-  useEffect(() => {
 
+
+  useEffect(() => {
     if (match.url.search("mytask") > 0) {
-      setActivemenu(activemenu.push("1"))
+      setActive_submenu(active_submenu.push("1"))
     }
     if (match.url.search("inprogress") > 0) {
-      setActivemenu(activemenu.push("2"))
+      setActive_submenu(active_submenu.push("2"))
     }
     if (match.url.search("resolved") > 0) {
-      setActivemenu(activemenu.push("3"))
+      setActive_submenu(active_submenu.push("3"))
     }
     if (match.url.search("cancel") > 0) {
-      setActivemenu(activemenu.push("4"))
+      setActive_submenu(active_submenu.push("4"))
     }
     if (match.url.search("complete") > 0) {
-      setActivemenu(activemenu.push("5"))
+      setActive_submenu(active_submenu.push("5"))
     }
+    if (match.url.search("ricef") > 0) {
+      setActive_submenu(active_submenu.push("6"))
+    }
+
+
   }, [])
 
+  console.log("state", state?.usersdata?.users?.profile_image)
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -126,10 +134,11 @@ export default function MasterPage(props) {
         <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']} style={{ backgroundColor: "#0099FF" }}>
           <Row>
             <Col span={12}>
-              {collapsed ? <MenuUnfoldOutlined onClick={toggle} /> : <MenuFoldOutlined onClick={toggle} />}
+
+              {/* {collapsed ? <MenuUnfoldOutlined onClick={toggle} /> : <MenuFoldOutlined onClick={toggle} />} */}
               <img
                 style={{ height: "35px" }}
-                src={`${process.env.PUBLIC_URL}/logo-brand.png`}
+                src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
                 alt=""
               />
             </Col>
@@ -167,9 +176,9 @@ export default function MasterPage(props) {
                   overlayStyle={{ width: 200, boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px" }}
                   overlay={(
                     <Menu mode="inline" theme="light" onMouseOver="">
-                      <Button type="text">{state.user && `${state.user.first_name} ${state.user.last_name}`}</Button> <br />
+                      <Button type="text">{state.usersdata && `${state.usersdata?.users.first_name} ${state.usersdata?.users.last_name}`}</Button> <br />
                       <hr />
-                      <Menu.Item key="1" onClick={() => alert("Profile")}>
+                      <Menu.Item key="1" onClick={() => history.push({ pathname: "/internal/user/profile" })}>
                         Profile
                       </Menu.Item>
                       <Menu.Item key="2" onClick={() => alert("Setting")}>
@@ -180,12 +189,19 @@ export default function MasterPage(props) {
                     </Menu>
                   )} trigger="click">
 
-                  <Button type="primary" danger color="red" shape="circle" size="middle" icon={<UserOutlined />} >
+                  <Button type="text" ghost >
+                    {/* <Avatar style={{ backgroundColor: '#87d068', display: state?.usersdata?.users?.profile_image !== "" ? "block" : "none"}}
+                      size={48} src={state?.usersdata?.users?.profile_image} /> */}
+                    {/* <Avatar  style={{ backgroundColor: '#87d068', display: state?.usersdata?.users?.profile_image === undefined ? "block" : "none"}}
+                      size={48} icon={<UserOutlined />} /> */}
 
+                    <Avatar 
+                      size={48} icon={<UserOutlined />} />
                   </Button>
 
+
                 </Dropdown>
-                &nbsp;<label className="user-login">{state.user && `${state.user.first_name} ${state.user.last_name}`}</label>
+                &nbsp;<label className="user-login">{state.usersdata && `${state.usersdata?.users.first_name} ${state.usersdata?.users.last_name}`}</label>
               </Tooltip>
 
             </Col>
@@ -194,10 +210,12 @@ export default function MasterPage(props) {
       </Header>
       <Layout>
         <Sider theme="light" style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
-          <Menu theme="light" mode="inline" defaultOpenKeys={['sub1']} defaultSelectedKeys={activemenu}
+          <Menu theme="light" mode="inline"
+            defaultOpenKeys={activemenu}
+            defaultSelectedKeys={active_submenu}
 
-          >/
-            <SubMenu key="sub1" icon={<UserOutlined />} title="Issue">
+          >
+            <SubMenu key="sub1" icon={<FileOutlined />} title="Issue">
               <Menu.Item key="1" onClick={() => history.push({ pathname: '/internal/issue/mytask' })}>
                 My Task
                 {
@@ -240,7 +258,13 @@ export default function MasterPage(props) {
               </Menu.Item>
 
             </SubMenu>
-            <SubMenu key="sub2" icon={<UserOutlined />} title="RICEF">
+
+            <SubMenu
+              style={{
+                display: state.usersdata?.organize.OrganizeCode === "consult" ||
+                  state.usersdata?.organize.OrganizeCode === "dev" ? "block" : "none"
+              }}
+              key="sub2" icon={<AuditOutlined />} title="RICEF">
               <Menu.Item key="6" onClick={() => history.push('/internal/ricef')}>
                 - All Task
                   <Badge count={1}>
@@ -253,8 +277,15 @@ export default function MasterPage(props) {
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 </Badge>
               </Menu.Item>
+              <Menu.Item key="8" onClick={() => history.push('/internal/ricef/inprogress')}>
+                - InProgress
+                  <Badge count={1}>
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                </Badge>
+              </Menu.Item>
             </SubMenu>
-            <SubMenu key="sub3" icon={<UserOutlined />} title="Report">
+
+            <SubMenu key="sub3" icon={<BarChartOutlined />} title="Report">
               <Menu.Item key="10" onClick={() => history.push('/internal/report/charts')}>
                 - Report
                   <Badge count={1}>
@@ -263,7 +294,7 @@ export default function MasterPage(props) {
               </Menu.Item>
             </SubMenu>
             <SubMenu key="sub4" icon={<SettingOutlined />} title="Setting">
-            <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mastercompany')}>
+              <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mastercompany')}>
                 - ข้อมูลบริษัท
               </Menu.Item>
               <Menu.Item key="12" onClick={() => history.push('/internal/issue/setting/mapcompany')}>

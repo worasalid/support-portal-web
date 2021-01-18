@@ -81,7 +81,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>ประเมินผลกระทบส่งให้ CR Center</p>
                         </div>
                     ),
                     onOk() {
@@ -112,7 +112,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         console.log('textbox:', stdversion);
         console.log('Success:', values);
         console.log('textremark:', textValue);
-         SendFlow(values);
+        SendFlow(values);
     };
 
 
@@ -149,13 +149,14 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     ]}
                 >
                     <Radio.Group onChange={(e) => { return setRadiovalue(e.target.value), setStdversion(null) }}>
+                        <Radio style={radioStyle} value={2}>ไม่ใช่ STD</Radio>
                         <Radio style={radioStyle} value={1}>
                             STD
                             <Input placeholder="Version" onChange={(e) => setStdversion(e.target.value)}
                                 style={{ width: 300, marginLeft: 10, display: radiovalue === 1 ? "inline" : "none" }}
                             />
                         </Radio>
-                        <Radio style={radioStyle} value={2}>ไม่ใช่ STD</Radio>
+
                     </Radio.Group>
                 </Form.Item>
                 <Form.Item

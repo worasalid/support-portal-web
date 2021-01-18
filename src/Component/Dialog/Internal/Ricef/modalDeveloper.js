@@ -1,18 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Input, Select, Button, Row, Col } from 'antd';
+import React, { useState, useRef } from 'react';
+import { Modal, Form } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import UploadFile from '../../UploadFile'
+import { useHistory,useRouteMatch } from "react-router-dom";
+import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
 
-export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+export default function ModalDeveloper({ visible = false, onOk, onCancel, details, ...props }) {
+    const match = useRouteMatch();
     const history = useHistory();
     const uploadRef = useRef(null);
     const uploadRef_unittest = useRef(null);
-    // const uploadRef_filedeploy = useRef(null);
-    const uploadRef_document = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
@@ -25,16 +23,14 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
         try {
             if (textValue !== "") {
                 const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/ricef/create-comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketid: details && details.ticketid,
-                        taskid: details.taskid,
+                        ricefid: match.params.ricefid,
                         comment_text: textValue,
-                        comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -46,34 +42,16 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
     const SaveUnitTest = async (values) => {
         const unittest = await Axios({
-            url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
+            url: process.env.REACT_APP_API_URL + "/ricef/save-document",
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             data: {
-                ticketid: details && details.ticketid,
-                taskid: details.taskid,
+                ricefid: details.ricefid,
                 files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.urltest,
+                reftype: "Master_Ricef",
                 grouptype: "unittest"
-            }
-        })
-    }
-
-    const SaveDocumentDeploy = async (values) => {
-        const unittest = await Axios({
-            url: process.env.REACT_APP_API_URL + "/workflow/save_deploydocument",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            data: {
-                ticketid: details && details.ticketid,
-                taskid: details.taskid,
-                files: uploadRef_document.current.getFiles().map((n) => n.response.id),
-                url: values.urltest,
-                grouptype: "document_deploy"
             }
         })
     }
@@ -81,37 +59,32 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send",
+                url: process.env.REACT_APP_API_URL + "/ricef/send-task",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    taskid: details.taskid,
-                    mailboxid: details.mailboxid,
-                    flowoutputid: details.flowoutputid,
-                    value: {
-                        comment_text: textValue
-                    }
+                    ricefid: details.ricefid,
+                    status: details.flowstatus
                 }
             });
 
             if (sendflow.status === 200) {
                 SaveComment();
                 SaveUnitTest(values);
-                SaveDocumentDeploy(values);
                 onOk();
 
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>แก้ไขงานเสร็จ ส่งงานให้ Leader ตรวจสอบ</p>
+                            <p>แก้ไขงานเสร็จ ส่งงานให้ Consult ตรวจสอบ</p>
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        editorRef.current.editor.setContent("");
+                        history.goBack();
                     },
                 });
             }
@@ -136,7 +109,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     const onFinish = (values) => {
         console.log('Success:', values);
         SendFlow(values);
-        onOk();
+    
     };
 
     return (
@@ -186,19 +159,6 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     <UploadFile ref={uploadRef_unittest} />
                 </Form.Item>
 
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Deploy Document"
-                    name="document"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input Deploy Document!',
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_document} />
-                </Form.Item>
             </Form>
             <Editor
                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"

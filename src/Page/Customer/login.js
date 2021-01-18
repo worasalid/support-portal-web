@@ -17,7 +17,7 @@ export default function Login() {
             });
             localStorage.setItem("sp-ssid", result.data.ssid);
             dispatch({ type: 'Authen', payload: true});
-            dispatch({ type: 'LOGIN', payload: result.data.users});
+            dispatch({ type: 'LOGIN', payload: result.data.usersdata});
              history.push('/customer/servicedesk');
         } catch (error) {
             alert("ข้อมููลไม่ถูกต้อง")

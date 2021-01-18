@@ -16,13 +16,6 @@ export default function IssueMenu() {
     const { state, dispatch } = useContext(AuthenContext);
     const [issuedata, setIssuedata] = useState([])
 
-    const data = [
-        'Racing car sprays burning fuel into crowd.',
-        'Japanese princess to wed commoner.',
-        'Australian walks 100km after outback crash.',
-        'Man charged over missing wedding girl.',
-        'Los Angeles battles huge wildfires.',
-      ];
 
     const GetIssueType = async () => {
         try {
@@ -54,7 +47,6 @@ export default function IssueMenu() {
 
 
 
-    console.log("issuedata", issuedata && issuedata)
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>

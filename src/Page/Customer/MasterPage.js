@@ -15,7 +15,7 @@ export default function MasterPage(props) {
   const [show_notice, setshow_notice] = useState(true);
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
-  const userlogin = state.user
+  const userlogin =  state.usersdata.users
   const [activemenu, setActivemenu] = useState([])
 
   const getuser = async () => {
@@ -28,7 +28,7 @@ export default function MasterPage(props) {
         },
       });
       dispatch({ type: 'Authen', payload: true });
-      dispatch({ type: 'LOGIN', payload: result.data.users });
+      dispatch({ type: 'LOGIN', payload: result.data.usersdata });
     } catch (error) {
 
     }
@@ -111,6 +111,8 @@ export default function MasterPage(props) {
       setActivemenu(activemenu.push("5"))
     }
   }, [])
+
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header style={{ backgroundColor: "#1a73e8" }}>
@@ -119,7 +121,7 @@ export default function MasterPage(props) {
             <Col span={12}>
               <img
                 style={{ height: "35px" }}
-                src={`${process.env.PUBLIC_URL}/logo-brand.png`}
+                src={`${process.env.PUBLIC_URL}/logo-space.png`}
                 alt=""
               />
             </Col>

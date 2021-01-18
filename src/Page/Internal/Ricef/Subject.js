@@ -1,33 +1,37 @@
-import { Col, Tag, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Popconfirm } from "antd";
+import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, DatePicker } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import RicefComment from "../../../Component/Comment/Internal/Ricef_Comment";
-import Historylog from "../../../Component/History/Customer/Historylog";
+import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ConsoleSqlOutlined, FileAddOutlined, PoweroffOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
+import AuthenContext from "../../../utility/authenContext";
 import RicefContext, { ricefReducer, ricefState } from "../../../utility/ricefContext";
-import Clock from "../../../utility/countdownTimer";
 import moment from "moment";
-import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
-import CommentBox from "../../../Component/Comment/Internal/Internal_comment";
+import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
 
+import ModalDeveloper from "../../../Component/Dialog/Internal/Ricef/modalDeveloper";
+import ModalConsult from "../../../Component/Dialog/Internal/Ricef/modalConsult";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-
 export default function Subject() {
     const match = useRouteMatch();
     const history = useHistory();
-    const selectRef = useRef(null)
-    const subTaskRef = useRef(null)
+    const uploadRef = useRef(null);
+    const editorRef = useRef(null)
+    const [textValue, setTextValue] = useState("");
+
+    const { state, dispatch } = useContext(AuthenContext);
     const { state: ricefstate, dispatch: ricefdispatch } = useContext(RicefContext);
 
 
     //modal
-    // const [visible, setVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(null)
+    const [modalDeveloper, setModalDeveloper] = useState(null)
 
     //div
     const [container, setContainer] = useState(null);
@@ -35,7 +39,52 @@ export default function Subject() {
     const [collapsetext, setCollapsetext] = useState("Hide details")
 
     // data
-    const [ProgressStatus, setProgressStatus] = useState("");
+    const [flowText, setFlowText] = useState(null);
+    const [flowOutput, setFlowOutput] = useState("");
+    const [flowStatus, setFlowStatus] = useState("");
+    // const [ricefstatus, setRicefstatus] = useState(null);
+    const flowdata = [
+        {
+            Id: 1,
+            Name: "Send To Dev",
+            type: "progress",
+            flowstatus: "InProgress"
+        },
+        {
+            Id: 2,
+            Name: "Send Unit Test",
+            type: "progress",
+            flowstatus: "Resolved"
+        },
+        {
+            Id: 3,
+            Name: "ReOpen",
+            type: "progress",
+            flowstatus: "ReOpen"
+        },
+        {
+            Id: 4,
+            Name: "Complete",
+            type: "progress",
+            flowstatus: "Complete"
+        }
+
+    ]
+    const GetFlowOutput = async () => {
+        if (ricefstate.recefdetail[0]?.Status === "Open") {
+            setFlowOutput(flowdata.filter((x) => x.Id === 1).map((x) => ({ value: x.Id, label: x.Name, type: x.type, status: x.flowstatus })))
+        }
+        if (ricefstate.recefdetail[0]?.Status === "InProgress" || ricefstate.recefdetail[0]?.Status === "ReOpen") {
+            setFlowOutput(flowdata.filter((x) => x.Id === 2).map((x) => ({ value: x.Id, label: x.Name, type: x.type, status: x.flowstatus })))
+        }
+        if (ricefstate.recefdetail[0]?.Status === "Resolved") {
+            setFlowOutput(flowdata.filter((x) => x.Id === 3 || x.Id === 4).map((x) => ({ value: x.Id, label: x.Name, type: x.type, status: x.flowstatus })))
+        }
+    }
+
+    const handleEditorChange = (content, editor) => {
+        setTextValue(content);
+    }
 
     const GetRicefDetail = async () => {
         try {
@@ -54,21 +103,6 @@ export default function Subject() {
                 ricefdispatch({ type: "LOAD_RICEFDETAIL", payload: ricef_detail.data })
 
             }
-        } catch (error) {
-
-        }
-    }
-
-    const getIssueType = async () => {
-        try {
-            const issuetype = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/issue-types",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-            });
-            ricefdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
         } catch (error) {
 
         }
@@ -107,31 +141,64 @@ export default function Subject() {
         }
     }
 
+    const GetType = async () => {
+        try {
+            const issuetype = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/issue-types",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+            });
+            ricefdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
+        } catch (error) {
+
+        }
+    }
+
     function onChange(value, item) {
-        console.log("onChange", value)
-        console.log("onChange2", item)
-        Modal.info({
-            title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
-            content: (
-                <div>
-                    <p></p>
-                </div>
-            ),
-            okCancel() {
+        console.log("item", item)
+        if (item.type === "progress" && item.value === 1) {
+            setFlowText(item.label);
+            setFlowStatus(item.status);
+            setModalVisible(true);
+        }
+        if (item.type === "progress" && item.value === 2) {
+            setFlowText(item.label);
+            setFlowStatus(item.status);
+            setModalDeveloper(true);
+        }
+        if (item.type === "progress" && (item.value === 3 || item.value === 4)) {
+            setFlowText(item.label);
+            setFlowStatus(item.status);
+            setModalVisible(true);
+        }
+        if (item.type !== "progress") {
+            Modal.info({
+                title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
+                content: (
+                    <div>
+                        <p></p>
+                    </div>
+                ),
+                okCancel() {
 
-            },
-            onOk() {
-                if (item.type === "priority") {
-                    UpdatePriority(value);
-                    Modal.success({
-                        content: 'บันทึกข้อมูลเรียบร้อยแล้ว',
-                        okText: "Close"
-                    });
-                }
+                },
+                onOk() {
+                    if (item.type === "priority") {
+                        UpdatePriority(value);
+                    }
+                    if (item.type === "module") {
+                        UpdateModule(value);
+                    }
+                    if (item.type === "riceftype") {
+                        UpdateType(value);
+                    }
 
+                },
+            });
+        }
 
-            },
-        });
     }
 
     const UpdatePriority = async (value, item) => {
@@ -149,6 +216,10 @@ export default function Subject() {
             });
             if (priority.status === 200) {
                 GetRicefDetail();
+                Modal.success({
+                    content: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                    okText: "Close"
+                });
             }
 
         } catch (error) {
@@ -156,13 +227,68 @@ export default function Subject() {
         }
     }
 
+    const UpdateModule = async (value, item) => {
+        try {
+            const module = await Axios({
+                url: process.env.REACT_APP_API_URL + "/ricef/update-module",
+                method: "PATCH",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ricefid: match.params.ricefid,
+                    module: value,
+                }
+            });
+            if (module.status === 200) {
+                GetRicefDetail();
+                Modal.success({
+                    content: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                    okText: "Close"
+                });
+            }
 
+        } catch (error) {
+            Modal.success({
+                content: 'Error',
+                okText: "Close"
+            });
+        }
+    }
 
+    const UpdateType = async (value, item) => {
+        try {
+            const module = await Axios({
+                url: process.env.REACT_APP_API_URL + "/ricef/update-type",
+                method: "PATCH",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ricefid: match.params.ricefid,
+                    type: value,
+                }
+            });
+            if (module.status === 200) {
+                GetRicefDetail();
+                Modal.success({
+                    content: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                    okText: "Close"
+                });
+            }
+
+        } catch (error) {
+            Modal.success({
+                content: error,
+                okText: "Close"
+            });
+        }
+    }
 
     function HandleChange(value, item) {
         console.log("value", value)
         console.log("item", item)
-        setProgressStatus(item.label);
+        // setProgressStatus(item.label);
     }
 
     function renderColorPriority(param) {
@@ -183,7 +309,6 @@ export default function Subject() {
         GetRicefDetail();
 
     }, [])
-
 
     return (
         <MasterPage>
@@ -253,8 +378,8 @@ export default function Subject() {
 
                                         <TabsDocument
                                             details={{
-                                                // refId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-                                                //reftype: "Master_Ticket",
+                                                refId: match.params.ricefid,
+                                                reftype: "Master_Ricef",
                                             }}
                                         />
                                     </Col>
@@ -270,7 +395,7 @@ export default function Subject() {
                                                 <RicefComment />
                                             </TabPane>
                                             <TabPane tab="History Log" key="2">
-                                                <Historylog />
+                                                <Historylog type="RICEF" />
                                             </TabPane>
                                         </Tabs>
                                     </Col>
@@ -286,7 +411,33 @@ export default function Subject() {
                                     <label className="header-text">ProgressStatus</label>
                                 </Col>
                                 <Col span={18} style={{ marginTop: 10 }}>
-                                    <label className="value-text">{ricefstate.recefdetail[0]?.Title}</label>
+                                    <div
+                                        style={{
+                                            display: (state?.usersdata?.organize?.OrganizeCode === "dev" && ricefstate.recefdetail[0]?.Status === "InProgress" || ricefstate.recefdetail[0]?.Status === "ReOpen") ||
+                                                (state?.usersdata?.organize?.OrganizeCode === "consult" && ricefstate.recefdetail[0]?.Status !== "InProgress") ? "block" : "none"
+                                        }}>
+                                        <Select
+                                            style={{ width: '100%' }}
+                                            allowClear
+                                            showSearch
+
+                                            filterOption={(input, option) =>
+                                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            onClick={() => GetFlowOutput()}
+                                            options={flowOutput}
+                                            onChange={(value, item) => onChange(value, item)}
+                                            value={ricefstate.recefdetail[0]?.Status}
+                                        />
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: (state?.usersdata?.organize?.OrganizeCode === "dev" && (ricefstate.recefdetail[0]?.Status !== "InProgress" && ricefstate.recefdetail[0]?.Status !== "ReOpen")) ||
+                                                (state?.usersdata?.organize?.OrganizeCode === "consult" && ricefstate.recefdetail[0]?.Status === "InProgress") ? "block" : "none"
+                                        }}>
+                                        <label className="value-text">{ricefstate.recefdetail[0]?.Status}</label>
+                                    </div>
+
                                 </Col>
                             </Row>
                             <Row style={{ marginBottom: 20 }}>
@@ -294,43 +445,70 @@ export default function Subject() {
                                     <label className="header-text">Type</label>
                                 </Col>
                                 <Col span={18} >
-                                    <label className="value-text">{ricefstate.recefdetail[0]?.IssueType}</label>
+                                    <div
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "consult" &&
+                                                ricefstate.recefdetail[0]?.Status === "Open" ? "block" : "none"
+                                        }}>
+                                        <Select
+                                            style={{ width: '100%' }}
+                                            allowClear
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            onClick={() => GetType()}
+
+                                            options={ricefstate.masterdata.issueTypeState?.map((x) => ({ value: x.Id, label: x.Name, type: "riceftype" }))}
+                                            onChange={(value, item) => onChange(value, item)}
+                                            value={ricefstate.recefdetail[0]?.IssueType}
+                                        />
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "dev" ||
+                                            (state?.usersdata?.organize?.OrganizeCode === "consult"  &&  ricefstate.recefdetail[0]?.Status !== "Open") ? "block" : "none"
+                                        }}>
+                                        <label className="value-text">{ricefstate.recefdetail[0]?.IssueType}</label>
+                                    </div>
+
+
                                 </Col>
                             </Row>
-                            <Row style={{ marginBottom: 20 }}>
-                                <Col span={18} >
-                                    <label className="header-text">DueDate</label>
-                                </Col>
-                                <Col span={18} >
-                                    <label className="value-text">
-                                        {moment(ricefstate.recefdetail[0]?.DueDate).format("DD/MM/YYYY")}
-                                    </label>
-                                </Col>
-                            </Row>
+
                             <Row style={{ marginBottom: 20 }} align="middle">
                                 <Col span={18}>
                                     <label className="header-text">Priority</label>
                                 </Col>
                                 <Col span={18}>
-                                    <Select
-                                        style={{ width: '100%' }}
-                                        allowClear
-                                        showSearch
+                                    <div
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "consult" ? "block" : "none"
+                                        }}>
+                                        <Select
+                                            style={{ width: '100%' }}
+                                            allowClear
+                                            showSearch
 
-                                        filterOption={(input, option) =>
-                                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                        }
-                                        onClick={() => GetPriority()}
+                                            filterOption={(input, option) =>
+                                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            onClick={() => GetPriority()}
 
-                                        options={ricefstate.masterdata.priorityState?.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))}
-                                        onChange={(value, item) => onChange(value, item)}
-                                        value={ricefstate.recefdetail[0]?.Priority}
-                                    />
-                                    {/* <label className="value-text">{ricefstate.recefdetail[0]?.Priority}</label> */}
+                                            options={ricefstate.masterdata.priorityState?.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))}
+                                            onChange={(value, item) => onChange(value, item)}
+                                            value={ricefstate.recefdetail[0]?.Priority}
+                                        />
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
+                                        }}>
+                                        <label className="value-text">{ricefstate.recefdetail[0]?.Priority}</label>
+                                    </div>
                                 </Col>
                             </Row>
-
-
 
                             <Row style={{ marginBottom: 20 }}>
                                 <Col span={18}>
@@ -347,33 +525,89 @@ export default function Subject() {
                                     <label className="value-text">{ricefstate.recefdetail[0]?.ProductName} {`(${ricefstate.recefdetail[0]?.ProductFullName})`}</label>
                                 </Col>
                             </Row>
+
                             <Row style={{ marginBottom: 20 }}>
                                 <Col span={18}>
                                     <label className="header-text">Module</label>
-                                    <br />
-                                    <Select
-                                        style={{ width: '100%' }}
-                                        allowClear
-                                        showSearch
+                                </Col>
+                                <Col span={18}>
+                                    <div
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "consult" &&
+                                                ricefstate.recefdetail[0]?.Status === "Open" ? "block" : "none"
+                                        }}>
+                                        <Select
+                                            style={{ width: '100%' }}
+                                            allowClear
+                                            filterOption={(input, option) =>
+                                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            onClick={() => LoadModule()}
 
-                                        filterOption={(input, option) =>
-                                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                        }
-                                        onClick={() => LoadModule()}
+                                            options={ricefstate.masterdata.moduleState?.map((x) => ({ value: x.Id, label: x.Name, type: "module" }))}
+                                            onChange={(value, item) => onChange(value, item)}
+                                            value={ricefstate.recefdetail[0]?.ModuleName}
+                                        />
+                                    </div>
 
-                                        options={ricefstate.masterdata.moduleState?.map((x) => ({ value: x.Id, label: x.Name, type: "module" }))}
-                                        onChange={(value, item) => onChange(value, item)}
-                                        value={ricefstate.recefdetail[0]?.ModuleName}
-                                    />
-                                    {/* <label className="value-text">{ricefstate.recefdetail[0]?.ModuleName}</label> */}
+                                    <div
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "dev" ||
+                                                (state?.usersdata?.organize?.OrganizeCode === "consult" && ricefstate.recefdetail[0]?.Status) !== "Open" ? "block" : "none"
+                                        }}>
+                                        <label className="value-text">{ricefstate.recefdetail[0]?.ModuleName}</label>
+                                    </div>
+
                                 </Col>
                             </Row>
-
+                            <Row style={{ marginBottom: 20 }}>
+                                <Col span={18} >
+                                    <label className="header-text">DueDate</label>
+                                </Col>
+                                <Col span={18} >
+                                    <label className="value-text">
+                                        <DatePicker 
+                                        defaultValue = {moment(ricefstate.recefdetail[0]?.DueDate)}
+                                        format="DD/MM/YYYY"
+                                        />
+                                        {ricefstate.recefdetail[0]?.DueDate}
+                                    </label>
+                                </Col>
+                            </Row>
                         </Col>
                         {/* SideBar */}
                     </Row>
                 </div>
             </div>
+
+            <ModalConsult
+                visible={modalVisible}
+                title={flowText}
+                width={800}
+                onCancel={() => setModalVisible(false)}
+                onOk={() => setModalVisible(false)}
+                details={{
+                    ricefid: ricefstate.recefdetail[0]?.RicefId,
+                    flowstatus: flowStatus && flowStatus,
+                    status :ricefstate.recefdetail[0]?.Status
+
+                }}
+            />
+
+            <ModalDeveloper
+                title={flowText}
+                visible={modalDeveloper}
+                width={800}
+                onCancel={() => setModalDeveloper(false)}
+                onOk={() => setModalDeveloper(false)}
+                details={{
+                    ricefid: ricefstate.recefdetail[0]?.RicefId,
+                    flowstatus: flowStatus && flowStatus,
+                    status :ricefstate.recefdetail[0]?.Status
+                }}
+            />
+
+
 
         </MasterPage>
     );

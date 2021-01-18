@@ -150,7 +150,7 @@ export default function InProgress() {
                         {
                           record.IssueType === 'ChangeRequest' ?
                             <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
+                            <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip>
                         }
                         <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                         {/* <Divider type="vertical" /> */}

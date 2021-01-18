@@ -1,7 +1,7 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import axios from "axios";
-import React, {useContext, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useHistory } from "react-router-dom";
 import AuthenContext from '../../utility/authenContext';
 
@@ -11,20 +11,24 @@ export default function NormalLoginForm() {
 
   const onFinish = async (value) => {
     try {
-        const result = await axios({
-          url: process.env.REACT_APP_API_URL + "/auth",
-          method: "POST",
-          data: { email: value.username },
-        });
+      const result = await axios({
+        url: process.env.REACT_APP_API_URL + "/auth",
+        method: "POST",
+        data: { email: value.username },
+      });
 
-      localStorage.setItem("sp-ssid", result.data);
-      dispatch({ type: 'Authen', payload: true});
-      dispatch({ type: 'LOGIN', payload: result.data.users});
+       localStorage.setItem("sp-ssid", result.data);
+      //localStorage.setItem("sp-ssid", result.data.ssid);
+      dispatch({ type: 'Authen', payload: true });
+       dispatch({ type: 'LOGIN', payload: result.data.users });
+      //dispatch({ type: 'LOGIN', payload: result.data.usersdata.users });
       history.push("/internal/issue/mytask");
     } catch (error) {
       alert("ข้อมููลไม่ถูกต้อง");
     }
   };
+
+  console.log("sssss")
 
   return (
     <div
@@ -38,7 +42,7 @@ export default function NormalLoginForm() {
       }}
     >
       <Form
-        style={{ padding: 32, maxWidth: 480, backgroundColor: "white" }}
+        style={{ padding: 32, maxWidth: 480,height: 500, backgroundColor: "white" }}
         name="normal_login"
         className="login-form"
         initialValues={{
@@ -48,7 +52,8 @@ export default function NormalLoginForm() {
         onFinish={onFinish}
       >
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <img src="logo-brand.png" alt="" style={{ height: "70px" }} />
+          <img src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
+            alt="" style={{ height: "100px",width: "200px" }} />
         </div>
 
         <h2
@@ -58,7 +63,7 @@ export default function NormalLoginForm() {
             textTransform: "uppercase",
           }}
         >
-          Issue Portal
+          {/* Issue Portal */}
         </h2>
         <Form.Item
           style={{ minWidth: 300, maxWidth: 300 }}

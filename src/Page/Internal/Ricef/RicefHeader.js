@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Table, Button, Row, Col, Form, Modal, Upload } from 'antd';
 import Column from 'antd/lib/table/Column';
-import { DownloadOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, LeftCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import Axios from 'axios'
 import moment from 'moment';
 import MasterPage from '../MasterPage'
@@ -9,8 +9,7 @@ import { useRouteMatch, useHistory } from 'react-router-dom';
 import xlsx from 'xlsx'
 import UploadFile from '../../../Component/UploadFile';
 import _ from 'lodash'
-import { userState } from '../../../utility/issueContext';
-import { current } from '@reduxjs/toolkit';
+
 
 export default function RicefHeader({ name, ...props }) {
     const match = useRouteMatch();
@@ -185,6 +184,17 @@ export default function RicefHeader({ name, ...props }) {
         <MasterPage>
             <Row>
                 <Col span={24}>
+                    <Button type="link"
+                        onClick={() => history.goBack()}
+                    >
+                        <LeftCircleOutlined />
+
+                    </Button>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col span={24}>
                     {/* {company && company[0].Name} */}
                     <label style={{ fontSize: 20, verticalAlign: "top" }}>{company && company[0].FullNameTH}</label>
 
@@ -202,7 +212,7 @@ export default function RicefHeader({ name, ...props }) {
                     <Button
                         type="default"
                         icon={<DownloadOutlined />}
-                        target="_blank" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1Ns229hFbvgL94zyqYR9wrpfqfeiIZGUU&export=download", "_blank")}>
+                        target="_blank" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1txcydTJ4PVCFJ_ElKuuhWk_5sz0Metux&export=download", "_blank")}>
                         DownLoad Templete
                     </Button>
                 </Col>
@@ -222,14 +232,68 @@ export default function RicefHeader({ name, ...props }) {
                             }
                         />
                         <Column align="center" title="Owner" width="30%" dataIndex="Owner" />
-                        <Column align="center" title="จำนวน" width="10%" dataIndex=""
+                        <Column align="center" title="จำนวน" width="15%" dataIndex=""
                             render={(record) => {
                                 return (
-                                    <Button type="link"
-                                        onClick={() => history.push({ pathname: "/internal/ricef/comp-" + match.params.compid + "/batch-" + record.BatchId })}
-                                    >
-                                        {record.cnt}
-                                    </Button>
+                                    <>
+                                        <Row>
+                                            <Col span={18} style={{ textAlign: "left" }}>
+                                            <label style={{fontWeight:"bold"}}>Total</label>
+                                            </Col>
+                                            <Col span={6}>
+                                                <Button type="link"
+                                                    onClick={() => history.push({ pathname: "/internal/ricef/comp-" + match.params.compid + "/batch-" + record.BatchId })}
+                                                >
+                                                    {record.cntTotal}
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={18} style={{ textAlign: "left" }}>
+                                            <label >Open</label>
+                                            </Col>
+                                            <Col span={6}>
+                                                {record.cntOpen}
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={18} style={{ textAlign: "left" }}>
+                                            <label style={{color:"#2db7f5"}}>InProgress</label>
+                                                
+                                            </Col>
+                                            <Col span={6}>
+                                                {record.cntInprogress}
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={18} style={{ textAlign: "left" }}>
+                                            <label style={{color:"#f50"}}>Resolved</label>
+                                                
+                                            </Col>
+                                            <Col span={6}>
+                                                {record.cntResolved}
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={18} style={{ textAlign: "left" }}>
+                                            <label style={{color:"#87d068"}}>Complete</label>
+                                                
+                                            </Col>
+                                            <Col span={6}>
+                                                {record.cntComplete}
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={18} style={{ textAlign: "left" }}>
+                                            <label style={{color:"#87d068"}}>Next Version</label>
+                                                
+                                            </Col>
+                                            <Col span={6}>
+                                               1
+                                            </Col>
+                                        </Row>
+
+                                    </>
                                 )
                             }
                             }

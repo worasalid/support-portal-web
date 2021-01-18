@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from 'react'
 import { Card, Avatar } from 'antd'
 import axios from 'axios'
-import { SendOutlined, UserOutlined } from '@ant-design/icons'
+import { UserOutlined } from '@ant-design/icons'
 import AuthenContext from '../../../utility/authenContext';
 
 export default function MasterPage(props) {
     const { state, dispatch } = useContext(AuthenContext);
-    const userdata = state.user
+    const userdata = state.usersdata.users
     const getuser = async () => {
         try {
             const result = await axios({
@@ -18,7 +18,7 @@ export default function MasterPage(props) {
 
             });
             dispatch({ type: 'Authen', payload: true });
-            dispatch({ type: 'LOGIN', payload: result.data.users });
+            dispatch({ type: 'LOGIN', payload: result.data.usersdata });
         } catch (error) {
 
         }
@@ -29,6 +29,7 @@ export default function MasterPage(props) {
             getuser();
         }
     }, []);
+
 
     return (
         <div

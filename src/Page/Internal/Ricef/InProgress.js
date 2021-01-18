@@ -1,14 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { Table, Button, Row, Col, Form, Modal, Upload, Tooltip, Tag } from 'antd';
+import { Table, Button, Row, Col, Tooltip, Tag, Select } from 'antd';
 import Column from 'antd/lib/table/Column';
-import { CloudUploadOutlined, DownloadOutlined, EditOutlined, LeftCircleOutlined, UploadOutlined } from '@ant-design/icons';
+import { HistoryOutlined, LeftCircleOutlined } from '@ant-design/icons';
 import Axios from 'axios'
 import moment from 'moment';
 import MasterPage from '../MasterPage'
 import { useRouteMatch, useHistory } from 'react-router-dom';
 import AuthenContext from "../../../utility/authenContext";
+import RicefSearch from "../../../Component/Search/Internal/ricefSearch";
 
-export default function RicefDetails() {
+export default function InProgress() {
     const match = useRouteMatch();
     const history = useHistory();
     const { state, dispatch } = useContext(AuthenContext);
@@ -17,39 +18,17 @@ export default function RicefDetails() {
 
 
     const [ricef, setRicef] = useState(null)
-    const [company, setCompany] = useState(null);
 
-    const GetCompany = async (value) => {
-        try {
-            const companyby_id = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/company",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    id: value
-                }
-            });
-            if (companyby_id.status === 200) {
-                setCompany(companyby_id.data)
-            }
-        } catch (error) {
-
-        }
-    }
 
     const GetRicef = async (value) => {
         try {
             const details = await Axios({
-                url: process.env.REACT_APP_API_URL + "/ricef/load-ricef",
+                url: process.env.REACT_APP_API_URL + "/ricef/load-inprogress",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
-                params: {
-                    batchid: value
-                }
+
             });
             if (details.status === 200) {
                 setRicef(details.data)
@@ -64,12 +43,10 @@ export default function RicefDetails() {
     }
 
     useEffect(() => {
-        GetCompany(match.params.compid)
-        GetRicef(match.params.batchid)
-
+        GetRicef()
     }, [])
 
-    console.log("organize", state)
+
 
     return (
         <MasterPage>
@@ -79,17 +56,13 @@ export default function RicefDetails() {
                 <LeftCircleOutlined />
 
             </Button>
-            <Row style={{ marginBottom: 30 }}>
-                <Col span={24}>
-                    <label style={{ fontSize: 20, verticalAlign: "top" }}>{company && company[0].FullNameTH}</label>
-                </Col>
-            </Row>
+
+            <RicefSearch />
 
 
             <Table dataSource={ricef} loading={loading}>
                 {/* <Column align="center" title="No" width="1%" dataIndex="RowNo" /> */}
                 <Column align="left" title="IssueNumber" width="20%" dataIndex=""
-
                     render={(record) => {
                         return (
                             <div>
@@ -113,8 +86,7 @@ export default function RicefDetails() {
                         );
                     }}
                 />
-                <Column title="Subject"
-                    width="30%"
+                <Column title="Subject" width="35%"
                     render={(record) => {
                         return (
                             <>
@@ -142,51 +114,70 @@ export default function RicefDetails() {
                     }
                     }
                 />
-                <Column align="center" title="DueDate" width="10%" dataIndex=""
-                    render={(record) => {
-                        return (
-                            moment(record.DueDate).format("DD/MM/YYYY")
-                        )
-                    }
-                    }
-                />
-                <Column align="center" title="Owner" width="20%" dataIndex="OwnerName" />
-                <Column align="center" title="Assignee" width="20%" dataIndex=""
+                <Column align="center" width="20%"
+                    title={(state?.usersdata?.organize?.OrganizeCode === "dev" ? "Owner" : "Assignee")}
                     render={(record) => {
                         return (
                             <>
-                             {record.Assignee}  <br />
-                             {moment(record.AssignDate).format("DD/MM/YYYY")}
-                           </>
-                        )
-                    }
-                    }
-                />
-                <Column align="center" title="Progress" width="10%" dataIndex="Status" />
-                {/* <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-                    width="10%"
-                    align="center"
-                    render={(record) => {
-                        return (
-                            <>
-                                <Button type="link"
-                                    // onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                    onClick={() => {
-                                        return (
-                                            <>
-                                            </>
-                                            // setModalfiledownload_visible(true)
-                                        )
-                                    }
-                                    }
-                                >
-
-                                </Button>
+                                {record.OwnerName}<br />
+                                <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
                             </>
                         )
                     }
                     }
-                /> */}
+                />
+                <Column align="center" title="Progress" width="5%" dataIndex="Status" />
+                <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
+                    width="20%"
+                    align="center"
+                    render={(record) => {
+                        return (
+                            <>
+                                <Row style={{ textAlign: "right" }}>
+                                    <Col span={12}>
+                                        <label className="value-text">Due Date</label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="value-text">{moment(record.DueDate).format("DD/MM/YYYY")}</label>
+                                    </Col>
+                                </Row>
+                                <Row style={{ textAlign: "right" }}>
+                                    <Col span={12}>
+                                        <label className="value-text">Assign Date</label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="value-text">
+                                            {record.AssignDate === "" ? "-" : moment(record.AssignDate).format("DD/MM/YYYY")}
+                                        </label>
+                                    </Col>
+                                </Row>
+                                <Row style={{ textAlign: "right" }}>
+                                    <Col span={12}>
+                                        <label className="value-text">Resolved Date</label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="value-text">
+                                            {record.ResolvedDate === "" ? "-" : moment(record.ResolvedDate).format("DD/MM/YYYY")}
+                                        </label>
+
+                                    </Col>
+                                </Row>
+                                <Row style={{ textAlign: "right" }}>
+                                    <Col span={12}>
+                                        <label className="value-text"> Complete Date</label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="value-text">
+                                            {record.CompleteDate === "" ? "-" : moment(record.CompleteDate).format("DD/MM/YYYY")}
+                                        </label>
+
+                                    </Col>
+                                </Row>
+                            </>
+                        )
+                    }
+                    }
+                />
             </Table>
 
 
