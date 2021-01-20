@@ -8,14 +8,13 @@ import MasterPage from '../MasterPage'
 import { useRouteMatch, useHistory } from 'react-router-dom';
 import AuthenContext from "../../../utility/authenContext";
 import RicefSearch from "../../../Component/Search/Internal/ricefSearch";
+import RicefContext, { ricefReducer, ricefState } from "../../../utility/ricefContext";
 
 export default function InProgress() {
     const match = useRouteMatch();
     const history = useHistory();
     const { state, dispatch } = useContext(AuthenContext);
-
-    const [loading, setLoading] = useState(true);
-
+    const { state: ricefstate, dispatch: ricefdispatch } = useContext(RicefContext);
 
     const [ricef, setRicef] = useState(null)
 
@@ -28,13 +27,21 @@ export default function InProgress() {
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
+                params: {
+                    companyid: ricefstate.filter.companyState,
+                    issuetype: ricefstate.filter.typeState,
+                    productid: ricefstate.filter.productState,
+                    moduleid: ricefstate.filter.moduleState,
+                    progress: ricefstate.filter.progressState,
+                    startdate: ricefstate.filter.date.startdate === "" ? "" : moment(ricefstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+                    enddate: ricefstate.filter.date.enddate === "" ? "" : moment(ricefstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+                    keyword: ricefstate.filter.keyword,
+                }
 
             });
             if (details.status === 200) {
                 setRicef(details.data)
-                setTimeout(() => {
-                    setLoading(false)
-                }, 500)
+               
 
             }
         } catch (error) {
@@ -46,6 +53,15 @@ export default function InProgress() {
         GetRicef()
     }, [])
 
+    useEffect(() => {
+        ricefdispatch({ type: "LOADING", payload: true })
+        setTimeout(() => {
+            GetRicef();
+            ricefdispatch({ type: "LOADING", payload: false })
+        }, 1000)
+
+        ricefdispatch({ type: "SEARCH", payload: false })
+    }, [ricefstate.search]);
 
 
     return (
@@ -60,7 +76,7 @@ export default function InProgress() {
             <RicefSearch />
 
 
-            <Table dataSource={ricef} loading={loading}>
+            <Table dataSource={ricef} loading={ricefstate.loading}>
                 {/* <Column align="center" title="No" width="1%" dataIndex="RowNo" /> */}
                 <Column align="left" title="IssueNumber" width="20%" dataIndex=""
                     render={(record) => {

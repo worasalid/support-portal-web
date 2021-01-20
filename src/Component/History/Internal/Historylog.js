@@ -1,9 +1,9 @@
 import React, { useEffect, useState,useContext } from 'react'
-import { List, Avatar, Row, Col } from 'antd';
+import { List, Avatar} from 'antd';
 import moment from 'moment';
 import Axios from 'axios';
 import { useRouteMatch } from 'react-router-dom';
-import { ArrowRightOutlined, ClockCircleOutlined, SwapRightOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, SwapRightOutlined } from '@ant-design/icons';
 import AuthenContext from "../../../utility/authenContext";
 
 export default function Historylog({ type = "Issue" }) {

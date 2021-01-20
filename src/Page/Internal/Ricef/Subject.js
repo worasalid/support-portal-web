@@ -42,6 +42,7 @@ export default function Subject() {
     const [flowText, setFlowText] = useState(null);
     const [flowOutput, setFlowOutput] = useState("");
     const [flowStatus, setFlowStatus] = useState("");
+    const [duedate, setDuedate] = useState("31/11/2021");
     // const [ricefstatus, setRicefstatus] = useState(null);
     const flowdata = [
         {
@@ -101,7 +102,7 @@ export default function Subject() {
 
             if (ricef_detail.status === 200) {
                 ricefdispatch({ type: "LOAD_RICEFDETAIL", payload: ricef_detail.data })
-
+                setDuedate(ricefstate?.recefdetail[0]?.DueDate)
             }
         } catch (error) {
 
@@ -194,6 +195,9 @@ export default function Subject() {
                     if (item.type === "riceftype") {
                         UpdateType(value);
                     }
+                    if (item.type === "duedate") {
+                        UpdateDueDate(value);
+                    }
 
                 },
             });
@@ -285,6 +289,35 @@ export default function Subject() {
         }
     }
 
+    const UpdateDueDate = async (value, item) => {
+        try {
+            const module = await Axios({
+                url: process.env.REACT_APP_API_URL + "/ricef/update-duedate",
+                method: "PATCH",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ricefid: match.params.ricefid,
+                    duedate: value,
+                }
+            });
+            if (module.status === 200) {
+                GetRicefDetail();
+                Modal.success({
+                    content: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                    okText: "Close"
+                });
+            }
+
+        } catch (error) {
+            Modal.success({
+                content: error,
+                okText: "Close"
+            });
+        }
+    }
+
     function HandleChange(value, item) {
         console.log("value", value)
         console.log("item", item)
@@ -307,8 +340,9 @@ export default function Subject() {
 
     useEffect(() => {
         GetRicefDetail();
-
+        setDuedate(ricefstate?.recefdetail[0]?.DueDate)
     }, [])
+    console.log("duedate", duedate)
 
     return (
         <MasterPage>
@@ -467,7 +501,7 @@ export default function Subject() {
                                     <div
                                         style={{
                                             display: state?.usersdata?.organize?.OrganizeCode === "dev" ||
-                                            (state?.usersdata?.organize?.OrganizeCode === "consult"  &&  ricefstate.recefdetail[0]?.Status !== "Open") ? "block" : "none"
+                                                (state?.usersdata?.organize?.OrganizeCode === "consult" && ricefstate.recefdetail[0]?.Status !== "Open") ? "block" : "none"
                                         }}>
                                         <label className="value-text">{ricefstate.recefdetail[0]?.IssueType}</label>
                                     </div>
@@ -565,12 +599,20 @@ export default function Subject() {
                                     <label className="header-text">DueDate</label>
                                 </Col>
                                 <Col span={18} >
-                                    <label className="value-text">
-                                        <DatePicker 
-                                        defaultValue = {moment(ricefstate.recefdetail[0]?.DueDate)}
+                                    <DatePicker
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "consult" ? "block" : "none"
+                                        }}
+                                        value={moment(ricefstate?.recefdetail[0]?.DueDate, "DD/MM/YYYY")}
                                         format="DD/MM/YYYY"
-                                        />
-                                        {ricefstate.recefdetail[0]?.DueDate}
+                                        onChange={(date, dateString) => onChange(dateString,{value: dateString, type: "duedate"} )}
+                                    />
+                                    <label className="value-text"
+                                        style={{
+                                            display: state?.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
+                                        }}
+                                    >
+                                        {ricefstate?.recefdetail[0]?.DueDate}
                                     </label>
                                 </Col>
                             </Row>
@@ -589,7 +631,7 @@ export default function Subject() {
                 details={{
                     ricefid: ricefstate.recefdetail[0]?.RicefId,
                     flowstatus: flowStatus && flowStatus,
-                    status :ricefstate.recefdetail[0]?.Status
+                    status: ricefstate.recefdetail[0]?.Status
 
                 }}
             />
@@ -603,7 +645,7 @@ export default function Subject() {
                 details={{
                     ricefid: ricefstate.recefdetail[0]?.RicefId,
                     flowstatus: flowStatus && flowStatus,
-                    status :ricefstate.recefdetail[0]?.Status
+                    status: ricefstate.recefdetail[0]?.Status
                 }}
             />
 

@@ -13,21 +13,46 @@ export default function RicefSearch() {
     const { state, dispatch } = useContext(AuthenContext);
     const { state: ricefstate, dispatch: ricefdispatch } = useContext(RicefContext);
 
+    const ricefProgress = [
+        {
+            name: "Open",
+            value: "Open"
+        },
+        {
+            name: "InProgress",
+            value: "InProgress"
+        },
+        {
+            name: "Resolved",
+            value: "Resolved"
+        },
+        {
+            name: "Complete",
+            value: "Complete"
+        }
+    ]
     const handleChange = (e) => {
         if (e.target.group === "company") {
             ricefdispatch({ type: "SELECT_COMPANY", payload: e.target.value })
-
         }
         if (e.target.group === "issuetype") {
+            // console.log("issuetype", e.target.value)
             ricefdispatch({ type: "SELECT_TYPE", payload: e.target.value })
         }
         if (e.target.group === "product") {
+            //console.log("product", e.target.value)
             ricefdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
         }
         if (e.target.group === "module") {
+            // console.log("module", e.target.value)
             ricefdispatch({ type: "SELECT_MODULE", payload: e.target.value })
         }
+        if (e.target.group === "progress") {
+            // console.log("progress", e.target.value)
+            ricefdispatch({ type: "SELECT_PROGRESS", payload: e.target.value })
+        }
         if (e.target.group === "date") {
+            console.log("datetimne", { startdate: e.target.value[0], enddate: e.target.value[1] })
             ricefdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })
         }
         if (e.target.group === "keyword") {
@@ -106,16 +131,18 @@ export default function RicefSearch() {
         }
     }, [ricefstate.filter.productState]);
 
+    console.log("ricefstate", ricefstate.filter)
+
     return (
         <>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={4}>
-                </Col>
+
                 <Col span={4} >
                     <Select placeholder="Company" mode="multiple" allowClear
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        maxTagCount={1}
                         style={{ width: "100%" }}
                         // onKeyUp={(e) => {console.log(e.target)}}
                         onChange={(value, option) => handleChange({ target: { value: value || "", group: "company" } })}
@@ -129,6 +156,7 @@ export default function RicefSearch() {
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        maxTagCount={1}
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", group: "issuetype" } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
@@ -137,13 +165,13 @@ export default function RicefSearch() {
                     </Select>
                 </Col>
                 <Col span={4}>
-
                     <Select placeholder="Product" style={{ width: "100%" }}
                         allowClear
                         mode="multiple"
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
                         dropdownRender={(value) => (
@@ -168,10 +196,25 @@ export default function RicefSearch() {
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        maxTagCount={1}
                         allowClear
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'module' } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
                         onClear={() => alert()}
+                    />
+                </Col>
+                <Col span={4}>
+                    <Select placeholder="Progress"
+                        mode="multiple"
+                        style={{ width: "100%" }}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount={1}
+                        allowClear
+                        onChange={(value) => handleChange({ target: { value: value || "", group: 'progress' } })}
+                        options={ricefProgress.map((x) => ({ value: x.value, label: x.name }))}
+
                     />
                 </Col>
 
@@ -183,15 +226,17 @@ export default function RicefSearch() {
                     </Button>
                 </Col>
             </Row>
+
             <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
                 <Col span={4}></Col>
                 <Col span={8} >
                     <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
+                        placeholder={["Start DueDate", "End DueDate"]}
                         onChange={(date, dateString) => handleChange({ target: { value: dateString || "", group: 'date' } })}
                     />
                 </Col>
                 <Col span={8}>
-                    <Input placeholder="Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}></Input>
+                    <Input placeholder="เลขที่ Issue / รายละเอียด Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}></Input>
                 </Col>
             </Row>
         </>

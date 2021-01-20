@@ -21,7 +21,7 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
     const SaveComment = async () => {
         try {
             if (textValue !== "") {
-                const comment = await Axios({
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {

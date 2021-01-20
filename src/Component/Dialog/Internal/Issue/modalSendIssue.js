@@ -5,7 +5,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 
-const { TabPane } = Tabs;
+// const { TabPane } = Tabs;
 
 export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();

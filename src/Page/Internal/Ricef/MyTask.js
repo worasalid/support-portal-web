@@ -7,15 +7,15 @@ import moment from 'moment';
 import MasterPage from '../MasterPage'
 import { useRouteMatch, useHistory } from 'react-router-dom';
 import AuthenContext from "../../../utility/authenContext";
+import RicefContext, { ricefReducer, ricefState } from "../../../utility/ricefContext";
+
 import RicefSearch from "../../../Component/Search/Internal/ricefSearch";
 
 export default function MyTask() {
     const match = useRouteMatch();
     const history = useHistory();
     const { state, dispatch } = useContext(AuthenContext);
-
-    const [loading, setLoading] = useState(true);
-
+    const { state: ricefstate, dispatch: ricefdispatch } = useContext(RicefContext);
 
     const [ricef, setRicef] = useState(null)
 
@@ -28,14 +28,21 @@ export default function MyTask() {
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
+                params: {
+                    companyid: ricefstate.filter.companyState,
+                    issuetype: ricefstate.filter.typeState,
+                    productid: ricefstate.filter.productState,
+                    moduleid: ricefstate.filter.moduleState,
+                    progress: ricefstate.filter.progressState,
+                    startdate: ricefstate.filter.date.startdate === "" ? "" : moment(ricefstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+                    enddate: ricefstate.filter.date.enddate === "" ? "" : moment(ricefstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+                    keyword: ricefstate.filter.keyword,
+                }
 
             });
             if (details.status === 200) {
                 setRicef(details.data)
-                setTimeout(() => {
-                    setLoading(false)
-                }, 500)
-
+        
             }
         } catch (error) {
 
@@ -46,7 +53,17 @@ export default function MyTask() {
         GetRicef()
     }, [])
 
-    console.log("state", state?.usersdata?.organize?.OrganizeCode)
+    useEffect(() => {
+        ricefdispatch({ type: "LOADING", payload: true })
+        setTimeout(() => {
+            GetRicef();
+            ricefdispatch({ type: "LOADING", payload: false })
+        }, 1000)
+
+        ricefdispatch({ type: "SEARCH", payload: false })
+    }, [ricefstate.search]);
+
+    console.log("startdate",moment(ricefstate?.filter?.date?.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"))
 
     return (
         <MasterPage>
@@ -60,7 +77,7 @@ export default function MyTask() {
             <RicefSearch />
 
 
-            <Table dataSource={ricef} loading={loading}>
+            <Table dataSource={ricef} loading={ricefstate.loading}>
                 {/* <Column align="center" title="No" width="1%" dataIndex="RowNo" /> */}
                 <Column align="left" title="IssueNumber" width="20%" dataIndex=""
 
@@ -122,7 +139,18 @@ export default function MyTask() {
                     render={(record) => {
                         return (
                             <>
-                                {record.OwnerName}<br />
+                                <div
+                                    style={{ display: (state?.usersdata?.organize?.OrganizeCode === "dev") ? "block" : "none" }}
+                                >
+                                    {record.OwnerName}<br />
+                                    {record.OwnerName2}<br />
+                                </div>
+                                <div
+                                    style={{ display: (state?.usersdata?.organize?.OrganizeCode === "consult") ? "block" : "none" }}
+                                >
+                                    {record.AssigneeName}<br />
+                                </div>
+
                                 <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
                             </>
                         )

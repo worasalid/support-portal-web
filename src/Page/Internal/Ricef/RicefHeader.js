@@ -8,7 +8,8 @@ import MasterPage from '../MasterPage'
 import { useRouteMatch, useHistory } from 'react-router-dom';
 import xlsx from 'xlsx'
 import UploadFile from '../../../Component/UploadFile';
-import _ from 'lodash'
+import _ from 'lodash';
+import ReactExport from 'react-data-export';
 
 
 export default function RicefHeader({ name, ...props }) {
@@ -17,36 +18,58 @@ export default function RicefHeader({ name, ...props }) {
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
 
+    const ExcelFile = ReactExport.ExcelFile;
+    const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+    const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
+
     //Data
     const [loading, setLoading] = useState(true);
     const [visible, setVisible] = useState(null);
     const [company, setCompany] = useState(null);
-    const [excel, setExcel] = useState(null);
+    const [exceldata, setExceldata] = useState(null);
     const [listRicef, setListRicef] = useState(null);
 
-    // const handleImportExcel = (file, fileList) => {
-    //     let blob = new Blob([fileList[0].originFileObj], {
-    //         type: fileList[0].type,
-    //     });
-
-    //     const reader = new FileReader();
-    //     reader.readAsArrayBuffer(blob);
-    //     reader.onload = () => {
-    //         const data = new Uint8Array(reader.result);
-    //         const wb = xlsx.read(data, { type: "array" });
-
-    //         let sheet = wb.SheetNames[0];
-    //         readFileBySheet({ sheet, workbook: wb });
-    //     };
-    // };
-
-    // const readFileBySheet = ({ sheet, workbook }) => {
-    //     const json = xlsx.utils.sheet_to_json(workbook.Sheets[sheet], {
-    //         raw: true,
-    //         defval: null,
-    //     });
-    //     console.log("json", json)
-    // };
+    const multiDataSet = [
+        {
+            columns: [
+                { title: "Headings", width: { wpx: 300 } },//pixels width 
+                { title: "Text Style", width: { wch: 40 } },//char width 
+                { title: "Colors", width: { wpx: 90 } },
+            ],
+            data: [
+                [
+                    { value: "H1", width: { wpx: 300 }, style: { font: { sz: "24", bold: true } }, width: 200 },
+                    { value: "Bold", style: { font: { bold: true } } },
+                    { value: "Red", style: { fill: { patternType: "solid", fgColor: { rgb: "FFFF0000" } } } },
+                ],
+                [
+                    { value: "H2", style: { font: { sz: "18", bold: true } } },
+                    { value: "underline", style: { font: { underline: true } } },
+                    { value: "Blue", style: { fill: { patternType: "solid", fgColor: { rgb: "FF0000FF" } } } },
+                ],
+                [
+                    { value: "H3", style: { font: { sz: "14", bold: true } } },
+                    { value: "italic", style: { font: { italic: true } } },
+                    { value: "Green", style: { fill: { patternType: "solid", fgColor: { rgb: "FF00FF00" } } } },
+                ],
+                [
+                    { value: "H4", style: { font: { sz: "12", bold: true } } },
+                    { value: "strike", style: { font: { strike: true } } },
+                    { value: "Orange", style: { fill: { patternType: "solid", fgColor: { rgb: "FFF86B00" } } } },
+                ],
+                [
+                    { value: "H5", style: { font: { sz: "10.5", bold: true } } },
+                    { value: "outline", style: { font: { outline: true } } },
+                    { value: "Yellow", style: { fill: { patternType: "solid", fgColor: { rgb: "FFFFFF00" } } } },
+                ],
+                [
+                    { value: "H6", style: { font: { sz: "7.5", bold: true } } },
+                    { value: "shadow", style: { font: { shadow: true } } },
+                    { value: "Light Blue", style: { fill: { patternType: "solid", fgColor: { rgb: "FFCCEEFF" } } } }
+                ]
+            ]
+        }
+    ];
 
     const GetCompany = async (value) => {
         try {
@@ -144,6 +167,55 @@ export default function RicefHeader({ name, ...props }) {
         }
     }
 
+    const GetRicefExport = async (value) => {
+        try {
+            const exportexcel = await Axios({
+                url: process.env.REACT_APP_API_URL + "/ricef/export-ricef",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    batchid: value
+                }
+            });
+            if (exportexcel.status === 200) {
+                setExceldata(exportexcel.data)
+
+            }
+        } catch (error) {
+
+        }
+    }
+
+    const ExportExcel = () => {
+        return (
+            <>
+                <ExcelFile
+                    filename="RICEF"
+                    element={<Button icon={<DownloadOutlined />} > Excel Download</Button>}
+                >
+                    {/* <ExcelSheet dataSet={multiDataSet} name="Organization"/> */}
+                    <ExcelSheet data={exceldata} name="Ricef">
+                        <ExcelColumn label="No" value="RowNo" />
+                        <ExcelColumn label="Issue" value="IssueNumber" style={{ width: { wpx: "300" } }} />
+                        <ExcelColumn label="Product" value="ProductName"/>
+                        <ExcelColumn label="Module" value="ModuleName"/>
+                        <ExcelColumn label="Type" value="IssueType" wpx="300" />
+                        <ExcelColumn label="Priority" value="Priority" />
+                        <ExcelColumn label="Title" value="Title" />
+                        <ExcelColumn label="Description" value="Description" />
+                        <ExcelColumn label="Status" value="Status" />
+                        <ExcelColumn label="Manday" value="Manday" />
+                        <ExcelColumn label="DueDate" value="DueDate" />
+                        <ExcelColumn label="Owner" value="OwnerName" />
+                        <ExcelColumn label="UnitTest_URL" value="UnitTest_URL" style={{ width: 300 }} />
+                    </ExcelSheet>
+                </ExcelFile>
+            </>
+        )
+    }
+
     const onFinish = (values) => {
         console.log('Success:', values.excel_import.file, values.excel_import.fileList);
         Modal.info({
@@ -179,7 +251,10 @@ export default function RicefHeader({ name, ...props }) {
 
     }, [loading])
 
-    console.log("listRicef?.length", listRicef?.length)
+    useEffect(() => {
+        GetRicefExport()
+    }, [])
+
     return (
         <MasterPage>
             <Row>
@@ -238,7 +313,7 @@ export default function RicefHeader({ name, ...props }) {
                                     <>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                            <label style={{fontWeight:"bold"}}>Total</label>
+                                                <label style={{ fontWeight: "bold" }}>Total</label>
                                             </Col>
                                             <Col span={6}>
                                                 <Button type="link"
@@ -250,7 +325,7 @@ export default function RicefHeader({ name, ...props }) {
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                            <label >Open</label>
+                                                <label >Open</label>
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntOpen}
@@ -258,8 +333,8 @@ export default function RicefHeader({ name, ...props }) {
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                            <label style={{color:"#2db7f5"}}>InProgress</label>
-                                                
+                                                <label style={{ color: "#2db7f5" }}>InProgress</label>
+
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntInprogress}
@@ -267,8 +342,8 @@ export default function RicefHeader({ name, ...props }) {
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                            <label style={{color:"#f50"}}>Resolved</label>
-                                                
+                                                <label style={{ color: "#f50" }}>Resolved</label>
+
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntResolved}
@@ -276,23 +351,27 @@ export default function RicefHeader({ name, ...props }) {
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                            <label style={{color:"#87d068"}}>Complete</label>
-                                                
+                                                <label style={{ color: "#87d068" }}>Complete</label>
+
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntComplete}
                                             </Col>
                                         </Row>
-                                        <Row>
-                                            <Col span={18} style={{ textAlign: "left" }}>
-                                            <label style={{color:"#87d068"}}>Next Version</label>
-                                                
-                                            </Col>
-                                            <Col span={6}>
-                                               1
-                                            </Col>
-                                        </Row>
 
+                                    </>
+                                )
+                            }
+                            }
+                        />
+                        <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
+                            width="10%"
+                            align="center"
+                            render={(record) => {
+                                return (
+                                    <>
+                                        <Button onClick={() => GetRicefExport(record.BatchId)}>GET Data</Button>
+                                        {ExportExcel()}
                                     </>
                                 )
                             }
@@ -338,9 +417,9 @@ export default function RicefHeader({ name, ...props }) {
                         <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
-
-
             </Modal>
+
+
         </MasterPage>
     )
 }

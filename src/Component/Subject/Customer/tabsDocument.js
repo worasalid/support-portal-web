@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState, useRef } from 'react'
-import { Button, Modal, Table, Tabs, Row } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Button, Table, Tabs} from 'antd'
 import Axios from 'axios'
-import { useRouteMatch, useHistory } from 'react-router-dom'
+//import { useRouteMatch, useHistory } from 'react-router-dom'
 import Column from 'antd/lib/table/Column';
 import { DownCircleOutlined, DownloadOutlined, UpCircleOutlined } from '@ant-design/icons';
 import moment from "moment"
@@ -10,8 +10,8 @@ import moment from "moment"
 const { TabPane } = Tabs;
 
 export default function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
-    const history = useHistory();
-    const match = useRouteMatch();
+    //const history = useHistory();
+    //const match = useRouteMatch();
 
     //data
 

@@ -2,7 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button, Table, Modal } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom';
+//import { useHistory } from 'react-router-dom';
 import MasterPage from '../MasterPage'
 
 const { Column } = Table;
@@ -17,7 +17,7 @@ export default function MapCompany() {
     const [visible, setVisible] = useState(false);
 
     const [userdata, setUserdata] = useState();
-    const [selectionType, setSelectionType] = useState('checkbox');
+    //const [selectionType, setSelectionType] = useState('checkbox');
     const [loading, setLoading] = useState(false)
     const [binding, setBinding] = useState(false)
 

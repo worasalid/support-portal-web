@@ -1,9 +1,8 @@
-import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Modal, Rate, Form, Input } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
-import UploadFile from '../../UploadFile'
+import React, { useState, useContext, useEffect } from 'react';
+import { Modal, Form, Input } from 'antd';
+
 import Axios from 'axios';
-import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
+//import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import { useHistory } from 'react-router-dom';
 
 const { TextArea } = Input;
@@ -11,8 +10,8 @@ const { TextArea } = Input;
 
 export default function ModalCancelIssue({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
-    const [textValue, setTextValue] = useState("")
-    const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+    // const [textValue, setTextValue] = useState("")
+    //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
 
 

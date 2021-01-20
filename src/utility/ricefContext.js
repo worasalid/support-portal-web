@@ -16,7 +16,8 @@ export const ricefState = {
     companyState: [],
     productState: [],
     moduleState: [],
-    TypeState: [],
+    typeState: [],
+    progressState: [],
     priorityState: [],
     date: {
       startdate: "",
@@ -25,6 +26,7 @@ export const ricefState = {
     keyword: ""
   },
   search: false,
+  loading: false,
   assignee: [],
   recefdetail: []
 }
@@ -35,9 +37,11 @@ export const ricefReducer = createReducer(ricefState, {
   SELECT_MODULE: (state, { payload }) => { state.filter.moduleState = payload },
   SELECT_TYPE: (state, { payload }) => { state.filter.TypeState = payload },
   SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
+  SELECT_PROGRESS: (state, { payload }) => { state.filter.progressState = payload },
   SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
   SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
   SEARCH: (state, { payload }) => { state.search = payload },
+  LOADING: (state, { payload }) => { state.loading = payload },
 
   LOAD_COMPANY: (state, { payload }) => { state.masterdata.companyState = payload },
   LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },

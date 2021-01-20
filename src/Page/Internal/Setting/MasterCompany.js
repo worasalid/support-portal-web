@@ -15,7 +15,7 @@ export default function MasterCompany() {
     //data
     const [listcompany, setListcompany] = useState([]);
     const [selectcompany, setSelectcompany] = useState(null);
-    const [companyid, setCompanyid] = useState(null);
+    //const [companyid, setCompanyid] = useState(null);
 
     const GetCompany = async (value) => {
         console.log("value", value)

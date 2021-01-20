@@ -126,7 +126,6 @@ export default function MasterPage(props) {
 
   }, [])
 
-  console.log("state", state?.usersdata?.users?.profile_image)
 
   return (
     <Layout style={{ height: "100vh" }}>
