@@ -9,26 +9,47 @@ export default function NormalLoginForm() {
   const { state, dispatch } = useContext(AuthenContext);
   const history = useHistory();
 
+  // const onFinish = async (value) => {
+  //   try {
+  //     const result = await axios({
+  //       url: process.env.REACT_APP_API_URL + "/auth",
+  //       method: "POST",
+  //       data: {
+  //         email: value.username,
+  //         password: btoa(value.password)
+  //       },
+  //     });
+
+  //     localStorage.setItem("sp-ssid", result.data);
+  //     dispatch({ type: 'Authen', payload: true });
+  //     dispatch({ type: 'LOGIN', payload: result.data.users });
+  //     history.push("/internal/issue/mytask");
+  //   } catch (error) {
+  //     alert("ข้อมููลไม่ถูกต้อง");
+  //   }
+  // };
+
   const onFinish = async (value) => {
     try {
       const result = await axios({
-        url: process.env.REACT_APP_API_URL + "/auth",
+        url: process.env.REACT_APP_API_URL + "/auth/user",
         method: "POST",
-        data: { email: value.username },
+        data: {
+          email: value.username,
+          password: btoa(value.password)
+        },
       });
 
-       localStorage.setItem("sp-ssid", result.data);
-      //localStorage.setItem("sp-ssid", result.data.ssid);
+      localStorage.setItem("sp-ssid", result.data);
       dispatch({ type: 'Authen', payload: true });
-       dispatch({ type: 'LOGIN', payload: result.data.users });
-      //dispatch({ type: 'LOGIN', payload: result.data.usersdata.users });
+      dispatch({ type: 'LOGIN', payload: result.data.users });
       history.push("/internal/issue/mytask");
     } catch (error) {
       alert("ข้อมููลไม่ถูกต้อง");
     }
   };
 
-  console.log("sssss")
+
 
   return (
     <div
@@ -42,7 +63,7 @@ export default function NormalLoginForm() {
       }}
     >
       <Form
-        style={{ padding: 32, maxWidth: 480,height: 500, backgroundColor: "white" }}
+        style={{ padding: 32, maxWidth: 480, height: 500, backgroundColor: "white" }}
         name="normal_login"
         className="login-form"
         initialValues={{
@@ -53,7 +74,7 @@ export default function NormalLoginForm() {
       >
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
           <img src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
-            alt="" style={{ height: "100px",width: "200px" }} />
+            alt="" style={{ height: "100px", width: "200px" }} />
         </div>
 
         <h2

@@ -10,6 +10,8 @@ export default function Historylog() {
     const match = useRouteMatch();
     const [historylog, setHistorylog] = useState([]);
 
+
+
     const GetHistoryLog = async () => {
         try {
             const historylog = await Axios({
@@ -32,7 +34,8 @@ export default function Historylog() {
                         value: values.Value,
                         value2: values.Value2,
                         historytype: values.HistoryType,
-                        usertype: values.UserType
+                        usertype: values.UserType,
+                        avatar: values.ProfileImage
                     }
                 }));
             }
@@ -53,7 +56,8 @@ export default function Historylog() {
             renderItem={item => (
                 <List.Item>
                     <List.Item.Meta
-                        avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                        //avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                        avatar={<Avatar src={item.avatar}  />}
                         title={
                             <>
                             {(item.usertype === "user" ? <label style={{marginRight: "6px"}}>(ICON)</label>  :"") }

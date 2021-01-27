@@ -57,7 +57,7 @@ export default function MasterPage(props) {
   const getuser = async () => {
     try {
       const result = await Axios({
-        url: process.env.REACT_APP_API_URL + "/auth/customer/me",
+        url: process.env.REACT_APP_API_URL + "/auth/user/me",
         method: "get",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -83,8 +83,8 @@ export default function MasterPage(props) {
         }
       });
       masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in").length });
-      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "InProgress" || x.InternalStatus === "ReOpen")).length });
-      masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.InternalStatus === "Resolved" || x.InternalStatus === "Pass" || x.InternalStatus === "Deploy")).length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Resolved" || x.GroupStatus === "Pass" || x.GroupStatus === "Deploy")).length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length });
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.InternalStatus === "Complete").length })
 
@@ -126,96 +126,115 @@ export default function MasterPage(props) {
 
   }, [])
 
-
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header style={{ backgroundColor: "#0099FF" }}>
-        <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']} style={{ backgroundColor: "#0099FF" }}>
-          <Row>
-            <Col span={12}>
+      {/* <Header style={{ backgroundColor: "#be1e2d" }}> */}
+      {/* <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']} style={{ backgroundColor: "#0099FF" }}> */}
+      <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']}
+        style={{
+          backgroundColor: "#be1e2d",
+          height: "60px",
+          boxshadow: "0 30px 500px rgba(0,0,0,75)"
+        }}>
+        <Row>
+          <Col span={12}>
+            <img
+              style={{ height: "60px", width: "130px" }}
+              src={`${process.env.PUBLIC_URL}/logo-space02.png`}
+              alt=""
+            />
+          </Col>
+          <Col span={12} style={{ textAlign: "right" }}>
 
-              {/* {collapsed ? <MenuUnfoldOutlined onClick={toggle} /> : <MenuFoldOutlined onClick={toggle} />} */}
-              <img
-                style={{ height: "35px" }}
-                src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
-                alt=""
-              />
-            </Col>
-            <Col span={12} style={{ textAlign: "right" }}>
+            <Tooltip title="Notifications">
+              <Dropdown
+                placement="bottomCenter"
+                overlayStyle={{ width: 500, height: 400 }}
+                overlay={(
+                  <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
+                    <Menu.Item key="1" onClick={() => alert("Profile")}>
+                      <div style={{ height: "50vh", overflowY: "scroll" }}>
+                        <Row style={{ padding: 16 }}>
+                          <Col span={24}>
+                            <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
 
-              <Tooltip title="Notifications">
-                <Dropdown
-                  placement="bottomCenter"
-                  overlayStyle={{ width: 500, height: 400 }}
-                  overlay={(
-                    <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
-                      <Menu.Item key="1" onClick={() => alert("Profile")}>
-                        <div style={{ height: "50vh", overflowY: "scroll" }}>
-                          <Row style={{ padding: 16 }}>
-                            <Col span={24}>
-                              <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
+                          </Col>
+                        </Row>
+                      </div>
+                    </Menu.Item>
+                  </Menu>
+                )} trigger="click">
 
-                            </Col>
-                          </Row>
-                        </div>
+                <Button type="text" style={{ marginRight: 20 }} size="middle"
+                  icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
+                >
+                </Button>
+              </Dropdown>
+            </Tooltip>
+
+            <Tooltip title="User Profile">
+              <Dropdown
+
+                placement="topCenter"
+                overlayStyle={{ width: 200, boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px" }}
+                overlay={(
+                  <Menu mode="inline" theme="light" onMouseOver="">
+                    <Button type="text">{state.usersdata && `${state.usersdata?.users.first_name} ${state.usersdata?.users.last_name}`}</Button> <br />
+                    <hr />
+                    <Menu.Item key="1" onClick={() => history.push({ pathname: "/internal/user/profile" })}>
+                      Profile
                       </Menu.Item>
-                    </Menu>
-                  )} trigger="click">
-
-                  <Button type="text" style={{ marginRight: 20 }} size="middle"
-                    icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
-                  >
-                  </Button>
-                </Dropdown>
-              </Tooltip>
-
-              <Tooltip title="User Profile">
-                <Dropdown
-                  placement="topCenter"
-                  overlayStyle={{ width: 200, boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px" }}
-                  overlay={(
-                    <Menu mode="inline" theme="light" onMouseOver="">
-                      <Button type="text">{state.usersdata && `${state.usersdata?.users.first_name} ${state.usersdata?.users.last_name}`}</Button> <br />
-                      <hr />
-                      <Menu.Item key="1" onClick={() => history.push({ pathname: "/internal/user/profile" })}>
-                        Profile
+                    <Menu.Item key="2" onClick={() => alert("Setting")}>
+                      Setting
                       </Menu.Item>
-                      <Menu.Item key="2" onClick={() => alert("Setting")}>
-                        Setting
-                      </Menu.Item>
-                      <hr />
-                      <Button type="link" onClick={() => history.push("/Login")}>Log Out</Button> <br />
-                    </Menu>
-                  )} trigger="click">
+                    <hr />
+                    <Button type="link" onClick={() => history.push("/Login")}>Log Out</Button> <br />
+                  </Menu>
+                )} trigger="click">
 
-                  <Button type="text" ghost >
-                    {/* <Avatar style={{ backgroundColor: '#87d068', display: state?.usersdata?.users?.profile_image !== "" ? "block" : "none"}}
-                      size={48} src={state?.usersdata?.users?.profile_image} /> */}
-                    {/* <Avatar  style={{ backgroundColor: '#87d068', display: state?.usersdata?.users?.profile_image === undefined ? "block" : "none"}}
-                      size={48} icon={<UserOutlined />} /> */}
+                <Button type="text" ghost style={{ display: state?.usersdata?.users?.profile_image !== "" ? "inline-block" : "none" }}>
+                  <div >
+                    <Avatar size={48} src={state?.usersdata?.users?.profile_image}
+                      icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}
+                    />
+                  </div>
+                </Button>
 
-                    <Avatar 
-                      size={48} icon={<UserOutlined />} />
-                  </Button>
+              </Dropdown>
+              <label
+                style={{ display: state.usersdata !== "" ? "inline-block" : "none" }}
+                className="user-login">
+                {state.usersdata && `${state.usersdata?.users.first_name} ${state.usersdata?.users.last_name}`}
+              </label>
+            </Tooltip>
 
-
-                </Dropdown>
-                &nbsp;<label className="user-login">{state.usersdata && `${state.usersdata?.users.first_name} ${state.usersdata?.users.last_name}`}</label>
-              </Tooltip>
-
-            </Col>
-          </Row>
-        </Menu>
-      </Header>
-      <Layout>
-        <Sider theme="light" style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5" }} width={200}>
-          <Menu theme="light" mode="inline"
+          </Col>
+        </Row>
+      </Menu>
+      {/* </Header> */}
+      <Layout style={{ backgroundColor: "#edebec" }}>
+        <Sider theme="light"
+          style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
+          width={200}
+        >
+          <Menu theme="light"
+            style={{ backgroundColor: "#edebec" }}
+            mode="inline"
             defaultOpenKeys={activemenu}
             defaultSelectedKeys={active_submenu}
 
           >
-            <SubMenu key="sub1" icon={<FileOutlined />} title="Issue">
-              <Menu.Item key="1" onClick={() => history.push({ pathname: '/internal/issue/mytask' })}>
+            <SubMenu key="sub1" icon={<FileOutlined />} title="Issue" >
+              <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/alltask' })} >
+                All Task
+                {/* {
+                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
+
+                } */}
+              </Menu.Item>
+              <Menu.Item key="1" onClick={() => history.push({ pathname: '/internal/issue/mytask' })} >
                 My Task
                 {
                   masterstate.toolbar.sider_menu.issue.mytask.count === 0
@@ -224,7 +243,7 @@ export default function MasterPage(props) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="2" onClick={() => history.push('/internal/issue/inprogress')}>
+              <Menu.Item key="2" onClick={() => history.push('/internal/issue/inprogress')} >
                 In progress
                 {
                   masterstate.toolbar.sider_menu.issue.inprogress.count === 0
@@ -234,7 +253,7 @@ export default function MasterPage(props) {
                 }
               </Menu.Item>
 
-              <Menu.Item key="3" onClick={() => history.push('/internal/issue/resolved')}>
+              <Menu.Item key="3" onClick={() => history.push('/internal/issue/resolved')} >
                 Resolved
                 {
                   masterstate.toolbar.sider_menu.issue.resolved.count === 0
@@ -243,7 +262,7 @@ export default function MasterPage(props) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="4" onClick={() => history.push('/internal/issue/cancel')}>
+              <Menu.Item key="4" onClick={() => history.push('/internal/issue/cancel')} >
                 Cancel
                 {
                   masterstate.toolbar.sider_menu.issue.cancel.count === 0

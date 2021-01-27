@@ -42,7 +42,7 @@ export default function MyTask() {
             });
             if (details.status === 200) {
                 setRicef(details.data)
-        
+
             }
         } catch (error) {
 
@@ -63,16 +63,14 @@ export default function MyTask() {
         ricefdispatch({ type: "SEARCH", payload: false })
     }, [ricefstate.search]);
 
-    console.log("startdate",moment(ricefstate?.filter?.date?.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"))
 
     return (
         <MasterPage>
-            <Button type="link"
-                onClick={() => history.goBack()}
-            >
-                <LeftCircleOutlined />
-
-            </Button>
+            <Row style={{ marginBottom: 16, textAlign: "left" }}>
+                <Col span={24}>
+                    <label style={{ fontSize: 20, verticalAlign: "top" }}>GAP Document</label>
+                </Col>
+            </Row>
 
             <RicefSearch />
 

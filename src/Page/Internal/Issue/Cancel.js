@@ -32,6 +32,9 @@ export default function Cancel() {
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent,setPageCurrent] = useState(1);
+  const [pageSize,setPageSize] = useState(10);
+  const [pageTotal,setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
 
@@ -52,14 +55,16 @@ export default function Cancel() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "Cancel"
+          task: "Cancel",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
 
-        // masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
-        userdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
     } catch (error) {
 
@@ -125,7 +130,19 @@ export default function Cancel() {
           <Col span={24}>
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
+              pagination={{ pageSize: pageSize, total:pageTotal }}
               style={{ padding: "5px 5px" }}
+              onChange={(x) => {return( setPageCurrent(x.current), setPageSize(x.pageSize))} }
+              footer={(x) => {
+                return (
+                  <>
+                  <div style={{textAlign:"right"}}>
+                    <label>จำนวนเคส : </label>
+                    <label>{x.length}</label>
+                  </div>
+                  </>
+                )
+              }}
               onRow={(record, rowIndex) => {
                 // console.log(record, rowIndex)
                 return {

@@ -35,6 +35,9 @@ export default function Resolved() {
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent,setPageCurrent] = useState(1);
+  const [pageSize,setPageSize] = useState(10);
+  const [pageTotal,setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
 
@@ -55,14 +58,16 @@ export default function Resolved() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "Resolved"
+          task: "Resolved",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
 
-        // masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
-        userdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
     } catch (error) {
 
@@ -78,7 +83,7 @@ export default function Resolved() {
     }, 1000)
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
+  }, [userstate.search,pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -94,6 +99,8 @@ export default function Resolved() {
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
+              pagination={{ pageSize: pageSize, total:pageTotal }}
+              onChange={(x) => {return( setPageCurrent(x.current), setPageSize(x.pageSize))} }
               onRow={(record, rowIndex) => {
                 // console.log(record, rowIndex)
                 return {

@@ -174,19 +174,19 @@ export default function RicefSearch() {
                         maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
-                        dropdownRender={(value) => (
-                            <div >
-                                <Row>
-                                    <Col>
-                                        {value}
-                                    </Col>
-                                    <Col>
+                        // dropdownRender={(value) => (
+                        //     <div >
+                        //         <Row>
+                        //             <Col>
+                        //                 {value}
+                        //             </Col>
+                        //             <Col>
 
-                                    </Col>
-                                </Row>
-                            </div>
-                        )
-                        }
+                        //             </Col>
+                        //         </Row>
+                        //     </div>
+                        // )
+                        // }
                     />
                 </Col>
                 <Col span={4}>

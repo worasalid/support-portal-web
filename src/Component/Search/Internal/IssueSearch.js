@@ -23,6 +23,7 @@ export default function Issuesearch() {
             userdispatch({ type: "SELECT_TYPE", payload: e.target.value })
         }
         if (e.target.group === "product") {
+            console.log("product",e.target.value)
             userdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
         }
         if (e.target.group === "module") {
@@ -107,6 +108,7 @@ export default function Issuesearch() {
         }
     }, [userstate.filter.productState]);
 
+
     return (
         <>
 
@@ -149,22 +151,22 @@ export default function Issuesearch() {
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        maxTagCount={1}
+                        //maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
                         options={userstate.masterdata && userstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
-                        dropdownRender={(value) => (
-                            <div >
-                                <Row>
-                                    <Col>
-                                        {value}
-                                    </Col>
-                                    <Col>
+                        // dropdownRender={(value) => (
+                        //     <div >
+                        //         <Row>
+                        //             <Col>
+                        //                 {value}
+                        //             </Col>
+                        //             <Col>
 
-                                    </Col>
-                                </Row>
-                            </div>
-                        )
-                        }
+                        //             </Col>
+                        //         </Row>
+                        //     </div>
+                        // )
+                        // }
                     />
                 </Col>
                 <Col span={4}>

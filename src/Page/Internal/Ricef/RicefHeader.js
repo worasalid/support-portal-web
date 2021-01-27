@@ -180,7 +180,9 @@ export default function RicefHeader({ name, ...props }) {
                 }
             });
             if (exportexcel.status === 200) {
-                setExceldata(exportexcel.data)
+                setExceldata(exportexcel.data);
+                ExportExcel(exportexcel.data)
+
 
             }
         } catch (error) {
@@ -188,33 +190,57 @@ export default function RicefHeader({ name, ...props }) {
         }
     }
 
-    const ExportExcel = () => {
-        return (
-            <>
-                <ExcelFile
-                    filename="RICEF"
-                    element={<Button icon={<DownloadOutlined />} > Excel Download</Button>}
-                >
-                    {/* <ExcelSheet dataSet={multiDataSet} name="Organization"/> */}
-                    <ExcelSheet data={exceldata} name="Ricef">
-                        <ExcelColumn label="No" value="RowNo" />
-                        <ExcelColumn label="Issue" value="IssueNumber" style={{ width: { wpx: "300" } }} />
-                        <ExcelColumn label="Product" value="ProductName"/>
-                        <ExcelColumn label="Module" value="ModuleName"/>
-                        <ExcelColumn label="Type" value="IssueType" wpx="300" />
-                        <ExcelColumn label="Priority" value="Priority" />
-                        <ExcelColumn label="Title" value="Title" />
-                        <ExcelColumn label="Description" value="Description" />
-                        <ExcelColumn label="Status" value="Status" />
-                        <ExcelColumn label="Manday" value="Manday" />
-                        <ExcelColumn label="DueDate" value="DueDate" />
-                        <ExcelColumn label="Owner" value="OwnerName" />
-                        <ExcelColumn label="UnitTest_URL" value="UnitTest_URL" style={{ width: 300 }} />
-                    </ExcelSheet>
-                </ExcelFile>
-            </>
-        )
+    const ExportExcel = (json) => {
+        if (json !== undefined) {
+            let ws = xlsx.utils.json_to_sheet(json.map((x) => {
+                return {
+                    No: x.RowNo,
+                    Issue: x.IssueNumber,
+                    Product: x.ProductName,
+                    Module: x.ModuleName,
+                    Type: x.IssueType,
+                    Priority: x.Priority,
+                    Title: x.Title,
+                    Description: x.Description,
+                    Status: x.Status,
+                    Manday: x.Manday,
+                    DueDate: x.DueDate,
+                    Owner: x.Owner,
+                    UnitTest_URL: x.UnitTest_URL
+
+                }
+            }));
+            let wb = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(wb, ws, 'RICEF');
+            xlsx.writeFile(wb, `RICEF - ${moment().format("YYMMDD_HHmm")}.xlsx`);
+        }
     }
+    // const ExportExcel = () => {
+    //     return (
+    //         <>
+    //             <ExcelFile
+    //                 filename="RICEF"
+    //                 element={<Button icon={<DownloadOutlined />} > Excel Download</Button>}
+    //             >
+    //                 <ExcelSheet data={exceldata} name="Ricef">
+    //                     <ExcelColumn label="No" value="RowNo" />
+    //                     <ExcelColumn label="Issue" value="IssueNumber" style={{ width: { wpx: "300" } }} />
+    //                     <ExcelColumn label="Product" value="ProductName" />
+    //                     <ExcelColumn label="Module" value="ModuleName" />
+    //                     <ExcelColumn label="Type" value="IssueType" wpx="300" />
+    //                     <ExcelColumn label="Priority" value="Priority" />
+    //                     <ExcelColumn label="Title" value="Title" />
+    //                     <ExcelColumn label="Description" value="Description" />
+    //                     <ExcelColumn label="Status" value="Status" />
+    //                     <ExcelColumn label="Manday" value="Manday" />
+    //                     <ExcelColumn label="DueDate" value="DueDate" />
+    //                     <ExcelColumn label="Owner" value="OwnerName" />
+    //                     <ExcelColumn label="UnitTest_URL" value="UnitTest_URL" style={{ width: 300 }} />
+    //                 </ExcelSheet>
+    //             </ExcelFile>
+    //         </>
+    //     )
+    // }
 
     const onFinish = (values) => {
         console.log('Success:', values.excel_import.file, values.excel_import.fileList);
@@ -252,25 +278,24 @@ export default function RicefHeader({ name, ...props }) {
     }, [loading])
 
     useEffect(() => {
-        GetRicefExport()
+        // GetRicefExport()
     }, [])
 
     return (
         <MasterPage>
             <Row>
                 <Col span={24}>
-                    <Button type="link"
-                        onClick={() => history.goBack()}
-                    >
-                        <LeftCircleOutlined />
 
-                    </Button>
                 </Col>
             </Row>
 
             <Row>
                 <Col span={24}>
-                    {/* {company && company[0].Name} */}
+                    <Button type="link"
+                        onClick={() => history.push('/internal/ricef')}
+                    >
+                        <LeftCircleOutlined style={{ fontSize: 30 }} title="Back" />
+                    </Button>
                     <label style={{ fontSize: 20, verticalAlign: "top" }}>{company && company[0].FullNameTH}</label>
 
                 </Col>
@@ -279,16 +304,31 @@ export default function RicefHeader({ name, ...props }) {
             <Row style={{ textAlign: "right" }}>
                 <Col span={24}>
                     <Button
-                        type="default"
-                        icon={<UploadOutlined />}
-                        style={{ marginRight: 20 }} type="primary" onClick={() => setVisible(true)}>
-                        Import
+                        type="link"
+                        style={{ marginRight: 20 }}
+                        onClick={() => setVisible(true)}>
+                        <img
+                            style={{ height: "35px" }}
+                            src={`${process.env.PUBLIC_URL}/icons-xls-import.png`}
+                            alt="Import File"
+                        />
+                        <label>Import File</label>
+
                     </Button>
+
                     <Button
-                        type="default"
-                        icon={<DownloadOutlined />}
-                        target="_blank" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1txcydTJ4PVCFJ_ElKuuhWk_5sz0Metux&export=download", "_blank")}>
-                        DownLoad Templete
+                        type="link"
+                        // icon={<DownloadOutlined />}
+                        target="_blank"
+                        onClick={() => window.open("https://drive.google.com/u/0/uc?id=1txcydTJ4PVCFJ_ElKuuhWk_5sz0Metux&export=download", "_blank")}
+                    >
+                        <img
+                            style={{ height: "35px" }}
+                            src={`${process.env.PUBLIC_URL}/icons-export-excel-Templete.png`}
+                            alt="DownLoad Templete"
+                        />
+                        <label> DownLoad Templete</label>
+
                     </Button>
                 </Col>
             </Row>
@@ -297,7 +337,27 @@ export default function RicefHeader({ name, ...props }) {
                 <Col span={24}>
                     <Table dataSource={listRicef} loading={loading}>
                         {/* <Column align="center" title="No" width="2%" key="1" dataIndex="1" /> */}
-                        <Column align="center" title="GAP Document" width="40%" dataIndex="Description" />
+                        <Column align="center" title="GAP Document" width="40%" dataIndex=""
+                            render={(record) => {
+                                return (
+                                    <>
+                                        <div style={{ textAlign: "left" }}>
+                                            <label >
+                                                {record.Description}
+                                            </label>
+                                        </div>
+                                        <div style={{ textAlign: "left" }}>
+                                            <label className="table-column-detail"
+                                                onClick={() => history.push({ pathname: "/internal/ricef/comp-" + match.params.compid + "/batch-" + record.BatchId })}
+                                            >
+                                                รายละเอียด
+                                            </label>
+                                        </div>
+                                    </>
+                                )
+                            }}
+
+                        />
                         <Column align="center" title="วันที่" width="10%" dataIndex=""
                             render={(record) => {
                                 return (
@@ -364,14 +424,23 @@ export default function RicefHeader({ name, ...props }) {
                             }
                             }
                         />
-                        <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
+                        <Column
+                            //title={<DownloadOutlined style={{ fontSize: 30 }} />}
                             width="10%"
                             align="center"
                             render={(record) => {
                                 return (
                                     <>
-                                        <Button onClick={() => GetRicefExport(record.BatchId)}>GET Data</Button>
-                                        {ExportExcel()}
+                                        <Button type="link" onClick={() => GetRicefExport(record.BatchId)}
+                                            title="Excel Export"
+                                        >
+                                            <img
+                                                style={{ height: "35px" }}
+                                                src={`${process.env.PUBLIC_URL}/icons-export-excel.png`}
+                                                alt="Excel Export"
+                                            />
+
+                                        </Button>
                                     </>
                                 )
                             }

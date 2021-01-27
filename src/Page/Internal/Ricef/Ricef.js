@@ -14,66 +14,66 @@ export default function Ricef() {
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState(false);
     //data
+    const [mastercompany, setMastercompany] = useState([]);
     const [listcompany, setListcompany] = useState([]);
-    const [selectcompany, setSelectcompany] = useState([]);
+    const [selectcompany, setSelectcompany] = useState(null);
 
-    const GetCompany = async (value) => {
+    const GetCompany = async () => {
         try {
             const company_all = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/load-company",
+                url: process.env.REACT_APP_API_URL + "/ricef/company-ricef",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                }
+            });
+
+            if (company_all.status === 200) {
+                setMastercompany(company_all.data)
+              
+            }
+        } catch (error) {
+
+        }
+    }
+    const GetCompanyRicef = async (value) => {
+        try {
+            const result = await Axios({
+                url: process.env.REACT_APP_API_URL + "/ricef/load-company",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    companyid: []
+                    companyid: selectcompany && selectcompany
                 }
 
             });
 
-            if (company_all.status === 200) {
-                setListcompany(company_all.data)
+            if (result.status === 200) {
+                setListcompany(result.data)
                 setTimeout(() => {
                     setLoading(false)
                 }, 500)
             }
-
-            // const companyby_id = await Axios({
-            //     url: process.env.REACT_APP_API_URL + "/master/load-company",
-            //     method: "GET",
-            //     headers: {
-            //         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            //     },
-            //     params:{
-            //         companyid: selectcompany && selectcompany
-            //     }
-            // });
-
-            // if (companyby_id.status === 200) {
-            //     setListcompany(companyby_id.data)
-            // }
-
-
         } catch (error) {
 
         }
     }
 
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         GetCompany()
-    //         setSearch(false)
-    //     }, 1000)
-    // }, [])
+    useEffect(() => {
+        GetCompany()
+    }, [])
 
     useEffect(() => {
         setTimeout(() => {
-            GetCompany()
+            GetCompanyRicef()
             setSearch(false)
         }, 1000)
 
     }, [search])
 
+    console.log("selectcompany", selectcompany)
 
     return (
         <MasterPage>
@@ -85,9 +85,10 @@ export default function Ricef() {
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        maxTagCount={3}
                         style={{ width: "100%" }}
-                        options={listcompany.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
-                        onChange={(value, item) => { console.log("onChange", item); setSelectcompany(item)  }}
+                        options={mastercompany.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
+                        onChange={(value, item) => setSelectcompany(value)}
                     >
 
                     </Select>
@@ -103,7 +104,17 @@ export default function Ricef() {
             <Table dataSource={listcompany} loading={loading}>
                 <Column title="Code" width="10%" dataIndex="Code" />
                 <Column title="CompanyName" width="15%" dataIndex="Name" />
-                <Column title="FullName" width="50%" dataIndex="FullNameTH" />
+                <Column title="FullName" width="50%" dataIndex=""
+                    render={(record) => {
+                        return (
+                            <>
+                                <label> {record.FullNameTH}</label>  <br />
+                                <label className="value-text"> {record.FullNameEN}</label>
+
+                            </>
+                        )
+                    }}
+                />
                 <Column title="GAP Documnet" width="15%" dataIndex="" />
                 <Column title=""
                     align="center"

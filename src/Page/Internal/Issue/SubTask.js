@@ -1,4 +1,4 @@
-import { Col, Tag, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Popconfirm } from "antd";
+import { Col, Tag, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Result } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -264,8 +264,33 @@ export default function SubTask() {
 
   }, [historyduedate_visible])
 
+  if (userstate.taskdata.data.length === 0) {
+    return (
+      <MasterPage>
+       <Result
+          status="403"
+          title="403"
+          subTitle="Sorry, you are not authorized to access this page."
+          extra={<Button type="primary">Back Home</Button>}
+        />
+      </MasterPage>
+    )
+
+  }
+
   return (
     <MasterPage>
+
+      {/* {
+
+        <Result
+          status="403"
+          title="403"
+          subTitle="Sorry, you are not authorized to access this page."
+          extra={<Button type="primary">Back Home</Button>}
+        />
+      } */}
+
       <div style={{ height: "100%" }} >
         <div className="scrollable-container" ref={setContainer} >
           <Affix target={() => container}>

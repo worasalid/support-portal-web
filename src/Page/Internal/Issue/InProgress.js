@@ -36,6 +36,9 @@ export default function InProgress() {
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent,setPageCurrent] = useState(1);
+  const [pageSize,setPageSize] = useState(10);
+  const [pageTotal,setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
 
@@ -56,14 +59,16 @@ export default function InProgress() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "InProgress"
+          task: "InProgress",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
 
-        // masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
-        userdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
     } catch (error) {
 
@@ -101,7 +106,7 @@ export default function InProgress() {
     }, 1000)
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
+  }, [userstate.search, pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -117,6 +122,19 @@ export default function InProgress() {
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
+              
+              pagination={{ pageSize: 10, total:10 }}
+              onChange={(x) => {return( setPageCurrent(x.current), setPageSize(x.pageSize))} }
+              footer={(x) => {
+                return (
+                  <>
+                  <div style={{textAlign:"right"}}>
+                    <label>จำนวนเคส : </label>
+                    <label>{x.length}</label>
+                  </div>
+                  </>
+                )
+              }}
               onRow={(record, rowIndex) => {
                 // console.log(record, rowIndex)
                 return {

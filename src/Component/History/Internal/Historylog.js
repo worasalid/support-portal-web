@@ -64,7 +64,8 @@ export default function Historylog({ type = "Issue" }) {
                             value: values.Value,
                             value2: values.Value2,
                             historytype: values.HistoryType,
-                            usertype: values.UserType
+                            usertype: values.UserType,
+                            avatar: values.ProfileImage
                         }
                     }));
                 }
@@ -95,9 +96,9 @@ export default function Historylog({ type = "Issue" }) {
             renderItem={item => (
                 <List.Item>
                     <List.Item.Meta
-                         avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                        //avatar={<Avatar src={state?.usersdata?.users?.profile_image} />}
-                       
+                         //avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                        //avatar={<Avatar src={state?.usersdata?.users?.profile_image}  />}
+                        avatar={<Avatar src={item.avatar}  />}
                         title={
                             <>
                                 <b>{item.createname}</b> &nbsp;&nbsp;

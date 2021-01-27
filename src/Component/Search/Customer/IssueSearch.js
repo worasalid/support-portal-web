@@ -122,7 +122,7 @@ export default function Issuesearch() {
                 </Col>
                 <Col span={4}>
 
-                    <Select placeholder="Product" style={{ width: "100%" }}
+                    {/* <Select placeholder="Product" style={{ width: "100%" }}
                         allowClear
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -142,6 +142,12 @@ export default function Issuesearch() {
                             </div>
                         )
                         }
+                    /> */}
+                     <Select placeholder="Priority" style={{ width: "100%" }}
+                        allowClear
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
+                        options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        onClear={() => alert()}
                     />
                 </Col>
                 <Col span={4}>
@@ -157,7 +163,7 @@ export default function Issuesearch() {
                     />
                 </Col>
                 <Col span={6} >
-                    <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
+                    <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder={["IssueDate (Start)","IssueDate (End)"]}
                         onChange={(date, dateString) => handleChange({ target: { value: dateString || "", name: 'date' } })}
                     />
                 </Col>
@@ -173,12 +179,7 @@ export default function Issuesearch() {
                 <Col span={6}>
                 </Col>
                 <Col span={4}>
-                    <Select placeholder="Priority" style={{ width: "100%" }}
-                        allowClear
-                        onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
-                        options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onClear={() => alert()}
-                    />
+                   
                 </Col>
                 <Col span={10}>
                     <Input placeholder="Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", name: 'keyword' } })}></Input>

@@ -1,5 +1,5 @@
 import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider,List } from "antd";
+import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, List } from "antd";
 import React, { useState, useContext, useEffect } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AuthenContext from "../../utility/authenContext";
@@ -15,7 +15,6 @@ export default function MasterPage(props) {
   const [show_notice, setshow_notice] = useState(true);
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
-  const userlogin =  state.usersdata.users
   const [activemenu, setActivemenu] = useState([])
 
   const getuser = async () => {
@@ -42,7 +41,7 @@ export default function MasterPage(props) {
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
-        params:{
+        params: {
           type: "customer"
         }
       });
@@ -57,7 +56,7 @@ export default function MasterPage(props) {
     }
   }
 
-  const GetNotifications = async() => {
+  const GetNotifications = async () => {
     try {
       const notification = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/countstatus",
@@ -67,7 +66,7 @@ export default function MasterPage(props) {
         }
       });
     } catch (error) {
-      
+
     }
   }
 
@@ -84,13 +83,14 @@ export default function MasterPage(props) {
       title: 'ISSUE-001-20120018',
       description: "มีการ Update Comment"
     },
-   
+
   ];
 
   useEffect(() => {
     if (!state.authen) {
       getuser()
     }
+    getuser();
     CountStatus();
   }, [])
 
@@ -111,7 +111,6 @@ export default function MasterPage(props) {
       setActivemenu(activemenu.push("5"))
     }
   }, [])
-
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -187,28 +186,21 @@ export default function MasterPage(props) {
                 trigger="click"
               >
                 <Button type="link" >
-                  {/* <div style={{ display: "flex", alignItems: "center" }}>
-                    <label className="user-login">
-                      {state.user && state.user.users.first_name + ' ' + state.user.users.last_name}
-                    </label>
-                    <Avatar size="default" icon={<UserOutlined/>}>
+                  <div style={{ display: "inline-block", alignItems: "center" }}>
+                    <Avatar size={48}  icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
                     </Avatar>
-                 
-                  </div> */}
-                  <div
-                    style={{
-                      textAlign: "right",
-                      padding: "16px",
-                    }}>
+                  </div>
+                  <div style={{ display: "inline-block",marginLeft:8 }}>
                     <label className="user-login">
-                      {userlogin && userlogin.first_name + ' ' + userlogin.last_name}
+                      {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
                     </label>
-                    <Avatar size="default" icon={<UserOutlined />}></Avatar>
-
                   </div>
                 </Button>
+
+
               </Dropdown>
+
             </Col>
           </Row>
         </Menu>

@@ -88,6 +88,7 @@ export const customerReducer = createReducer(customerState, {
     SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
+    CLEAR_FILTER: (state, { payload }) => { state.filter = payload },
     SEARCH: (state, { payload }) => { state.search = payload },
     LOADING: (state, { payload }) => { state.loading = payload },
     SELECT_DATAROW: (state, {payload}) => {state.issuedata.datarow = payload},

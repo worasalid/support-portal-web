@@ -27,8 +27,6 @@ export default function IssueCreate() {
     const { state, dispatch } = useContext(AuthenContext);
     const [customerstate, customerdispatch] = useReducer(customerReducer, customerState)
 
-
-
     const match = useRouteMatch();
     const [hiddenForm, sethiddenForm] = useState(false);
     const [title, setTitle] = useState(match.params.id);
@@ -37,11 +35,15 @@ export default function IssueCreate() {
 
     const getproducts = async () => {
         const products = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/products",
+            url: process.env.REACT_APP_API_URL + "/master/customer-products",
             method: "get",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params:{
+               companyid:  "1"
             }
+            
         });
         customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
     }
@@ -74,7 +76,7 @@ export default function IssueCreate() {
     const getMasterdata = async () => {
         try {
             getproducts();
-            getmodule();
+           // getmodule();
             getpriority();
         } catch (error) {
 
@@ -154,6 +156,10 @@ export default function IssueCreate() {
         if (state.authen) {
             getMasterdata();
         }
+        if(state?.usersdata?.users === undefined){
+            getMasterdata();
+        }
+       
     }, [state.authen]);
 
     useEffect(() => {
@@ -161,14 +167,6 @@ export default function IssueCreate() {
             getmodule();
         }
     }, [customerstate.filter.productState]);
-
-    const images_upload_handler = (blobInfo, success, failure) => {
-        setTimeout(function () {
-            /* no matter what you upload, we will turn it into TinyMCE logo :)*/
-            success('http://moxiecode.cachefly.net/tinymce/v9/images/logo.png');
-        }, 2000);
-    }
-
 
     return (
         <MasterPage>
@@ -197,7 +195,7 @@ export default function IssueCreate() {
                     name="issue"
                     initialValues={{
                         // product: "REM",
-                        module: 2,
+                       // module: 2,
                         priority: 4
                     }}
                     layout="vertical"

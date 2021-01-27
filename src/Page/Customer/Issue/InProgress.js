@@ -59,6 +59,11 @@ export default function InProgress() {
     }
   };
 
+  useEffect(() => {
+    //customerdispatch({ type: "CLEAR_FILTER", payload: {} })
+  }, []);
+
+
 
   useEffect(() => {
     customerdispatch({ type: "LOADING", payload: true })

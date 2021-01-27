@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Divider, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -12,7 +12,7 @@ import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
-import Clock from "../../../utility/countdownTimer";
+
 
 
 
@@ -89,6 +89,11 @@ export default function MyTask() {
   }
 
   useEffect(() => {
+    //customerdispatch({ type: "CLEAR_FILTER", payload: {} })
+  }, []);
+
+
+  useEffect(() => {
     customerdispatch({ type: "LOADING", payload: true })
     setTimeout(() => {
       loadIssue();
@@ -146,8 +151,8 @@ export default function MyTask() {
                       }
                       <Divider type="vertical" />
                       <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-                      <Divider type="vertical" />
-                      <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
+                      {/* <Divider type="vertical" />
+                      <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip> */}
                       <Divider type="vertical" />
                       <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
                     </div>
