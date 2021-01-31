@@ -50,7 +50,9 @@ export default function CommentBox() {
                         author: values.CreateName,
                         datetime: moment(values.CreateDate).format("DD/MM/YYYY H:mm"),
                         content: values.Text,
-                        cntfile: values.cntFile
+                        cntfile: values.cntFile,
+                        avatar: values.ProfileImage,
+                        email: values.Email
                     }
                 })
                 );
@@ -105,7 +107,7 @@ export default function CommentBox() {
         } catch (error) {
             Modal.info({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
-                
+
                 okText: "Close",
                 // okCancel:true,
                 content: (
@@ -113,7 +115,7 @@ export default function CommentBox() {
                         <p>กรุณาระบุ Comment!</p>
                     </div>
                 ),
-                onOk(){
+                onOk() {
 
                 },
                 onCancel() {
@@ -155,14 +157,14 @@ export default function CommentBox() {
                         }
                         avatar={
                             <Avatar
-                                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                                alt="ICON Support"
+                                src={item.avatar} 
+                                icon={item.email.substring(0, 1).toLocaleUpperCase()}
                             />
                         }
                         content={
                             <>
-                                <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
-                                <Divider style={{ marginTop:20 }} />
+                                <label className="value-text" dangerouslySetInnerHTML={{ __html: item.content }} ></label>
+                                <Divider style={{ marginTop: 20 }} />
                                 {item.cntfile === 0 ? "" :
                                     <div>
                                         <Row>

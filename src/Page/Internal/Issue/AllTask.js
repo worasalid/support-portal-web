@@ -93,7 +93,6 @@ export default function AllTask() {
     userdispatch({ type: "SEARCH", payload: false })
   }, [userstate.search, pageCurrent]);
 
-  console.log("sdsd", issueAllStatus);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -142,7 +141,7 @@ export default function AllTask() {
                     <div style={{ textAlign: "right" }}>
                       <label>จำนวนเคส : </label>
                       <label>{x.length}</label>
-                      <label>จากทั้งหมด : </label>
+                      <label> จากทั้งหมด : </label>
                       <label>{pageTotal}</label>
 
                     </div>

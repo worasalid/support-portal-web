@@ -106,7 +106,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>แก้ไขงานเสร็จ ส่งงานให้ Leader ตรวจสอบ</p>
+                            <p>แก้ไขงานเสร็จ และส่ง UnitTest เรียบร้อยแล้ว</p>
                         </div>
                     ),
                     onOk() {

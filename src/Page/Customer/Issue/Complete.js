@@ -133,8 +133,7 @@ export default function Complete() {
               render={(record, index) => {
                 return (
                   <div>
-                    {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                    <label>
+                    <label className="table-column-text">
                       {record.Number}
                     </label>
                     <div style={{ marginTop: 10, fontSize: "smaller" }}>
@@ -143,7 +142,7 @@ export default function Complete() {
                           <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
                           <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                       }
-                       <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                       <Divider type="vertical" />
                       <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                       <Divider type="vertical" />
@@ -159,8 +158,7 @@ export default function Complete() {
                 return (
                   <>
                     <div>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                      <label>
+                      <label className="table-column-text">
                         {record.Title}
                       </label>
                     </div>
@@ -188,9 +186,9 @@ export default function Complete() {
               render={(record) => {
                 return (
                   <>
-                    {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                    <label>
-                    {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                    <label className="table-column-text">
+                      {moment(record.CreateDate).format("DD/MM/YYYY")}<br />
+                      {moment(record.CreateDate).format("HH:mm")}
                     </label>
 
                   </>
@@ -207,7 +205,8 @@ export default function Complete() {
                 return (
                   <>
                     <label className="table-column-text">
-                      {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
+                      {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
+                      {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                     </label>
                     <br />
                     {record.cntDueDate > 1 ?
@@ -236,10 +235,12 @@ export default function Complete() {
                 return (
                   <>
                     <div>
-                      <label>{record.GroupStatus}</label>
+                      <label className="table-column-text">{record.GroupStatus}</label>
                     </div>
                     <div>
-                      {record.CompleteDate === null ? "" : moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
+                      <label className="table-column-text">
+                        {record.CompleteDate === null ? "" : moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
+                      </label>
                     </div>
                   </>
                 );

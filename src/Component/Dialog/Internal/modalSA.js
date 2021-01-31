@@ -115,7 +115,6 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         SendFlow(values);
     };
 
-
     return (
         <Modal
             visible={visible}

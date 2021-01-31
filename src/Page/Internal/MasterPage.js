@@ -11,6 +11,7 @@ import {
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
 import MasterContext from "../../utility/masterContext";
+import Notifications from '../../Component/Notifications/Internal/Notification';
 
 
 export class Menucollapsed extends Component {
@@ -152,14 +153,17 @@ export default function MasterPage(props) {
                 overlayStyle={{ width: 500, height: 400 }}
                 overlay={(
                   <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
-                    <Menu.Item key="1" onClick={() => alert("Profile")}>
+                    <Menu.Item key="1">
+                      <div>
+                      <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
                       <div style={{ height: "50vh", overflowY: "scroll" }}>
                         <Row style={{ padding: 16 }}>
                           <Col span={24}>
-                            <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
-
+                           
+                               <Notifications />
                           </Col>
                         </Row>
+                      </div>
                       </div>
                     </Menu.Item>
                   </Menu>
@@ -225,14 +229,13 @@ export default function MasterPage(props) {
 
           >
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issue" >
-              <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/alltask' })} >
+              <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/alltask' })}
+               style={{
+                display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
+              }}
+              >
                 All Task
-                {/* {
-                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
-
-                } */}
+               
               </Menu.Item>
               <Menu.Item key="1" onClick={() => history.push({ pathname: '/internal/issue/mytask' })} >
                 My Task
@@ -285,21 +288,21 @@ export default function MasterPage(props) {
               key="sub2" icon={<AuditOutlined />} title="RICEF">
               <Menu.Item key="6" onClick={() => history.push('/internal/ricef')}>
                 - All Task
-                  <Badge count={1}>
+                  {/* <Badge count={1}> */}
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                </Badge>
+                {/* </Badge> */}
               </Menu.Item>
               <Menu.Item key="7" onClick={() => history.push('/internal/ricef/mytask')}>
                 - My Task
-                  <Badge count={1}>
+                  {/* <Badge count={1}> */}
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                </Badge>
+                {/* </Badge> */}
               </Menu.Item>
               <Menu.Item key="8" onClick={() => history.push('/internal/ricef/inprogress')}>
                 - InProgress
-                  <Badge count={1}>
+                  {/* <Badge count={1}> */}
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                </Badge>
+                {/* </Badge> */}
               </Menu.Item>
             </SubMenu>
 

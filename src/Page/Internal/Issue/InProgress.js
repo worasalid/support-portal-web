@@ -36,9 +36,9 @@ export default function InProgress() {
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
-  const [pageCurrent,setPageCurrent] = useState(1);
-  const [pageSize,setPageSize] = useState(10);
-  const [pageTotal,setPageTotal] = useState(0);
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageTotal, setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
 
@@ -122,16 +122,16 @@ export default function InProgress() {
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
-              
-              pagination={{ pageSize: 10, total:10 }}
-              onChange={(x) => {return( setPageCurrent(x.current), setPageSize(x.pageSize))} }
+
+              pagination={{ pageSize: 10, total: 10 }}
+              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
               footer={(x) => {
                 return (
                   <>
-                  <div style={{textAlign:"right"}}>
-                    <label>จำนวนเคส : </label>
-                    <label>{x.length}</label>
-                  </div>
+                    <div style={{ textAlign: "right" }}>
+                      <label>จำนวนเคส : </label>
+                      <label>{x.length}</label>
+                    </div>
                   </>
                 )
               }}
@@ -159,22 +159,42 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <div>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                      <label>
+                      <label className="table-column-text">
                         {record.Number}
                       </label>
 
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        {
-                          record.IssueType === 'ChangeRequest' ?
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                            <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip>
-                        }
-                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                        <Tooltip title="Issue Type">
+                          <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
+                            <label style={{ fontSize: "10px" }}>
+                              {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
+                        <Tooltip title="Priority">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.Priority}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                        <Tooltip title="Product">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ProductName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
+                        {/* <Divider type="vertical" /> */}
+                        <Tooltip title="Module">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ModuleName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                       </div>
                     </div>
                   );
@@ -187,10 +207,16 @@ export default function InProgress() {
                   return (
                     <>
                       <div>
-                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                        <label>
+                        <label className="table-column-text">
                           {record.Title}
                         </label>
+                        <Tag color="#00CC00"
+                          style={{
+                            borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
+                            display: record.TaskCnt > 1 ? "inline-block" : "none"
+                          }}>
+                          <label style={{ fontSize: 10, alignContent: "center", verticalAlign: "center" }}>{record.TaskCnt} Task</label>
+                        </Tag>
                       </div>
                       <div>
                         <label
@@ -219,15 +245,13 @@ export default function InProgress() {
                     <>
 
                       <div>
-                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                        <label>
+                        <label className="table-column-text">
                           {record.CreateBy}
                         </label>
                       </div>
 
                       <div>
-                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                        <label>
+                        <label className="table-column-text">
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
@@ -239,22 +263,17 @@ export default function InProgress() {
 
                 }
               />
-              {/* <Column
-                title="Assignee"
-                align="center"
-                width="10%"
-                dataIndex="Assignee"
-              ></Column> */}
+
               <Column title="Due Date"
                 width="10%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-
-                      {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
-
+                      <label className="table-column-text">
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}<br/>
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
+                      </label>
                       <br />
                       {record.cntDueDate > 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
@@ -281,7 +300,7 @@ export default function InProgress() {
                   return (
                     <>
                       <div>
-                        <label>
+                        <label className="table-column-text">
                           {record.FlowStatus}
                         </label>
                       </div>

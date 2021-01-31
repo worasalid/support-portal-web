@@ -25,8 +25,8 @@ export default function CommentBox() {
     const [commenttext, setCommenttext] = useState("");
     const [commentid, setCommentid] = useState(null);
 
-     // Modal
-     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+    // Modal
+    const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
 
     const loadComment = async () => {
         try {
@@ -49,7 +49,9 @@ export default function CommentBox() {
                         author: values.CreateName,
                         datetime: moment(values.CreateDate).format("DD/MM/YYYY HH:mm"),
                         content: values.Text,
-                        cntfile: values.cntFile
+                        cntfile: values.cntFile,
+                        avatar: values.ProfileImage,
+                        email: values.Email
                     }
                 })
                 );
@@ -128,20 +130,20 @@ export default function CommentBox() {
                         }
                         avatar={
                             <Avatar
-                                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                                alt="ICON Support"
+                                src={item.avatar} 
+                                icon={item.email.substring(0, 1).toLocaleUpperCase()}
                             />
                         }
                         content={
                             <>
-                                <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
-                                <Divider style={{ marginTop:20}}/>
+                                <label className="value-text" dangerouslySetInnerHTML={{ __html: item.content }} ></label>
+                                <Divider style={{ marginTop: 20 }} />
                                 {item.cntfile === 0 ? "" :
                                     <div>
                                         <Row>
                                             <Col span={24}>
                                                 <label
-                                                     onClick={() => {return (setCommentid(item.id), setModalfiledownload_visible(true) )} }
+                                                    onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
                                                     className="text-link-hover">
                                                     <FileOutlined /> DownloadFile
                                                 </label>
@@ -152,27 +154,27 @@ export default function CommentBox() {
                             </>
 
                         }
-                        // actions={[
-                        //     (item.filename === null ? "" : (
-                        //         <>
-                        //             <div>
-                        //                 <Row>
-                        //                     <Col span={24}>
-                        //                         <label
-                        //                             onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                        //                             className="text-link-hover">
-                        //                             <FileOutlined /> {item.filename}
-                        //                         </label>
-                        //                     </Col>
+                    // actions={[
+                    //     (item.filename === null ? "" : (
+                    //         <>
+                    //             <div>
+                    //                 <Row>
+                    //                     <Col span={24}>
+                    //                         <label
+                    //                             onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
+                    //                             className="text-link-hover">
+                    //                             <FileOutlined /> {item.filename}
+                    //                         </label>
+                    //                     </Col>
 
-                        //                 </Row>
+                    //                 </Row>
 
-                        //             </div>
-                        //         </>
-                        //     )
-                        //     )
-                        // ]
-                        // }
+                    //             </div>
+                    //         </>
+                    //     )
+                    //     )
+                    // ]
+                    // }
                     >
 
                     </Comment>
@@ -195,8 +197,8 @@ export default function CommentBox() {
 
                             {/* <TextArea rows={4} onChange={onChange} value={value} style={{ marginRight: 50 }} /> */}
                             <Editor
-                            ref={editorRef}
-                        
+                                ref={editorRef}
+
                                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                                 initialValue=""
                                 init={{
@@ -228,7 +230,7 @@ export default function CommentBox() {
                                         Add Comment
                                     </Button>
                                 </Col>
-                               
+
                             </Row>
                         </Form.Item>
                     </Form>

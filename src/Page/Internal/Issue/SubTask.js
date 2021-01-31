@@ -60,6 +60,7 @@ export default function SubTask() {
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
+  const [divProgress, setDivProgress] = useState("hide")
 
 
   // data
@@ -85,6 +86,11 @@ export default function SubTask() {
       });
 
       if (flow_output.status === 200) {
+        if ((flow_output.data.filter((x) => x.Type === "Task").length) > 0) {
+          setDivProgress("show")
+        }
+        // console.log("LOAD_ACTION_FLOW", flow_output.data.filter((x) => x.Type === "Task").length)
+
         if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName === "qa" && userstate.taskdata.data[0].QARecheck) {
           userdispatch({
             type: "LOAD_ACTION_FLOW",
@@ -94,6 +100,7 @@ export default function SubTask() {
 
         if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName !== "qa") {
           userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
+
         }
       }
     } catch (error) {
@@ -158,11 +165,16 @@ export default function SubTask() {
       }
       if (item.data.value === "Resolved") { setModalresolved_visible(true) }
       if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
+      if (item.data.value === "RejectToQA") { setModalsendtask_visible(true) }
     }
     if (item.data.NodeName === "developer_2") {
       if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+      if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
       if (item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
       if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
+      if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
+      if (item.data.value === "LeaderReject") { setModalsendtask_visible(true) }
+
     }
     if (item.data.NodeName === "developer_1") {
       if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
@@ -172,33 +184,20 @@ export default function SubTask() {
       if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
       if (item.data.value === "QApass") { setModalQA_visible(true) }
       if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
+      if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
     }
     if (item.data.NodeName === "qa") {
+      if (item.data.value === "QAReject") { setModalsendtask_visible(true) }
       setModalQA_visible(true)
     }
-    if (item.data.NodeName === "cr_center") {
-      if (item.data.value === "SendTask") { setModalsendtask_visible(true) }
-    }
-    if (item.data.TextEng === "Reject") {
-      setModalreject_visible(true)
-    }
-    // if (item.data.NodeName === "support" && item.data.value === "SendIssue" || item.data.value === "ResolvedTask") { return (setVisible(true)) }
-    //if (item.data.NodeName === "developer_2" && item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
-    //if (item.data.NodeName === "developer_2" && item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
-    //if (item.data.NodeName === "developer_1" && item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-    //if (item.data.TextEng === "Reject") { setModalreject_visible(true) }
-    //if (item.data.NodeName === "developer_2" && item.data.value === "Deploy") { return (setModalcomplete_visible(true)) }
-    // if (item.data.NodeName === "qa_leader" && item.data.value === "QAassign") { setModalQAassign_visible(true) }
-    // if (item.data.NodeName === "qa_leader" && item.data.value === "QApass") { setModalQA_visible(true) }
-    // if (item.data.NodeName === "qa_leader" && item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
-    //if (item.data.NodeName === "qa") { setModalQA_visible(true) }
-    //if (item.data.NodeName === "support" && item.data.value === "Resolved") { return (setModalresolved_visible(true)) }
 
 
     // Flow CR
     if (item.data.NodeName === "cr_center") {
       if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }
       if (item.data.value === "CheckManday" || item.data.value === "RejectManday") { setModalmanday_visible(true) }
+      if (item.data.value === "SendTask") { setModalsendtask_visible(true) }
+      if (item.data.value === "RejectTask") { setModalsendtask_visible(true) }
     }
     if (item.data.NodeName === "developer_2") {
       if (item.data.value === "SendManday") { setModalmanday_visible(true) }
@@ -250,6 +249,7 @@ export default function SubTask() {
   useEffect(() => {
     getdetail();
     GetTaskDetail();
+    getflow_output(userstate?.issuedata?.details[0]?.TransId)
   }, [])
 
   useEffect(() => {
@@ -259,24 +259,26 @@ export default function SubTask() {
   useEffect(() => {
     if (historyduedate_visible) {
       GetDueDateHistory();
-
     }
-
   }, [historyduedate_visible])
 
-  if (userstate.taskdata.data.length === 0) {
-    return (
-      <MasterPage>
-       <Result
-          status="403"
-          title="403"
-          subTitle="Sorry, you are not authorized to access this page."
-          extra={<Button type="primary">Back Home</Button>}
-        />
-      </MasterPage>
-    )
+  useEffect(() => {
+    getflow_output(userstate?.issuedata?.details[0]?.TransId)
+  }, [userstate?.issuedata?.details[0]?.TransId])
 
-  }
+
+  // if (userstate.taskdata.data.length === 0) {
+  //   return (
+  //     <MasterPage>
+  //       <Result
+  //         status="403"
+  //         title="403"
+  //         subTitle="Sorry, you are not authorized to access this page."
+  //         extra={<Button type="primary">Back Home</Button>}
+  //       />
+  //     </MasterPage>
+  //   )
+  // }
 
   return (
     <MasterPage>
@@ -391,9 +393,16 @@ export default function SubTask() {
             <Col span={6} style={{ backgroundColor: "", height: 500, marginLeft: 20 }}>
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
-                  <label className="header-text">ProgressStatus</label>
+                  <label className="header-text">Progress Status</label>
                 </Col>
-                <Col span={18} style={{ marginTop: 10, display: userstate.taskdata.data[0]?.MailType === "in" ? "block" : "none" }}>
+                <Col span={18}
+                  style={{
+                    marginTop: 10,
+                    display: userstate.taskdata.data[0]?.MailType === "in" &&
+                     // userstate.taskdata.data[0]?.Status !== "Resolved" &&
+                      divProgress === "show" ? "block" : "none"
+                  }}
+                >
                   <Select ref={selectRef}
                     value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
@@ -408,7 +417,17 @@ export default function SubTask() {
                     }
                   />
                 </Col>
-                <Col span={18} style={{ display: userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none" }}>
+                <Col span={18}
+                  style={{
+                    display:
+                      //userstate.taskdata.data[0]?.Status === "Resolved" &&
+                      userstate.taskdata.data[0]?.MailType === "in" &&
+                        divProgress === "hide" ? "block" : "none"
+                  }}>
+                  <label className="value-text">{userstate.taskdata.data[0]?.FlowStatus}</label>
+                </Col>
+                <Col span={18}
+                  style={{ display: userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none" }}>
                   <label className="value-text">{userstate.taskdata.data[0]?.FlowStatus}</label>
                 </Col>
               </Row>
@@ -553,8 +572,8 @@ export default function SubTask() {
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
           taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
           mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-
+          flowoutputid: userstate.node.output_data.FlowOutputId,
+          flowoutput: userstate.node.output_data
         }}
       />
 
@@ -570,8 +589,8 @@ export default function SubTask() {
           ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
           taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
           mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-
+          flowoutputid: userstate.node.output_data.FlowOutputId,
+          flowoutput: userstate.node.output_data
         }}
       />
 
@@ -750,6 +769,6 @@ export default function SubTask() {
         }}
       />
 
-    </MasterPage>
+    </MasterPage >
   );
 }

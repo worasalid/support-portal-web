@@ -78,11 +78,10 @@ export default function MyTask() {
             <Table dataSource={ricef} loading={ricefstate.loading}>
                 {/* <Column align="center" title="No" width="1%" dataIndex="RowNo" /> */}
                 <Column align="left" title="IssueNumber" width="20%" dataIndex=""
-
                     render={(record) => {
                         return (
                             <div>
-                                <label>
+                                <label className="table-column-text">
                                     {record.IssueNumber}
                                 </label>
 
@@ -108,7 +107,7 @@ export default function MyTask() {
                         return (
                             <>
                                 <div>
-                                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                                    <label className="table-column-text">
                                         {record.Title}
                                     </label>
                                 </div>
@@ -140,13 +139,19 @@ export default function MyTask() {
                                 <div
                                     style={{ display: (state?.usersdata?.organize?.OrganizeCode === "dev") ? "block" : "none" }}
                                 >
-                                    {record.OwnerName}<br />
-                                    {record.OwnerName2}<br />
+                                    <label className="table-column-text">
+                                        {record.OwnerName}<br />
+                                    </label>
+                                    <label className="table-column-text">
+                                        {record.OwnerName2}<br />
+                                    </label>
                                 </div>
                                 <div
                                     style={{ display: (state?.usersdata?.organize?.OrganizeCode === "consult") ? "block" : "none" }}
                                 >
-                                    {record.AssigneeName}<br />
+                                    <label className="table-column-text">
+                                        {record.AssigneeName}<br />
+                                    </label>
                                 </div>
 
                                 <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
@@ -155,7 +160,18 @@ export default function MyTask() {
                     }
                     }
                 />
-                <Column align="center" title="Progress" width="5%" dataIndex="Status" />
+                <Column align="center" title="Progress" width="5%" 
+                    render={(record) => {
+                        return (
+                            <>
+                                <label className="table-column-text">
+                                    {record.Status}
+                                </label>
+                            </>
+                        )
+                    }}
+
+                />
                 <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
                     width="20%"
                     align="center"

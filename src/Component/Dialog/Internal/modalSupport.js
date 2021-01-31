@@ -23,39 +23,6 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         setTextValue(content);
     }
 
-    // const GetIssueType = async () => {
-    //     try {
-    //         const issuetype = await Axios({
-    //             url: process.env.REACT_APP_API_URL + "/master/issue-types",
-    //             method: "GET",
-    //             headers: {
-    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //             },
-    //         });
-    //         userdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
-    //     } catch (error) {
-
-    //     }
-    // }
-
-    // const LoadModule = async () => {
-    //     try {
-    //         const module = await Axios({
-    //             url: process.env.REACT_APP_API_URL + "/master/modules",
-    //             method: "GET",
-    //             headers: {
-    //                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //             },
-    //             params: {
-    //                 productId: details.productId
-    //             }
-    //         });
-    //         userdispatch({ type: "LOAD_MODULE", payload: module.data })
-    //     } catch (error) {
-
-    //     }
-    // }
-
     const SaveComment = async () => {
         try {
             if (textValue !== "") {
@@ -131,9 +98,13 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("");
-                       
                         formRef.resetFields();
-                         history.push({ pathname: "/internal/issue/inprogress" })
+                        if (details.flowoutput.value === "ResolvedTask") {
+                            history.goBack();
+                        } else {
+                            history.push({ pathname: "/internal/issue/inprogress" });
+                        }
+                      
                     },
                 });
             }
@@ -159,21 +130,6 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     const onFinish = (values) => {
         SendFlow(values);
     };
-    // useEffect(() => {
-    //     if (visible) {
-    //         GetIssueType();
-    //         LoadModule();
-    //     }
-
-    // }, [visible])
-
-    // useEffect(() => {
-    //     if (formRef && visible) {
-    //         formRef.setFieldsValue({ issuetype: details.internaltype, module: details.moduleId })
-    //     }
-    // }, [details.internaltype, visible, formRef])
-
-
 
     return (
         <Modal

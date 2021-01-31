@@ -56,7 +56,10 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
                                         icon={<ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />}
                                         className="value-text"
                                     >
-                                        {new Date(item.due_date).toLocaleDateString('en-GB')}
+                                        <label className="value-text">
+                                            {new Date(item.due_date).toLocaleDateString('en-GB')}
+                                        </label>
+
                                     </Button>
                                 </Col>
                             </Row>

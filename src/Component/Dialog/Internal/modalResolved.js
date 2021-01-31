@@ -120,7 +120,6 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
 
     }, [visible])
 
-
     return (
         <Modal
             visible={visible}

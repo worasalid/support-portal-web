@@ -113,9 +113,10 @@ export default function Issuesearch() {
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        maxTagCount={2}
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", name: "issuetype" } })}
-                        options={customerstate.masterdata && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        options={customerstate.masterdata && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name.replace("ChangeRequest", "CR") }))}
                     >
 
                     </Select>
@@ -143,8 +144,10 @@ export default function Issuesearch() {
                         )
                         }
                     /> */}
-                     <Select placeholder="Priority" style={{ width: "100%" }}
+                    <Select placeholder="Priority" style={{ width: "100%" }}
+                        mode="multiple"
                         allowClear
+                        maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
                         options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
                         onClear={() => alert()}
@@ -163,12 +166,12 @@ export default function Issuesearch() {
                     />
                 </Col>
                 <Col span={6} >
-                    <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder={["IssueDate (Start)","IssueDate (End)"]}
+                    <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder={["IssueDate (Start)", "IssueDate (End)"]}
                         onChange={(date, dateString) => handleChange({ target: { value: dateString || "", name: 'date' } })}
                     />
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                    <Button type="primary"  shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
                         onClick={() => customerdispatch({ type: "SEARCH", payload: true })}
                     >
                         Search
@@ -179,7 +182,7 @@ export default function Issuesearch() {
                 <Col span={6}>
                 </Col>
                 <Col span={4}>
-                   
+
                 </Col>
                 <Col span={10}>
                     <Input placeholder="Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", name: 'keyword' } })}></Input>

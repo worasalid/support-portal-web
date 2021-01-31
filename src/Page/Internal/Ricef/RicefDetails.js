@@ -113,7 +113,7 @@ export default function RicefDetails() {
                     render={(record) => {
                         return (
                             <div>
-                                <label>
+                                <label className="table-column-text">
                                     {record.IssueNumber}
                                 </label>
 
@@ -139,7 +139,7 @@ export default function RicefDetails() {
                         return (
                             <>
                                 <div>
-                                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                                    <label className="table-column-text">
                                         {record.Title}
                                     </label>
                                 </div>
@@ -162,10 +162,35 @@ export default function RicefDetails() {
                     }
                     }
                 />
-             
-                <Column align="center" title="Owner" width="20%" dataIndex="OwnerName" />
-               
-                <Column align="center" title="Progress" width="5%" dataIndex="Status" />
+
+                <Column align="center" title="Owner" width="20%"
+                    render={(record) => {
+                        return (
+                            <>
+                                <label className="table-column-text">
+                                    {record.OwnerName}<br />
+                                </label>
+                                <label className="table-column-text">
+                                    {record.OwnerName2}
+                                </label>
+                            </>
+                        )
+                    }
+                    }
+                />
+
+                <Column align="center" title="Progress" width="5%" 
+                    render={(record) => {
+                        return (
+                            <>
+                                <label className="table-column-text">
+                                    {record.Status}
+                                </label>
+                            </>
+                        )
+                    }
+                    }
+                />
                 <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
                     width="20%"
                     align="center"

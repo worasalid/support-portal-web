@@ -57,14 +57,14 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     value: {
                         comment_text: textValue
                     }
-                  
+
                 }
             });
 
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -74,7 +74,15 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        if(details.flowoutput.value === "SendTask" || details.flowoutput.value === "ResolvedTask"){
+                            history.goBack();
+                        }
+                        else{
+                            history.push({ pathname: "/internal/issue/inprogress" });
+                        }
+                       
+                     
+
                     },
                 });
             }
@@ -98,8 +106,8 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
     const onFinish = (values) => {
         console.log('Success:', values);
         SendFlow();
-    };
 
+    };
 
     return (
         <Modal
@@ -111,7 +119,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-  
+
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
                 name="qa-test"
                 layout="vertical"
@@ -125,7 +133,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     // style={{ minWidth: 300, maxWidth: 300 }}
                     name="remark"
                     label="Remark :"
-                    
+
                 >
                     <Editor
                         apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"

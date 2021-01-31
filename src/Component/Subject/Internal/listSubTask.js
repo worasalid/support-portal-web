@@ -1,6 +1,6 @@
 
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { List, Row, Col, Button, Popconfirm, Modal, Tag} from 'antd'
+import { List, Row, Col, Button, Popconfirm, Modal, Tag } from 'antd'
 import Axios from 'axios'
 import { useHistory } from 'react-router-dom'
 import { ArrowRightOutlined, DeleteOutlined, FileOutlined, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
@@ -168,11 +168,22 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                 <Col span={23} >
                                                     <Row>
                                                         <Col span={1}>{<FileOutlined />}</Col>
-                                                        <Col span={15}>{item.title}  <Tag color="#f50">{item.module} </Tag></Col>
+                                                        <Col span={15}>
+                                                            <label className="value-text">
+                                                                {item.title}
+                                                            </label>
+
+                                                            <Tag color="#f50">{item.module}
+                                                            </Tag>
+                                                        </Col>
                                                         <Col span={8} style={{ textAlign: "right" }} >{renderTaskStatus(item.status)}</Col>
                                                     </Row>
                                                     <Row style={{ textAlign: "right" }}>
-                                                        <Col span={24}>{item.flowstatus === null ? "" : `(${item.flowstatus})`}</Col>
+                                                        <Col span={24}>
+                                                            <label className="value-text">
+                                                                {item.flowstatus === null ? "" : `(${item.flowstatus})`}
+                                                            </label>
+                                                        </Col>
                                                     </Row>
 
                                                 </Col>

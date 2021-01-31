@@ -67,7 +67,7 @@ export default function NormalLoginForm() {
         name="normal_login"
         className="login-form"
         initialValues={{
-          username: "thidarath@iconframework.com",
+          username: "",
           remember: true,
         }}
         onFinish={onFinish}
@@ -98,7 +98,7 @@ export default function NormalLoginForm() {
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder="Username"
+            placeholder="email"
           />
         </Form.Item>
         <Form.Item

@@ -219,7 +219,7 @@ export default function RicefSearch() {
                 </Col>
 
                 <Col span={2}>
-                    <Button type="primary" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                    <Button type="primary"  shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
                         onClick={() => ricefdispatch({ type: "SEARCH", payload: true })}
                     >
                         Search

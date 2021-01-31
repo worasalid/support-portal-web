@@ -13,7 +13,7 @@ export default function Issuesearch() {
     const { state, dispatch } = useContext(AuthenContext);
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
- 
+
     const handleChange = (e) => {
         if (e.target.group === "company") {
             userdispatch({ type: "SELECT_COMPANY", payload: e.target.value })
@@ -23,7 +23,7 @@ export default function Issuesearch() {
             userdispatch({ type: "SELECT_TYPE", payload: e.target.value })
         }
         if (e.target.group === "product") {
-            console.log("product",e.target.value)
+            console.log("product", e.target.value)
             userdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
         }
         if (e.target.group === "module") {
@@ -154,19 +154,19 @@ export default function Issuesearch() {
                         //maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
                         options={userstate.masterdata && userstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
-                        // dropdownRender={(value) => (
-                        //     <div >
-                        //         <Row>
-                        //             <Col>
-                        //                 {value}
-                        //             </Col>
-                        //             <Col>
+                    // dropdownRender={(value) => (
+                    //     <div >
+                    //         <Row>
+                    //             <Col>
+                    //                 {value}
+                    //             </Col>
+                    //             <Col>
 
-                        //             </Col>
-                        //         </Row>
-                        //     </div>
-                        // )
-                        // }
+                    //             </Col>
+                    //         </Row>
+                    //     </div>
+                    // )
+                    // }
                     />
                 </Col>
                 <Col span={4}>
@@ -187,7 +187,8 @@ export default function Issuesearch() {
                 </Col>
 
                 <Col span={2}>
-                    <Button type="primary" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                    <Button type="primary" shape="round" icon={<SearchOutlined />}
+                        style={{ backgroundColor: "#00CC00" }}
                         onClick={() => userdispatch({ type: "SEARCH", payload: true })}
                     >
                         Search

@@ -144,17 +144,37 @@ export default function MyTask() {
                       {record.Number}
                     </label>
                     <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                      {
-                        record.IssueType === 'Bug' ?
-                          <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
-                          <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
-                      }
+                      <Tooltip title="Issue Type">
+                        <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
+                          <label style={{ fontSize: "10px" }}>
+                            {record.IssueType}
+                          </label>
+                        </Tag>
+                      </Tooltip>
                       <Divider type="vertical" />
-                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-                      {/* <Divider type="vertical" />
-                      <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip> */}
+                      <Tooltip title="Priority">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.Priority}
+                          </label>
+                        </Tag>
+                      </Tooltip>
                       <Divider type="vertical" />
-                      <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                      <Tooltip title="Product">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.ProductName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
+                      <Divider type="vertical" />
+                      <Tooltip title="Module">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.ModuleName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
                     </div>
                   </div>
                 );
@@ -195,7 +215,8 @@ export default function MyTask() {
                 return (
                   <>
                     <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                      {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                      {moment(record.CreateDate).format("DD/MM/YYYY")}<br/>
+                      {moment(record.CreateDate).format("HH:mm")}
                     </label>
 
                   </>
@@ -213,7 +234,8 @@ export default function MyTask() {
                   <>
                    {record.GroupStatus === "Wait For Progress" ? "" :
                     <label className="table-column-text">
-                      {record.SLA === null ? "" : moment(record.SLA).format("DD/MM/YYYY HH:mm")}
+                      {record.SLA === null ? "" : moment(record.SLA).format("DD/MM/YYYY")}<br/>
+                      {record.SLA === null ? "" : moment(record.SLA).format("HH:mm")}
                     </label>
               }
                     <br />
@@ -237,12 +259,12 @@ export default function MyTask() {
             />
 
            <Column
-              title="ProgressStatus"
+              title="Progress Status"
               width="10%"
               align="center"
               render={(record) => {
                 return (
-                  <label>{record.ProgressStatus}</label>
+                  <label className="table-column-text">{record.ProgressStatus}</label>
                 );
               }}
             />

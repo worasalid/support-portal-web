@@ -41,7 +41,7 @@ export default function InProgress() {
             });
             if (details.status === 200) {
                 setRicef(details.data)
-               
+
 
             }
         } catch (error) {
@@ -82,7 +82,7 @@ export default function InProgress() {
                     render={(record) => {
                         return (
                             <div>
-                                <label>
+                                <label className="table-column-text">
                                     {record.IssueNumber}
                                 </label>
 
@@ -107,7 +107,7 @@ export default function InProgress() {
                         return (
                             <>
                                 <div>
-                                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                                    <label className="table-column-text">
                                         {record.Title}
                                     </label>
                                 </div>
@@ -135,14 +135,28 @@ export default function InProgress() {
                     render={(record) => {
                         return (
                             <>
-                                {record.OwnerName}<br />
+                                <label className="table-column-text">
+                                    {record.AssigneeName}<br />
+                                </label>
+
                                 <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
                             </>
                         )
                     }
                     }
                 />
-                <Column align="center" title="Progress" width="5%" dataIndex="Status" />
+                <Column align="center" title="Progress" width="5%" 
+                    render={(record) => {
+                        return (
+                            <>
+                                <label className="table-column-text">
+                                    {record.Status}
+                                </label>
+                            </>
+                        )
+                    }}
+
+                />
                 <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
                     width="20%"
                     align="center"

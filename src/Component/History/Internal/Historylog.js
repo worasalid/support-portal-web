@@ -1,5 +1,5 @@
-import React, { useEffect, useState,useContext } from 'react'
-import { List, Avatar} from 'antd';
+import React, { useEffect, useState, useContext } from 'react'
+import { List, Avatar } from 'antd';
 import moment from 'moment';
 import Axios from 'axios';
 import { useRouteMatch } from 'react-router-dom';
@@ -65,7 +65,8 @@ export default function Historylog({ type = "Issue" }) {
                             value2: values.Value2,
                             historytype: values.HistoryType,
                             usertype: values.UserType,
-                            avatar: values.ProfileImage
+                            avatar: values.ProfileImage,
+                            email: values.Email
                         }
                     }));
                 }
@@ -96,15 +97,15 @@ export default function Historylog({ type = "Issue" }) {
             renderItem={item => (
                 <List.Item>
                     <List.Item.Meta
-                         //avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                        //avatar={<Avatar src={state?.usersdata?.users?.profile_image}  />}
-                        avatar={<Avatar src={item.avatar}  />}
+                        avatar={<Avatar src={item.avatar} icon={item.email.substring(0, 1).toLocaleUpperCase()} />}
                         title={
                             <>
                                 <b>{item.createname}</b> &nbsp;&nbsp;
                                 <label style={{ color: "#fa8c16" }} > {item.description}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                {/* <label> {item.value}</label> */}
                                 <ClockCircleOutlined style={{ fontSize: 18 }} />&nbsp;&nbsp;
                                 <label>{moment(item.createdate).format("DD/MM/YYYY H:mm")}</label>
+                              
                             </>
                         }
 

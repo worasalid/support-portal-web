@@ -2,31 +2,60 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Modal, DatePicker, Row, Col, Form, Input } from 'antd';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import { Editor } from '@tinymce/tinymce-react';
 import IssueContext from '../../../utility/issueContext';
 
 
 export default function ModalChangeDueDate({ visible = false, onOk, onCancel, details, ...props }) {
-    const [formRef, setFormRef] = useState(null);
+    const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
+    const uploadRef = useRef(null);
     const [form] = Form.useForm();
+    const [textValue, setTextValue] = useState("");
     const textAreaRef = useRef(null);
     const [duedate, setDuedate] = useState(null);
-    const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
+    const editorRef = useRef(null)
+    
+    const handleEditorChange = (content, editor) => {
+        setTextValue(content);
+    }
 
-    const onFinish = async (values) => {
+    const SaveComment = async () => {
+        try {
+            if (textValue !== "") {
+                const comment = await Axios({
+                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                    },
+                    data: {
+                        ticketid: details && details.ticketid,
+                        comment_text: textValue,
+                        comment_type: "customer",
+                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    }
+                });
+            }
+        } catch (error) {
+
+        }
+    }
+
+    const SaveDueDate = async (values) => {
         try {
             const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/save_duedate",
-                method: "POST",
+                url: process.env.REACT_APP_API_URL + "/tickets/update-duedate",
+                method: "PATCH",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-                    ticket_number: userstate.issuedata.details[0] && userstate.issuedata.details[0].Number,
-                    duedate: duedate,
-                    description: values.description
+                    ticketid: details && details.ticketid,
+                    duedate: values.duedate,
+                    decription: values.description
                 }
             });
+
             if (result.status === 200) {
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -37,15 +66,21 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
                     ),
                     onOk() {
                         onOk();
-                        formRef.resetFields();
+                        form.resetFields();
                     },
                 });
             }
         } catch (error) {
 
         }
+    }
 
+    const onFinish = async (values) => {
+       console.log("onFinish",values)
+       SaveDueDate(values);
+       SaveComment();
     };
+
     const onFinishFailed = errorInfo => {
         console.log('Failed:', errorInfo);
 
@@ -56,7 +91,7 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
     }, [])
 
     useEffect(() => {
-        console.log(formRef)
+
         if (textAreaRef.current) {
             textAreaRef.current.focus();
 
@@ -73,7 +108,7 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
             {...props}
         >
 
-            <Form ref={setFormRef} form={form} style={{ padding: 0, width: "100%", backgroundColor: "white" }}
+            <Form  form={form} style={{ padding: 0, width: "100%", backgroundColor: "white" }}
                 name="logDueDate"
                 className="login-form"
                 onFinish={onFinish}
@@ -92,7 +127,8 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
                                 },
                             ]}
                         >
-                            <DatePicker format="DD/MM/YYYY" onChange={(date,datestring) => { form.setFieldsValue({ duedate: datestring }); setDuedate(datestring) }} /><br />
+                            <DatePicker format="DD/MM/YYYY HH:mm" showTime
+                            onChange={(date, datestring) => { form.setFieldsValue({ duedate: datestring }); setDuedate(datestring) }} /><br />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -110,6 +146,31 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
                         >
                             <Input.TextArea rows={5} ref={textAreaRef} />
                         </Form.Item>
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col span={24}>
+                        <label className="header-text">Remark</label>
+                        <Editor
+                            apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                            ref={editorRef}
+                            initialValue=""
+                            init={{
+                                height: 300,
+                                menubar: false,
+                                plugins: [
+                                    'advlist autolink lists link image charmap print preview anchor',
+                                    'searchreplace visualblocks code fullscreen',
+                                    'insertdatetime media table paste code help wordcount'
+                                ],
+                                toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                                toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                            }}
+                            onEditorChange={handleEditorChange}
+                        />
+                        <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
                     </Col>
                 </Row>
             </Form>

@@ -56,7 +56,9 @@ export default function CommentBox({ loadingComment = false }) {
                         author: values.CreateName,
                         datetime: moment(values.CreateDate).format("DD/MM/YYYY H:mm"),
                         content: values.Text,
-                        cntfile: values.cntFile
+                        cntfile: values.cntFile,
+                        avatar: values.ProfileImage,
+                        email: values.Email
                     }
                 })
                 );
@@ -185,13 +187,13 @@ export default function CommentBox({ loadingComment = false }) {
                         }
                         avatar={
                             <Avatar
-                                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                                alt="ICON Support"
+                                src={item.avatar}
+                                icon={item.email.substring(0, 1).toLocaleUpperCase()}
                             />
                         }
                         content={
                             <>
-                                <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
+                                <label className="value-text" dangerouslySetInnerHTML={{ __html: item.content }} ></label>
                                 <Divider style={{ margin: 0, marginBottom: 10 }} />
                                 {item.cntfile === 0 ? "" :
                                     <div>
@@ -199,7 +201,7 @@ export default function CommentBox({ loadingComment = false }) {
                                             <Col span={24}>
                                                 <label
                                                     onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
-                                                    className="text-link">
+                                                    className="text-link value-text">
                                                     <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
                                                 </label>
                                             </Col>

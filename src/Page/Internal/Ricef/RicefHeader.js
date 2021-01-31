@@ -342,7 +342,7 @@ export default function RicefHeader({ name, ...props }) {
                                 return (
                                     <>
                                         <div style={{ textAlign: "left" }}>
-                                            <label >
+                                            <label className="table-column-text">
                                                 {record.Description}
                                             </label>
                                         </div>
@@ -361,12 +361,25 @@ export default function RicefHeader({ name, ...props }) {
                         <Column align="center" title="วันที่" width="10%" dataIndex=""
                             render={(record) => {
                                 return (
-                                    moment(record.document_date).format("DD/MM/YYYY")
+                                    <label className="table-column-text">
+                                        {moment(record.document_date).format("DD/MM/YYYY")}
+                                    </label>
+
                                 )
                             }
                             }
                         />
-                        <Column align="center" title="Owner" width="30%" dataIndex="Owner" />
+                        <Column align="center" title="Owner" width="30%"
+                            render={(record) => {
+                                return (
+                                    <label className="table-column-text">
+                                        {record.Owner}
+                                    </label>
+
+                                )
+                            }
+                            }
+                        />
                         <Column align="center" title="จำนวน" width="15%" dataIndex=""
                             render={(record) => {
                                 return (
@@ -379,13 +392,16 @@ export default function RicefHeader({ name, ...props }) {
                                                 <Button type="link"
                                                     onClick={() => history.push({ pathname: "/internal/ricef/comp-" + match.params.compid + "/batch-" + record.BatchId })}
                                                 >
-                                                    {record.cntTotal}
+                                                    <label className="table-column-text">
+                                                        {record.cntTotal}
+                                                    </label>
+
                                                 </Button>
                                             </Col>
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                                <label >Open</label>
+                                                <label className="table-column-text">Open</label>
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntOpen}
@@ -393,8 +409,7 @@ export default function RicefHeader({ name, ...props }) {
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                                <label style={{ color: "#2db7f5" }}>InProgress</label>
-
+                                                <label className="table-column-text" style={{ color: "#2db7f5" }}>InProgress</label>
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntInprogress}
@@ -402,8 +417,7 @@ export default function RicefHeader({ name, ...props }) {
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                                <label style={{ color: "#f50" }}>Resolved</label>
-
+                                                <label className="table-column-text" style={{ color: "#f50" }}>Resolved</label>
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntResolved}
@@ -411,8 +425,7 @@ export default function RicefHeader({ name, ...props }) {
                                         </Row>
                                         <Row>
                                             <Col span={18} style={{ textAlign: "left" }}>
-                                                <label style={{ color: "#87d068" }}>Complete</label>
-
+                                                <label className="table-column-text" style={{ color: "#87d068" }}>Complete</label>
                                             </Col>
                                             <Col span={6}>
                                                 {record.cntComplete}

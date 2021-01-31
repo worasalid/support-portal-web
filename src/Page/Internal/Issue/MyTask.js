@@ -1,4 +1,4 @@
-import { Button, Col, Row, Table, Tag, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Tooltip, Divider } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -121,10 +121,10 @@ export default function Mytask() {
               footer={(x) => {
                 return (
                   <>
-                  <div style={{textAlign:"right"}}>
-                    <label>จำนวนเคส : </label>
-                    <label>{x.length}</label>
-                  </div>
+                    <div style={{ textAlign: "right" }}>
+                      <label>จำนวนเคส : </label>
+                      <label>{x.length}</label>
+                    </div>
                   </>
                 )
               }}
@@ -159,17 +159,37 @@ export default function Mytask() {
                       </label>
 
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        {
-                          record.IssueType === 'ChangeRequest' ?
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                            <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip>
-                        }
-
-                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                        <Tooltip title="Issue Type">
+                          <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
+                            <label style={{ fontSize: "10px" }}>
+                              {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
+                        <Tooltip title="Priority">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.Priority}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                        <Tooltip title="Product">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ProductName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
+                        {/* <Divider type="vertical" /> */}
+                        <Tooltip title="Module">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ModuleName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                       </div>
                     </div>
                   );
@@ -181,24 +201,49 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <>
-                      <div>
-                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                          {record.Title}
-                        </label>
-                      </div>
-                      <div>
-                        <label
-                          onClick={() => {
-                            return (
-                              history.push({ pathname: "/internal/issue/subject/" + record.Id }),
-                              (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
-                          }
-                          }
-                          className="table-column-detail">
-                          รายละเอียด
+                      {/* <div> */}
+                      <Row align="middle">
+                        <Col span={24}>
+                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                            {record.Title}
                           </label>
+                          <Tag color="#00CC00"
+                            style={{
+                              borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
+                              display: record.TaskCnt > 1 ? "inline-block" : "none"
+                            }}
+                          >
+                            <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
+                          </Tag>
+                        </Col>
+
+                      </Row>
+                      <Row>
+                        <Col span={24}>
+
+                          <label
+                            onClick={() => {
+                              return (
+                                history.push({ pathname: "/internal/issue/subject/" + record.Id }),
+                                (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+                              )
+                            }
+                            }
+                            className="table-column-detail">
+                            รายละเอียด
+                          </label>
+
+                        </Col>
+                      </Row>
+
+
+                      {/* 
                       </div>
+                      <div>
+
+
+                      </div> */}
+
 
                     </>
                   )
@@ -260,7 +305,7 @@ export default function Mytask() {
               />
 
               <Column
-                title="ProgressStatus"
+                title="Progress Status"
                 width="10%"
                 align="center"
                 render={(record) => {
@@ -268,7 +313,7 @@ export default function Mytask() {
                     <>
 
                       <div>
-                        <label>
+                        <label className="table-column-text">
                           {record.FlowStatus}
                         </label>
                       </div>
