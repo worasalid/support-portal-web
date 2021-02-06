@@ -8,6 +8,7 @@ label.value-text {
     font-size: 12px !important;
 }
 
+
 label.table-column-text-unread {
     font-size: 12px !important;
     font-weight: bold;
@@ -82,6 +83,19 @@ div.issue-detail-box {
     padding: 16px;
     margin-top: 16px;
 
+}
+
+.issue-description {
+    font-size: 12px !important;
+    img {
+       max-width: 100%;
+    }
+}
+.comment-description {
+    font-size: 12px !important;
+    img {
+       max-width: 100%;
+    }
 }
 
 div.sd-page-header {

@@ -286,7 +286,7 @@ export default function Mytask() {
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
                       </label>
                       <br />
-                      {record.cntDueDate > 1 ?
+                      {record.cntDueDate >= 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })

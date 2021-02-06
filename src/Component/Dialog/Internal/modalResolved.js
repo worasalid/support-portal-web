@@ -1,25 +1,49 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Form} from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
-import UploadFile from '../../UploadFile'
+import { Modal, Form, Select } from 'antd';
+import UploadFile from '../../UploadFile';
 import Axios from 'axios';
+import TextEditor from '../../TextEditor';
+
+const { Option } = Select;
 
 export default function ModalResolved({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const uploadRef_testresult = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
+    const progressOnPremise = [
+        {
+            name: "Waiting Update Patch",
+            label: "Waiting Update Patch"
+        },
+        {
+            name: "Waiting Deploy to PRD",
+            label: "Waiting Deploy to PRD"
+        }
+    ]
+
+    const progressOnCloud = [
+        {
+            name: "Automatic Update Patch",
+            label: "Automatic Update Patch"
+        },
+        {
+            name: "Waiting Cus To Check",
+            label: "Waiting Cus To Check"
+        },
+        {
+            name: "Deploy PRD Completed",
+            label: "Deploy PRD Completed"
+        }
+    ]
+
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "") {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -28,7 +52,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     },
                     data: {
                         ticketid: details && details.ticketid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -59,7 +83,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         }
     }
 
-    const SendFlow = async () => {
+    const SendFlow = async (item) => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
@@ -70,7 +94,10 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 data: {
                     ticketid: details.ticketid,
                     mailboxid: details && details.mailboxid,
-                    flowoutputid: details.flowoutput.FlowOutputId
+                    flowoutputid: details.flowoutput.FlowOutputId,
+                    value: {
+                        progress_description: item.progress_description
+                    }
                 }
             });
 
@@ -86,7 +113,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
+                        editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/resolved" })
                     },
                 });
@@ -100,7 +127,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue();
                     onOk();
 
                 },
@@ -108,10 +135,9 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         }
     }
 
-
     const onFinish = (values) => {
         console.log('onFinish:', values);
-        SendFlow();
+        SendFlow(values);
     };
 
     useEffect(() => {
@@ -127,7 +153,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { return (form.resetFields(), editorRef.current.setvalue(), onCancel()) }}
             {...props}
         >
 
@@ -140,6 +166,33 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 }}
                 onFinish={onFinish}
             >
+                <Form.Item
+                    style={{ minWidth: 300, maxWidth: 800 }}
+                    label="สถานะ Progress"
+                    name="progress_description"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'กรุณาระบุ Progress'
+                        },
+                    ]}
+                >
+                    {/* <Select
+                        placeholder="None"
+                        style={{ width: "60%",display: details.iscloudsite === true ? "block" : "none" }}
+                        options={progressOnCloud.map((x) => ({ value: x.name, label: x.label }))}
+                    /> */}
+                    <Select
+                        placeholder="None"
+                        style={{ width: "60%" }}
+                        options={
+                            details.iscloudsite === false ?
+                                progressOnPremise.map((x) => ({ value: x.name, label: x.label })) :
+                                progressOnCloud.map((x) => ({ value: x.name, label: x.label }))
+                        }
+                    />
+                </Form.Item>
+
                 {
                     details.flowoutput.value === "Deploy"
                         ? ""
@@ -157,26 +210,14 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                             <UploadFile ref={uploadRef_testresult} />
                         </Form.Item>
                 }
+
+
             </Form>
 
+
+
             <label className="header-text">Remark</label>
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
+            <TextEditor ref={editorRef} />
             <br />
                      AttachFile : <UploadFile ref={uploadRef} />
 

@@ -8,57 +8,6 @@ import { useHistory } from 'react-router-dom';
 export default function Notifications(props) {
     const history = useHistory()
     const [notification, setNotification] = useState([]);
-    // const data = [
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-
-    // ];
 
     const GetNotification = async () => {
         try {

@@ -1,9 +1,10 @@
-import { Col, Tag, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Result } from "antd";
+import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Divider } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Internal/Comment";
 import InternalComment from "../../../Component/Comment/Internal/Internal_comment";
+import TaskComment from "../../../Component/Comment/Internal/TaskComment";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
@@ -11,7 +12,6 @@ import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UpCircleOutlin
 import Axios from "axios";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
-import Issuesearch from "../../../Component/Search/Internal/IssueSearch";
 import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 // import ModalDocument from "../../../Component/Dialog/Internal/modalDocument";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
@@ -26,6 +26,7 @@ import ModalComplete from "../../../Component/Dialog/Internal/modalComplete";
 import ModalReject from "../../../Component/Dialog/Internal/modalReject";
 import ModalSendTask from "../../../Component/Dialog/Internal/modalSendTask";
 import ModalManday from "../../../Component/Dialog/Internal/modalManday";
+import ModalRequestInfoDev from "../../../Component/Dialog/Internal/Issue/modalRequestInfoDev";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -41,6 +42,7 @@ export default function SubTask() {
 
   //modal
   const [visible, setVisible] = useState(false);
+  const [modalpreview, setModalpreview] = useState(false)
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalsendtask_visible, setModalsendtask_visible] = useState(false);
@@ -55,6 +57,7 @@ export default function SubTask() {
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalreject_visible, setModalreject_visible] = useState(false);
+  const [modalRequestInfoDev, setModalRequestInfoDev] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -160,51 +163,87 @@ export default function SubTask() {
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
     if (item.data.NodeName === "support") {
-      if (item.data.value === "SendIssue" || item.data.value === "ResolvedTask") {
-        setVisible(true)
-      }
+      // if (item.data.value === "ResolvedTask") {
+      //   setVisible(true)
+      // }
       if (item.data.value === "Resolved") { setModalresolved_visible(true) }
-      if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
-      if (item.data.value === "RejectToQA") { setModalsendtask_visible(true) }
+
+
     }
     if (item.data.NodeName === "developer_2") {
-      if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
-      if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
       if (item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
       if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
-      if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
       if (item.data.value === "LeaderReject") { setModalsendtask_visible(true) }
-
     }
     if (item.data.NodeName === "developer_1") {
       if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
       if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
     }
     if (item.data.NodeName === "qa_leader") {
-      if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
-      if (item.data.value === "QApass") { setModalQA_visible(true) }
-      if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
-      if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
+
     }
     if (item.data.NodeName === "qa") {
       if (item.data.value === "QAReject") { setModalsendtask_visible(true) }
       setModalQA_visible(true)
     }
 
+    // Flow Bug
+    if (userstate.issuedata.details[0]?.IssueType === "Bug") {
+      if (item.data.NodeName === "support") {
+        if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
+        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
+        if (item.data.value === "RejectToQA") { setModalsendtask_visible(true) }
+        if (item.data.value === "SendToDeploy") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "developer_2") {
+        if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+        if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+        if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "qa_leader") {
+        if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
+        if (item.data.value === "QApass") { setModalQA_visible(true) }
+        if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
+        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
+      }
 
+    }
     // Flow CR
-    if (item.data.NodeName === "cr_center") {
-      if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }
-      if (item.data.value === "CheckManday" || item.data.value === "RejectManday") { setModalmanday_visible(true) }
-      if (item.data.value === "SendTask") { setModalsendtask_visible(true) }
-      if (item.data.value === "RejectTask") { setModalsendtask_visible(true) }
+    if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest") {
+      if (item.data.NodeName === "support") {
+        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "cr_center") {
+        if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }
+        if (item.data.value === "CheckManday" || item.data.value === "RejectManday") { setModalmanday_visible(true) }
+        if (item.data.value === "SendTask") { setModalsendtask_visible(true) }
+        if (item.data.value === "RejectTask") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "developer_2") {
+        if (item.data.value === "SendManday") { setModalmanday_visible(true) }
+        if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
+        if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+        if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+      }
+      if (item.data.NodeName === "qa_leader") {
+        if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
+        if (item.data.value === "QApass") { setModalQA_visible(true) }
+        if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
+        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
+      }
     }
-    if (item.data.NodeName === "developer_2") {
-      if (item.data.value === "SendManday") { setModalmanday_visible(true) }
-      if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
+
+    // Flow Use
+    if (userstate.issuedata.details[0]?.IssueType === "Use") {
+      if (item.data.NodeName === "support") {
+        if (item.data.value === "RequestInfoDev") { setModalRequestInfoDev(true) }
+      }
+      if (item.data.NodeName === "developer_1") {
+        if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
+      }
+    }
 
 
-    }
   }
 
   function renderColorPriority(param) {
@@ -329,6 +368,15 @@ export default function SubTask() {
                           </Typography.Title>
                         </Col>
                         <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                          <Button title="preview" type="link"
+                            icon={<img
+                              style={{ height: "20px", width: "20px" }}
+                              src={`${process.env.PUBLIC_URL}/icons-expand.png`}
+                              alt=""
+                            />}
+                            onClick={() => setModalpreview(true)}
+                          />
+                          <Divider type="vertical" />
                           <Button type="link"
                             onClick={
                               () => {
@@ -344,10 +392,7 @@ export default function SubTask() {
                       </Row>
                       <Row>
                         <div style={{ display: divcollapse }}>
-                          <p>
-                            {userstate.taskdata.data[0] && userstate.taskdata.data[0].Description}
-                          </p>
-
+                          <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }} ></div>
                         </div>
                       </Row>
                     </div>
@@ -374,7 +419,7 @@ export default function SubTask() {
                     {
                       <Tabs defaultActiveKey="1" >
                         <TabPane tab="Internal Note" key="1" >
-                          <InternalComment />
+                          <TaskComment />
                         </TabPane>
                         <TabPane tab="History Log" key="2">
                           <Historylog />
@@ -398,9 +443,7 @@ export default function SubTask() {
                 <Col span={18}
                   style={{
                     marginTop: 10,
-                    display: userstate.taskdata.data[0]?.MailType === "in" &&
-                     // userstate.taskdata.data[0]?.Status !== "Resolved" &&
-                      divProgress === "show" ? "block" : "none"
+                    display: userstate.taskdata.data[0]?.MailType === "in" ? "block" : "none"
                   }}
                 >
                   <Select ref={selectRef}
@@ -420,8 +463,8 @@ export default function SubTask() {
                 <Col span={18}
                   style={{
                     display:
-                      //userstate.taskdata.data[0]?.Status === "Resolved" &&
-                      userstate.taskdata.data[0]?.MailType === "in" &&
+                      userstate.taskdata.data[0]?.Status === "Resolved" &&
+                        userstate.taskdata.data[0]?.MailType === "in" &&
                         divProgress === "hide" ? "block" : "none"
                   }}>
                   <label className="value-text">{userstate.taskdata.data[0]?.FlowStatus}</label>
@@ -478,13 +521,13 @@ export default function SubTask() {
                         {userstate.taskdata.data[0] &&
                           (userstate.taskdata.data[0].DueDate === null ? "None" : moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm"))}
                       </Button>
-                      : <label>&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
+                      : <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
                   }
-                  {history_duedate_data.length > 1 ?
+                  {/* {history_duedate_data.length > 1 ?
                     <Tag color="warning">
                       DueDate ถูกเลื่อน
                    </Tag> : ""
-                  }
+                  } */}
                 </Col>
               </Row>
 
@@ -540,6 +583,22 @@ export default function SubTask() {
       </div>
 
       {/* Modal */}
+      <Modal
+        title="Preview"
+        width={1000}
+        visible={modalpreview}
+        onCancel={() => setModalpreview(false)}
+      >
+        <Row>
+          <Col span={16} style={{ display: "inline" }}>
+            <Typography.Title level={4}>
+              <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.taskdata?.data[0]?.Title}
+            </Typography.Title>
+          </Col>
+        </Row>
+        <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }} ></div>
+      </Modal>
+
       <Modal
         title="ประวัติ DueDate"
         visible={historyduedate_visible}
@@ -717,6 +776,27 @@ export default function SubTask() {
           taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
           mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
           flowoutputid: userstate.node.output_data.FlowOutputId
+        }}
+      />
+
+      <ModalRequestInfoDev
+        title={ProgressStatus}
+        visible={modalRequestInfoDev}
+        onCancel={() => { return (setModalRequestInfoDev(false), setSelected(null)) }}
+        width={800}
+        onOk={() => {
+          setModalRequestInfoDev(false);
+        }}
+        onCancel={() => {
+          setModalRequestInfoDev(false);
+          // window.location.reload("false");
+        }}
+        details={{
+          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+          flowoutputid: userstate.node.output_data.FlowOutputId,
+          flowoutput: userstate.node.output_data
         }}
       />
 

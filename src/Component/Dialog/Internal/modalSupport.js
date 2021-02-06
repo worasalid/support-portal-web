@@ -1,32 +1,30 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Select, Button } from 'antd';
+import React, { useState, useRef, useContext } from 'react';
+import { useHistory } from "react-router-dom";
+import { Modal, Form } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+// import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import IssueContext from '../../../utility/issueContext';
+import TextEditor from '../../TextEditor';
 
 
 export default function ModalSupport({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const [formRef, setFormRef] = useState(null);
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
     //data
-    const [counttask,setCounttask] = useState(null)
+    const [counttask, setCounttask] = useState(null)
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
+
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "") {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -35,7 +33,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -59,7 +57,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 }
             });
             if (task.data.filter((x) => x.Status === "Waiting Progress")) {
-                
+
             }
         } catch (error) {
 
@@ -79,16 +77,14 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
-                    value: {
-                        comment_text: textValue
-                    }
-                   
+                    
+
                 }
             });
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -104,7 +100,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         } else {
                             history.push({ pathname: "/internal/issue/inprogress" });
                         }
-                      
+
                     },
                 });
             }
@@ -179,7 +175,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     </Select>
                 </Form.Item> */}
 
-                
+
                 {/* <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="module"
@@ -207,23 +203,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 </Form.Item> */}
             </Form>
              Remark :
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
+            <TextEditor ref={editorRef} />
             <br />
              AttachFile : <UploadFile ref={uploadRef} />
         </Modal>

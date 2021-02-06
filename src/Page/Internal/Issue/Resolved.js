@@ -241,7 +241,7 @@ export default function Resolved() {
                       </label>
                       <br />
 
-                      {record.cntDueDate > 1 ?
+                      {record.cntDueDate >= 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })

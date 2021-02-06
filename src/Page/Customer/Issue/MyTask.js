@@ -195,7 +195,7 @@ export default function MyTask() {
                         onClick={() => {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id }),
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id }),
                             (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
@@ -240,7 +240,7 @@ export default function MyTask() {
               }
                     <br />
                    
-                    {record.cntDueDate > 1 ?
+                    {record.cntDueDate >= 1 ?
                       <Tag color="warning"
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -248,7 +248,7 @@ export default function MyTask() {
                         }
                         }
                       >
-                        เลื่อน DueDate
+                         DueDate ถูกเลื่อน
                    </Tag> : ""
                     }
 
@@ -299,7 +299,8 @@ export default function MyTask() {
         visible={historyduedate_visible}
         onCancel={() => setHistoryduedate_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.datarow.Id
+          ticketId: customerstate.issuedata.datarow.Id,
+          duedate: customerstate.issuedata.datarow.SLA_DueDate
         }}
       >
       </DuedateLog>

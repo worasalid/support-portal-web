@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Modal, Form, InputNumber, Input, List, Row, Col, Radio, Tag } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
@@ -78,8 +78,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null){
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -89,7 +89,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: textValue,
-                        comment_type: details.flowoutput.Type === "Issue" ? "customer" : "internal",
+                        comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -121,6 +121,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
             if (sendflow.status === 200) {
                 SaveComment();
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -129,8 +130,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk();
+                        editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -144,7 +144,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue();
                     onOk();
 
                 },
@@ -175,6 +175,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
             if (SendFlowIssue.status === 200) {
                 SaveComment();
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -183,8 +184,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk();
+                        editorRef.current.setvalue();
+                     
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -198,7 +199,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue();
                     onOk();
 
                 },
@@ -208,9 +209,6 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
 
     const onFinish = (values) => {
-        console.log('Success:', values);
-        console.log('totalmanday:', totalmanday);
-        console.log('totalcost:', totalcost);
         details.flowoutput.Type === "Task" ? SendFlowTask(values) : SendFlowIssue(values)
     };
 
@@ -264,10 +262,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     label="Manday (Devs)"
                 >
                     <InputNumber min={0.25} max={100} step={0.25} style={{ width: "30%" }} />
-
-
                 </Form.Item>
-
             </Form>
 
             <Form form={form2} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }} {...form2Props}
@@ -367,7 +362,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                             <Col span={10} style={{ textAlign: "right" }}>
                                 <label>Total Cost</label>
                             </Col>
-                            <Col span={10} style={{ textAlign: "right", borderBottom:"1px solid" }}>
+                            <Col span={10} style={{ textAlign: "right", borderBottom: "1px solid" }}>
                                 <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label>
                                 <u></u>
                             </Col>
@@ -379,26 +374,10 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                 </Row>
             </Form>
 
-            <Row style={{marginTop: 50}}>
+            <Row style={{ marginTop: 50 }}>
                 <Col span={24}>
                     <label>Remark :</label> <br />
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
+                    <TextEditor ref={editorRef} />
                     <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                 </Col>

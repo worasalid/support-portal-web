@@ -60,10 +60,10 @@ export default function Historylog({ loading = false }) {
                         title={
                             <>
                                 {(item.usertype === "user" ? <label style={{ marginRight: "6px" }}>(ICON)</label> : "")}
-                                <b>{item.createname}</b> &nbsp;&nbsp;
-                                <label style={{ color: "#fa8c16" }} > {item.description}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <label className="value-text"><b>{item.createname}</b></label>  &nbsp;&nbsp;
+                                <label className="value-text" style={{ color: "#fa8c16" }} > {item.description}</label>&nbsp;&nbsp;&nbsp;&nbsp;
                                 <ClockCircleOutlined style={{ fontSize: 18 }} />&nbsp;&nbsp;
-                                <label>{moment(item.createdate).format("DD/MM/YYYY H:mm")}</label>
+                                <label className="value-text">{moment(item.createdate).format("DD/MM/YYYY H:mm")}</label>
                             </>
                         }
 
@@ -72,9 +72,10 @@ export default function Historylog({ loading = false }) {
                             <>
                                 {item.value === "" || item.value === null ? "" :
                                     <>
-                                        { item.value} &nbsp;&nbsp;
+                                     <label className="value-text">{item.value}</label> &nbsp;&nbsp;
+                                      
                                         < SwapRightOutlined />&nbsp;&nbsp;
-                                        { item.value2}
+                                        <label className="value-text">{item.value2}</label>
                                     </>
                                 }
                             </>

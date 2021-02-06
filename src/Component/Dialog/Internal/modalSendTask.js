@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Modal, Form, Table, Tabs } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import React, { useRef } from 'react';
+import { useHistory } from "react-router-dom";
+import { Button, Modal, Form, Tabs } from 'antd';
+// import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import TextEditor from '../../TextEditor';
 
 const { TabPane } = Tabs;
 
@@ -11,18 +12,12 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
-
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null) {
+               await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -31,7 +26,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -55,7 +50,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
-                        comment_text: textValue
+                        comment_text: editorRef.current.getValue()
                     }
 
                 }
@@ -73,15 +68,15 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        if(details.flowoutput.value === "SendTask" || details.flowoutput.value === "ResolvedTask"){
+                        editorRef.current.setvalue();
+                        if (details.flowoutput.value === "SendTask" || details.flowoutput.value === "ResolvedTask") {
                             history.goBack();
                         }
-                        else{
+                        else {
                             history.push({ pathname: "/internal/issue/inprogress" });
                         }
-                       
-                     
+
+
 
                     },
                 });
@@ -95,7 +90,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue();
                     onOk();
                     history.push({ pathname: "/internal/issue/inprogress" })
                 },
@@ -108,7 +103,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
         SendFlow();
 
     };
-
+// console.log("modalsendtask")
     return (
         <Modal
             visible={visible}
@@ -135,23 +130,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     label="Remark :"
 
                 >
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
+                    <TextEditor ref={editorRef} />
                     <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                 </Form.Item>

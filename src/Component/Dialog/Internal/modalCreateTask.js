@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Modal, Form, Input, Select, Button } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import IssueContext from '../../../utility/issueContext';
+import TextEditor from '../../../Component/TextEditor';
 
 const { TextArea } = Input;
 
@@ -13,6 +12,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
 
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
+    const editorRef = useRef(null)
 
     const LoadModule = async () => {
         try {
@@ -32,7 +32,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
         }
     }
 
-    const CreateTask = async(values) => {
+    const CreateTask = async (values) => {
         try {
             const createtask = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create-task",
@@ -41,9 +41,9 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketid : details.ticketid,
+                    ticketid: details.ticketid,
                     title: values.title,
-                    description: values.description,
+                    description: editorRef.current.getValue(),
                     moduleid: values.module,
                     mailboxid: details.mailboxid
                 }
@@ -56,7 +56,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                             <p></p>
                         </div>
                     ),
-                    onOk() {                
+                    onOk() {
                         onOk();
                         form.resetFields();
                     },
@@ -67,7 +67,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                 title: 'สร้าง Task งานไม่สำเร็จ',
                 content: (
                     <div>
-                         <p>{error.message}</p>
+                        <p>{error.message}</p>
                         <p>{error.response.data}</p>
                     </div>
                 ),
@@ -76,7 +76,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                 },
             });
         }
-            
+
     }
 
     const onFinish = (values) => {
@@ -86,15 +86,16 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     useEffect(() => {
         if (visible) {
             LoadModule();
+            form.setFieldsValue({ title: details.title })
         }
-        
+
     }, [visible])
 
     // console.log("details",details)
     return (
         <Modal
             visible={visible}
-            onOk={() => {form.submit(); onCancel()}}
+            onOk={() => { form.submit(); onCancel() }}
             okText="Create"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             onCancel={() => {
@@ -111,7 +112,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                 onFinish={onFinish}
             >
                 <Form.Item
-                    style={{width: "100%"}}
+                    style={{ width: "100%" }}
                     name="title"
                     label="Title"
                     rules={[
@@ -125,12 +126,12 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                 </Form.Item>
 
                 <Form.Item
-                    style={{width: "100%"}}
+                    style={{ width: "100%" }}
                     name="description"
                     label="Description"
-                    
+
                 >
-                    <TextArea rows={5}  />
+                    <TextEditor ref={editorRef} />
                 </Form.Item>
 
                 <Form.Item

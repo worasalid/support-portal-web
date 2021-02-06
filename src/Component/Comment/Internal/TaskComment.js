@@ -1,33 +1,43 @@
-import { Comment, Avatar, Form, Button, List, Row, Col, Divider, Modal } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col, Select, Divider, Modal, Checkbox } from 'antd';
 import moment from 'moment';
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Tabs } from 'antd';
+import { Editor } from '@tinymce/tinymce-react';
 import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
-import { FileOutlined } from '@ant-design/icons';
-import ModalFileDownload from '../../Dialog/Customer/modalFileDownload';
+import { DownloadOutlined } from '@ant-design/icons';
+import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 import TextEditor from '../../TextEditor';
 
 
 const { TabPane } = Tabs;
+const { Option } = Select;
 
-export default function CommentBox() {
+export default function TaskComment({ loadingComment = false }) {
     const editorRef = useRef(null)
-
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const uploadRef = useRef(null);
-    // const history = useHistory();
+    const history = useHistory();
     const match = useRouteMatch();
+    const [form] = Form.useForm();
 
-    //data
+    // data
+
     const [commentdata, setCommentdata] = useState([]);
+    const [commenttext, setCommenttext] = useState("");
     const [commentid, setCommentid] = useState(null);
+    const [listmailbox, setListmailbox] = useState([]);
+    const [listmailto, setListmailto] = useState([]);
+    const mailto = []
 
     // Modal
     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+    const [modalemail_visible, setModalemail_visible] = useState(false);
 
-    const loadComment = async () => {
+    const [disabled, setDisabled] = useState(false)
+
+    const loadInternalComment = async () => {
         try {
             const commment_list = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/loadcomment",
@@ -36,9 +46,8 @@ export default function CommentBox() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: match.params.id,
-                    type: "customer"
-
+                    taskId: match.params.task,
+                    type: "task"
                 }
             });
             if (commment_list.status === 200) {
@@ -46,7 +55,7 @@ export default function CommentBox() {
                     return {
                         id: values.Id,
                         author: values.CreateName,
-                        datetime: moment(values.CreateDate).format("DD/MM/YYYY HH:mm"),
+                        datetime: moment(values.CreateDate).format("DD/MM/YYYY H:mm"),
                         content: values.Text,
                         cntfile: values.cntFile,
                         avatar: values.ProfileImage,
@@ -60,10 +69,27 @@ export default function CommentBox() {
         }
     }
 
-    const onFinish = async (values) => {
-        // console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
+    const LoadUserInmailbox = async () => {
         try {
+            const mailbox = await Axios({
+                url: process.env.REACT_APP_API_URL + "/workflow/user-mailbox",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    ticketId: match.params.id,
+                }
+            });
+            setListmailbox(mailbox.data);
+        } catch (error) {
 
+        }
+    }
+
+    const onFinish = async (values) => {
+
+        try {
             if (editorRef.current.getValue() === "" || editorRef.current.getValue() === null) {
                 throw ("กรุณาระบุ Comment!")
             }
@@ -76,9 +102,11 @@ export default function CommentBox() {
                 },
                 data: {
                     ticketid: match.params.id,
+                    taskid: match.params.task,
                     comment_text: editorRef.current.getValue(),
-                    comment_type: "customer",
+                    comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    userid: values.sendto
                 }
             });
 
@@ -91,15 +119,22 @@ export default function CommentBox() {
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.setvalue();
+                        editorRef.current.setvalue()
+                        setModalemail_visible(false)
                         setLoading(true);
+                        form.resetFields();
 
                     },
                 });
+
+
             }
+
         } catch (error) {
+            console.log(error.response);
             Modal.info({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
+
                 okText: "Close",
                 // okCancel:true,
                 content: (
@@ -108,7 +143,9 @@ export default function CommentBox() {
                     </div>
                 ),
                 onOk() {
+                    setModalemail_visible(false)
                     editorRef.current.setvalue()
+                    form.resetFields();
                 },
                 onCancel() {
 
@@ -119,14 +156,14 @@ export default function CommentBox() {
 
     useEffect(() => {
         setTimeout(() => {
-            loadComment()
             setLoading(false)
+            loadInternalComment()
         }, 1000)
     }, [])
 
     useEffect(() => {
         setTimeout(() => {
-            loadComment()
+            loadInternalComment()
             setLoading(false)
         }, 1000)
 
@@ -155,16 +192,16 @@ export default function CommentBox() {
                         }
                         content={
                             <>
-                                <label className="comment-description " dangerouslySetInnerHTML={{ __html: item.content }} ></label>
-                                <Divider style={{ marginTop: 20 }} />
+                                <label className="value-text" dangerouslySetInnerHTML={{ __html: item.content }} ></label>
+                                <Divider style={{ margin: 0, marginBottom: 10 }} />
                                 {item.cntfile === 0 ? "" :
                                     <div>
                                         <Row>
                                             <Col span={24}>
                                                 <label
                                                     onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
-                                                    className="text-link-hover">
-                                                    <FileOutlined /> DownloadFile
+                                                    className="text-link value-text">
+                                                    <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
                                                 </label>
                                             </Col>
                                         </Row>
@@ -173,7 +210,10 @@ export default function CommentBox() {
                             </>
 
                         }
+                        actions={[
 
+                        ]
+                        }
                     >
 
                     </Comment>
@@ -181,21 +221,18 @@ export default function CommentBox() {
             />
 
             <Tabs defaultActiveKey="1">
-                <TabPane tab="Reply To ICON" key="1">
+                <TabPane tab="Internal Note" key="1">
                     <Form
-                        name="issue"
+                        name="Internal"
                         initialValues={{
-                            // product: "REM",
-                            // module: "CRM",
-                            // issue_type: "Bug",
                         }}
                         layout="vertical"
-                        onFinish={onFinish}
+                    // onFinish={onFinish}
                     >
-                        <Form.Item name="comment">
+                        <Form.Item name="Internal_comment">
                             <TextEditor ref={editorRef} />
                         </Form.Item>
-                        <Form.Item name="fileattach">
+                        <Form.Item name="Internal_fileattach">
                             <Row>
                                 <Col span={2} style={{ display: "inline" }} >
                                     Attach :
@@ -204,7 +241,17 @@ export default function CommentBox() {
                                     <Uploadfile ref={uploadRef} />
                                 </Col>
                                 <Col span={18} style={{ textAlign: "right" }}>
-                                    <Button htmlType="submit" type="primary">
+                                    {/* <Button htmlType="submit" type="primary">
+                                        Add Comment
+                                    </Button> */}
+                                    <Button type="primary"
+                                        onClick={() => {
+                                            return (
+                                                setModalemail_visible(true),
+                                                LoadUserInmailbox()
+                                            )
+                                        }
+                                        }>
                                         Add Comment
                                     </Button>
                                 </Col>
@@ -230,8 +277,66 @@ export default function CommentBox() {
                     reftype: "Log_Ticket_Comment",
                     grouptype: "comment"
                 }}
-
             />
+
+            <Modal
+                title="Internal Note"
+                visible={modalemail_visible}
+                onCancel={() => {
+                    return (
+                        setModalemail_visible(false),
+                        setDisabled(false),
+                        form.resetFields()
+                    )
+                }
+                }
+                width={600}
+                okText="Send"
+                okButtonProps={{ type: "primary", htmlType: "submit" }}
+                onOk={() => { return (form.submit()) }}
+
+            >
+                <Form
+                    form={form}
+                    name="email_send"
+                    initialValues={{
+
+                    }}
+                    layout="horizontal"
+                    onFinish={onFinish}
+                >
+                    <Form.Item name="email_All" label="ส่งทุกคน" valuePropName="checked">
+                        <Checkbox onChange={(e) => {
+                            return (
+                                setDisabled(e.target.checked)
+                            )
+
+
+                        }} />
+                    </Form.Item>
+                    <Form.Item name="sendto" label="To" >
+                        <Select style={{ width: '100%' }} placeholder="None"
+                            // showSearch
+                            mode="multiple"
+                            disabled={disabled}
+                            allowClear
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+
+                            // onChange={(value, item) => setListmailbox(item.value)}
+                            options={
+                                listmailbox && listmailbox.map((item) => ({
+                                    value: item.UserId,
+                                    label: item.UserName + " (" + item.Email + ")"
+                                }))
+                            }
+                        >
+                        </Select>
+                    </Form.Item>
+                </Form>
+
+            </Modal>
         </>
     );
 }

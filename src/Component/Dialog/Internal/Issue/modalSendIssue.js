@@ -1,27 +1,20 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
-import {  Modal, Form, Tabs } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import {  Modal, Form } from 'antd';
 import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
-
+import TextEditor from '../../../TextEditor';
 // const { TabPane } = Tabs;
 
 export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
-
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -31,8 +24,8 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
-                        comment_type: "customer",
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: details.flowoutput.Type === "Issue" ? "internal" : "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -53,10 +46,10 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 data: {
                     ticketid: details.ticketid,
                     mailboxid: details && details.mailboxid,
-                    flowoutputid: details.flowoutput.FlowOutputId,
-                    value: {
-                        comment_text: textValue
-                    }
+                    flowoutputid: details.flowoutput.FlowOutputId
+                    // value: {
+                    //     comment_text: editorRef.current.getValue()
+                    // }
                   
                 }
             });
@@ -72,8 +65,13 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        editorRef.current.setvalue();
+                        if(details.flowoutput.value === "Resolved"){
+                            history.push({ pathname: "/internal/issue/resolved" })
+                        }else{
+                            history.push({ pathname: "/internal/issue/inprogress" })
+                        }
+                    
                     },
                 });
             }
@@ -86,7 +84,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue();
                     onOk();
                     history.push({ pathname: "/internal/issue/inprogress" })
                 },
@@ -95,11 +93,9 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
         SendFlow();
     };
-
-
+    
     return (
         <Modal
             visible={visible}
@@ -126,23 +122,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                     label="Remark :"
                     
                 >
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
+                     <TextEditor ref={editorRef} />
                     <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                 </Form.Item>

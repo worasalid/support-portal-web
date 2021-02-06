@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Select, Table, Button, Tabs } from 'antd';
+import { useHistory } from "react-router-dom";
+import { Modal, Form, Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-import Column from 'antd/lib/table/Column';
-import { DownloadOutlined } from '@ant-design/icons';
 import TextArea from 'antd/lib/input/TextArea';
+import TextEditor from '../../TextEditor';
 
 const { TabPane } = Tabs;
 
@@ -20,14 +19,14 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     const editorRef = useRef(null)
 
     //data
-    const [listunittest, setListunittest] = useState([]);
-    const [listfiledeploy, setFiledeploy] = useState([]);
-    const [listdocument, setDocument] = useState([]);
-    const [historyvalue, setHistoryvalue] = useState(null);
+    // const [listunittest, setListunittest] = useState([]);
+    // const [listfiledeploy, setFiledeploy] = useState([]);
+    // const [listdocument, setDocument] = useState([]);
+    // const [historyvalue, setHistoryvalue] = useState(null);
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
+    // const handleEditorChange = (content, editor) => {
+    //     setTextValue(content);
+    // }
     const SaveUnitTest = async (values) => {
         const unittest = await Axios({
             url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
@@ -47,17 +46,17 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "") {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                      ticketid: details && details.ticketid,
+                        ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -90,7 +89,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 SaveComment();
                 SaveUnitTest(values);
                 onOk();
-                
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -99,7 +98,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("");
+                        editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -113,7 +112,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("");
+                    editorRef.current.setvalue();
                     onOk();
                 },
             });
@@ -125,7 +124,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
         SendFlow(values);
     };
 
-  
+
     return (
         <Modal
             visible={visible}
@@ -137,7 +136,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             {...props}
         >
 
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" ,marginTop: 0 }}
+            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white", marginTop: 0 }}
                 name="qa-test"
                 className="login-form"
                 initialValues={{
@@ -148,7 +147,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 <Form.Item
                     // style={{ minWidth: 300, maxWidth: 300 }}
                     name="linkurl"
-                    label= "URL"
+                    label="URL"
                     rules={[
                         {
                             required: false,
@@ -158,7 +157,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 >
                     <TextArea rows="2" style={{ width: "100%" }} />
                 </Form.Item>
-                
+
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     label="Unit Test"
@@ -174,24 +173,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 </Form.Item>
             </Form>
                  Remark :
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
+            <TextEditor ref={editorRef} />
+            <br />
                      AttachFile : <UploadFile ref={uploadRef} />
 
         </Modal>

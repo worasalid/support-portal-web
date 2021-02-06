@@ -133,8 +133,7 @@ export default function Cancel() {
               render={(record, index) => {
                 return (
                   <div>
-                    {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                    <label>
+                    <label className="table-column-text">
                       {record.Number}
                     </label>
                     <div style={{ marginTop: 10, fontSize: "smaller" }}>
@@ -159,8 +158,7 @@ export default function Cancel() {
                 return (
                   <>
                     <div>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                      <label>
+                      <label className="table-column-text">
                         {record.Title}
                       </label>
                     </div>
@@ -188,8 +186,7 @@ export default function Cancel() {
               render={(record) => {
                 return (
                   <>
-                    {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                    <label>
+                    <label className="table-column-text">
                       {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
                     </label>
 
@@ -235,10 +232,13 @@ export default function Cancel() {
                 return (
                   <>
                     <div>
-                      <label>{record.GroupStatus}</label>
+                      <label className="table-column-text">{record.GroupStatus}</label>
                     </div>
                     <div>
-                      {record.CanceldDate === null ? "" : moment(record.CanceldDate).format("DD/MM/YYYY HH:mm")}
+                      <label className="table-column-text">
+                        {record.CanceldDate === null ? "" : moment(record.CanceldDate).format("DD/MM/YYYY HH:mm")}
+                      </label>
+
                     </div>
                   </>
                 );
@@ -252,10 +252,14 @@ export default function Cancel() {
                 return (
                   <>
                     <div>
-                      <label>{record.CancelReasonText}</label>
+                      <label className="table-column-text">
+                        {record.CancelReasonText}
+                      </label>
                     </div>
                     <div>
-                      <label>{record.CancelDescription}</label>
+                      <label className="table-column-text">
+                        {record.CancelDescription}
+                      </label>
                     </div>
                   </>
                 );

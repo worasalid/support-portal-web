@@ -6,6 +6,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
+import TextEditor from '../../TextEditor';
 
 export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
@@ -23,7 +24,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "") {
                 const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -33,7 +34,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -110,7 +111,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
+                        editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -124,7 +125,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue();
                     onOk();
 
                 },
@@ -200,23 +201,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     <UploadFile ref={uploadRef_document} />
                 </Form.Item>
             </Form>
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
+            <TextEditor ref={editorRef} />
             <br />
                      AttachFile : <UploadFile ref={uploadRef} />
         </Modal>

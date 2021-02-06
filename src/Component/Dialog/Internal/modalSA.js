@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Modal, Form, Input, Checkbox, Radio } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
@@ -31,8 +31,8 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null) {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -41,7 +41,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -77,6 +77,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
 
             if (sendflow.status === 200) {
                 SaveComment();
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -85,8 +86,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk();
+                        editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -100,7 +100,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue();
                     onOk();
                     history.push({ pathname: "/internal/issue/inprogress" })
                 },
@@ -109,9 +109,6 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        console.log('textbox:', stdversion);
-        console.log('Success:', values);
-        console.log('textremark:', textValue);
         SendFlow(values);
     };
 
@@ -197,23 +194,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     label="Remark :"
 
                 >
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
+                    <TextEditor ref={editorRef} />
                     <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                 </Form.Item>

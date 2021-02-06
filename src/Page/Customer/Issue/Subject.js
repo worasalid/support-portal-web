@@ -141,26 +141,48 @@ export default function Subject() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
-      return (modalSendissue_visible(true))
-    }
-    if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
+    // if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
+    //   return (modalSendissue_visible(true))
+    // }
 
-    // CR FLOW
-    if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setModalconfirmManday_visible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "Reject") { 
-      modalSendissue_visible(true)
+    if (customerstate.issuedata.details[0].IssueType === "Bug") {
+      if (item.data.NodeName === "customer" &&
+        item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" ||
+        item.data.value === "SendToDeploy") {
+        return (modalSendissue_visible(true))
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
-    if (item.data.NodeName === "customer" && item.data.value === "SendPO") { return (setModalPO_visible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "RejectDueDate") { 
-      setModalDueDate_visible(true)
+
+    if (customerstate.issuedata.details[0].IssueType === "ChangeRequest") {
+      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
+        return (modalSendissue_visible(true))
+      }
+      // CR FLOW
+      if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setModalconfirmManday_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Reject") {
+        modalSendissue_visible(true)
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "SendPO") { return (setModalPO_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "RejectDueDate") {
+        setModalDueDate_visible(true)
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ApproveDueDate") {
+        setModalDueDate_visible(true)
+      }
     }
-    if (item.data.NodeName === "customer" && item.data.value === "ApproveDueDate") { 
-      setModalDueDate_visible(true)
+
+    if (customerstate.issuedata.details[0].IssueType === "Use") {
+      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
+        return (modalSendissue_visible(true))
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
-   
+
   }
 
   function renderColorPriority(param) {
@@ -239,9 +261,7 @@ export default function Subject() {
                       </Row>
                       <Row>
                         <div style={{ display: divcollapse }}>
-                          <p>
-                            {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Description}
-                          </p>
+                          <div className="issue-description" dangerouslySetInnerHTML={{ __html: customerstate?.issuedata?.details[0]?.Description }} ></div>
                         </div>
                       </Row>
                     </div>
@@ -269,6 +289,7 @@ export default function Subject() {
                       <TabPane tab="Comment" key="1">
                         <CommentBox />
                       </TabPane>
+
                       <TabPane tab="History Log" key="2">
                         <Historylog />
                       </TabPane>
@@ -369,22 +390,31 @@ export default function Subject() {
                   <label className="header-text">DueDate</label>
                   <br />
 
-                  <Button type="text"
+                  <label className="value-text">
+                    {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
+                  </label>
+
+                  {history_duedate_data.length >= 1 ?
+                    <Tag style={{ marginLeft: 16, cursor: "pointer" }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
+                      <label style={{ cursor: "pointer" }}> DueDate ถูกเลื่อน</label>
+
+                    </Tag> : ""
+                  }
+
+
+                  {/* <Button type="text"
                     style={{ padding: 0 }}
                     icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
                     className="value-text"
-                    onClick={() => setHistoryduedate_visible(true)}
                   >
-
-                    {customerstate.issuedata.details[0] &&
-                      (customerstate.issuedata.details[0].DueDate === null ? "None" : new Date(customerstate.issuedata.details[0].DueDate).toLocaleDateString('en-GB'))}
+                    {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
                   </Button>
 
-                  {history_duedate_data.length > 1 ?
-                    <Tag style={{ marginLeft: 16 }} color="warning">
+                  {history_duedate_data.length >= 1 ?
+                    <Tag style={{ marginLeft: 16 }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
                       DueDate ถูกเลื่อน
                    </Tag> : ""
-                  }
+                  } */}
                 </Col>
               </Row>
 

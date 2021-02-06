@@ -52,7 +52,7 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
                 data: {
                     ticketid: details && details.ticketid,
                     duedate: values.duedate,
-                    decription: values.description
+                    description: values.description
                 }
             });
 

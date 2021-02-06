@@ -142,7 +142,7 @@ export default function Pass() {
                         onClick={() => {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id })
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id })
                             // (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
@@ -182,7 +182,7 @@ export default function Pass() {
                       {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
                     </label>
                     <br />
-                    {record.cntDueDate > 1 ?
+                    {record.cntDueDate >= 1 ?
                       <Tag style={{ marginLeft: 16 }} color="warning"
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -241,7 +241,8 @@ export default function Pass() {
         visible={historyduedate_visible}
         onCancel={() => setHistoryduedate_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.datarow.Id
+          ticketId: customerstate.issuedata.datarow.Id,
+          duedate: customerstate.issuedata.datarow.SLA_DueDate
         }}
       >
       </DuedateLog>

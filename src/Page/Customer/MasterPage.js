@@ -5,6 +5,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import AuthenContext from "../../utility/authenContext";
 import Axios from "axios";
 import MasterContext from "../../utility/masterContext";
+import Notifications from "../../Component/Notifications/Customer/Notification";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -131,26 +132,17 @@ export default function MasterPage(props) {
                   overlayStyle={{ width: 500, height: 400 }}
                   overlay={(
                     <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
-                      <Menu.Item key="1" onClick={() => alert("Profile")}>
-                        <div style={{ height: "50vh", overflowY: "scroll" }}>
-                          <Row style={{ padding: 16 }}>
-                            <Col span={24}>
-                              <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
-                              <List
-                                itemLayout="horizontal"
-                                dataSource={data}
-                                renderItem={item => (
-                                  <List.Item>
-                                    <List.Item.Meta
-                                      avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                                      title={<a href="http://localhost:3000/space/Customer/Issue/Subject/3">{item.title}</a>}
-                                      description={item.description}
-                                    />
-                                  </List.Item>
-                                )}
-                              />
-                            </Col>
-                          </Row>
+                      <Menu.Item key="1">
+                        <div>
+                          <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
+                          <div style={{ height: "50vh", overflowY: "scroll" }}>
+                            <Row style={{ padding: 16 }}>
+                              <Col span={24}>
+
+                                <Notifications />
+                              </Col>
+                            </Row>
+                          </div>
                         </div>
                       </Menu.Item>
                     </Menu>
@@ -187,11 +179,11 @@ export default function MasterPage(props) {
               >
                 <Button type="link" >
                   <div style={{ display: "inline-block", alignItems: "center" }}>
-                    <Avatar size={48}  icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
+                    <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
                     </Avatar>
                   </div>
-                  <div style={{ display: "inline-block",marginLeft:8 }}>
+                  <div style={{ display: "inline-block", marginLeft: 8 }}>
                     <label className="user-login">
                       {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
                     </label>

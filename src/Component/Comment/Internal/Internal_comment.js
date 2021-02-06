@@ -8,6 +8,7 @@ import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
 import { DownloadOutlined } from '@ant-design/icons';
 import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
+import TextEditor from '../../TextEditor';
 
 
 const { TabPane } = Tabs;
@@ -45,7 +46,7 @@ export default function CommentBox({ loadingComment = false }) {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    taskId: match.params.task,
+                    ticketId: match.params.id,
                     type: "internal"
                 }
             });
@@ -87,11 +88,9 @@ export default function CommentBox({ loadingComment = false }) {
     }
 
     const onFinish = async (values) => {
-        console.log("onFinish", values)
-        console.log("commenttext", commenttext)
         try {
 
-            if (commenttext === "") {
+            if (editorRef.current.getValue() === "" || editorRef.current.getValue() === null) {
                 throw ("กรุณาระบุ Comment!")
             }
 
@@ -104,7 +103,7 @@ export default function CommentBox({ loadingComment = false }) {
                 data: {
                     ticketid: match.params.id,
                     taskid: match.params.task,
-                    comment_text: commenttext,
+                    comment_text: editorRef.current.getValue(),
                     comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
                     userid: values.sendto
@@ -120,10 +119,11 @@ export default function CommentBox({ loadingComment = false }) {
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
+                        editorRef.current.setvalue()
+                        form.resetFields();
                         setModalemail_visible(false)
                         setLoading(true);
-                        form.resetFields();
+
 
                     },
                 });
@@ -145,7 +145,7 @@ export default function CommentBox({ loadingComment = false }) {
                 ),
                 onOk() {
                     setModalemail_visible(false)
-                    editorRef.current.editor.setContent("")
+                    editorRef.current.setvalue()
                     form.resetFields();
                 },
                 onCancel() {
@@ -193,7 +193,7 @@ export default function CommentBox({ loadingComment = false }) {
                         }
                         content={
                             <>
-                                <label className="value-text" dangerouslySetInnerHTML={{ __html: item.content }} ></label>
+                                <div className="comment-description " dangerouslySetInnerHTML={{ __html: item.content }} ></div>
                                 <Divider style={{ margin: 0, marginBottom: 10 }} />
                                 {item.cntfile === 0 ? "" :
                                     <div>
@@ -248,28 +248,7 @@ export default function CommentBox({ loadingComment = false }) {
                     // onFinish={onFinish}
                     >
                         <Form.Item name="Internal_comment">
-
-                            {/* <TextArea rows={4} onChange={onChange} value={value} style={{ marginRight: 50 }} /> */}
-                            <Editor
-                                ref={editorRef}
-
-                                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                                initialValue=""
-                                init={{
-
-                                    height: 300,
-                                    menubar: false,
-                                    plugins: [
-                                        'advlist autolink lists link image charmap print preview anchor',
-                                        'searchreplace visualblocks code fullscreen',
-                                        'insertdatetime media table paste code help wordcount'
-                                    ],
-                                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                                }}
-
-                                onEditorChange={(content, editor) => { return (console.log("onEditorChange", editor), setCommenttext(content)) }}
-                            />
+                            <TextEditor ref={editorRef} />
                         </Form.Item>
                         <Form.Item name="Internal_fileattach">
                             <Row>
@@ -285,13 +264,14 @@ export default function CommentBox({ loadingComment = false }) {
                                     </Button> */}
                                     <Button type="primary"
                                         onClick={() => {
-                                            return (
-                                                setModalemail_visible(true),
-                                                LoadUserInmailbox()
-                                            )
+                                                return (
+                                                    (editorRef?.current?.getValue() === "" || editorRef?.current?.getValue() === null ? alert("กรุณาระบุ Comment!") :  setModalemail_visible(true)),
+                                                    LoadUserInmailbox()
+                                                )
                                         }
-                                        }>
-                                        Add Comment
+                                        }
+                                    >
+                                        Add Comments
                                     </Button>
                                 </Col>
 

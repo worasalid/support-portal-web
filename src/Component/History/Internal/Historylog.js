@@ -100,12 +100,13 @@ export default function Historylog({ type = "Issue" }) {
                         avatar={<Avatar src={item.avatar} icon={item.email.substring(0, 1).toLocaleUpperCase()} />}
                         title={
                             <>
-                                <b>{item.createname}</b> &nbsp;&nbsp;
-                                <label style={{ color: "#fa8c16" }} > {item.description}</label>&nbsp;&nbsp;&nbsp;&nbsp;
-                                {/* <label> {item.value}</label> */}
-                                <ClockCircleOutlined style={{ fontSize: 18 }} />&nbsp;&nbsp;
-                                <label>{moment(item.createdate).format("DD/MM/YYYY H:mm")}</label>
-                              
+                                <label className="value-text"><b>{item.createname}</b></label>  &nbsp;&nbsp;
+
+                                <label className="value-text" style={{ color: "#fa8c16" }} > {item.description}</label>&nbsp;&nbsp;&nbsp;
+                                <label className="value-text">{`(${item.value})` }</label>
+                                <ClockCircleOutlined style={{ fontSize: 18,marginLeft:10 }} />&nbsp;&nbsp;
+                                <label className="value-text">{moment(item.createdate).format("DD/MM/YYYY H:mm")}</label>
+
                             </>
                         }
 
@@ -114,7 +115,8 @@ export default function Historylog({ type = "Issue" }) {
                             <>
                                 {(item.value === "" || item.value === null) ? "" :
                                     <>
-                                        { item.value} &nbsp;&nbsp;
+                                        <label className="value-text">  {item.value}</label>  &nbsp;&nbsp;
+
                                         {(item.value2 === "" || item.value2 === null) ? "" :
                                             <>
                                                 < SwapRightOutlined /> <label> {item.value2}</label>
