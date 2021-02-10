@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Divider, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -14,7 +14,9 @@ import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
 
 
-export default function Complete() {
+
+
+export default function AllMyTask() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
 
@@ -48,8 +50,9 @@ export default function Complete() {
           startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
+          progress: customerstate.filter.progress,
           keyword: customerstate.filter.keyword,
-          task: "Complete",
+          task: "allmytask",
           pageCurrent: pageCurrent,
           pageSize: pageSize
         }
@@ -79,18 +82,23 @@ export default function Complete() {
     customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
   }
 
-  // const UpdateStatusMailbox = async (value) => {
-  //   const mailbox = await Axios({
-  //     url: process.env.REACT_APP_API_URL + "/tickets/read",
-  //     method: "PATCH",
-  //     headers: {
-  //       "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-  //     },
-  //     params: {
-  //       mailbox_id: value
-  //     }
-  //   });
-  // }
+  const UpdateStatusMailbox = async (value) => {
+    const mailbox = await Axios({
+      url: process.env.REACT_APP_API_URL + "/tickets/read",
+      method: "PATCH",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        mailbox_id: value
+      }
+    });
+  }
+
+  useEffect(() => {
+    //customerdispatch({ type: "CLEAR_FILTER", payload: {} })
+  }, []);
+
 
   useEffect(() => {
     customerdispatch({ type: "LOADING", payload: true })
@@ -110,7 +118,7 @@ export default function Complete() {
           <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
         </Col>
       </Row>
-      <IssueSearch />
+      <IssueSearch Progress="show" />
       <Row>
         <Col span={24}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
@@ -120,6 +128,8 @@ export default function Complete() {
                   <div style={{ textAlign: "right" }}>
                     <label>จำนวนเคส : </label>
                     <label>{x.length}</label>
+                    <label> / จากทั้งหมด : </label>
+                    <label>{pageTotal}</label>
                   </div>
                 </>
               )
@@ -128,6 +138,7 @@ export default function Complete() {
 
             onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
             onRow={(record, rowIndex) => {
+              // console.log(record, rowIndex)
               return {
                 onClick: event => { }, // click row
                 onDoubleClick: event => { }, // double click row
@@ -151,20 +162,41 @@ export default function Complete() {
               render={(record, index) => {
                 return (
                   <div>
-                    <label className="table-column-text">
+                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                       {record.Number}
                     </label>
                     <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                      {
-                        record.IssueType === 'Bug' ?
-                          <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
-                          <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
-                      }
-                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-                      <Divider type="vertical" />
-                      <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
-                      <Divider type="vertical" />
-                      <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                      <Tooltip title="Issue Type">
+                        <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
+                          <label style={{ fontSize: "10px" }}>
+                            {record.IssueType}
+                          </label>
+                        </Tag>
+                      </Tooltip>
+                      {/* <Divider type="vertical" /> */}
+                      <Tooltip title="Priority">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.Priority}
+                          </label>
+                        </Tag>
+                      </Tooltip>
+                      {/* <Divider type="vertical" /> */}
+                      <Tooltip title="Product">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.ProductName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
+                      {/* <Divider type="vertical" /> */}
+                      <Tooltip title="Module">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.ModuleName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
                     </div>
                   </div>
                 );
@@ -176,7 +208,7 @@ export default function Complete() {
                 return (
                   <>
                     <div>
-                      <label className="table-column-text">
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Title}
                       </label>
                     </div>
@@ -185,8 +217,8 @@ export default function Complete() {
                         onClick={() => {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            history.push({ pathname: "/customer/issue/subject/" + record.Id })
-                            // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id }),
+                            (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
                         }
@@ -204,7 +236,7 @@ export default function Complete() {
               render={(record) => {
                 return (
                   <>
-                    <label className="table-column-text">
+                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                       {moment(record.CreateDate).format("DD/MM/YYYY")}<br />
                       {moment(record.CreateDate).format("HH:mm")}
                     </label>
@@ -217,18 +249,21 @@ export default function Complete() {
             />
 
             <Column title="Due Date"
-              align="center"
               width="10%"
+              align="center"
               render={(record) => {
                 return (
                   <>
-                    <label className="table-column-text">
-                      {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
-                      {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
-                    </label>
+                    {record.GroupStatus === "Wait For Progress" ? "" :
+                      <label className="table-column-text">
+                        {record.SLA === null ? "" : moment(record.SLA).format("DD/MM/YYYY")}<br />
+                        {record.SLA === null ? "" : moment(record.SLA).format("HH:mm")}
+                      </label>
+                    }
                     <br />
+
                     {record.cntDueDate >= 1 ?
-                      <Tag style={{ marginLeft: 16 }} color="warning"
+                      <Tag color="warning"
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
                           setHistoryduedate_visible(true)
@@ -251,16 +286,7 @@ export default function Complete() {
               align="center"
               render={(record) => {
                 return (
-                  <>
-                    <div>
-                      <label className="table-column-text">{record.GroupStatus}</label>
-                    </div>
-                    <div>
-                      <label className="table-column-text">
-                        {record.CompleteDate === null ? "" : moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
-                      </label>
-                    </div>
-                  </>
+                  <label className="table-column-text">{record.ProgressStatus}</label>
                 );
               }}
             />
@@ -313,8 +339,8 @@ export default function Complete() {
           node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
           to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
           to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus
-
+          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
+          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
         }}
       />
 
@@ -334,6 +360,8 @@ export default function Complete() {
         }}
 
       />
+
+
       {/* </Spin> */}
     </MasterPage >
   );

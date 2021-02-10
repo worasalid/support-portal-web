@@ -177,11 +177,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                         },
                     ]}
                 >
-                    {/* <Select
-                        placeholder="None"
-                        style={{ width: "60%",display: details.iscloudsite === true ? "block" : "none" }}
-                        options={progressOnCloud.map((x) => ({ value: x.name, label: x.label }))}
-                    /> */}
+
                     <Select
                         placeholder="None"
                         style={{ width: "60%" }}

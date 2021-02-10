@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import Profile from './Page/Internal/Profile';
 
+import CustomerDashboard from './Page/Customer/Dashboard/MyDashboard';
+import CustomerAllMytask from './Page/Customer/Issue/AllMyTask';
 import CustomerMytask from './Page/Customer/Issue/MyTask';
 import CustomerComplete from './Page/Customer/Issue/Complete';
 import CustomerInProgress from './Page/Customer/Issue/InProgress';
@@ -11,7 +13,8 @@ import CustomerCancel from './Page/Customer/Issue/Cancel';
 import CustomerSubject from './Page/Customer/Issue/Subject';
 import Customerlogin from './Page/Customer/login';
 
-
+import Dashboard from './Page/Internal/DashBoard/MyDashBoard';
+import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
 import MyTask from './Page/Internal/Issue/MyTask';
 import InProgress from './Page/Internal/Issue/InProgress';
@@ -67,6 +70,8 @@ export default function Routes() {
                                     <Route path="/internal/issue/setting/mastercompany" exact component={MasterCompany} />
                                     <Route path="/internal/issue/setting/mapcompany" exact component={MappingCompany} />
                                     <Route path="/internal/issue/setting/mapdeveloper" exact component={MappingDeveloper} />
+                                    <Route path="/internal/dashboard" exact component={Dashboard} />
+                                    <Route path="/internal/issue/all" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
                                     <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />
                                     <Route path="/internal/issue/inprogress/:id?" exact component={InProgress} />
@@ -90,6 +95,8 @@ export default function Routes() {
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />
                                     <Route path="/customer/servicedesk/issuemenu" exact component={IssueMenu} />
                                     <Route path="/customer/servicedesk/issuecreate/:id?" exact component={IssueCreate} />
+                                    <Route path="/customer/dashboard" exact component={CustomerDashboard} />
+                                    <Route path="/customer/issue/alltask" exact component={CustomerAllMytask} />
                                     <Route path="/customer/issue/mytask" exact component={CustomerMytask} />
                                     <Route path="/customer/issue/inprogress" exact component={CustomerInProgress} />
                                     <Route path="/customer/issue/pass" exact component={CustomerPass} />

@@ -35,7 +35,7 @@ export default function Index() {
                 </Card>
                 <Card className="card-box issue-active" bordered hoverable
                     style={{ marginTop: 30 }}
-                    onClick={() => history.push({ pathname: "/customer/issue/mytask" })}>
+                    onClick={() => history.push({ pathname: "/customer/dashboard" })}>
                     <Meta
                         avatar={
                             <HomeOutlined style={{ fontSize: 30 }} />

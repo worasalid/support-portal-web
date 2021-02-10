@@ -49,7 +49,27 @@ export default function Subject() {
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
 
-  const getflow_output = async (trans_id) => {
+  // const getflow_output = async (trans_id) => {
+  //   const flow_output = await Axios({
+  //     url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
+  //     method: "GET",
+  //     headers: {
+  //       "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+  //     },
+  //     params: {
+  //       trans_id
+  //     }
+  //   });
+
+
+  //   customerdispatch({
+  //     type: "LOAD_ACTION_FLOW",
+  //     payload: flow_output.data.filter((x) => x.Type === "Issue" ||  x.Type === null ||
+  //                x.Type === (customerstate?.issuedata?.details[0]?.IsCloudSite === true) ? "onCloud" : "onPremiss")
+  //   })
+  // }
+
+  const getflow_output = async (value) => {
     const flow_output = await Axios({
       url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
       method: "GET",
@@ -57,10 +77,19 @@ export default function Subject() {
         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
       },
       params: {
-        trans_id
+        trans_id: value.TransId
       }
     });
-    customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+    if (flow_output.status === 200) {
+      console.log("IsCloudSite", value.IsCloudSite)
+     
+    }
+    customerdispatch({
+      type: "LOAD_ACTION_FLOW",
+      payload: flow_output.data.filter((x) => x.Type === null
+        || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
+      )
+    })
   }
 
   const getdetail = async () => {
@@ -78,7 +107,8 @@ export default function Subject() {
 
       if (ticket_detail.status === 200) {
         customerdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
-        getflow_output(ticket_detail.data[0].TransId)
+        // getflow_output(ticket_detail.data[0].TransId)
+        getflow_output(ticket_detail.data[0])
       }
     } catch (error) {
 
@@ -145,6 +175,7 @@ export default function Subject() {
     //   return (modalSendissue_visible(true))
     // }
 
+    // BUG FLOW
     if (customerstate.issuedata.details[0].IssueType === "Bug") {
       if (item.data.NodeName === "customer" &&
         item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" ||
@@ -156,11 +187,11 @@ export default function Subject() {
       if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
 
+    // CR FLOW
     if (customerstate.issuedata.details[0].IssueType === "ChangeRequest") {
       if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
         return (modalSendissue_visible(true))
       }
-      // CR FLOW
       if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setModalconfirmManday_visible(true)) }
       if (item.data.NodeName === "customer" && item.data.value === "Reject") {
         modalSendissue_visible(true)
@@ -171,6 +202,15 @@ export default function Subject() {
       }
       if (item.data.NodeName === "customer" && item.data.value === "ApproveDueDate") {
         setModalDueDate_visible(true)
+      }
+      if (item.data.value === "ReOpen") {
+        setModalreopen_visible(true)
+      }
+      if (item.data.value === "Pass") {
+        modalSendissue_visible(true)
+      }
+      if (item.data.value === "Complete") {
+        setModalcomplete_visible(true)
       }
     }
 

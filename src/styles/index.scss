@@ -74,6 +74,15 @@ label.table-column-detail:hover {
     cursor: pointer;
 }
 
+label.dashboard-card-status {
+    font-size: 14px;
+    color: gray;
+}
+
+label.dashboard-card-value {
+    font-size: 24px;
+}
+
 /// div
 div.issue-detail-box {
     border: solid 1px;

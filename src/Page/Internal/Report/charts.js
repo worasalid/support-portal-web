@@ -4,6 +4,17 @@ import MasterPage from '../MasterPage'
 
 
 export default function Charts() {
+    var result;
+    const filter = ["ICON", "ICON2"]
+    const filterdata = [
+        {
+            company: "ICON"
+        },
+        {
+            company: "ICON2"
+        }
+    ]
+
     var data = [
         {
             company: 'ICONICONICON',
@@ -198,18 +209,22 @@ export default function Charts() {
 
 
     ];
+
+
+
     var config = {
+        // data: data.map((x) => ({company: x.company, status: x.status, value: x.value})),
         data: data,
         xField: 'company',
         yField: 'value',
         seriesField: 'status',
         //isPercent: true,
         isStack: true,
-        
+
         slider: {
             start: 0,
             end: 2,
-            maxLimit:100,
+            maxLimit: 100,
         },
         label: {
             position: 'middle',
@@ -221,7 +236,7 @@ export default function Charts() {
         legend: {
             layout: 'horizontal',
             position: 'bottom'
-          },
+        },
         color: function color(x) {
             if (x.status === "Open") { return "gray" }
             if (x.status === "InProgress") { return "#5B8FF9" }
@@ -231,10 +246,12 @@ export default function Charts() {
 
         },
     };
+
+
     return (
         <MasterPage>
-            <div style={{ height: 400, width:"100%" }}>
-                <Column {...config} scrollbar="true" xAxis={{position:"bottom"}} />
+            <div style={{ height: 400, width: "100%" }}>
+                <Column {...config} scrollbar="true" xAxis={{ position: "bottom" }} />
             </div>
         </MasterPage>
     )

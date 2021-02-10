@@ -268,7 +268,13 @@ export default function Mytask() {
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
-                      <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
+                      <Tooltip title="Company">
+                        <Tag color="gray" style={{ fontSize: 8 }} >
+                          <label className="table-column-text" style={{ fontSize: 8 }}>
+                            {record.CompanyName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
 
                     </>
                   )
@@ -305,7 +311,7 @@ export default function Mytask() {
               />
 
               <Column
-                title="Progress Status"
+                title="ProgressStatus"
                 width="10%"
                 align="center"
                 render={(record) => {

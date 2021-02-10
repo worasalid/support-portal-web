@@ -7,17 +7,30 @@ import AuthenContext from '../../../utility/authenContext';
 import IssueContext, { userState } from '../../../utility/issueContext';
 
 
-export default function Issuesearch() {
+export default function Issuesearch({ Progress = "hide" }) {
     const { RangePicker } = DatePicker;
     //const { Option } = Select;
     const { state, dispatch } = useContext(AuthenContext);
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
+    const progressstatus = [
+        {
+            value: "InProgress",
+            text: "InProgress"
+        },
+        {
+            value: "Resolved",
+            text: "Resolved"
+        },
+        {
+            value: "Complete",
+            text: "Complete"
+        },
+    ]
 
     const handleChange = (e) => {
         if (e.target.group === "company") {
             userdispatch({ type: "SELECT_COMPANY", payload: e.target.value })
-
         }
         if (e.target.group === "issuetype") {
             userdispatch({ type: "SELECT_TYPE", payload: e.target.value })
@@ -28,6 +41,9 @@ export default function Issuesearch() {
         }
         if (e.target.group === "module") {
             userdispatch({ type: "SELECT_MODULE", payload: e.target.value })
+        }
+        if (e.target.name === "progress") {
+            userdispatch({ type: "SELECT_PROGRESS", payload: e.target.value })
         }
         if (e.target.group === "date") {
             userdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })
@@ -113,8 +129,20 @@ export default function Issuesearch() {
         <>
 
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={4}>
-
+            <Col span={4}>
+                    <Select placeholder="Progress"
+                        style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
+                        mode="multiple"
+                        showSearch
+                        allowClear
+                        maxTagCount={1}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'progress' } })}
+                        options={progressstatus.map((x) => ({ value: x.value, label: x.text }))}
+                        onClear={() => alert()}
+                    />
                 </Col>
                 <Col span={4} >
                     <Select placeholder="Company" mode="multiple" allowClear
@@ -185,7 +213,7 @@ export default function Issuesearch() {
                     />
 
                 </Col>
-
+               
                 <Col span={2}>
                     <Button type="primary" shape="round" icon={<SearchOutlined />}
                         style={{ backgroundColor: "#00CC00" }}

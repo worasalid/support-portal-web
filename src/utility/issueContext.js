@@ -16,6 +16,7 @@ export const customerState = {
         moduleState: [],
         TypeState: [],
         priorityState: [],
+        progress:[],
         date: {
             startdate: "",
             enddate: ""
@@ -54,6 +55,7 @@ export const userState = {
         moduleState: [],
         TypeState: [],
         priorityState: [],
+        progress:[],
         date: {
             startdate: "",
             enddate: ""
@@ -87,6 +89,7 @@ export const customerReducer = createReducer(customerState, {
     SELECT_TYPE: (state, { payload }) => { state.filter.TypeState = payload },
     SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
+    SELECT_PROGRESS: (state, { payload }) => { state.filter.progress = payload },
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
     CLEAR_FILTER: (state, { payload }) => { state.filter = payload },
     SEARCH: (state, { payload }) => { state.search = payload },
@@ -112,6 +115,7 @@ export const userReducer = createReducer(userState, {
     SELECT_MODULE: (state, { payload }) => { state.filter.moduleState = payload },
     SELECT_TYPE: (state, { payload }) => { state.filter.TypeState = payload },
     SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
+    SELECT_PROGRESS: (state, { payload }) => { state.filter.progress = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
     SEARCH: (state, { payload }) => { state.search = payload },

@@ -91,11 +91,13 @@ export default function IssueCreate() {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
-                companyid: "1"
+                companyid: state?.usersdata?.users?.company_id
             }
-
         });
-        customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
+        if (products.status === 200) {
+            customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
+        }
+
     }
 
     const getmodule = async () => {
@@ -123,14 +125,11 @@ export default function IssueCreate() {
         customerdispatch({ type: "LOAD_PRIORITY", payload: priority.data })
     }
 
-    const getMasterdata = async () => {
-        try {
-            getproducts();
-            // getmodule();
-            getpriority();
-        } catch (error) {
+    const getMasterdata = () => {
+        getproducts();
+        // getmodule();
+        getpriority();
 
-        }
     }
 
     const onFinish = async (values) => {
@@ -197,26 +196,29 @@ export default function IssueCreate() {
 
     }, [title]);
 
-    useEffect(() => {
-        if (state.authen) {
-            getMasterdata();
-        }
-        if (state?.usersdata?.users === undefined) {
-            getMasterdata();
-        }
+    // useEffect(() => {
+    //     if (!state.authen) {
+    //         getMasterdata();
+    //         getproducts();
+    //     }
+    //     if (state?.usersdata?.users === undefined) {
+    //         getMasterdata();
+    //         getproducts();
+    //     }
 
-    }, [state.authen]);
+    // }, [state.authen]);
+
+    useEffect(() => {
+        if (state?.usersdata?.users?.company_id) {
+            getMasterdata();
+        }
+    }, [state?.usersdata?.users?.company_id]);
 
     useEffect(() => {
         if (state.authen) {
             getmodule();
         }
     }, [customerstate.filter.productState]);
-
-    useEffect(() => {
-
-
-    }, []);
 
     return (
         <MasterPage>
@@ -430,7 +432,7 @@ export default function IssueCreate() {
                     </Form.Item>
                     <Form.Item {...tailLayout}>
                         <Button
-                        style={{width:100}}
+                            style={{ width: 100 }}
                             type="primary"
                             htmlType="submit"
                             size="middle"

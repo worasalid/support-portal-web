@@ -106,7 +106,7 @@ export default function InProgress() {
     }, 1000)
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, pageCurrent]);
+  }, [userstate.search,visible, pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>

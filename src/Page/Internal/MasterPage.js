@@ -3,7 +3,7 @@ import React, { Component, useState, useContext, useEffect } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown } from 'antd';
 import { Badge, Avatar } from 'antd';
-import { UserOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BarChartOutlined } from '@ant-design/icons';
+import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BarChartOutlined } from '@ant-design/icons';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined
@@ -127,6 +127,7 @@ export default function MasterPage(props) {
 
   }, [])
 
+ 
   return (
     <Layout style={{ height: "100vh" }}>
       {/* <Header style={{ backgroundColor: "#be1e2d" }}> */}
@@ -188,9 +189,9 @@ export default function MasterPage(props) {
                     <Menu.Item key="1" onClick={() => history.push({ pathname: "/internal/user/profile" })}>
                       Profile
                       </Menu.Item>
-                    <Menu.Item key="2" onClick={() => alert("Setting")}>
+                    {/* <Menu.Item key="2" onClick={() => alert("Setting")}>
                       Setting
-                      </Menu.Item>
+                      </Menu.Item> */}
                     <hr />
                     <Button type="link" onClick={() => history.push("/Login")}>Log Out</Button> <br />
                   </Menu>
@@ -224,20 +225,30 @@ export default function MasterPage(props) {
           <Menu theme="light"
             style={{ backgroundColor: "#edebec" }}
             mode="inline"
-            defaultOpenKeys={activemenu}
+            defaultOpenKeys={["sub1"]}
             defaultSelectedKeys={active_submenu}
 
           >
+             <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
+              <Menu.Item key="0" onClick={() => history.push('/internal/dashboard')}>
+                - DashBoard
+                
+              </Menu.Item>
+            </SubMenu>
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issue" >
-              <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/alltask' })}
-               style={{
-                display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
-              }}
+            <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/all' })}
+              //  style={{
+              //   display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
+              // }}
               >
-                All Task
+                All Issue
                
               </Menu.Item>
-              <Menu.Item key="1" onClick={() => history.push({ pathname: '/internal/issue/mytask' })} >
+              <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
+              {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
+                All Task
+              </Menu.Item>
+              <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
                 My Task
                 {
                   masterstate.toolbar.sider_menu.issue.mytask.count === 0
@@ -246,7 +257,7 @@ export default function MasterPage(props) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="2" onClick={() => history.push('/internal/issue/inprogress')} >
+              <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
                 In progress
                 {
                   masterstate.toolbar.sider_menu.issue.inprogress.count === 0
@@ -256,7 +267,7 @@ export default function MasterPage(props) {
                 }
               </Menu.Item>
 
-              <Menu.Item key="3" onClick={() => history.push('/internal/issue/resolved')} >
+              <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
                 Resolved
                 {
                   masterstate.toolbar.sider_menu.issue.resolved.count === 0
@@ -265,7 +276,7 @@ export default function MasterPage(props) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="4" onClick={() => history.push('/internal/issue/cancel')} >
+              <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
                 Cancel
                 {
                   masterstate.toolbar.sider_menu.issue.cancel.count === 0
@@ -274,7 +285,7 @@ export default function MasterPage(props) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="5" onClick={() => history.push('/internal/issue/complete')}>
+              <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
                 <span >Complete</span>
               </Menu.Item>
 
@@ -306,15 +317,17 @@ export default function MasterPage(props) {
               </Menu.Item>
             </SubMenu>
 
-            <SubMenu key="sub3" icon={<BarChartOutlined />} title="Report">
+            {/* <SubMenu key="sub3" icon={<BarChartOutlined />} title="Report">
               <Menu.Item key="10" onClick={() => history.push('/internal/report/charts')}>
                 - Report
                   <Badge count={1}>
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 </Badge>
               </Menu.Item>
-            </SubMenu>
-            <SubMenu key="sub4" icon={<SettingOutlined />} title="Setting">
+            </SubMenu> */}
+            <SubMenu key="sub4" icon={<SettingOutlined />} title="Setting"
+            style={{display: state.usersdata?.users.code === "I0017" ? "block" : "none"}}
+            >
               <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mastercompany')}>
                 - ข้อมูลบริษัท
               </Menu.Item>

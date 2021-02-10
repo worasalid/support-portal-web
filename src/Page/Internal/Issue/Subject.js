@@ -7,7 +7,7 @@ import InternalCommentBox from "../../../Component/Comment/Internal/Internal_com
 import Historylog from "../../../Component/History/Customer/Historylog";
 import InternalHistorylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ConsoleSqlOutlined, FileAddOutlined, PoweroffOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
@@ -293,6 +293,9 @@ export default function Subject() {
         if (item.data.value === "SendDueDate" || item.data.value === "RequestDueDate") {
           setModalduedate_visible(true)
         }
+        if (item.data.value === "Resolved") {
+          setModalsendissue_visible(true)
+        }
       }
       if (userstate.issuedata.details[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
@@ -525,7 +528,13 @@ export default function Subject() {
                     }}>
                     <Button icon={<FileAddOutlined />}
                       shape="round"
-                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ? alert("กรุณา ระบุ Priority") : setModaladdtask(true)} >
+                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
+                        Modal.info({
+                          title: 'กรุณา ระบุ Priority',
+                          okText:"Close"
+                        })
+                        : setModaladdtask(true)}
+                    >
                       CreateTask
                         </Button>
                   </Col>
@@ -762,7 +771,7 @@ export default function Subject() {
                   userstate.issuedata.details[0]?.Manday ? "block" : "none"
               }}>
                 <Col span={18}>
-                  <label className="header-text">Manday</label>
+                  <label className="header-text">Total Manday</label>
                   <Button type="link" onClick={() => setModalmandaylog_visible(true)} >{userstate.issuedata.details[0]?.Manday}</Button>
 
                 </Col>
@@ -976,6 +985,6 @@ export default function Subject() {
 
 
 
-    </MasterPage>
+    </MasterPage >
   );
 }

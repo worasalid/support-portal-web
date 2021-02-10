@@ -1,8 +1,10 @@
-import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
+import { BarChartOutlined, NotificationOutlined,PieChartOutlined, FileOutlined } from "@ant-design/icons";
 import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, List } from "antd";
 import React, { useState, useContext, useEffect } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AuthenContext from "../../utility/authenContext";
+import IssueContext from '../../utility/issueContext';
+//import IssueContext, { customerReducer, customerState } from "../../utility/issueContext";
 import Axios from "axios";
 import MasterContext from "../../utility/masterContext";
 import Notifications from "../../Component/Notifications/Customer/Notification";
@@ -15,6 +17,7 @@ export default function MasterPage(props) {
   const match = useRouteMatch();
   const [show_notice, setshow_notice] = useState(true);
   const { state, dispatch } = useContext(AuthenContext);
+  //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
   const [activemenu, setActivemenu] = useState([])
 
@@ -96,20 +99,23 @@ export default function MasterPage(props) {
   }, [])
 
   useEffect(() => {
-    if (match.url.search("mytask") > 0) {
-      setActivemenu(activemenu.push("1"))
-    }
-    if (match.url.search("inprogress") > 0) {
+    if (match.url.search("alltask") > 0) {
       setActivemenu(activemenu.push("2"))
     }
-    if (match.url.search("pass") > 0) {
+    if (match.url.search("mytask") > 0) {
       setActivemenu(activemenu.push("3"))
     }
-    if (match.url.search("cancel") > 0) {
+    if (match.url.search("inprogress") > 0) {
       setActivemenu(activemenu.push("4"))
     }
-    if (match.url.search("complete") > 0) {
+    if (match.url.search("pass") > 0) {
       setActivemenu(activemenu.push("5"))
+    }
+    if (match.url.search("cancel") > 0) {
+      setActivemenu(activemenu.push("6"))
+    }
+    if (match.url.search("complete") > 0) {
+      setActivemenu(activemenu.push("7"))
     }
   }, [])
 
@@ -219,12 +225,32 @@ export default function MasterPage(props) {
                 แจ้งปัญหาการใช้งาน
               </Button>
             </div>
-
-            <SubMenu key="sub1" title="Issues">
+            <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
+              <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
+                - DashBoard
+                
+              </Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub1" icon={<FileOutlined />} title="Issues">
               <Menu.Item
-                key="1"
-                onClick={() =>
-                  history.push({ pathname: "/customer/issue/mytask" })
+                key="2"
+                onClick={() =>  history.push('/customer/issue/alltask')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/allmytask" }), window.location.reload(true)) 
+                  // }
+                  
+                }
+              >
+                All Task
+               
+
+              </Menu.Item>
+              <Menu.Item
+                key="3"
+                onClick={() => history.push('/customer/issue/mytask')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/mytask" }), window.location.reload(true)) 
+                  // }
                 }
               >
                 My Task
@@ -237,9 +263,10 @@ export default function MasterPage(props) {
 
               </Menu.Item>
               <Menu.Item
-                key="2"
+                key="4"
                 onClick={() =>
-                  history.push({ pathname: "/customer/issue/inprogress" })
+                  // history.push({ pathname: "/customer/issue/inprogress" })
+                  history.push('/customer/issue/inprogress')
                 }
               >
                 In progress
@@ -251,9 +278,11 @@ export default function MasterPage(props) {
                 }
               </Menu.Item>
               <Menu.Item
-                key="3"
-                onClick={() =>
-                  history.push({ pathname: "/customer/issue/pass" })
+                key="5"
+                onClick={() =>  history.push('/customer/issue/pass')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/pass" }), window.location.reload(true)) 
+                  // }
                 }
               >
                 Pass
@@ -265,9 +294,11 @@ export default function MasterPage(props) {
                 }
               </Menu.Item>
               <Menu.Item
-                key="4"
+                key="6"
                 onClick={() =>
-                  history.push({ pathname: "/customer/issue/cancel" })
+                  {
+                    return ( history.push({ pathname: "/customer/issue/cancel" }), window.location.reload(true)) 
+                  }
                 }
               >
                 Cancel
@@ -279,12 +310,22 @@ export default function MasterPage(props) {
                 }
               </Menu.Item>
               <Menu.Item
-                key="5"
-                onClick={() =>
-                  history.push({ pathname: "/customer/issue/complete" })
+                key="7"
+                onClick={() => history.push('/customer/issue/complete')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/complete" }), window.location.reload(true)) 
+                  // }
                 }
               >
                 Completed
+              </Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
+              <Menu.Item key="10" onClick={() => history.push('/customer/report/charts')}>
+                - Report
+                  <Badge count={1}>
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                </Badge>
               </Menu.Item>
             </SubMenu>
           </Menu>
@@ -301,6 +342,7 @@ export default function MasterPage(props) {
             padding: 24,
             margin: 0,
             minHeight: 280,
+            // backgroundColor: "#f0f2f5",
             backgroundColor: "#fff",
           }}
         >

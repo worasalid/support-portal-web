@@ -118,7 +118,7 @@ export default function Complete() {
     }, 1000)
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
+  }, [userstate.search, pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>

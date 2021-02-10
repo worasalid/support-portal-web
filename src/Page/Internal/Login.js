@@ -40,10 +40,14 @@ export default function NormalLoginForm() {
         },
       });
 
-      localStorage.setItem("sp-ssid", result.data);
-      dispatch({ type: 'Authen', payload: true });
-      dispatch({ type: 'LOGIN', payload: result.data.users });
-      history.push("/internal/issue/mytask");
+      if (result.status === 200) {
+        localStorage.setItem("sp-ssid", result.data);
+        dispatch({ type: 'Authen', payload: true });
+        dispatch({ type: 'LOGIN', payload: result.data.users });
+        history.push("/internal/dashboard");
+      }
+
+
     } catch (error) {
       alert("ข้อมููลไม่ถูกต้อง");
     }

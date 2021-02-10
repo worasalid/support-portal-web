@@ -14,7 +14,7 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 import Clock from "../../../utility/countdownTimer";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
-export default function AllTask() {
+export default function AllIssue() {
   const history = useHistory();
 
   //modal
@@ -55,7 +55,7 @@ export default function AllTask() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "alltask",
+          task: "allissue",
           pageCurrent: pageCurrent,
           pageSize: pageSize
         }
@@ -104,8 +104,27 @@ export default function AllTask() {
           </Col>
         </Row>
 
-        <IssueSearch Progress="show" />
+        <IssueSearch Progress="show"/>
+        {/* <Row style={{ textAlign: "left", marginTop:30 }}>
+       
+          <Col span={3} style={{ textAlign: "left" }}>
+            <Tag color="default">Open</Tag>:&nbsp;&nbsp;
+            {issueAllStatus?.open}
+          </Col>
+          <Col span={3} style={{ textAlign: "left" }}>
+            <Tag color="#FFA500">InProgress</Tag>:&nbsp;&nbsp;
+            {issueAllStatus?.inprogress}
+          </Col>
+          <Col span={3} style={{ textAlign: "left" }}>
+            <Tag color=" #87d068">Resolved</Tag>:&nbsp;&nbsp;
+            {issueAllStatus?.resolved}
+          </Col>
+          <Col span={3} style={{ textAlign: "left" }}>
 
+            <Tag color=" #87d068">Complete</Tag>:&nbsp;&nbsp;
+            {issueAllStatus?.complete}
+          </Col>
+        </Row> */}
 
         <Row>
           <Col span={24}>
@@ -264,8 +283,8 @@ export default function AllTask() {
                     <>
 
                       <div>
-                        <label className = "table-column-text">
-                          {record.InternalStatus}<br />
+                      <label className = "table-column-text">
+                          {record.InternalStatus}<br/>
                           {record.FlowStatus}
                         </label>
                       </div>

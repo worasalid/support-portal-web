@@ -211,7 +211,7 @@ export default function SubTask() {
     // Flow CR
     if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest") {
       if (item.data.NodeName === "support") {
-        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
+        if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR") { setModalsendtask_visible(true) }
       }
       if (item.data.NodeName === "cr_center") {
         if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }

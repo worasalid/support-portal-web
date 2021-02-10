@@ -205,7 +205,7 @@ export default function RicefHeader({ name, ...props }) {
                     Status: x.Status,
                     Manday: x.Manday,
                     DueDate: x.DueDate,
-                    Owner: x.Owner,
+                    Owner: x.OwnerName,
                     UnitTest_URL: x.UnitTest_URL
 
                 }
@@ -320,7 +320,7 @@ export default function RicefHeader({ name, ...props }) {
                         type="link"
                         // icon={<DownloadOutlined />}
                         target="_blank"
-                        onClick={() => window.open("https://drive.google.com/u/0/uc?id=1txcydTJ4PVCFJ_ElKuuhWk_5sz0Metux&export=download", "_blank")}
+                        onClick={() => window.open("https://drive.google.com/file/d/1txcydTJ4PVCFJ_ElKuuhWk_5sz0Metux/view?usp=sharing", "_blank")}
                     >
                         <img
                             style={{ height: "35px" }}
