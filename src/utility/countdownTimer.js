@@ -24,6 +24,7 @@ class Clock extends Component {
     // คำนวนระยะเวลาทำงาน
     if (type === "timeworking") {
       this.getTimeWorking(node_receivedate, node_senddate)
+     // console.log("A")
     }
 
     // SLA ยังไม่เกิน DueDate
@@ -33,6 +34,7 @@ class Clock extends Component {
 
       //setInterval(() => this.getTimeUntil(this.props.deadline), 1000);
       this.dateTimeDiffToNow(this.props.deadline)
+     // console.log("B")
     }
     /// SLA เกิน DueDate (กรณีแก้ไขยังไม่เสร็จ)
     if (this.props.resolvedDate === undefined &&
@@ -40,11 +42,15 @@ class Clock extends Component {
       type === undefined) {
       //setInterval(() => this.getTimeUntil(this.props.deadline), 1000);
       this.dateTimeDiffToNow(this.props.deadline)
+      //console.log("C")
     }
 
     /// SLA เกิน DueDate (กรณีแก้ไขเสร็จ)
     if (this.props.resolvedDate !== undefined && type === undefined) {
       this.getTimeUntil(deadline, createdate, resolvedDate);
+     // console.log("D");
+     // console.log("resolvedDate",this.props.resolvedDate);
+
     }
 
   }
@@ -58,10 +64,9 @@ class Clock extends Component {
     //let to = moment(new Date("2020-11-18 09:15"))
     let to = moment();
     let diff = Math.abs(moment(from.format("YYYY-MM-DD")).diff(moment(to.format("YYYY-MM-DD")), 'days'));
-
     let minute = 0;
     let timehistory = [];
-    for (let i = 0; i <= diff; i++) {
+    for (let i = 0; i <= 1; i++) {
 
 
       let result = moment(from).add(i, 'd');
@@ -79,7 +84,7 @@ class Clock extends Component {
           minute: Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute')) % 60,
           remark: 1
         })
-        console.log("1");
+
         // minute += Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute'))
       }
 
@@ -103,7 +108,7 @@ class Clock extends Component {
               : Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute')) % 60,
             remark: 2
           })
-          console.log("2");
+
         } else {
           timehistory.push({
             timestart: moment(result).format("YYYY-MM-DD 09:00"),
@@ -117,7 +122,7 @@ class Clock extends Component {
             remark: 2
           })
         }
-        console.log("2-1");
+
         minute += Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(to.format("YYYY-MM-DD HH:mm")), 'minute')) % 60
       }
 
@@ -134,7 +139,7 @@ class Clock extends Component {
           minute: Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute')) % 60,
           remark: 3
         })
-        console.log("3");
+
         // minute += Math.abs(moment(result.format("YYYY-MM-DD 09:00")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute'))
       }
 
@@ -153,10 +158,10 @@ class Clock extends Component {
           minute: Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute')) % 60,
           remark: 4
         })
-        console.log("4");
+
         // minute += Math.abs(moment(result.format("YYYY-MM-DD HH:mm")).diff(moment(result.format("YYYY-MM-DD 18:00")), 'minute'))
       }
-      console.log("timehistory", timehistory);
+
     }
     // let seconds = minute % 3600;
     // let minutes = minute % 60;
@@ -164,7 +169,8 @@ class Clock extends Component {
     // let hours = h % 8;
     // let days = Math.floor(h / 8);
     // let overdue = true
-    // console.log("timehistory", timehistory)
+
+    //console.log("timehistory", timehistory)
 
     let minutes = 0;
     for (let i = 0; i < timehistory.length; i++) {
@@ -179,14 +185,14 @@ class Clock extends Component {
     let d = Math.floor(hours / 8);
 
     // console.log({ days: d, hours: h, minutes: min});
-    const overdue = moment(from).format("YYYY-MM-DD HH:mm") < moment(to).format("YYYY-MM-DD HH:mm") ?true : false
+    const overdue = moment(from).format("YYYY-MM-DD HH:mm") < moment(to).format("YYYY-MM-DD HH:mm") ? true : false
     this.setState({ days: d, hours: h, minutes: min, seconds: 0, overdue: overdue });
   }
 
   getTimeUntil(deadline, createdate, resolvedDate) {
     let time;
     if (resolvedDate !== undefined && createdate !== undefined) {
-      time = Date.parse(createdate) - Date.parse(resolvedDate);
+      time = Date.parse(deadline) - Date.parse(resolvedDate);
 
     } else {
       time = Date.parse(deadline) - Date.parse(new Date());

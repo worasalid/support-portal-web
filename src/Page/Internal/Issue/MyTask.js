@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Tooltip, Divider } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -35,6 +35,9 @@ export default function Mytask() {
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageTotal, setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
 
@@ -42,7 +45,7 @@ export default function Mytask() {
     // setLoadding(true);
     try {
       const results = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -55,33 +58,21 @@ export default function Mytask() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "mytask"
+          task: "mytask",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
 
-        // masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
-        userdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
     } catch (error) {
 
     }
   };
-
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
-      }
-    });
-    userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
-  }
 
   const UpdateStatusMailbox = async (value) => {
     const mailbox = await Axios({
@@ -96,14 +87,11 @@ export default function Mytask() {
     });
   }
 
-
-
   function HandleChange(items) {
     console.log("Menu", items.item.props.node)
     if (items.item.props.node === "support") { setVisible(true) }
     if (items.item.props.node === "developer_1") { setModaldeveloper_visible(true) }
     if (items.item.props.node === "qa" || items.item.props.node === "developer_2") { setModalQA_visible(true) }
-
   }
 
   useEffect(() => {
@@ -114,7 +102,7 @@ export default function Mytask() {
     }, 1000)
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
+  }, [userstate.search, pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -130,8 +118,20 @@ export default function Mytask() {
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
+              footer={(x) => {
+                return (
+                  <>
+                    <div style={{ textAlign: "right" }}>
+                      <label>จำนวนเคส : </label>
+                      <label>{x.length}</label>
+                    </div>
+                  </>
+                )
+              }}
+              pagination={{ pageSize: pageSize, total: pageTotal }}
+
+              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
               onRow={(record, rowIndex) => {
-                // console.log(record, rowIndex)
                 return {
                   onClick: event => { }, // click row
                   onDoubleClick: event => { }, // double click row
@@ -154,22 +154,42 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <div>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Number}
                       </label>
 
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        {
-                          record.IssueType === 'ChangeRequest' ?
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
-                        }
-
-                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                        <Tooltip title="Issue Type">
+                          <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
+                            <label style={{ fontSize: "10px" }}>
+                              {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
+                        <Tooltip title="Priority">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.Priority}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                        <Tooltip title="Product">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ProductName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
+                        {/* <Divider type="vertical" /> */}
+                        <Tooltip title="Module">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ModuleName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                       </div>
                     </div>
                   );
@@ -177,28 +197,53 @@ export default function Mytask() {
               />
 
               <Column title="Subject"
-                width="30%"
+                width="25%"
                 render={(record) => {
                   return (
                     <>
-                      <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                          {record.Title}
-                        </label>
-                      </div>
-                      <div>
-                        <label
-                          onClick={() => {
-                            return (
-                              history.push({ pathname: "/internal/issue/subject/" + record.Id }),
-                              (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
-                          }
-                          }
-                          className="table-column-detail">
-                          รายละเอียด
+                      {/* <div> */}
+                      <Row align="middle">
+                        <Col span={24}>
+                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                            {record.Title}
                           </label>
+                          <Tag color="#00CC00"
+                            style={{
+                              borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
+                              display: record.TaskCnt > 1 ? "inline-block" : "none"
+                            }}
+                          >
+                            <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
+                          </Tag>
+                        </Col>
+
+                      </Row>
+                      <Row>
+                        <Col span={24}>
+
+                          <label
+                            onClick={() => {
+                              return (
+                                history.push({ pathname: "/internal/issue/subject/" + record.Id }),
+                                (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+                              )
+                            }
+                            }
+                            className="table-column-detail">
+                            รายละเอียด
+                          </label>
+
+                        </Col>
+                      </Row>
+
+
+                      {/* 
                       </div>
+                      <div>
+
+
+                      </div> */}
+
 
                     </>
                   )
@@ -207,23 +252,29 @@ export default function Mytask() {
               />
               <Column title="Issue By"
                 align="center"
-                width="10%"
+                width="15%"
                 render={(record) => {
                   return (
                     <>
 
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.CreateBy}
                         </label>
                       </div>
 
                       <div>
-                        <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
-                      <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
+                      <Tooltip title="Company">
+                        <Tag color="gray" style={{ fontSize: 8 }} >
+                          <label className="table-column-text" style={{ fontSize: 8 }}>
+                            {record.CompanyName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
 
                     </>
                   )
@@ -231,23 +282,17 @@ export default function Mytask() {
 
                 }
               />
-              {/* <Column
-                title="Assignee"
-                align="center"
-                width="10%"
-                dataIndex="Assignee"
-              ></Column> */}
               <Column title="Due Date"
                 width="10%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
                       </label>
                       <br />
-                      {record.cntDueDate > 1 ?
+                      {record.cntDueDate >= 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -255,31 +300,10 @@ export default function Mytask() {
                           }
                           }
                         >
-                           เลื่อน Due
+                          เลื่อน Due
                        </Tag> : ""
                       }
 
-                    </>
-                  )
-                }
-                }
-              />
-
-              <Column
-                title="Time Tracking"
-                align="center"
-                width="10%"
-                render={(record) => {
-                  return (
-                    <>
-                   
-                      <Clock showseconds={false}
-                        deadline={record.DueDate}
-                         createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                         resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                         onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
-                      />
-                    
                     </>
                   )
                 }
@@ -293,51 +317,39 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <>
-                      {/* <Dropdown
-                        overlayStyle={{
-                          width: 300,
-                          boxShadow:
-                            "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                        }}
-                        overlay={
-                          <Menu
-                            onSelect={(x) => console.log(x.selectedKeys)}
-                            onClick={(x) => {
-                              HandleChange(x)
-                              setProgressStatus(x.item.props.children[1]);
-                              userdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                              userdispatch({ type: "SELECT_DATAROW", payload: record })
-                            }}
-                          >
-                            {userstate.actionflow.filter(
-                              (x) => x.text !== record.FlowStatus
-                            ).map((x) => (
-                              <Menu.Item key={x.ToNodeId} node={x.NodeName}>{x.TextEng}</Menu.Item>
-                            ))}
-                          </Menu>
-                        }
-                        trigger="click"
-                      >
-                        <Button type="link"
-                          onClick={() => {
-                            getflow_output(record.TransId)
-                          }}
-                        >{record.FlowStatus}</Button>
-                      </Dropdown> */}
+
                       <div>
-                        <label>
+                        <label className="table-column-text">
                           {record.FlowStatus}
                         </label>
                       </div>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                        {record.DueDate === null ? "" : new Date(record.DueDate).toLocaleDateString('en-GB')}
-                      </label> */}
                     </>
                   );
 
                 }}
               />
 
+              <Column
+                title="Time Tracking"
+                align="center"
+                width="10%"
+                render={(record) => {
+                  return (
+                    <>
+                      <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
+                        <Clock
+                          showseconds={false}
+                          deadline={record.DueDate}
+                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
+                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
+                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                        />
+                      </div>
+                    </>
+                  )
+                }
+                }
+              />
 
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
                 width="10%"

@@ -1,5 +1,5 @@
-import { Col, DatePicker, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Tag, Timeline, Modal } from "antd";
-import React, { useContext, useState, useEffect, useReducer } from "react";
+import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Tag, Modal } from "antd";
+import React, { useContext, useState, useEffect } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Customer/Comment";
@@ -7,13 +7,17 @@ import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
+import moment from 'moment';
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
 import ModalCompleteIssue from "../../../Component/Dialog/Customer/modalCompleteIssue";
 import ModalCancelIssue from "../../../Component/Dialog/Customer/modalCancelIssue";
 import ModalReOpen from "../../../Component/Dialog/Customer/modalReOpen";
+import ModalConfirmManday from "../../../Component/Dialog/Customer/modalConfirmManday";
+import ModalPO from "../../../Component/Dialog/Customer/modalPO";
+import ModalDueDate from "../../../Component/Dialog/Customer/modalDueDate";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -31,17 +35,41 @@ export default function Subject() {
 
   // modal
   const [visible, setVisible] = useState(false);
+  const [modalsendissue_visible, modalSendissue_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalreopen_visible, setModalreopen_visible] = useState(false);
   const [modalcancel_visible, setModalcancel_visible] = useState(false);
+  const [modalconfirmManday_visible, setModalconfirmManday_visible] = useState(false);
+  const [modalPO_visible, setModalPO_visible] = useState(false);
+  const [modalDueDate_visible, setModalDueDate_visible] = useState(false);
 
   // data
   const [ticketdata, setTicketdata] = useState([]);
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
 
-  const getflow_output = async (trans_id) => {
+  // const getflow_output = async (trans_id) => {
+  //   const flow_output = await Axios({
+  //     url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
+  //     method: "GET",
+  //     headers: {
+  //       "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+  //     },
+  //     params: {
+  //       trans_id
+  //     }
+  //   });
+
+
+  //   customerdispatch({
+  //     type: "LOAD_ACTION_FLOW",
+  //     payload: flow_output.data.filter((x) => x.Type === "Issue" ||  x.Type === null ||
+  //                x.Type === (customerstate?.issuedata?.details[0]?.IsCloudSite === true) ? "onCloud" : "onPremiss")
+  //   })
+  // }
+
+  const getflow_output = async (value) => {
     const flow_output = await Axios({
       url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
       method: "GET",
@@ -49,10 +77,19 @@ export default function Subject() {
         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
       },
       params: {
-        trans_id
+        trans_id: value.TransId
       }
     });
-    customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+    if (flow_output.status === 200) {
+      customerdispatch({
+        type: "LOAD_ACTION_FLOW",
+        payload: flow_output.data.filter((x) => x.Type === null
+          || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
+        )
+      })
+
+    }
+
   }
 
   const getdetail = async () => {
@@ -70,7 +107,40 @@ export default function Subject() {
 
       if (ticket_detail.status === 200) {
         customerdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
-        getflow_output(ticket_detail.data[0].TransId)
+        // getflow_output(ticket_detail.data[0].TransId)
+        getflow_output(ticket_detail.data[0])
+      }
+    } catch (error) {
+
+    }
+  }
+
+  const UndoIssue = async (value) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/issue-undo",
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          mailboxid: value
+        }
+      });
+
+      if (result.status === 200) {
+        await Modal.info({
+          title: 'บันทึกข้อมูลสำเร็จ',
+          content: (
+            <div>
+              <p>ยกเลิกการส่ง Issue เลขที่ : {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</p>
+            </div>
+          ),
+          onOk() {
+            history.push({ pathname: "/customer/issue/mytask" })
+          },
+        });
+
       }
     } catch (error) {
 
@@ -101,10 +171,58 @@ export default function Subject() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "customer" && item.data.value === "AssignIcon") { return (setVisible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
-    if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
+    // if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
+    //   return (modalSendissue_visible(true))
+    // }
+
+    // BUG FLOW
+    if (customerstate.issuedata.details[0].IssueType === "Bug") {
+      if (item.data.NodeName === "customer" &&
+        item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" ||
+        item.data.value === "SendToDeploy") {
+        return (modalSendissue_visible(true))
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
+    }
+
+    // CR FLOW
+    if (customerstate.issuedata.details[0].IssueType === "ChangeRequest") {
+      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
+        return (modalSendissue_visible(true))
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setModalconfirmManday_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Reject") {
+        modalSendissue_visible(true)
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "SendPO") { return (setModalPO_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "RejectDueDate") {
+        setModalDueDate_visible(true)
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ApproveDueDate") {
+        setModalDueDate_visible(true)
+      }
+      if (item.data.value === "ReOpen") {
+        setModalreopen_visible(true)
+      }
+      if (item.data.value === "Pass") {
+        modalSendissue_visible(true)
+      }
+      if (item.data.value === "Complete") {
+        setModalcomplete_visible(true)
+      }
+    }
+
+    if (customerstate.issuedata.details[0].IssueType === "Use") {
+      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
+        return (modalSendissue_visible(true))
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
+    }
+
   }
 
   function renderColorPriority(param) {
@@ -183,9 +301,7 @@ export default function Subject() {
                       </Row>
                       <Row>
                         <div style={{ display: divcollapse }}>
-                          <p>
-                            {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Description}
-                          </p>
+                          <div className="issue-description" dangerouslySetInnerHTML={{ __html: customerstate?.issuedata?.details[0]?.Description }} ></div>
                         </div>
                       </Row>
                     </div>
@@ -199,7 +315,7 @@ export default function Subject() {
                     <TabsDocument
                       details={{
                         refId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-                        reftype: "Master_Ticket",
+                        // reftype: "Master_Ticket",
                       }}
                     />
                   </Col>
@@ -213,6 +329,7 @@ export default function Subject() {
                       <TabPane tab="Comment" key="1">
                         <CommentBox />
                       </TabPane>
+
                       <TabPane tab="History Log" key="2">
                         <Historylog />
                       </TabPane>
@@ -225,19 +342,19 @@ export default function Subject() {
 
             {/* SideBar */}
             <Col
-              span={6}
-              style={{ backgroundColor: "#fafafa", padding: 24 }}
+              span={8}
+              style={{ backgroundColor: "#fafafa", padding: 24, border: "1px" }}
             >
-              <Row style={{ marginBottom: 30 }}>
-                <Col span={18}>
+              <Row style={{ marginBottom: 20 }}>
+                <Col span={16}>
                   <label className="header-text">Progress Status</label>
                   <br />
                   <Select
                     style={{ width: "100%", marginTop: 8 }}
                     placeholder="None"
                     onChange={(value, item) => HandleChange(value, item)}
-                    value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].GroupStatus}
-                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.ToNodeId, label: x.TextEng, data: x }))}
+                    value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
+                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                     disabled={
                       customerstate.issuedata.details[0] &&
                         customerstate.issuedata.details[0].MailType === "out" ? true : false
@@ -245,15 +362,32 @@ export default function Subject() {
                   >
                   </Select>
                 </Col>
+                <Col span={8}>
+
+                  <Button type="primary" icon={<UndoOutlined />} color="green"
+                    style={{
+                      marginLeft: 20,
+                      width: 100,
+                      marginTop: 35,
+                      display: customerstate.issuedata.details[0]?.IsUndo === true &&
+                        customerstate.issuedata.details[0].MailType === "out" &&
+                        customerstate.issuedata.details[0].NodeActionText === "Create" ? "block" : "none"
+                    }}
+                    onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
+                  >
+                    Undo
+                    </Button>
+                </Col>
+
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">IssueType</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].IssueType}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Priority</label>
                   <br />
@@ -264,41 +398,63 @@ export default function Subject() {
                   </label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Product</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && `${customerstate.issuedata.details[0].ProductName} (${customerstate.issuedata.details[0].ProductFullName})`}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
+
+              <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Module</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleName}</label>
                 </Col>
               </Row>
-              <Row style={{ marginBottom: 30 }}>
-                <Col span={24}>
+
+              <Row style={{
+                marginBottom: 20,
+                display: customerstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
+                  customerstate.issuedata.details[0]?.Manday !== null ? "block" : "none"
+              }}>
+                <Col span={18}>
+                  <label className="header-text">Manday</label>
+                  <label style={{ marginLeft: 10 }} className="value-text">{customerstate.issuedata.details[0]?.Manday}</label>
+                </Col>
+              </Row>
+
+              <Row style={{ marginBottom: 20 }}>
+                <Col span={18}>
                   <label className="header-text">DueDate</label>
                   <br />
 
-                  <Button type="text"
+                  <label className="value-text">
+                    {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
+                  </label>
+
+                  {history_duedate_data.length >= 1 ?
+                    <Tag style={{ marginLeft: 16, cursor: "pointer" }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
+                      <label style={{ cursor: "pointer" }}> DueDate ถูกเลื่อน</label>
+
+                    </Tag> : ""
+                  }
+
+
+                  {/* <Button type="text"
                     style={{ padding: 0 }}
                     icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
                     className="value-text"
-                    onClick={() => setHistoryduedate_visible(true)}
                   >
-
-                    {customerstate.issuedata.details[0] &&
-                      (customerstate.issuedata.details[0].DueDate === null ? "None" : new Date(customerstate.issuedata.details[0].DueDate).toLocaleDateString('en-GB'))}
+                    {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
                   </Button>
 
-                  {history_duedate_data.length > 1 ?
-                    <Tag style={{ marginLeft: 16 }} color="warning">
+                  {history_duedate_data.length >= 1 ?
+                    <Tag style={{ marginLeft: 16 }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
                       DueDate ถูกเลื่อน
                    </Tag> : ""
-                  }
+                  } */}
                 </Col>
               </Row>
 
@@ -319,22 +475,64 @@ export default function Subject() {
 
       <ModalSendIssue
         title={ProgressStatus}
-        visible={visible}
+        visible={modalsendissue_visible}
         width={700}
-        onCancel={() => setVisible(false)}
+        onCancel={() => modalSendissue_visible(false)}
         onOk={() => {
-          setVisible(false);
+          modalSendissue_visible(false);
         }}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+        }}
+      />
 
+      <ModalConfirmManday
+        title={ProgressStatus}
+        visible={modalconfirmManday_visible}
+        width={700}
+        onCancel={() => setModalconfirmManday_visible(false)}
+        onOk={() => {
+          setModalconfirmManday_visible(false);
+        }}
+        details={{
+          ticketid: customerstate.issuedata.details[0]?.Id,
+          mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+          flowoutputid: customerstate.node.output_data?.FlowOutputId,
+          manday: customerstate.issuedata.details[0]?.Manday,
+          cost: customerstate.issuedata.details[0]?.Cost
+        }}
+      />
+
+      <ModalDueDate
+        title={ProgressStatus}
+        visible={modalDueDate_visible}
+        width={700}
+        onCancel={() => setModalDueDate_visible(false)}
+        onOk={() => {
+          setModalDueDate_visible(false);
+        }}
+        details={{
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+          duedate: moment(customerstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
+        }}
+      />
+
+      <ModalPO
+        title={ProgressStatus}
+        visible={modalPO_visible}
+        width={700}
+        onCancel={() => setModalPO_visible(false)}
+        onOk={() => {
+          setModalPO_visible(false);
+        }}
+        details={{
+          ticketid: customerstate.issuedata.details[0]?.Id,
+          mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+          flowoutputid: customerstate.node.output_data?.FlowOutputId
         }}
       />
 
@@ -345,17 +543,9 @@ export default function Subject() {
         width={700}
         onOk={() => setModalcomplete_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          ticketnumber: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number,
-          productId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProductId,
-          moduleId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleId,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
         }}
       />
 
@@ -366,14 +556,9 @@ export default function Subject() {
         width={700}
         onOk={() => setModalcancel_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          ticketnumber: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
         }}
       />
 
@@ -384,15 +569,9 @@ export default function Subject() {
         width={700}
         onOk={() => setModalreopen_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          node_output_id: customerstate.node.output_data && customerstate.node.output_data.NodeOutputId,
-          to_node_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeId,
-          to_node_action_id: customerstate.node.output_data && customerstate.node.output_data.ToNodeActionId,
-          flowstatus: customerstate.node.output_data && customerstate.node.output_data.FlowStatus,
-          groupstatus: customerstate.node.output_data && customerstate.node.output_data.GroupStatus,
-          flowaction: customerstate.node.output_data && customerstate.node.output_data.FlowAction
-
+          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
         }}
       />
 

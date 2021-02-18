@@ -1,106 +1,59 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Modal, Form, Table, Tabs, Row, Col, Upload } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
-import UploadFile from '../../UploadFile'
+import { useHistory } from "react-router-dom";
+import { Modal, Form, Select } from 'antd';
+import UploadFile from '../../UploadFile';
 import Axios from 'axios';
-import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
-import Column from 'antd/lib/table/Column';
+import TextEditor from '../../TextEditor';
 
-const { TabPane } = Tabs;
+const { Option } = Select;
 
 export default function ModalResolved({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const uploadRef_testresult = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
 
-    const [listunittest, setListunittest] = useState([]);
-    const [listfiledeploy, setFiledeploy] = useState([]);
-    const [listdocument, setDocument] = useState([]);
-
-    const GetUnitTest = async () => {
-        try {
-            const unittest = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "unittest"
-                }
-            });
-
-            setListunittest(unittest.data)
-        } catch (error) {
-
+    const progressOnPremise = [
+        {
+            name: "Waiting Customer Update Patch",
+            label: "Waiting Customer Update Patch"
+        },
+        {
+            name: "Waiting Customer Deploy PRD",
+            label: "Waiting Customer Deploy PRD"
         }
-    }
+    ]
 
-    const GetFileDeploy = async () => {
-        try {
-            const filedeploy = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "filedeploy"
-                }
-            });
-
-            setFiledeploy(filedeploy.data)
-        } catch (error) {
-
+    const progressOnCloud = [
+        {
+            name: "Automatic Update Patch",
+            label: "Automatic Update Patch"
+        },
+        {
+            name: "Waiting Customer Test",
+            label: "Waiting Customer Test"
+        },
+        {
+            name: "Deploy PRD Completed",
+            label: "Deploy PRD Completed"
         }
-    }
+    ]
 
-    const GetDeployDocument = async () => {
-        try {
-            const documentdeploy = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "deploydocument"
-                }
-            });
-
-            setDocument(documentdeploy.data)
-        } catch (error) {
-
-        }
-    }
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
-                        comment_text: textValue,
-                        comment_type: "internal",
+                        ticketid: details && details.ticketid,
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -119,7 +72,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: details && details.ticketId,
+                    ticketid: details && details.ticketid,
                     files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
                     reftype: "Master_Ticket",
                     grouptype: "testResult"
@@ -130,30 +83,28 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         }
     }
 
-    const SendFlow = async () => {
+    const SendFlow = async (item) => {
         try {
             const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send",
+                url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Customer",
-                        description: details.flowaction,
-                        value: "Send Test Result (ส่งผล Test ให้ลูกค้า)" 
-                      }
+                    ticketid: details.ticketid,
+                    mailboxid: details && details.mailboxid,
+                    flowoutputid: details.flowoutput.FlowOutputId,
+                    value: {
+                        progress_description: item.progress_description
+                    }
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveTestResult();
+                SaveComment();
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -162,51 +113,40 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk();
+                        editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/resolved" })
                     },
                 });
             }
         } catch (error) {
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.setvalue();
+                    onOk();
 
+                },
+            });
         }
     }
 
-    // const normFile = e => {
-    //     console.log('Upload event:', e);
-    //     if (Array.isArray(e)) {
-    //         return e;
-    //     }
-    //     return e && e.fileList;
-    // };
-
     const onFinish = (values) => {
         console.log('onFinish:', values);
-        SaveComment();
-        SaveTestResult();
-        SendFlow();
-        onOk();
+        SendFlow(values);
     };
-    // const onFinishFailed = errorInfo => {
-    //     console.log('Failed:', errorInfo);
-    //     normFile();
-    // };
 
     useEffect(() => {
         if (visible) {
-            GetUnitTest();
-            GetFileDeploy();
-            GetDeployDocument();
         }
 
     }, [visible])
 
 
-
-    // if(uploadRef_testresult && uploadRef_testresult.current.getFiles().map((n) => n.response.id) !== null){
-    //     console.log("file", uploadRef_testresult.current.getFiles().map((n) => n.response.id))
-    // }
     return (
         <Modal
             visible={visible}
@@ -214,7 +154,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { return (form.resetFields(), editorRef.current.setvalue(), onCancel()) }}
             {...props}
         >
 
@@ -226,187 +166,55 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     remember: true,
                 }}
                 onFinish={onFinish}
-                // onFinishFailed={onFinishFailed}
             >
-
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 800 }}
-                    // valuePropName="fileList"
-                    // getValueFromEvent={uploadRef_testresult.current}
-                    label="Test Result (ใบส่งมอบงาน)"
-                    name="uploadresult"
+                    label="สถานะ Progress"
+                    name="progress_description"
                     rules={[
                         {
                             required: true,
-                            message: 'กรุณาแนบ (ใบส่งมอบงาน)'
+                            message: 'กรุณาระบุ Progress'
                         },
                     ]}
                 >
-                    <UploadFile ref={uploadRef_testresult} />
 
+                    <Select
+                        placeholder="None"
+                        style={{ width: "60%" }}
+                        options={
+                            details && details?.iscloudsite === false ?
+                                progressOnPremise.map((x) => ({ value: x.name, label: x.label })) :
+                                progressOnCloud.map((x) => ({ value: x.name, label: x.label }))
+                        }
+                    />
                 </Form.Item>
+
+                {
+                    details.flowoutput.value === "Deploy"
+                        ? ""
+                        : <Form.Item
+                            style={{ minWidth: 300, maxWidth: 800 }}
+                            label="Test Result (ใบส่งมอบงาน)"
+                            name="uploadresult"
+                            rules={[
+                                {
+                                    required: false,
+                                    message: 'กรุณาแนบ (ใบส่งมอบงาน)'
+                                },
+                            ]}
+                        >
+                            <UploadFile ref={uploadRef_testresult} />
+                        </Form.Item>
+                }
+
+
             </Form>
 
 
 
-            <Tabs defaultActiveKey="1" type="card" style={{ marginBottom: 100 }}>
-                <TabPane tab="Unit Test" key="1">
-                    <Table dataSource={listunittest} style={{ width: "100%" }} pagination={false}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ไฟล์ Unit Test" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane>
-                {/* <TabPane tab="File Deploy" key="2">
-                    <Table dataSource={listfiledeploy}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ไฟล์ Deploy" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane> */}
-                <TabPane tab="Document Deploy" key="2">
-                    <Table dataSource={listdocument} style={{ width: "100%" }} pagination={false}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ชื่อเอกสาร" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane>
-            </Tabs>
             <label className="header-text">Remark</label>
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
+            <TextEditor ref={editorRef} />
             <br />
                      AttachFile : <UploadFile ref={uploadRef} />
 

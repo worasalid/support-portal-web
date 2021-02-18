@@ -10,7 +10,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
-    const [select_assign,setSelect_assign] = useState(null);
+    const [select_assign, setSelect_assign] = useState(null);
     const editorRef = useRef(null)
 
     const [assignlist, setAssignlist] = useState([]);
@@ -28,8 +28,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    productId: details.productId,
-                    moduleId: details.moduleId
+                    taskid: details.taskid
                 }
             });
             setAssignlist(assign.data)
@@ -50,7 +49,8 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -71,49 +71,55 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
-                    to_user_id: value,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction,
-                        value: "Assign Task To " + select_assign,
-                        value2: ""
-                      }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        assigneeid: value,
+                        comment_text: textValue
+                    }
+
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
+                onOk();
+                
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>Assign งานให้ {select_assign}</p>
                         </div>
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("");
-                        onOk();
+                        
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
         } catch (error) {
-
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.editor.setContent("");
+                    onOk();
+                   
+                },
+            });
         }
     }
 
-    const onFinish = (values,item) => {
+    const onFinish = (values, item) => {
         console.log('Success:', values, item);
-        SaveComment();
         SendFlow(values.assignto);
-        onOk();
     };
 
     useEffect(() => {
@@ -160,7 +166,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        onChange= {(value,item) => setSelect_assign(item.label)}
+                        onChange={(value, item) => setSelect_assign(item.label)}
                         options={
                             assignlist && assignlist.map((item) => ({
                                 value: item.UserId,

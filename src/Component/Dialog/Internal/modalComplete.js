@@ -23,29 +23,25 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
     const CompleteFlow = async (values) => {
         try {
             const completeflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/complete",
+                url: process.env.REACT_APP_API_URL + "/workflow/send",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: details && details.ticketId,
-                    mailbox_id: details && details.mailboxId,
-                    to_node_id: details && details.to_node_id,
-                    url: values.url,
-                    description: values.description,
-                    node_output_id: details && details.node_output_id,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    type: "Internal",
-                    history: {
-                        historytype: "Customer",
-                        description: details.flowaction
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        deploy_url: values.url,
+                        deploy_description: values.description
                     }
+
                 }
             });
 
             if (completeflow.status === 200) {
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -54,8 +50,8 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                         </div>
                     ),
                     onOk() {
-                        onOk();
-                        history.push({ pathname: "/internal/issue/complete" })
+                      
+                        history.push({ pathname: "/internal/issue/resolved" })
                     },
                 });
             }
@@ -68,7 +64,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                     </div>
                 ),
                 onOk() {
-                   
+
                 },
             });
         }
@@ -113,7 +109,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                         },
                     ]}
                 >
-                
+
                     <TextArea rows="2" style={{ width: "100%" }} />
                 </Form.Item>
 
@@ -121,7 +117,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                     label="Description"
                     name="description"
                 >
-                
+
                     <TextArea rows="5" style={{ width: "100%" }} />
                 </Form.Item>
             </Form>

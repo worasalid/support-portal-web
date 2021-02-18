@@ -16,6 +16,7 @@ export const customerState = {
         moduleState: [],
         TypeState: [],
         priorityState: [],
+        progress:[],
         date: {
             startdate: "",
             enddate: ""
@@ -28,6 +29,9 @@ export const customerState = {
         data: [],
         datarow: [],
         details: []
+    },
+    taskdata:{
+        data: []
     },
     actionflow: [],
     node: {
@@ -51,6 +55,7 @@ export const userState = {
         moduleState: [],
         TypeState: [],
         priorityState: [],
+        progress:[],
         date: {
             startdate: "",
             enddate: ""
@@ -64,6 +69,9 @@ export const userState = {
         datarow: [],
         details: []
     },
+    taskdata:{
+        data: []
+    },
     actionflow: [],
     node: {
         input_id: 0,
@@ -71,6 +79,7 @@ export const userState = {
         to_node_action_id: 0,
         output_data:[]
     }
+   
     
 }
 
@@ -80,7 +89,9 @@ export const customerReducer = createReducer(customerState, {
     SELECT_TYPE: (state, { payload }) => { state.filter.TypeState = payload },
     SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
+    SELECT_PROGRESS: (state, { payload }) => { state.filter.progress = payload },
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
+    CLEAR_FILTER: (state, { payload }) => { state.filter = payload },
     SEARCH: (state, { payload }) => { state.search = payload },
     LOADING: (state, { payload }) => { state.loading = payload },
     SELECT_DATAROW: (state, {payload}) => {state.issuedata.datarow = payload},
@@ -90,6 +101,7 @@ export const customerReducer = createReducer(customerState, {
 
     LOAD_ISSUE: (state, { payload }) => { state.issuedata.data = payload },
     LOAD_ISSUEDETAIL: (state, {payload}) => {state.issuedata.details = payload},
+    LOAD_TASKDATA: (state, {payload}) => {state.taskdata.data = payload},
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
     LOAD_TYPE: (state, { payload }) => { state.masterdata.issueTypeState = payload },
@@ -103,6 +115,7 @@ export const userReducer = createReducer(userState, {
     SELECT_MODULE: (state, { payload }) => { state.filter.moduleState = payload },
     SELECT_TYPE: (state, { payload }) => { state.filter.TypeState = payload },
     SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
+    SELECT_PROGRESS: (state, { payload }) => { state.filter.progress = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
     SEARCH: (state, { payload }) => { state.search = payload },
@@ -113,6 +126,7 @@ export const userReducer = createReducer(userState, {
 
     LOAD_ISSUE: (state, { payload }) => { state.issuedata.data = payload },
     LOAD_ISSUEDETAIL: (state, {payload}) => {state.issuedata.details = payload},
+    LOAD_TASKDATA: (state, {payload}) => {state.taskdata.data = payload},
     LOAD_COMPANY: (state, { payload }) => { state.masterdata.companyState = payload },
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
@@ -121,7 +135,5 @@ export const userReducer = createReducer(userState, {
     LOAD_ACTION_FLOW: (state, {payload}) => {state.actionflow = payload},
     LOAD_COUNT_MYTASK: (state, { payload }) => { state.toolbar.issuecount.mytask = payload },
 });
-
-
 
 export default IssueContext;

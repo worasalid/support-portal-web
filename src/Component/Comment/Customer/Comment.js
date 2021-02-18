@@ -1,13 +1,13 @@
-import { Comment, Avatar, Form, Button, List, Row, Col, Tooltip, Divider, Modal } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col, Divider, Modal } from 'antd';
 import moment from 'moment';
-import React, { useState, useEffect, useRef, createElement } from 'react';
-import { useHistory, useRouteMatch, Redirect, Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { Tabs } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
 import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
-import { DislikeOutlined, LikeOutlined, DislikeFilled, LikeFilled, FileOutlined } from '@ant-design/icons';
+import { FileOutlined } from '@ant-design/icons';
 import ModalFileDownload from '../../Dialog/Customer/modalFileDownload';
+import TextEditor from '../../TextEditor';
 
 
 const { TabPane } = Tabs;
@@ -17,16 +17,15 @@ export default function CommentBox() {
 
     const [loading, setLoading] = useState(true);
     const uploadRef = useRef(null);
-    const history = useHistory();
+    // const history = useHistory();
     const match = useRouteMatch();
 
     //data
     const [commentdata, setCommentdata] = useState([]);
-    const [commenttext, setCommenttext] = useState("");
     const [commentid, setCommentid] = useState(null);
 
-     // Modal
-     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+    // Modal
+    const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
 
     const loadComment = async () => {
         try {
@@ -47,9 +46,11 @@ export default function CommentBox() {
                     return {
                         id: values.Id,
                         author: values.CreateName,
-                        datetime: new Date(values.CreateDate).toLocaleDateString() + " : " + new Date(values.CreateDate).toLocaleTimeString(),
+                        datetime: moment(values.CreateDate).format("DD/MM/YYYY HH:mm"),
                         content: values.Text,
-                        cntfile: values.cntFile
+                        cntfile: values.cntFile,
+                        avatar: values.ProfileImage,
+                        email: values.Email
                     }
                 })
                 );
@@ -63,6 +64,10 @@ export default function CommentBox() {
         // console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
         try {
 
+            if (editorRef.current.getValue() === "" || editorRef.current.getValue() === null) {
+                throw ("กรุณาระบุ Comment!")
+            }
+
             const createcomment = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                 method: "POST",
@@ -70,8 +75,8 @@ export default function CommentBox() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: match.params.id,
-                    comment_text: commenttext,
+                    ticketid: match.params.id,
+                    comment_text: editorRef.current.getValue(),
                     comment_type: "customer",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
                 }
@@ -86,14 +91,29 @@ export default function CommentBox() {
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
+                        editorRef.current.setvalue();
                         setLoading(true);
 
                     },
                 });
             }
         } catch (error) {
-            alert("บันทึกไม่สำเร็จ")
+            Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                okText: "Close",
+                // okCancel:true,
+                content: (
+                    <div>
+                        <p>{error.response?.data ? error.response?.data : error.message || error}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.setvalue()
+                },
+                onCancel() {
+
+                }
+            });
         }
     }
 
@@ -112,6 +132,7 @@ export default function CommentBox() {
 
     }, [loading])
 
+
     return (
         <>
             <List
@@ -128,20 +149,20 @@ export default function CommentBox() {
                         }
                         avatar={
                             <Avatar
-                                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                                alt="ICON Support"
+                                src={item.avatar}
+                                icon={item.email.substring(0, 1).toLocaleUpperCase()}
                             />
                         }
                         content={
                             <>
-                                <label dangerouslySetInnerHTML={{ __html: item.content }} ></label>
-                                <Divider style={{ margin:0, marginBottom:10}}/>
+                                <label className="comment-description " dangerouslySetInnerHTML={{ __html: item.content }} ></label>
+                                <Divider style={{ marginTop: 20 }} />
                                 {item.cntfile === 0 ? "" :
                                     <div>
                                         <Row>
                                             <Col span={24}>
                                                 <label
-                                                     onClick={() => {return (setCommentid(item.id), setModalfiledownload_visible(true) )} }
+                                                    onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
                                                     className="text-link-hover">
                                                     <FileOutlined /> DownloadFile
                                                 </label>
@@ -152,27 +173,7 @@ export default function CommentBox() {
                             </>
 
                         }
-                        // actions={[
-                        //     (item.filename === null ? "" : (
-                        //         <>
-                        //             <div>
-                        //                 <Row>
-                        //                     <Col span={24}>
-                        //                         <label
-                        //                             onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                        //                             className="text-link-hover">
-                        //                             <FileOutlined /> {item.filename}
-                        //                         </label>
-                        //                     </Col>
 
-                        //                 </Row>
-
-                        //             </div>
-                        //         </>
-                        //     )
-                        //     )
-                        // ]
-                        // }
                     >
 
                     </Comment>
@@ -192,28 +193,7 @@ export default function CommentBox() {
                         onFinish={onFinish}
                     >
                         <Form.Item name="comment">
-
-                            {/* <TextArea rows={4} onChange={onChange} value={value} style={{ marginRight: 50 }} /> */}
-                            <Editor
-                            ref={editorRef}
-                        
-                                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                                initialValue=""
-                                init={{
-
-                                    height: 300,
-                                    menubar: false,
-                                    plugins: [
-                                        'advlist autolink lists link image charmap print preview anchor',
-                                        'searchreplace visualblocks code fullscreen',
-                                        'insertdatetime media table paste code help wordcount'
-                                    ],
-                                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                                }}
-
-                                onEditorChange={(content, editor) => { return (console.log("onEditorChange", editor), setCommenttext(content)) }}
-                            />
+                            <TextEditor ref={editorRef} />
                         </Form.Item>
                         <Form.Item name="fileattach">
                             <Row>
@@ -228,7 +208,7 @@ export default function CommentBox() {
                                         Add Comment
                                     </Button>
                                 </Col>
-                               
+
                             </Row>
                         </Form.Item>
                     </Form>

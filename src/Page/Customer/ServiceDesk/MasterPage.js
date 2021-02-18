@@ -1,12 +1,14 @@
 import React, { useContext, useEffect } from 'react'
 import { Card, Avatar } from 'antd'
 import axios from 'axios'
-import { SendOutlined, UserOutlined } from '@ant-design/icons'
+import { UserOutlined } from '@ant-design/icons'
 import AuthenContext from '../../../utility/authenContext';
+import IssueContext from '../../../utility/issueContext';
 
 export default function MasterPage(props) {
     const { state, dispatch } = useContext(AuthenContext);
-    const userdata = state.user
+    const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+
     const getuser = async () => {
         try {
             const result = await axios({
@@ -18,17 +20,19 @@ export default function MasterPage(props) {
 
             });
             dispatch({ type: 'Authen', payload: true });
-            dispatch({ type: 'LOGIN', payload: result.data.users });
+            dispatch({ type: 'LOGIN', payload: result.data.usersdata });
         } catch (error) {
 
         }
     }
 
-    useEffect(() => {       
+    useEffect(() => {
         if (!state.authen) {
             getuser();
         }
+        getuser();
     }, []);
+
 
     return (
         <div
@@ -55,19 +59,19 @@ export default function MasterPage(props) {
                         textAlign: "right",
                         padding: "16px",
                     }}>
-                    <label className="user-login">{userdata && userdata.first_name + ' ' + userdata.last_name}</label>
+                    <label className="user-login">{ state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}</label>
                     <Avatar size="default" icon={<UserOutlined />}></Avatar>
 
                 </div>
             </div>
-            <Card size="default"  bordered hoverable
-             style={{
-                width: "700px",
-                top: 50,
-                position: "absolute",
+            <Card size="default" bordered hoverable
+                style={{
+                    width: "700px",
+                    top: 50,
+                    position: "absolute",
 
-            }}>
-                <div style={{marginBottom:30}}>
+                }}>
+                <div style={{ marginBottom: 30 }}>
                     {props.children}
                 </div>
             </Card>

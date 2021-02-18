@@ -1,27 +1,29 @@
-import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, } from "antd";
+import { BarChartOutlined, NotificationOutlined,PieChartOutlined, FileOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, List } from "antd";
 import React, { useState, useContext, useEffect } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import axios from 'axios'
 import AuthenContext from "../../utility/authenContext";
+import IssueContext from '../../utility/issueContext';
+//import IssueContext, { customerReducer, customerState } from "../../utility/issueContext";
 import Axios from "axios";
 import MasterContext from "../../utility/masterContext";
+import Notifications from "../../Component/Notifications/Customer/Notification";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
-export default function MasterPage(props) {
+export default function MasterPage({bgColor='#fff',...props}) {
   const history = useHistory();
   const match = useRouteMatch();
   const [show_notice, setshow_notice] = useState(true);
   const { state, dispatch } = useContext(AuthenContext);
-  const {state: masterstate, dispatch: masterdispatch} = useContext(MasterContext)
-  const userlogin = state.user
+  //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+  const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
   const [activemenu, setActivemenu] = useState([])
 
   const getuser = async () => {
     try {
-      const result = await axios({
+      const result = await Axios({
         url: process.env.REACT_APP_API_URL + "/auth/customer/me",
         method: "get",
         headers: {
@@ -29,7 +31,7 @@ export default function MasterPage(props) {
         },
       });
       dispatch({ type: 'Authen', payload: true });
-      dispatch({ type: 'LOGIN', payload: result.data.users });
+      dispatch({ type: 'LOGIN', payload: result.data.usersdata });
     } catch (error) {
 
     }
@@ -42,40 +44,81 @@ export default function MasterPage(props) {
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          type: "customer"
         }
       });
-      masterdispatch({type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length});
-      masterdispatch({type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length});
-      masterdispatch({type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length});
-      masterdispatch({type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length})
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Pass").length });
+      masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length });
+      masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length })
 
     } catch (error) {
 
     }
   }
 
+  const GetNotifications = async () => {
+    try {
+      const notification = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/countstatus",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        }
+      });
+    } catch (error) {
+
+    }
+  }
+
+  const data = [
+    {
+      title: 'ISSUE-001-20120020',
+      description: "มีงานใหม่ส่งถึงคุณ"
+    },
+    {
+      title: 'ISSUE-001-20120019',
+      description: "มีการ Update Comment"
+    },
+    {
+      title: 'ISSUE-001-20120018',
+      description: "มีการ Update Comment"
+    },
+
+  ];
 
   useEffect(() => {
     if (!state.authen) {
       getuser()
     }
+    getuser();
     CountStatus();
   }, [])
 
   useEffect(() => {
-    if (match.url.search("mytask") > 0) {
-      setActivemenu(activemenu.push("1"))
-    }
-    if (match.url.search("inprogress") > 0) {
+    if (match.url.search("alltask") > 0) {
       setActivemenu(activemenu.push("2"))
     }
-    if (match.url.search("cancel") > 0) {
+    if (match.url.search("mytask") > 0) {
       setActivemenu(activemenu.push("3"))
     }
-    if (match.url.search("complete") > 0) {
+    if (match.url.search("inprogress") > 0) {
       setActivemenu(activemenu.push("4"))
     }
+    if (match.url.search("pass") > 0) {
+      setActivemenu(activemenu.push("5"))
+    }
+    if (match.url.search("cancel") > 0) {
+      setActivemenu(activemenu.push("6"))
+    }
+    if (match.url.search("complete") > 0) {
+      setActivemenu(activemenu.push("7"))
+    }
   }, [])
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header style={{ backgroundColor: "#1a73e8" }}>
@@ -84,7 +127,7 @@ export default function MasterPage(props) {
             <Col span={12}>
               <img
                 style={{ height: "35px" }}
-                src={`${process.env.PUBLIC_URL}/logo-brand.png`}
+                src={`${process.env.PUBLIC_URL}/logo-space.png`}
                 alt=""
               />
             </Col>
@@ -95,14 +138,17 @@ export default function MasterPage(props) {
                   overlayStyle={{ width: 500, height: 400 }}
                   overlay={(
                     <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
-                      <Menu.Item key="1" onClick={() => alert("Profile")}>
-                        <div style={{ height: "50vh", overflowY: "scroll" }}>
-                          <Row style={{ padding: 16 }}>
-                            <Col span={24}>
-                              <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
+                      <Menu.Item key="1">
+                        <div>
+                          <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
+                          <div style={{ height: "50vh", overflowY: "scroll" }}>
+                            <Row style={{ padding: 16 }}>
+                              <Col span={24}>
 
-                            </Col>
-                          </Row>
+                                <Notifications />
+                              </Col>
+                            </Row>
+                          </div>
                         </div>
                       </Menu.Item>
                     </Menu>
@@ -138,28 +184,21 @@ export default function MasterPage(props) {
                 trigger="click"
               >
                 <Button type="link" >
-                  {/* <div style={{ display: "flex", alignItems: "center" }}>
-                    <label className="user-login">
-                      {state.user && state.user.users.first_name + ' ' + state.user.users.last_name}
-                    </label>
-                    <Avatar size="default" icon={<UserOutlined/>}>
+                  <div style={{ display: "inline-block", alignItems: "center" }}>
+                    <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
                     </Avatar>
-                 
-                  </div> */}
-                  <div
-                    style={{
-                      textAlign: "right",
-                      padding: "16px",
-                    }}>
+                  </div>
+                  <div style={{ display: "inline-block", marginLeft: 8 }}>
                     <label className="user-login">
-                      {userlogin && userlogin.first_name + ' ' + userlogin.last_name}
+                      {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
                     </label>
-                    <Avatar size="default" icon={<UserOutlined />}></Avatar>
-
                   </div>
                 </Button>
+
+
               </Dropdown>
+
             </Col>
           </Row>
         </Menu>
@@ -186,58 +225,107 @@ export default function MasterPage(props) {
                 แจ้งปัญหาการใช้งาน
               </Button>
             </div>
-
-            <SubMenu key="sub1" title="Issues">
-              <Menu.Item
-                key="1"
-                onClick={() =>
-                  history.push({ pathname: "/customer/issue/mytask" })
-                }
-              >
-                My Task 
-                {
-                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
-                  ? ""
-                  : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
-
-                }
-              
+            <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
+              <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
+                - DashBoard
+                
               </Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub1" icon={<FileOutlined />} title="Issues">
               <Menu.Item
                 key="2"
-                onClick={() =>
-                  history.push({ pathname: "/customer/issue/inprogress" })
+                onClick={() =>  history.push('/customer/issue/alltask')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/allmytask" }), window.location.reload(true)) 
+                  // }
+                  
                 }
               >
-                In progress 
-                {
-                  masterstate.toolbar.sider_menu.issue.inprogress.count === 0
-                  ? ""
-                  : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+                All Task
+               
 
-                }
               </Menu.Item>
               <Menu.Item
                 key="3"
+                onClick={() => history.push('/customer/issue/mytask')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/mytask" }), window.location.reload(true)) 
+                  // }
+                }
+              >
+                My Task
+                {
+                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
+
+                }
+
+              </Menu.Item>
+              <Menu.Item
+                key="4"
                 onClick={() =>
-                  history.push({ pathname: "/customer/issue/cancel" })
+                  // history.push({ pathname: "/customer/issue/inprogress" })
+                  history.push('/customer/issue/inprogress')
+                }
+              >
+                In progress
+                {
+                  masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+
+                }
+              </Menu.Item>
+              <Menu.Item
+                key="5"
+                onClick={() =>  history.push('/customer/issue/pass')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/pass" }), window.location.reload(true)) 
+                  // }
+                }
+              >
+                Pass
+                {
+                  masterstate.toolbar.sider_menu.issue.pass.count === 0
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
+
+                }
+              </Menu.Item>
+              <Menu.Item
+                key="6"
+                onClick={() =>
+                  {
+                    return ( history.push({ pathname: "/customer/issue/cancel" }), window.location.reload(true)) 
+                  }
                 }
               >
                 Cancel
                 {
                   masterstate.toolbar.sider_menu.issue.cancel.count === 0
-                  ? ""
-                  : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+                    ? ""
+                    : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
 
                 }
               </Menu.Item>
               <Menu.Item
-                key="4"
-                onClick={() =>
-                  history.push({ pathname: "/customer/issue/complete" })
+                key="7"
+                onClick={() => history.push('/customer/issue/complete')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/complete" }), window.location.reload(true)) 
+                  // }
                 }
               >
-                Completed 
+                Completed
+              </Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
+              <Menu.Item key="10" onClick={() => history.push('/customer/report/charts')}>
+                - Report
+                  <Badge count={1}>
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                </Badge>
               </Menu.Item>
             </SubMenu>
           </Menu>
@@ -254,7 +342,9 @@ export default function MasterPage(props) {
             padding: 24,
             margin: 0,
             minHeight: 280,
-            backgroundColor: "#fff",
+
+            backgroundColor: bgColor,
+            // backgroundColor: "#fff",
           }}
         >
           {props.children}

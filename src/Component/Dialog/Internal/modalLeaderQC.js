@@ -20,68 +20,6 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
     const [listfiledeploy, setFiledeploy] = useState([]);
     const [listdocument, setDocument] = useState([]);
 
-    const GetUnitTest = async () => {
-        try {
-            const unittest = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "unittest"
-                }
-            });
-
-            setListunittest(unittest.data)
-        } catch (error) {
-
-        }
-    }
-
-    const GetFileDeploy = async () => {
-        try {
-            const filedeploy = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "filedeploy"
-                }
-            });
-
-            setFiledeploy(filedeploy.data)
-        } catch (error) {
-
-        }
-    }
-
-    const GetDeployDocument = async () => {
-        try {
-            const documentdeploy = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/filedownload",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.ticketId,
-                    reftype: "Master_Ticket",
-                    grouptype: "deploydocument"
-                }
-            });
-
-            setDocument(documentdeploy.data)
-        } catch (error) {
-
-        }
-    }
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -97,7 +35,8 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -118,56 +57,55 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction,
-                        value: "",
-                        value2: ""
-                      }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        comment_text: textValue
+                    }
+                  
                 }
             });
 
             if (sendflow.status === 200) {
+                SaveComment();
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>ส่งงานให้ทีม QA ตรวจสอบ</p>
                         </div>
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        onOk();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
         } catch (error) {
-
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.editor.setContent("")
+                    onOk();
+                    history.push({ pathname: "/internal/issue/inprogress" })
+                },
+            });
         }
     }
 
     const onFinish = (values) => {
         console.log('Success:', values);
-        SaveComment();
         SendFlow();
-        onOk();
     };
 
-    useEffect(() => {
-        if (visible) {
-            GetUnitTest();
-            GetFileDeploy();
-            GetDeployDocument();
-        }
-    }, [visible])
-    
+
     return (
         <Modal
             visible={visible}
@@ -178,146 +116,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-            <Tabs defaultActiveKey="1" type="card">
-                <TabPane tab="Unit Test" key="1">
-                    <Table dataSource={listunittest}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ไฟล์ Unit Test" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane>
-                {/* <TabPane tab="File Deploy" key="2">
-                    <Table dataSource={listfiledeploy}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ไฟล์ Deploy" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane> */}
-                <TabPane tab="Document Deploy" key="2">
-                    <Table dataSource={listdocument}>
-                        <Column title="No"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>{index + 1}</label>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title="ชื่อเอกสาร" dataIndex="FileName" ></Column>
-                        <Column title="OwnerName" dataIndex="OwnerName" ></Column>
-                        <Column title="วันที่"
-                            align="center"
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <label>
-                                            {new Date(record.ModifyDate).toLocaleDateString('en-GB')}
-                                        </label>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                        <Column title=""
-                            render={(value, record, index) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                        >
-                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
-
-                                        </Button>
-
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane>
-            </Tabs>
+  
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
                 name="qa-test"
                 layout="vertical"

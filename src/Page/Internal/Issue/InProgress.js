@@ -29,13 +29,16 @@ export default function InProgress() {
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
-  
+
 
   // data
   const [userstate, userdispatch] = useReducer(userReducer, userState);
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageTotal, setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
 
@@ -43,7 +46,7 @@ export default function InProgress() {
     // setLoadding(true);
     try {
       const results = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -56,14 +59,16 @@ export default function InProgress() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          task: "InProgress"
+          task: "InProgress",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
 
-        // masterdispatch({ type: "COUNT_MYTASK", payload: results.data.length })
-        userdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
     } catch (error) {
 
@@ -84,19 +89,6 @@ export default function InProgress() {
     userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
   }
 
-  const UpdateStatusMailbox = async (value) => {
-    const mailbox = await Axios({
-      url: process.env.REACT_APP_API_URL + "/tickets/read",
-      method: "PATCH",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        mailbox_id: value
-      }
-    });
-  }
-
 
   function HandleChange(items) {
     console.log("Menu", items.item.props.node)
@@ -114,7 +106,7 @@ export default function InProgress() {
     }, 1000)
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, visible, modaldeveloper_visible, modalQA_visible]);
+  }, [userstate.search,visible, pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -130,6 +122,19 @@ export default function InProgress() {
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
+
+              pagination={{ pageSize: 10, total: 10 }}
+              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              footer={(x) => {
+                return (
+                  <>
+                    <div style={{ textAlign: "right" }}>
+                      <label>จำนวนเคส : </label>
+                      <label>{x.length}</label>
+                    </div>
+                  </>
+                )
+              }}
               onRow={(record, rowIndex) => {
                 // console.log(record, rowIndex)
                 return {
@@ -154,22 +159,42 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <div>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                      <label>
+                      <label className="table-column-text">
                         {record.Number}
                       </label>
 
                       <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        {
-                          record.IssueType === 'ChangeRequest' ?
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
-                        }
-                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                        <Tooltip title="Issue Type">
+                          <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
+                            <label style={{ fontSize: "10px" }}>
+                              {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
+                        <Tooltip title="Priority">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.Priority}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                         {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                        <Tooltip title="Product">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ProductName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
+                        {/* <Divider type="vertical" /> */}
+                        <Tooltip title="Module">
+                          <Tag color="#808080">
+                            <label style={{ fontSize: "10px" }}>
+                              {record.ModuleName}
+                            </label>
+                          </Tag>
+                        </Tooltip>
                       </div>
                     </div>
                   );
@@ -182,10 +207,16 @@ export default function InProgress() {
                   return (
                     <>
                       <div>
-                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                        <label>
+                        <label className="table-column-text">
                           {record.Title}
                         </label>
+                        <Tag color="#00CC00"
+                          style={{
+                            borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
+                            display: record.TaskCnt > 1 ? "inline-block" : "none"
+                          }}>
+                          <label style={{ fontSize: 10, alignContent: "center", verticalAlign: "center" }}>{record.TaskCnt} Task</label>
+                        </Tag>
                       </div>
                       <div>
                         <label
@@ -214,16 +245,14 @@ export default function InProgress() {
                     <>
 
                       <div>
-                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                        <label>
+                        <label className="table-column-text">
                           {record.CreateBy}
                         </label>
                       </div>
 
                       <div>
-                        {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                        <label>
-                        {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
+                        <label className="table-column-text">
+                          {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
                       <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
@@ -234,24 +263,19 @@ export default function InProgress() {
 
                 }
               />
-              {/* <Column
-                title="Assignee"
-                align="center"
-                width="10%"
-                dataIndex="Assignee"
-              ></Column> */}
+
               <Column title="Due Date"
-               width="10%"
+                width="10%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-              
-                      {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
-               
+                      <label className="table-column-text">
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}<br/>
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
+                      </label>
                       <br />
-                      {record.cntDueDate > 1 ?
+                      {record.cntDueDate >= 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -276,7 +300,7 @@ export default function InProgress() {
                   return (
                     <>
                       <div>
-                        <label>
+                        <label className="table-column-text">
                           {record.FlowStatus}
                         </label>
                       </div>
@@ -295,15 +319,17 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                      <Clock 
-                      showseconds= {false}
-                      //deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                      deadline={record.DueDate}
-                      createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                      resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                      onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
-                      />
+                      <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
+                        <Clock
+                          showseconds={false}
+                          deadline={record.DueDate}
+                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
+                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
+                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                        />
+                      </div>
                     </>
+
                   )
                 }
                 }

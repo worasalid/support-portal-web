@@ -27,13 +27,16 @@ export default function Complete() {
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const { state, dispatch } = useContext(AuthenContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageTotal, setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
   const loadIssue = async (value) => {
     // setLoadding(true);
     try {
       const results = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        url: process.env.REACT_APP_API_URL + "/tickets/loadticket-customer",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -46,12 +49,15 @@ export default function Complete() {
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           keyword: customerstate.filter.keyword,
-          task: "Complete"
+          task: "Complete",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
-        customerdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        customerdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
 
       }
     } catch (error) {
@@ -94,7 +100,7 @@ export default function Complete() {
     }, 1000)
 
     customerdispatch({ type: "SEARCH", payload: false })
-  }, [customerstate.search, visible]);
+  }, [customerstate.search, visible, pageCurrent]);
 
 
   return (
@@ -108,8 +114,20 @@ export default function Complete() {
       <Row>
         <Col span={24}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
+            footer={(x) => {
+              return (
+                <>
+                  <div style={{ textAlign: "right" }}>
+                    <label>จำนวนเคส : </label>
+                    <label>{x.length}</label>
+                  </div>
+                </>
+              )
+            }}
+            pagination={{ pageSize: pageSize, total: pageTotal }}
+
+            onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
             onRow={(record, rowIndex) => {
-              // console.log(record, rowIndex)
               return {
                 onClick: event => { }, // click row
                 onDoubleClick: event => { }, // double click row
@@ -133,8 +151,7 @@ export default function Complete() {
               render={(record, index) => {
                 return (
                   <div>
-                    {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                    <label>
+                    <label className="table-column-text">
                       {record.Number}
                     </label>
                     <div style={{ marginTop: 10, fontSize: "smaller" }}>
@@ -143,7 +160,7 @@ export default function Complete() {
                           <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
                           <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
                       }
-                       <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
+                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
                       <Divider type="vertical" />
                       <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
                       <Divider type="vertical" />
@@ -159,8 +176,7 @@ export default function Complete() {
                 return (
                   <>
                     <div>
-                      {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                      <label>
+                      <label className="table-column-text">
                         {record.Title}
                       </label>
                     </div>
@@ -169,7 +185,7 @@ export default function Complete() {
                         onClick={() => {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id })
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id })
                             // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
@@ -188,9 +204,9 @@ export default function Complete() {
               render={(record) => {
                 return (
                   <>
-                    {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
-                    <label>
-                    {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                    <label className="table-column-text">
+                      {moment(record.CreateDate).format("DD/MM/YYYY")}<br />
+                      {moment(record.CreateDate).format("HH:mm")}
                     </label>
 
                   </>
@@ -207,10 +223,11 @@ export default function Complete() {
                 return (
                   <>
                     <label className="table-column-text">
-                      {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
+                      {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
+                      {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                     </label>
                     <br />
-                    {record.cntDueDate > 1 ?
+                    {record.cntDueDate >= 1 ?
                       <Tag style={{ marginLeft: 16 }} color="warning"
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -218,7 +235,7 @@ export default function Complete() {
                         }
                         }
                       >
-                        เลื่อน Due
+                        DueDate ถูกเลื่อน
                    </Tag> : ""
                     }
 
@@ -236,10 +253,12 @@ export default function Complete() {
                 return (
                   <>
                     <div>
-                      <label>{record.GroupStatus}</label>
+                      <label className="table-column-text">{record.GroupStatus}</label>
                     </div>
                     <div>
-                      {record.CompleteDate === null ? "" : moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
+                      <label className="table-column-text">
+                        {record.CompleteDate === null ? "" : moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
+                      </label>
                     </div>
                   </>
                 );
@@ -276,7 +295,8 @@ export default function Complete() {
         visible={historyduedate_visible}
         onCancel={() => setHistoryduedate_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.datarow.Id
+          ticketId: customerstate.issuedata.datarow.Id,
+          duedate: customerstate.issuedata.datarow.SLA_DueDate
         }}
       >
       </DuedateLog>

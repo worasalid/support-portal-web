@@ -21,7 +21,8 @@ export default function ModalTimetracking({ visible = false, onOk, onCancel, dat
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    transgroupId: details.transgroupId
+                    transgroupid: details.transgroupid,
+                    taskid: details.taskid
                 }
             });
             setTimetracking(timetracking.data)

@@ -1,7 +1,7 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import axios from "axios";
-import React, {useContext, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useHistory } from "react-router-dom";
 import AuthenContext from '../../utility/authenContext';
 
@@ -9,22 +9,51 @@ export default function NormalLoginForm() {
   const { state, dispatch } = useContext(AuthenContext);
   const history = useHistory();
 
+  // const onFinish = async (value) => {
+  //   try {
+  //     const result = await axios({
+  //       url: process.env.REACT_APP_API_URL + "/auth",
+  //       method: "POST",
+  //       data: {
+  //         email: value.username,
+  //         password: btoa(value.password)
+  //       },
+  //     });
+
+  //     localStorage.setItem("sp-ssid", result.data);
+  //     dispatch({ type: 'Authen', payload: true });
+  //     dispatch({ type: 'LOGIN', payload: result.data.users });
+  //     history.push("/internal/issue/mytask");
+  //   } catch (error) {
+  //     alert("ข้อมููลไม่ถูกต้อง");
+  //   }
+  // };
+
   const onFinish = async (value) => {
     try {
-        const result = await axios({
-          url: process.env.REACT_APP_API_URL + "/auth",
-          method: "POST",
-          data: { email: value.username },
-        });
+      const result = await axios({
+        url: process.env.REACT_APP_API_URL + "/auth/user",
+        method: "POST",
+        data: {
+          email: value.username,
+          password: btoa(value.password)
+        },
+      });
 
-      localStorage.setItem("sp-ssid", result.data);
-      dispatch({ type: 'Authen', payload: true});
-      dispatch({ type: 'LOGIN', payload: result.data.users});
-      history.push("/internal/issue/mytask");
+      if (result.status === 200) {
+        localStorage.setItem("sp-ssid", result.data);
+        dispatch({ type: 'Authen', payload: true });
+        dispatch({ type: 'LOGIN', payload: result.data.users });
+        history.push("/internal/dashboard");
+      }
+
+
     } catch (error) {
       alert("ข้อมููลไม่ถูกต้อง");
     }
   };
+
+
 
   return (
     <div
@@ -38,17 +67,18 @@ export default function NormalLoginForm() {
       }}
     >
       <Form
-        style={{ padding: 32, maxWidth: 480, backgroundColor: "white" }}
+        style={{ padding: 32, maxWidth: 480, height: 500, backgroundColor: "white" }}
         name="normal_login"
         className="login-form"
         initialValues={{
-          username: "thidarath@iconframework.com",
+          username: "",
           remember: true,
         }}
         onFinish={onFinish}
       >
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <img src="logo-brand.png" alt="" style={{ height: "70px" }} />
+          <img src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
+            alt="" style={{ height: "100px", width: "200px" }} />
         </div>
 
         <h2
@@ -58,7 +88,7 @@ export default function NormalLoginForm() {
             textTransform: "uppercase",
           }}
         >
-          Issue Portal
+          {/* Issue Portal */}
         </h2>
         <Form.Item
           style={{ minWidth: 300, maxWidth: 300 }}
@@ -72,7 +102,7 @@ export default function NormalLoginForm() {
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder="Username"
+            placeholder="email"
           />
         </Form.Item>
         <Form.Item
@@ -80,7 +110,7 @@ export default function NormalLoginForm() {
           name="password"
           rules={[
             {
-              required: true,
+              required: false,
               message: "Please input your Password!",
             },
           ]}

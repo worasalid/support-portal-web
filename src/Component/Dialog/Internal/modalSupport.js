@@ -1,72 +1,39 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Select, Button } from 'antd';
+import React, { useState, useRef, useContext } from 'react';
+import { useHistory } from "react-router-dom";
+import { Modal, Form } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+// import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import IssueContext from '../../../utility/issueContext';
+import TextEditor from '../../TextEditor';
 
 
 export default function ModalSupport({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const [formRef, setFormRef] = useState(null);
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
-    // page.loaddata.IssueType = page.data.IssueTypeData.map(x => ({ name: x.name, value: x.id }))
-    // page.loaddata.Module = page.data.ModuleData.map(x => ({ name: x.text, value: x.value }))
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
+    //data
+    const [counttask, setCounttask] = useState(null)
 
-    const GetIssueType = async () => {
-        try {
-            const issuetype = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/issue-types",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-            });
-            userdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
-        } catch (error) {
 
-        }
-    }
-
-    const LoadModule = async () => {
-        try {
-            const module = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/modules",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    productId: details.productId
-                }
-            });
-            userdispatch({ type: "LOAD_MODULE", payload: module.data })
-        } catch (error) {
-
-        }
-    }
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "") {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
-                        comment_text: textValue,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -77,6 +44,27 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         }
     }
 
+    const GetTask = async () => {
+        try {
+            const task = await Axios({
+                url: process.env.REACT_APP_API_URL + "/tickets/load-task",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    ticketId: details.ticketId
+                }
+            });
+            if (task.data.filter((x) => x.Status === "Waiting Progress")) {
+
+            }
+        } catch (error) {
+
+        }
+    }
+
+
     const SendFlow = async (values) => {
         try {
             const sendflow = await Axios({
@@ -86,22 +74,17 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    issuetype: values.issuetype,
-                    module_id: values.module,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    history: {
-                        historytype: "Customer",
-                        description: details.flowaction
-                      }
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
+                    
+
                 }
             });
             if (sendflow.status === 200) {
+                SaveComment();
+                onOk();
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -111,19 +94,23 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("");
-                        onOk();
                         formRef.resetFields();
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        if (details.flowoutput.value === "ResolvedTask") {
+                            history.goBack();
+                        } else {
+                            history.push({ pathname: "/internal/issue/inprogress" });
+                        }
+
                     },
                 });
             }
         } catch (error) {
-            console.log("error",error.response)
+            console.log("error", error.response)
             await Modal.info({
                 title: 'บันทึกไม่สำเร็จ',
                 content: (
                     <div>
-                         <p>{error.message}</p>
+                        <p>{error.message}</p>
                         <p>{error.response.data}</p>
                     </div>
                 ),
@@ -137,23 +124,8 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
     }
 
     const onFinish = (values) => {
-        SaveComment();
         SendFlow(values);
-  
     };
-    useEffect(() => {
-        if (visible) {
-            GetIssueType();
-            LoadModule();
-        }
-
-    }, [visible])
-
-    useEffect(() => {
-        if (formRef && visible) {
-            formRef.setFieldsValue({ issuetype: details.internaltype, module: details.moduleId })
-        }
-    }, [details.internaltype, visible, formRef])
 
     return (
         <Modal
@@ -176,7 +148,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                 // }}
                 onFinish={onFinish}
             >
-                IssueType
+                {/* IssueType
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="issuetype"
@@ -201,12 +173,13 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         }
                     >
                     </Select>
-                </Form.Item>
+                </Form.Item> */}
 
-                Module
-                <Form.Item
+
+                {/* <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     name="module"
+                    label="Module"
                     rules={[
                         {
                             required: true,
@@ -227,26 +200,10 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         }
                     >
                     </Select>
-                </Form.Item>
+                </Form.Item> */}
             </Form>
              Remark :
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
+            <TextEditor ref={editorRef} />
             <br />
              AttachFile : <UploadFile ref={uploadRef} />
         </Modal>

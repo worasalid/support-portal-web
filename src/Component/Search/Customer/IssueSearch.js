@@ -7,11 +7,27 @@ import { useEffect } from 'react';
 import AuthenContext from '../../../utility/authenContext';
 import IssueContext from '../../../utility/issueContext';
 
-export default function Issuesearch() {
+export default function Issuesearch({Progress = "hide"}) {
     const { RangePicker } = DatePicker;
     const { Option } = Select;
     const { state, dispatch } = useContext(AuthenContext);
     const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+
+    const progressstatus = [
+        {
+            value: "InProgress",
+            text: "InProgress"
+        },
+        {
+            value: "Resolved",
+            text: "Resolved"
+        },
+        {
+            value: "Complete",
+            text: "Complete"
+        },
+    ]
+
     const handleChange = (e) => {
         if (e.target.name === "issuetype") {
             customerdispatch({ type: "SELECT_TYPE", payload: e.target.value })
@@ -25,6 +41,10 @@ export default function Issuesearch() {
         if (e.target.name === "priority") {
             customerdispatch({ type: "SELECT_PRIORITY", payload: e.target.value })
         }
+        if (e.target.name === "progress") {
+            customerdispatch({ type: "SELECT_PROGRESS", payload: e.target.value })
+        }
+       
         if (e.target.name === "date") {
             customerdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })
         }
@@ -113,41 +133,30 @@ export default function Issuesearch() {
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        maxTagCount={2}
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", name: "issuetype" } })}
-                        options={customerstate.masterdata && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        options={customerstate.masterdata && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name.replace("ChangeRequest", "CR") }))}
                     >
 
                     </Select>
                 </Col>
                 <Col span={4}>
-
-                    <Select placeholder="Product" style={{ width: "100%" }}
+                    <Select placeholder="Priority" style={{ width: "100%" }}
+                        mode="multiple"
                         allowClear
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={(value) => handleChange({ target: { value: value || "", name: 'product' } })}
-                        options={customerstate.masterdata && customerstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})`, group: "Product" }))}
-                        dropdownRender={(value) => (
-                            <div >
-                                <Row>
-                                    <Col>
-                                        {value}
-                                    </Col>
-                                    <Col>
-
-                                    </Col>
-                                </Row>
-                            </div>
-                        )
-                        }
+                        maxTagCount={1}
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
+                        options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        onClear={() => alert()}
                     />
                 </Col>
                 <Col span={4}>
                     <Select placeholder="Module" style={{ width: "100%" }}
+                    mode="multiple"
                         showSearch
                         allowClear
+                        maxTagCount={1}
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
@@ -157,12 +166,12 @@ export default function Issuesearch() {
                     />
                 </Col>
                 <Col span={6} >
-                    <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
+                    <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder={["IssueDate (Start)", "IssueDate (End)"]}
                         onChange={(date, dateString) => handleChange({ target: { value: dateString || "", name: 'date' } })}
                     />
                 </Col>
                 <Col span={2}>
-                    <Button type="primary" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                    <Button type="primary"  shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
                         onClick={() => customerdispatch({ type: "SEARCH", payload: true })}
                     >
                         Search
@@ -173,10 +182,17 @@ export default function Issuesearch() {
                 <Col span={6}>
                 </Col>
                 <Col span={4}>
-                    <Select placeholder="Priority" style={{ width: "100%" }}
+                <Select placeholder="Progress" 
+                style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
+                    mode="multiple"
+                        showSearch
                         allowClear
-                        onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
-                        options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        maxTagCount={1}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'progress' } })}
+                        options={progressstatus.map((x) => ({ value: x.value, label: x.text }))}
                         onClear={() => alert()}
                     />
                 </Col>

@@ -5,7 +5,7 @@ export const AuthenContext = createContext();
 
 export const initState = {
     authen: false,
-    user: null,
+    usersdata: null,
     loading: false,
     error: null,
     response: {
@@ -18,7 +18,7 @@ export const reducer = createReducer(initState, {
     Authen: (state, { payload }) => { state.authen = payload },
     LOADING: (state, { payload }) => { state.loading = payload },
     ERROR: (state, { payload }) => { state.error = payload },
-    LOGIN: (state, { payload }) => { state.user = payload},
+    LOGIN: (state, { payload }) => { state.usersdata = payload},
     CLEAR: (state) => { state = initState },
     SET_RESPONSE_STATUS: (state, { payload }) => { state.response.status = payload }
 });

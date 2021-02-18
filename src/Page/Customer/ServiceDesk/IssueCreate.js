@@ -1,25 +1,25 @@
 import React, { useEffect, useRef, useState, useContext, useReducer } from 'react'
-import { Button, Form, Input, Select, Card, Avatar, Dropdown, Menu, Row, Col, Modal } from "antd";
-import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
+import { Button, Form, Input, Select, Card, Dropdown, Menu, Row, Col, Modal } from "antd";
+import { PhoneOutlined, DatabaseOutlined, FileOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from "react-router-dom";
 import MasterPage from "./MasterPage"
 import UploadFile from "../../../Component/UploadFile";
 import Axios from 'axios';
-import { Editor } from '@tinymce/tinymce-react';
-import classNames from 'classnames'
+// import classNames from 'classnames'
 import AuthenContext from '../../../utility/authenContext';
-import Reducer, { productReducer, moduleReducer, initState } from '../../../utility/reducer';
 import { customerReducer, customerState } from '../../../utility/issueContext';
+import TextEditor from '../../../Component/TextEditor';
+import { Editor } from '@tinymce/tinymce-react';
 
 const { TextArea } = Input;
-const { Option } = Select;
+// const { Option } = Select;
 const { Meta } = Card;
 const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 24 },
 };
 const tailLayout = {
-    wrapperCol: { offset: 8, span: 24 },
+    wrapperCol: { offset: 20, span: 24 },
 };
 
 export default function IssueCreate() {
@@ -27,23 +27,77 @@ export default function IssueCreate() {
     const { state, dispatch } = useContext(AuthenContext);
     const [customerstate, customerdispatch] = useReducer(customerReducer, customerState)
 
-
-
     const match = useRouteMatch();
     const [hiddenForm, sethiddenForm] = useState(false);
     const [title, setTitle] = useState(match.params.id);
     const [description, setDescription] = useState();
+
+    const [form] = Form.useForm();
     const uploadRef = useRef(null);
+    const editorRef = useRef(null)
+
+    const image_upload_handler = (blobInfo, success, failure, progress) => {
+        var xhr, formData;
+
+        xhr = new XMLHttpRequest();
+        xhr.withCredentials = false;
+        xhr.open("POST", process.env.REACT_APP_API_URL + "/files");
+
+        xhr.upload.onprogress = function (e) {
+            progress((e.loaded / e.total) * 100);
+        };
+
+        xhr.onload = function () {
+            var json;
+
+            if (xhr.status === 403) {
+                failure("HTTP Error: " + xhr.status, { remove: true });
+                return;
+            }
+
+            if (xhr.status < 200 || xhr.status >= 300) {
+                failure("HTTP Error: " + xhr.status);
+                return;
+            }
+
+            json = JSON.parse(xhr.responseText);
+
+            if (!json || typeof json.url != "string") {
+                failure("Invalid JSON: " + xhr.responseText);
+                return;
+            }
+
+            success(json.url);
+        };
+
+        xhr.onerror = function () {
+            failure(
+                "Image upload failed due to a XHR Transport error. Code: " + xhr.status
+            );
+        };
+
+        formData = new FormData();
+        formData.append("file", blobInfo.blob(), blobInfo.filename());
+
+        xhr.send(formData);
+    };
+
 
     const getproducts = async () => {
         const products = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/products",
+            url: process.env.REACT_APP_API_URL + "/master/customer-products",
             method: "get",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                companyid: state?.usersdata?.users?.company_id
             }
         });
-        customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
+        if (products.status === 200) {
+            customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
+        }
+
     }
 
     const getmodule = async () => {
@@ -71,23 +125,15 @@ export default function IssueCreate() {
         customerdispatch({ type: "LOAD_PRIORITY", payload: priority.data })
     }
 
-    const getMasterdata = async () => {
-        try {
-            getproducts();
-            getmodule();
-            getpriority();
-        } catch (error) {
+    const getMasterdata = () => {
+        getproducts();
+        // getmodule();
+        getpriority();
 
-        }
     }
-    const handleEditorChange = (content, editor) => {
-        console.log('Content was updated:', content);
-    }
-
 
     const onFinish = async (values) => {
-        console.log("onFinish", values.description);
-        console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
+
         try {
             let createTicket = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create",
@@ -96,13 +142,13 @@ export default function IssueCreate() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    company_id: state.user.company_id,
+                    company_id: state.usersdata.users.company_id,
                     type: match.params.id,
                     product_id: values.product,
                     module_id: values.module,
                     priority: values.priority,
                     title: values.subject,
-                    description: values.description,
+                    description: description,
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
 
                 },
@@ -147,20 +193,26 @@ export default function IssueCreate() {
                         match.params.id === "4" ? "Use" : ""
         );
 
-        // setDescription(
-        //     `${title}` === "Bug" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด" :
-        //         `${title}` === "CR" ? "แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ" :
-        //             `${title}` === "Memo" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
-        //                 `${title}` === "Use" ? "สอบถามข้อมูลทั่วไป / การใช้งานระบบ" : ""
-        // );
 
     }, [title]);
 
+    // useEffect(() => {
+    //     if (!state.authen) {
+    //         getMasterdata();
+    //         getproducts();
+    //     }
+    //     if (state?.usersdata?.users === undefined) {
+    //         getMasterdata();
+    //         getproducts();
+    //     }
+
+    // }, [state.authen]);
+
     useEffect(() => {
-        if (state.authen) {
+        if (state?.usersdata?.users?.company_id) {
             getMasterdata();
         }
-    }, [state.authen]);
+    }, [state?.usersdata?.users?.company_id]);
 
     useEffect(() => {
         if (state.authen) {
@@ -168,18 +220,11 @@ export default function IssueCreate() {
         }
     }, [customerstate.filter.productState]);
 
-    const images_upload_handler = (blobInfo, success, failure) => {
-        setTimeout(function () {
-            /* no matter what you upload, we will turn it into TinyMCE logo :)*/
-            success('http://moxiecode.cachefly.net/tinymce/v9/images/logo.png');
-        }, 2000);
-    }
-
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>
                 <div className="sd-page-header">
-                <Row>
+                    <Row>
                         <Col span={18}>
                             <h3>แจ้งปัญหาการใช้งาน</h3>
                         </Col>
@@ -194,15 +239,16 @@ export default function IssueCreate() {
                     </Row>
 
                 </div>
-                
+
                 <Form
+                    form={form}
                     hidden={hiddenForm}
                     {...layout}
 
                     name="issue"
                     initialValues={{
                         // product: "REM",
-                        module: 2,
+                        // module: 2,
                         priority: 4
                     }}
                     layout="vertical"
@@ -351,6 +397,7 @@ export default function IssueCreate() {
                     <Form.Item
                         label="รายละเอียด"
                         name="description"
+
                         rules={[
                             {
                                 required: true,
@@ -358,12 +405,12 @@ export default function IssueCreate() {
                             },
                         ]}
                     >
-                        <TextArea rows={5} placeholder="รายละเอียด" />
-                        {/* <Editor
+                        <Editor
+                            ref={editorRef}
                             apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                             initialValue=""
                             init={{
-                               
+
                                 height: 300,
                                 menubar: false,
                                 plugins: [
@@ -371,19 +418,26 @@ export default function IssueCreate() {
                                     'searchreplace visualblocks code fullscreen',
                                     'insertdatetime media table paste code help wordcount'
                                 ],
+                                block_unsupported_drop: false,
+                                paste_data_images: true,
+                                images_upload_handler: image_upload_handler,
                                 toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
                                 toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
                             }}
-                            onEditorChange={handleEditorChange} 
-
-                        /> */}
+                            onEditorChange={(content, editor) => setDescription(content)}
+                        />
                     </Form.Item>
                     <Form.Item label="ไฟล์แนบ" name="attach">
                         <UploadFile ref={uploadRef} />
                     </Form.Item>
                     <Form.Item {...tailLayout}>
-                        <Button type="primary" htmlType="submit"  >
-                            ยื่นเรื่อง
+                        <Button
+                            style={{ width: 100 }}
+                            type="primary"
+                            htmlType="submit"
+                            size="middle"
+                        >
+                            บันทึก
                             </Button>
                     </Form.Item>
                 </Form>

@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Divider, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -12,7 +12,7 @@ import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
-import Clock from "../../../utility/countdownTimer";
+
 
 
 
@@ -26,16 +26,20 @@ export default function MyTask() {
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
 
   // data
-  const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+  //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+  const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
   const { state, dispatch } = useContext(AuthenContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageTotal, setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
   const loadIssue = async (value) => {
     // setLoadding(true);
     try {
       const results = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/load",
+        url: process.env.REACT_APP_API_URL + "/tickets/loadticket-customer",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -48,12 +52,15 @@ export default function MyTask() {
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           keyword: customerstate.filter.keyword,
-          task: "mytask"
+          task: "mytask",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
-        customerdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        customerdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
 
       }
     } catch (error) {
@@ -88,6 +95,7 @@ export default function MyTask() {
     });
   }
 
+
   useEffect(() => {
     customerdispatch({ type: "LOADING", payload: true })
     setTimeout(() => {
@@ -96,7 +104,7 @@ export default function MyTask() {
     }, 1000)
 
     customerdispatch({ type: "SEARCH", payload: false })
-  }, [customerstate.search, visible]);
+  }, [customerstate.search, visible, pageCurrent]);
 
 
   return (
@@ -110,6 +118,19 @@ export default function MyTask() {
       <Row>
         <Col span={24}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
+            footer={(x) => {
+              return (
+                <>
+                  <div style={{ textAlign: "right" }}>
+                    <label>จำนวนเคส : </label>
+                    <label>{x.length}</label>
+                  </div>
+                </>
+              )
+            }}
+            pagination={{ pageSize: pageSize, total: pageTotal }}
+
+            onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
             onRow={(record, rowIndex) => {
               // console.log(record, rowIndex)
               return {
@@ -135,21 +156,41 @@ export default function MyTask() {
               render={(record, index) => {
                 return (
                   <div>
-                    <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                       {record.Number}
                     </label>
                     <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                      {
-                        record.IssueType === 'Bug' ?
-                          <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
-                          <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
-                      }
-                      <Divider type="vertical" />
-                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-                      <Divider type="vertical" />
-                      <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
-                      <Divider type="vertical" />
-                      <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
+                      <Tooltip title="Issue Type">
+                        <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
+                          <label style={{ fontSize: "10px" }}>
+                            {record.IssueType}
+                          </label>
+                        </Tag>
+                      </Tooltip>
+                      {/* <Divider type="vertical" /> */}
+                      <Tooltip title="Priority">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.Priority}
+                          </label>
+                        </Tag>
+                      </Tooltip>
+                      {/* <Divider type="vertical" /> */}
+                      <Tooltip title="Product">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.ProductName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
+                      {/* <Divider type="vertical" /> */}
+                      <Tooltip title="Module">
+                        <Tag color="#808080">
+                          <label style={{ fontSize: "10px" }}>
+                            {record.ModuleName}
+                          </label>
+                        </Tag>
+                      </Tooltip>
                     </div>
                   </div>
                 );
@@ -161,7 +202,7 @@ export default function MyTask() {
                 return (
                   <>
                     <div>
-                      <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Title}
                       </label>
                     </div>
@@ -170,7 +211,7 @@ export default function MyTask() {
                         onClick={() => {
                           return (
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id }),
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id }),
                             (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
                           )
                         }
@@ -189,8 +230,9 @@ export default function MyTask() {
               render={(record) => {
                 return (
                   <>
-                    <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}>
-                      {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                      {moment(record.CreateDate).format("DD/MM/YYYY")}<br />
+                      {moment(record.CreateDate).format("HH:mm")}
                     </label>
 
                   </>
@@ -206,14 +248,15 @@ export default function MyTask() {
               render={(record) => {
                 return (
                   <>
-                   {record.GroupStatus === "Wait For Progress" ? "" :
-                    <label className="table-column-text">
-                      {record.SLA === null ? "" : moment(record.SLA).format("DD/MM/YYYY HH:mm")}
-                    </label>
-              }
+                    {record.GroupStatus === "Wait For Progress" ? "" :
+                      <label className="table-column-text">
+                        {record.SLA === null ? "" : moment(record.SLA).format("DD/MM/YYYY")}<br />
+                        {record.SLA === null ? "" : moment(record.SLA).format("HH:mm")}
+                      </label>
+                    }
                     <br />
-                   
-                    {record.cntDueDate > 1 ?
+
+                    {record.cntDueDate >= 1 ?
                       <Tag color="warning"
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -221,7 +264,7 @@ export default function MyTask() {
                         }
                         }
                       >
-                        เลื่อน DueDate
+                        DueDate ถูกเลื่อน
                    </Tag> : ""
                     }
 
@@ -231,72 +274,13 @@ export default function MyTask() {
               }
             />
 
-            {/* <Column title="SLA"
-              align="center"
-              width="10%"
-              render={(record) => {
-                return (
-                  <>
-                   {record.GroupStatus === "Wait For Progress" ? "" :
-                    <Clock
-                      showseconds={false}
-                      deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
-                    />
-                }
-                  </>
-                )
-              }
-
-              }
-            /> */}
-
             <Column
               title="ProgressStatus"
               width="10%"
               align="center"
               render={(record) => {
                 return (
-                  <>
-                    <Dropdown
-                      overlayStyle={{
-                        width: 300,
-                        boxShadow:
-                          "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                      }}
-                      overlay={
-                        <Menu
-                          onSelect={(x) => console.log(x.selectedKeys)}
-                          onClick={(x) => {
-                            setVisible(true);
-                            setProgressStatus(x.item.props.children[1]);
-
-                            customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: x.key })
-                            customerdispatch({ type: "SELECT_DATAROW", payload: record })
-
-                          }}
-                        >
-
-                          {customerstate.actionflow && customerstate.actionflow.map((x) => {
-                            return (
-                              <Menu.Item key={x.ToNodeId}>{x.TextEng}</Menu.Item>
-                            )
-                          })}
-                        </Menu>
-                      }
-                      trigger="click"
-                    >
-                      <Button type="link"
-                        onClick={() => {
-                          getflow_output(record.TransId)
-                        }}
-                      >{record.GroupStatus}</Button>
-                    </Dropdown>
-
-
-                    <div>
-                      {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY HH:mm")}
-                    </div>
-                  </>
+                  <label className="table-column-text">{record.ProgressStatus}</label>
                 );
               }}
             />
@@ -331,7 +315,8 @@ export default function MyTask() {
         visible={historyduedate_visible}
         onCancel={() => setHistoryduedate_visible(false)}
         details={{
-          ticketId: customerstate.issuedata.datarow.Id
+          ticketId: customerstate.issuedata.datarow.Id,
+          duedate: customerstate.issuedata.datarow.SLA_DueDate
         }}
       >
       </DuedateLog>

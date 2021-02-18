@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import MasterPage from '../MasterPage'
 import Axios from 'axios';
-import { Button, Table, Modal, Tabs, message } from 'antd';
-import MapCompany from './MapCompany';
+import { Button, Table, Modal, message } from 'antd';
+//import MapCompany from './MapCompany';
 
 const { Column } = Table;
-const { TabPane } = Tabs;
+//const { TabPane } = Tabs;
 
 export default function MapDeveloper() {
 
     const [visible, setVisible] = useState(false);
     const [product_visible, setProduct_visible] = useState(false);
     const [module_visible, setModule_visible] = useState(false);
-    const [expandedRow, setExpandedRow] = useState(false);
+   // const [expandedRow, setExpandedRow] = useState(false);
 
 
     // data

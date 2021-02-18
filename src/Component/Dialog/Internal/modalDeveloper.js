@@ -6,9 +6,11 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
+import TextEditor from '../../TextEditor';
 
 export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
+    const uploadRef = useRef(null);
     const uploadRef_unittest = useRef(null);
     // const uploadRef_filedeploy = useRef(null);
     const uploadRef_document = useRef(null);
@@ -22,7 +24,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "") {
                 const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -30,60 +32,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                        ticketId: details && details.ticketId,
-                        comment_text: textValue,
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
-                        //files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
-                });
-
-
-            }
-        } catch (error) {
-
-        }
-    }
-
-    const SendFlow = async (values) => {
-        try {
-            const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send",
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    url: values.urltest,
-                    history: {
-                        historytype: "Internal",
-                        description: details.flowaction,
-                        value: "",
-                        value2: ""
-                    }
-                }
-            });
-
-            if (sendflow.status === 200) {
-                await Modal.info({
-                    title: 'บันทึกข้อมูลสำเร็จ',
-                    content: (
-                        <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
-                        </div>
-                    ),
-                    onOk() {
-                        editorRef.current.editor.setContent("")
-                        onOk();
-                        history.push({ pathname: "/internal/issue/inprogress" })
-                    },
                 });
             }
         } catch (error) {
@@ -99,47 +53,89 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             data: {
-                ticketId: details && details.ticketId,
+                ticketid: details && details.ticketid,
+                taskid: details.taskid,
                 files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.urltest
+                url: values.urltest,
+                grouptype: "unittest"
             }
         })
     }
 
-    // const SaveFileDeploy = async () => {
-    //     const filedeploy = await Axios({
-    //         url: process.env.REACT_APP_API_URL + "/workflow/save_filedeploy",
-    //         method: "POST",
-    //         headers: {
-    //             "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-    //         },
-    //         data: {
-    //             ticketId: details && details.ticketId,
-    //             files: uploadRef_filedeploy.current.getFiles().map((n) => n.response.id),
-    //         }
-    //     })
-    // }
-
-    const SaveDeployDocument = async () => {
-        const document = await Axios({
+    const SaveDocumentDeploy = async (values) => {
+        const unittest = await Axios({
             url: process.env.REACT_APP_API_URL + "/workflow/save_deploydocument",
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             data: {
-                ticketId: details && details.ticketId,
+                ticketid: details && details.ticketid,
+                taskid: details.taskid,
                 files: uploadRef_document.current.getFiles().map((n) => n.response.id),
+                url: values.urltest,
+                grouptype: "document_deploy"
             }
         })
     }
 
+    const SendFlow = async (values) => {
+        try {
+            const sendflow = await Axios({
+                url: process.env.REACT_APP_API_URL + "/workflow/send",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    taskid: details.taskid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        comment_text: textValue
+                    }
+                }
+            });
+
+            if (sendflow.status === 200) {
+                SaveComment();
+                SaveUnitTest(values);
+                SaveDocumentDeploy(values);
+                onOk();
+
+                await Modal.info({
+                    title: 'บันทึกข้อมูลสำเร็จ',
+                    content: (
+                        <div>
+                            <p>แก้ไขงานเสร็จ และส่ง UnitTest เรียบร้อยแล้ว</p>
+                        </div>
+                    ),
+                    onOk() {
+                        editorRef.current.setvalue();
+                        history.push({ pathname: "/internal/issue/inprogress" })
+                    },
+                });
+            }
+        } catch (error) {
+            await Modal.info({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                onOk() {
+                    editorRef.current.setvalue();
+                    onOk();
+
+                },
+            });
+        }
+    }
+
+
     const onFinish = (values) => {
         console.log('Success:', values);
-        SaveUnitTest(values);
-        // SaveFileDeploy();
-        SaveDeployDocument();
-        SaveComment();
         SendFlow(values);
         onOk();
     };
@@ -169,24 +165,13 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     name="urltest"
                     rules={[
                         {
-                            required: true,
+                            required: false,
                             message: 'กรุณาใส่ Url ที่ใช้ test ',
                         },
                     ]}
                 >
-                    {/* <Row>
-                        <Col span={4}>  
-                            Unit Test:
-                    </Col>
-                        <Col span={20}>
-                           <TextArea rows="2" style={{width: "100%"}}  />
-                        </Col>
-                    </Row> */}
-
                     <TextArea rows="2" style={{ width: "100%" }} />
                 </Form.Item>
-
-             
 
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
@@ -194,7 +179,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     name="unittest"
                     rules={[
                         {
-                            required: true,
+                            required: false,
                             message: 'Please input your UnitTest!',
                         },
                     ]}
@@ -202,59 +187,23 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     <UploadFile ref={uploadRef_unittest} />
                 </Form.Item>
 
-                {/* <Row>
-                    <Col span={4}>
-                        File Deploy:
-                    </Col>
-                    <Col>
-                        <UploadFile ref={uploadRef_filedeploy} />
-                    </Col>
-                </Row>
-
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    name="filedeploy"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-
-                </Form.Item> */}
-
                 <Form.Item
                     style={{ minWidth: 300, maxWidth: 300 }}
                     label="Deploy Document"
                     name="document"
                     rules={[
                         {
-                            required: true,
-                            message: 'Please input your UnitTest!',
+                            required: false,
+                            message: 'Please input Deploy Document!',
                         },
                     ]}
                 >
                     <UploadFile ref={uploadRef_document} />
                 </Form.Item>
             </Form>
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
+            <TextEditor ref={editorRef} />
+            <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
         </Modal>
     )
 }

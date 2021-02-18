@@ -48,534 +48,892 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
 
     return (
         <>
-            <label className="header-text">Document</label>
-            <span
+            {
+                listfile.length !== 0
+                    ?
+                    <>
+                        <label className="header-text">Document</label>
+                        <span
 
-                style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
-                onClick={
-                    () => {
-                        return (
-                            setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                            setCollapseicon(divcollapse === 'block' ? <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
-                        )
-                    }
-                }
-            >
-                {collapseicon}
-            </span>
+                            style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
+                            onClick={
+                                () => {
+                                    return (
+                                        setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                        setCollapseicon(divcollapse === 'block' ? <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+                                    )
+                                }
+                            }
+                        >
+                            {collapseicon}
+                        </span>
+                    </>
+                    : ""
+            }
+
 
             <div style={{ display: divcollapse }}>
-                {
-                    listfile.filter((x) => x.GroupType === "vdoUpload").length !== 0
-                        ? <Tabs defaultActiveKey="1" type="card">
-                            <TabPane tab="Unit Test" key="1">
-                                <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
-                                    <Column title="No"
-                                        width="2%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label>{index + 1}</label>
+                {/* UnitTest */}
+                <div
+                    style={{
+                        display: listfile.filter((x) => x.GroupType === "unittest").length !== 0 &&
+                            listfile.filter((x) => x.GroupType === "deploydocument").length === 0 ? "block" : "none"
+                    }}
+                >
+                    <Tabs defaultActiveKey="1" type="card">
+                        <TabPane tab="Unit Test" key="1">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
+                                <Column title="No"
+                                    width="2%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
 
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title="ไฟล์ Unit Test" width="25%" dataIndex="FileName" ></Column>
-                                    <Column title="URL" width="35%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <Button type="link" style={{ padding: 0 }}
-                                                        onClick={() => window.open(record.Url, "_blank")}
-                                                    >
-                                                        {record.Url}
-                                                    </Button>
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title="FileSize" width="15%" dataIndex="FileSize" ></Column>
-                                    <Column title="OwnerName"
-                                        width="20%"
-                                        align="center"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <labe>
-                                                        {record.OwnerName}
-                                                    </labe>
-                                                    <label>
-                                                        {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                        {moment(record.ModifyDate).format("HH:mm")}
-                                                    </label>
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title=""
-                                        width="3%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <Button type="link"
-                                                        onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                    >
-                                                        {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ไฟล์ Unit Test" width="25%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}<br />
+                                                </label>
 
-                                                    </Button>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="URL" width="35%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label type="link" className="text-link value-text"
+                                                    onClick={() => window.open(record.Url, "_blank")}
+                                                >
+                                                    {record.Url}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="FileSize" width="15%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    width="25%"
+                                    align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="3%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                </Table>
-                            </TabPane>
-                            <TabPane tab="Document Deploy" key="2" >
-                                <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
-                                    <Column title="No"
-                                        width="5%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label>{index + 1}</label>
+                                                </Button>
 
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
-                                    <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
-                                    <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                    <Column title="วันที่"
-                                        align="center"
-                                        width="10%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label>
-                                                        {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
-                                                    </label>
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title=""
-                                        width="5%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <Button type="link"
-                                                        onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                    >
-                                                        {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
 
-                                                    </Button>
+                    </Tabs>
+                </div>
 
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                </Table>
-                            </TabPane>
-                            <TabPane tab="Test Result" key="3">
-                                <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
-                                    <Column title="No"
-                                        width="5%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label>{index + 1}</label>
+                {/* UnitTest, DeployDocument */}
+                <div
+                    style={{
+                        display: listfile.filter((x) => x.GroupType === "unittest").length !== 0 &&
+                            listfile.filter((x) => x.GroupType === "deploydocument").length !== 0 &&
+                            listfile.filter((x) => x.GroupType === "test_result_QA").length === 0 &&
+                            listfile.filter((x) => x.GroupType === "vdoUpload").length === 0 ? "block" : "none"
+                    }}
+                >
+                    <Tabs defaultActiveKey="1" type="card">
+                        <TabPane tab="Unit Test" key="1">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
+                                <Column title="No"
+                                    width="2%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
 
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
-                                    <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
-                                    <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                    <Column title="วันที่"
-                                        align="center"
-                                        width="10%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label>
-                                                        {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
-                                                    </label>
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title=""
-                                        width="5%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <Button type="link"
-                                                        onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                    >
-                                                        {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ไฟล์ Unit Test" width="25%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}<br />
+                                                </label>
 
-                                                    </Button>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="URL" width="35%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label type="link" className="text-link value-text"
+                                                    onClick={() => window.open(record.Url, "_blank")}
+                                                >
+                                                    {record.Url}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="FileSize" width="15%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    width="25%"
+                                    align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="3%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                </Table>
-                            </TabPane>
-                            <TabPane tab="VDO" key="4">
-                                <Table dataSource={listfile.filter((x) => x.GroupType === "vdoUpload")} style={{ width: "100%" }} pagination={false}>
-                                    <Column title="No"
-                                        width="5%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label>{index + 1}</label>
+                                                </Button>
 
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                    <Column title="URL" width="45%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label className="text-hover" style={{ padding: 0,color: "#1890ff" }}
-                                                        onClick={() => window.open(record.Url, "_blank")}
-                                                    >
-                                                        {record.Url}
-                                                    </label>
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
-                                     <Column title="Description" dataIndex="Remark" width="20%"></Column>
-                                    <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                    <Column title="วันที่"
-                                        align="center"
-                                        width="10%"
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label>
-                                                        {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
-                                                    </label>
-                                                </>
-                                            )
-                                        }
-                                        }
-                                    />
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                        <TabPane tab="Document Deploy" key="2" >
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
+                                <Column title="No"
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
 
-                                </Table>
-                            </TabPane>
-                        </Tabs>
-                        : listfile.filter((x) => x.GroupType === "testResult").length !== 0
-                            ? <Tabs defaultActiveKey="1" type="card">
-                                <TabPane tab="Unit Test" key="1">
-                                    <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
-                                        <Column title="No"
-                                            width="2%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <label>{index + 1}</label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
 
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title="ไฟล์ Unit Test" width="25%" dataIndex="FileName" ></Column>
-                                        <Column title="URL" width="35%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <Button type="link" style={{ padding: 0 }}
-                                                            onClick={() => window.open(record.Url, "_blank")}
-                                                        >
-                                                            {record.Url}
-                                                        </Button>
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title="FileSize" width="15%" dataIndex="FileSize" ></Column>
-                                        <Column title="OwnerName"
-                                            width="20%"
-                                            align="center"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <labe>
-                                                            {record.OwnerName}
-                                                        </labe>
-                                                        <label>
-                                                            {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                            {moment(record.ModifyDate).format("HH:mm")}
-                                                        </label>
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title=""
-                                            width="3%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <Button type="link"
-                                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                        >
-                                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                />
+                                <Column title="FileSize" width="15%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    align="center"
+                                    width="20%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
-                                                        </Button>
+                                                </Button>
 
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                    </Table>
-                                </TabPane>
-                                <TabPane tab="Document Deploy" key="2" >
-                                    <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
-                                        <Column title="No"
-                                            width="5%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <label>{index + 1}</label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
 
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
-                                        <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
-                                        <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                        <Column title="วันที่"
-                                            align="center"
-                                            width="10%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <label>
-                                                            {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
-                                                        </label>
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title=""
-                                            width="5%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <Button type="link"
-                                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                        >
-                                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                    </Tabs>
+                </div>
 
-                                                        </Button>
+                {/* UnitTest, DeployDocument, QA_Document */}
+                <div
+                    style={{
+                        display: listfile.filter((x) => x.GroupType === "unittest").length !== 0 &&
+                            listfile.filter((x) => x.GroupType === "deploydocument").length !== 0 &&
+                            listfile.filter((x) => x.GroupType === "test_result_QA").length !== 0 &&
+                            listfile.filter((x) => x.GroupType === "vdoUpload").length === 0 ? "block" : "none"
+                    }}
+                >
+                    <Tabs defaultActiveKey="1" type="card">
+                        <TabPane tab="Unit Test" key="1">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
+                                <Column title="No"
+                                    width="2%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
 
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                    </Table>
-                                </TabPane>
-                                <TabPane tab="Test Result" key="3">
-                                    <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%" }} pagination={false}>
-                                        <Column title="No"
-                                            width="5%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <label>{index + 1}</label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ไฟล์ Unit Test" width="25%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}
+                                                </label>
+                                                <br />
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="URL" width="30%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="text-link value-text"
+                                                    onClick={() => window.open(record.Url, "_blank")}
+                                                >
+                                                    {record.Url}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="FileSize" width="15%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    width="25%"
+                                    align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="3%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
-                                        <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
-                                        <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                        <Column title="วันที่"
-                                            align="center"
-                                            width="10%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <label>
-                                                            {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
-                                                        </label>
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                        <Column title=""
-                                            width="5%"
-                                            render={(value, record, index) => {
-                                                return (
-                                                    <>
-                                                        <Button type="link"
-                                                            onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                        >
-                                                            {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                                </Button>
 
-                                                        </Button>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                        <TabPane tab="Document Deploy" key="2" >
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
+                                <Column title="No"
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
 
-                                                    </>
-                                                )
-                                            }
-                                            }
-                                        />
-                                    </Table>
-                                </TabPane>
-                            </Tabs>
-                            : listfile.filter((x) => x.GroupType === "unittest").length !== 0
-                                ? <Tabs defaultActiveKey="1" type="card">
-                                    <TabPane tab="Unit Test" key="1">
-                                        <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
-                                            <Column title="No"
-                                                width="2%"
-                                                render={(value, record, index) => {
-                                                    return (
-                                                        <>
-                                                            <label>{index + 1}</label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
 
-                                                        </>
-                                                    )
-                                                }
-                                                }
-                                            />
-                                            <Column title="ไฟล์ Unit Test" width="25%" dataIndex="FileName" ></Column>
-                                            <Column title="URL" width="35%"
-                                                render={(value, record, index) => {
-                                                    return (
-                                                        <>
-                                                            <Button type="link" style={{ padding: 0 }}
-                                                                onClick={() => window.open(record.Url, "_blank")}
-                                                            >
-                                                                {record.Url}
-                                                            </Button>
-                                                        </>
-                                                    )
-                                                }
-                                                }
-                                            />
-                                            <Column title="FileSize" width="15%" dataIndex="FileSize" ></Column>
-                                            <Column title="OwnerName"
-                                                width="20%"
-                                                align="center"
-                                                render={(value, record, index) => {
-                                                    return (
-                                                        <>
-                                                            <labe>
-                                                                {record.OwnerName}
-                                                            </labe>
-                                                            <label>
-                                                                {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                                {moment(record.ModifyDate).format("HH:mm")}
-                                                            </label>
-                                                        </>
-                                                    )
-                                                }
-                                                }
-                                            />
-                                            <Column title=""
-                                                width="3%"
-                                                render={(value, record, index) => {
-                                                    return (
-                                                        <>
-                                                            <Button type="link"
-                                                                onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                            >
-                                                                {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                />
+                                <Column title="FileSize" width="15%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    align="center"
+                                    width="20%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
-                                                            </Button>
+                                                </Button>
 
-                                                        </>
-                                                    )
-                                                }
-                                                }
-                                            />
-                                        </Table>
-                                    </TabPane>
-                                    <TabPane tab="Document Deploy" key="2" >
-                                        <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
-                                            <Column title="No"
-                                                width="5%"
-                                                render={(value, record, index) => {
-                                                    return (
-                                                        <>
-                                                            <label>{index + 1}</label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                        <TabPane tab="QA Test Result" key="3">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "test_result_QA")} style={{ width: "100%" }} pagination={false}
+                                scroll={{ x: "10vw"}}
+                            >
+                                <Column title="No"
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
 
-                                                        </>
-                                                    )
-                                                }
-                                                }
-                                            />
-                                            <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"></Column>
-                                            <Column title="FileSize" dataIndex="FileSize" width="15%"></Column>
-                                            <Column title="OwnerName" dataIndex="OwnerName" width="20%"></Column>
-                                            <Column title="วันที่"
-                                                align="center"
-                                                width="10%"
-                                                render={(value, record, index) => {
-                                                    return (
-                                                        <>
-                                                            <label>
-                                                                {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
-                                                            </label>
-                                                        </>
-                                                    )
-                                                }
-                                                }
-                                            />
-                                            <Column title=""
-                                                width="5%"
-                                                render={(value, record, index) => {
-                                                    return (
-                                                        <>
-                                                            <Button type="link"
-                                                                onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
-                                                            >
-                                                                {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ไฟล์ Unit Test" width="25%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}
+                                                </label>
+                                                <br />
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="URL" width="30%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="text-link value-text"
+                                                    onClick={() => window.open(record.Url, "_blank")}
+                                                >
+                                                    {record.Url}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="FileSize" dataIndex="FileSize" width="15%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}<br />
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    align="center"
+                                    width="20%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
-                                                            </Button>
+                                                </Button>
 
-                                                        </>
-                                                    )
-                                                }
-                                                }
-                                            />
-                                        </Table>
-                                    </TabPane>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                    </Tabs>
+                </div>
 
-                                </Tabs>
-                                : ""
-                }
+                {/* UnitTest, DeployDocument, QA_Document, VDO_Upload */}
+                <div
+                    style={{
+                        display: listfile.filter((x) => x.GroupType === "vdoUpload").length !== 0 ? "block" : "none"
+                    }}
+                >
+                    <Tabs defaultActiveKey="1" type="card">
+                        <TabPane tab="Unit Test" key="1">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
+                                <Column title="No"
+                                    width="2%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ไฟล์ Unit Test" width="25%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}<br />
+                                                </label>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="URL" width="35%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label type="link" className="text-link value-text"
+                                                    onClick={() => window.open(record.Url, "_blank")}
+                                                >
+                                                    {record.Url}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="FileSize" width="15%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    width="25%"
+                                    align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="3%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+
+                                                </Button>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                        <TabPane tab="Document Deploy" key="2" >
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "deploydocument")} style={{ width: "100%" }} pagination={false}>
+                                <Column title="No"
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+
+                                />
+                                <Column title="FileSize" width="15%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    align="center"
+                                    width="20%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+
+                                                </Button>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                        <TabPane tab="QA Test Result" key="3">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "test_result_QA")} style={{ width: "100%" }} pagination={false}>
+                                <Column title="No"
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}<br />
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="FileSize" dataIndex="FileSize" width="15%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}<br />
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName"
+                                    align="center"
+                                    width="20%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+
+                                                </Button>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                        <TabPane tab="VDO" key="4">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "vdoUpload")} style={{ width: "100%" }} pagination={false}>
+                                <Column title="No"
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="URL" width="35%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="text-hover value-text" style={{ padding: 0, color: "#1890ff" }}
+                                                    onClick={() => window.open(record.Url, "_blank")}
+                                                >
+                                                    {record.Url}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="Description" dataIndex="Remark" width="30%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.Remark}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName" align="center" width="20%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label className="value-text">
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+                    </Tabs>
+                </div>
             </div>
         </>
     )

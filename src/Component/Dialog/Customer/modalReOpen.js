@@ -1,6 +1,6 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
 import { Modal, Rate, Form, Input } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
@@ -13,45 +13,58 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     const history = useHistory();
     const uploadRef = useRef(null);
     const editorRef = useRef(null)
-    const [textValue, setTextValue] = useState("")
+    // const [textValue, setTextValue] = useState("")
     const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-      }
+    // const handleEditorChange = (content, editor) => {
+    //     setTextValue(content);
+    // }
+
+    const SaveComment = async () => {
+        try {
+            if (editorRef.current.getValue() !== "" || editorRef.current.getValue() !== null) {
+                await Axios({
+                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                    },
+                    data: {
+                        ticketid: details && details.ticketid,
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "customer",
+                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    }
+                });
+
+
+            }
+        } catch (error) {
+
+        }
+    }
+
 
     const FlowReOpen = async (values) => {
         try {
             const completeflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/reopen",
+                url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
-                    ticketId: details && details.ticketId,
-                    ticketnumber: details && details.ticketnumber,
-                    mailbox_id: details && details.mailboxId,
-                    node_output_id: details && details.node_output_id,
-                    to_node_id: details && details.to_node_id,
-                    node_action_id: details && details.to_node_action_id,
-                    product_id: details && details.productId,
-                    module_id: details && details.moduleId,
-                    flowstatus: details.flowstatus,
-                    groupstatus: details.groupstatus,
-                    type: "Customer",
-                    history: {
-                        historytype: "Customer",
-                        description: details.flowaction
-                    },
-                   reason: values.reason
-
+                    ticketid: details.ticketid,
+                    mailboxid: details.mailboxid,
+                    flowoutputid: details.flowoutputid
                 }
+
             });
 
             if (completeflow.status === 200) {
-                onCancel();
+                onOk();
+                SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -123,23 +136,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                     label="Remark"
                     name="remark"
                 >
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
+                    <TextEditor ref={editorRef} />
                     <br />
       AttachFile : <UploadFile ref={uploadRef} />
                 </Form.Item>
