@@ -16,12 +16,12 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
 
     const progressOnPremise = [
         {
-            name: "Waiting Update Patch",
-            label: "Waiting Update Patch"
+            name: "Waiting Customer Update Patch",
+            label: "Waiting Customer Update Patch"
         },
         {
-            name: "Waiting Deploy to PRD",
-            label: "Waiting Deploy to PRD"
+            name: "Waiting Customer Deploy PRD",
+            label: "Waiting Customer Deploy PRD"
         }
     ]
 
@@ -31,8 +31,8 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
             label: "Automatic Update Patch"
         },
         {
-            name: "Waiting Cus To Check",
-            label: "Waiting Cus To Check"
+            name: "Waiting Customer Test",
+            label: "Waiting Customer Test"
         },
         {
             name: "Deploy PRD Completed",
@@ -43,7 +43,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -146,6 +146,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
 
     }, [visible])
 
+
     return (
         <Modal
             visible={visible}
@@ -182,7 +183,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                         placeholder="None"
                         style={{ width: "60%" }}
                         options={
-                            details.iscloudsite === false ?
+                            details && details?.iscloudsite === false ?
                                 progressOnPremise.map((x) => ({ value: x.name, label: x.label })) :
                                 progressOnCloud.map((x) => ({ value: x.name, label: x.label }))
                         }

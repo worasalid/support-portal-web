@@ -1,4 +1,4 @@
-import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Divider } from "antd";
+import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Divider, Checkbox, message } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -8,7 +8,7 @@ import TaskComment from "../../../Component/Comment/Internal/TaskComment";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UpCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
@@ -285,6 +285,34 @@ export default function SubTask() {
     }
   }
 
+  const updateReleaseNote = async (value) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/update-releasenote",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          taskid: match.params.task,
+          ischeck: value
+        }
+      });
+      message.loading({ content: 'Loading...', duration: 0.5 });
+      if (result.status === 200) {
+
+        setTimeout(() => {
+
+          message.success({ content: 'Success!', duration: 1 });
+          GetTaskDetail();
+        }, 1000);
+      }
+
+    } catch (error) {
+
+    }
+  }
+
   useEffect(() => {
     getdetail();
     GetTaskDetail();
@@ -306,7 +334,7 @@ export default function SubTask() {
   }, [userstate?.issuedata?.details[0]?.TransId])
 
 
-  // if (userstate.taskdata.data.length === 0) {
+  //   if (userstate.taskdata.data.length === 0) {
   //   return (
   //     <MasterPage>
   //       <Result
@@ -318,6 +346,7 @@ export default function SubTask() {
   //     </MasterPage>
   //   )
   // }
+  console.log("IsReleaseNote", userstate.taskdata.data[0]?.IsReleaseNote)
 
   return (
     <MasterPage>
@@ -571,6 +600,19 @@ export default function SubTask() {
                 <Col span={18}>
                   <label className="header-text">Manday</label>
                   <label style={{ marginLeft: 10 }} className="value-text">{userstate.taskdata.data[0]?.Manday}</label>
+                </Col>
+
+              </Row>
+
+              <Row style={{
+                marginBottom: 20,
+
+              }}>
+                <Col span={18}>
+                  <label className="header-text">Release Note</label>&nbsp;&nbsp;
+                  <Checkbox
+                    checked={userstate.taskdata.data[0]?.IsReleaseNote}
+                    onChange={(x) => updateReleaseNote(x.target.checked)} />
                 </Col>
 
               </Row>

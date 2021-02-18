@@ -81,15 +81,15 @@ export default function Subject() {
       }
     });
     if (flow_output.status === 200) {
-      console.log("IsCloudSite", value.IsCloudSite)
-     
+      customerdispatch({
+        type: "LOAD_ACTION_FLOW",
+        payload: flow_output.data.filter((x) => x.Type === null
+          || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
+        )
+      })
+
     }
-    customerdispatch({
-      type: "LOAD_ACTION_FLOW",
-      payload: flow_output.data.filter((x) => x.Type === null
-        || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
-      )
-    })
+
   }
 
   const getdetail = async () => {

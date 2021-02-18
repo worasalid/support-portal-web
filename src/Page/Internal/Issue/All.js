@@ -62,6 +62,7 @@ export default function AllIssue() {
       });
 
       if (results.status === 200) {
+        console.log("allissue",results.data.data)
         setPageTotal(results.data.total);
         setIssueAllStatus(results.data.issue_status);
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data });
@@ -104,7 +105,7 @@ export default function AllIssue() {
           </Col>
         </Row>
 
-        <IssueSearch Progress="show"/>
+        <IssueSearch Progress="show" />
         {/* <Row style={{ textAlign: "left", marginTop:30 }}>
        
           <Col span={3} style={{ textAlign: "left" }}>
@@ -200,6 +201,14 @@ export default function AllIssue() {
                         <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.Title}
                         </label>
+                        <Tag color="#00CC00"
+                          style={{
+                            borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
+                            display: record.TaskCnt > 1 ? "inline-block" : "none"
+                          }}
+                        >
+                          <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
+                        </Tag>
                       </div>
                       <div>
                         <label
@@ -283,8 +292,8 @@ export default function AllIssue() {
                     <>
 
                       <div>
-                      <label className = "table-column-text">
-                          {record.InternalStatus}<br/>
+                        <label className="table-column-text">
+                          {record.InternalStatus}<br />
                           {record.FlowStatus}
                         </label>
                       </div>

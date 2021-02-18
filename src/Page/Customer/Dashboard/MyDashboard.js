@@ -96,7 +96,7 @@ export default function MyDashboard() {
     }, [])
 
     return (
-        <MasterPage>
+        <MasterPage bgColor="#f0f2f5">
             <Spin spinning={loading}>
                 <Row gutter={16}>
                     <Col span={4}>

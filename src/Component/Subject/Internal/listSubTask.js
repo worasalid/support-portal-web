@@ -40,7 +40,8 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     module: value.ModuleName,
                     status: value.Status,
                     flowstatus: value.FlowStatus,
-                    description: value.Description
+                    description: value.Description,
+                    releasenote: value.IsReleaseNote
                 }
             }))
         } catch (error) {
@@ -168,15 +169,21 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                 <Col span={23} >
                                                     <Row>
                                                         <Col span={1}>{<FileOutlined />}</Col>
-                                                        <Col span={15}>
+                                                        <Col span={17}>
                                                             <label className="value-text">
                                                                 {item.title}
                                                             </label>
-
-                                                            <Tag color="#f50">{item.module}
+                                                               &nbsp;&nbsp;
+                                                              <Tag color="#f50">{item.module}
+                                                            </Tag>
+                                                            &nbsp;&nbsp;
+                                                            <Tag color="#87d068"
+                                                                style={{ display: item.releasenote === true ? "inline-block" : "none" }}
+                                                            >
+                                                                ReleaseNote
                                                             </Tag>
                                                         </Col>
-                                                        <Col span={8} style={{ textAlign: "right" }} >{renderTaskStatus(item.status)}</Col>
+                                                        <Col span={6} style={{ textAlign: "right" }} >{renderTaskStatus(item.status)}</Col>
                                                     </Row>
                                                     <Row style={{ textAlign: "right" }}>
                                                         <Col span={24}>

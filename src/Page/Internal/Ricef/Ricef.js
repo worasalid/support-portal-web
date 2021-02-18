@@ -73,7 +73,6 @@ export default function Ricef() {
 
     }, [search])
 
-    console.log("selectcompany", selectcompany)
 
     return (
         <MasterPage>

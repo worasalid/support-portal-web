@@ -293,7 +293,8 @@ export default function MasterPage(props) {
 
             <SubMenu
               style={{
-                display: state.usersdata?.organize.OrganizeCode === "consult" ||
+                display: state.usersdata?.organize.OrganizeCode === "consult" || 
+                state.usersdata?.organize.OrganizeCode === "support" ||
                   state.usersdata?.organize.OrganizeCode === "dev" ? "block" : "none"
               }}
               key="sub2" icon={<AuditOutlined />} title="RICEF">
@@ -326,7 +327,7 @@ export default function MasterPage(props) {
               </Menu.Item>
             </SubMenu> */}
             <SubMenu key="sub4" icon={<SettingOutlined />} title="Setting"
-            style={{display: state.usersdata?.users.code === "I0017" ? "block" : "none"}}
+            style={{display: state.usersdata?.users.code !== "I0017" ? "block" : "none"}}
             >
               <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mastercompany')}>
                 - ข้อมูลบริษัท

@@ -1,5 +1,5 @@
-import { EditOutlined } from '@ant-design/icons';
-import { Button, Table, Input, InputNumber, Form, Modal } from 'antd';
+import { EditOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Select } from 'antd';
 
 import Column from 'antd/lib/table/Column';
 import Axios from 'axios'
@@ -13,21 +13,40 @@ export default function MasterCompany() {
     const [visible, setVisible] = useState(false);
 
     //data
+    const [filterCompany, setFilterCompany] = useState([]);
     const [listcompany, setListcompany] = useState([]);
     const [selectcompany, setSelectcompany] = useState(null);
-    //const [companyid, setCompanyid] = useState(null);
+    const [search, setSearch] = useState(false);
+    const [loading, setLoading] = useState(true)
 
+    const GetMasterCompany = async (value) => {
+        const mastercompany = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/company",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+        });
+        if (mastercompany.status === 200) {
+            setFilterCompany(mastercompany.data)
+        }
+    }
     const GetCompany = async (value) => {
-        console.log("value", value)
         try {
             const company_all = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/company",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    id: selectcompany && selectcompany
                 }
             });
             if (company_all.status === 200) {
+                setTimeout(() => {
+                    setLoading(false)
+                }, 1000)
                 setListcompany(company_all.data)
             }
 
@@ -77,7 +96,6 @@ export default function MasterCompany() {
     }
 
 
-
     const onFinish = async (values) => {
         console.log(values);
         try {
@@ -96,7 +114,7 @@ export default function MasterCompany() {
                 }
             });
             if (updatecompany.status === 200) {
-                GetCompany()
+                // GetCompany()
                 Modal.info({
                     title: 'บันทึกข้อมูลเรียบร้อย',
                     content: (
@@ -105,7 +123,8 @@ export default function MasterCompany() {
                         </div>
                     ),
                     onOk() {
-                        setVisible(false)
+                        setVisible(false);
+                        setLoading(true)
                     },
                 });
             }
@@ -116,13 +135,38 @@ export default function MasterCompany() {
     };
 
     useEffect(() => {
+        GetMasterCompany()
         GetCompany()
-    }, [])
+    }, [loading, search])
 
 
     return (
         <MasterPage>
-            <Table dataSource={listcompany} loading={false}>
+            <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+                <Col span={14}>
+                </Col>
+                <Col span={8} >
+                    <Select placeholder="Company" mode="multiple" allowClear
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount={3}
+                        style={{ width: "100%" }}
+                        options={filterCompany.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
+                        onChange={(value, item) => setSelectcompany(value)}
+                    >
+
+                    </Select>
+                </Col>
+                <Col span={2}>
+                    <Button type="primary" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                        onClick={() => { setSearch(true); setLoading(true) }}
+                    >
+                        Search
+                    </Button>
+                </Col>
+            </Row>
+            <Table dataSource={listcompany} loading={loading}>
                 <Column title="Code" width="10%" dataIndex="Code" />
                 <Column title="CompanyName" width="20%" dataIndex="Name" />
                 <Column title="FullName" width="60%" dataIndex="FullNameTH" />
@@ -176,7 +220,7 @@ export default function MasterCompany() {
                     onFinish={onFinish}
 
                 >
-                  
+
                     <Form.Item name="code" label="code">
                         <Input disabled={true} />
                     </Form.Item>
@@ -188,7 +232,7 @@ export default function MasterCompany() {
                         <Input />
                     </Form.Item>
                     <Form.Item name="fullname_en" label="FullName EN">
-                        <Input/>
+                        <Input />
                     </Form.Item>
                     <Form.Item name="cost" label="Cost manday">
                         <InputNumber

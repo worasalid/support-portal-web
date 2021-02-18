@@ -181,6 +181,14 @@ export default function AllTask() {
                         <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.Title}
                         </label>
+                        <Tag color="#00CC00"
+                          style={{
+                            borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
+                            display: record.TaskCnt > 1 ? "inline-block" : "none"
+                          }}
+                        >
+                          <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
+                        </Tag>
                       </div>
                       <div>
                         <label
@@ -264,7 +272,7 @@ export default function AllTask() {
                     <>
 
                       <div>
-                        <label className = "table-column-text">
+                        <label className="table-column-text">
                           {record.InternalStatus}<br />
                           {record.FlowStatus}
                         </label>

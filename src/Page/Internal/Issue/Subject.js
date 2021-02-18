@@ -12,6 +12,7 @@ import Axios from "axios";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
 import Clock from "../../../utility/countdownTimer";
+import ClockTimer from "../../../utility/countTimer";
 import moment from "moment";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
@@ -37,6 +38,7 @@ export default function Subject() {
   const selectRef = useRef(null)
   const subTaskRef = useRef(null)
   const clockRef = useRef(null)
+  const clockRef2 = useRef(null)
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
 
@@ -531,7 +533,7 @@ export default function Subject() {
                       onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
                         Modal.info({
                           title: 'กรุณา ระบุ Priority',
-                          okText:"Close"
+                          okText: "Close"
                         })
                         : setModaladdtask(true)}
                     >
@@ -681,6 +683,16 @@ export default function Subject() {
                 </Col>
               </Row>
 
+              <Row style={{marginBottom: 20}}>
+                <Col span={24} style={{ marginTop: "10px" }}>
+                  <ClockTimer
+                    ref={clockRef2}
+                    duedate={userstate?.issuedata?.details[0]?.SLA_DueDate}
+                    type="SLA"
+                  />
+                </Col>
+              </Row>
+
 
               <Row style={{ marginBottom: 20, display: userstate.issuedata.details[0]?.DueDate === null ? "none" : "block" }}>
                 <Col span={18}>
@@ -784,7 +796,8 @@ export default function Subject() {
       </div>
 
 
-
+//#region 
+//#endregion
       {/* Modal */}
       <Modal
         title="Preview"

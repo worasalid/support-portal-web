@@ -12,7 +12,7 @@ import Notifications from "../../Component/Notifications/Customer/Notification";
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
-export default function MasterPage(props) {
+export default function MasterPage({bgColor='#fff',...props}) {
   const history = useHistory();
   const match = useRouteMatch();
   const [show_notice, setshow_notice] = useState(true);
@@ -342,8 +342,9 @@ export default function MasterPage(props) {
             padding: 24,
             margin: 0,
             minHeight: 280,
-            // backgroundColor: "#f0f2f5",
-            backgroundColor: "#fff",
+
+            backgroundColor: bgColor,
+            // backgroundColor: "#fff",
           }}
         >
           {props.children}
