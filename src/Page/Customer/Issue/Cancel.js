@@ -27,6 +27,9 @@ export default function Cancel() {
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const { state, dispatch } = useContext(AuthenContext);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageTotal, setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
   const loadIssue = async (value) => {
@@ -46,12 +49,15 @@ export default function Cancel() {
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           keyword: customerstate.filter.keyword,
-          task: "Cancel"
+          task: "Cancel",
+          pageCurrent: pageCurrent,
+          pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
-        customerdispatch({ type: "LOAD_ISSUE", payload: results.data })
+        setPageTotal(results.data.total)
+        customerdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
 
       }
     } catch (error) {
@@ -94,7 +100,7 @@ export default function Cancel() {
     }, 1000)
 
     customerdispatch({ type: "SEARCH", payload: false })
-  }, [customerstate.search, visible]);
+  }, [customerstate.search, visible,pageCurrent]);
 
 
   return (
@@ -108,6 +114,19 @@ export default function Cancel() {
       <Row>
         <Col span={24}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
+           footer={(x) => {
+            return (
+              <>
+                <div style={{ textAlign: "right" }}>
+                  <label>จำนวนเคส : </label>
+                  <label>{x.length}</label>
+                </div>
+              </>
+            )
+          }}
+          pagination={{ pageSize: pageSize, total: pageTotal }}
+
+          onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
             onRow={(record, rowIndex) => {
               // console.log(record, rowIndex)
               return {

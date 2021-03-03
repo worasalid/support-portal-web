@@ -124,6 +124,9 @@ export default function Mytask() {
                     <div style={{ textAlign: "right" }}>
                       <label>จำนวนเคส : </label>
                       <label>{x.length}</label>
+                      <label> จากทั้งหมด : </label>
+                      <label>{pageTotal}</label>
+
                     </div>
                   </>
                 )
@@ -289,7 +292,11 @@ export default function Mytask() {
                   return (
                     <>
                       <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}
+                      </label>
+                      <br />
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
                       </label>
                       <br />
                       {record.cntDueDate >= 1 ?
@@ -300,7 +307,7 @@ export default function Mytask() {
                           }
                           }
                         >
-                          เลื่อน Due
+                          เลื่อน Due Date
                        </Tag> : ""
                       }
 
@@ -342,7 +349,7 @@ export default function Mytask() {
                           deadline={record.DueDate}
                           createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
                           resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                         // onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                         />
                       </div>
                     </>

@@ -62,7 +62,7 @@ export default function AllIssue() {
       });
 
       if (results.status === 200) {
-        console.log("allissue",results.data.data)
+        console.log("allissue", results.data.data)
         setPageTotal(results.data.total);
         setIssueAllStatus(results.data.issue_status);
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data });
@@ -247,7 +247,7 @@ export default function AllIssue() {
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
-                      <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
+                      <Tooltip title="Company"><Tag color="gray">{record.CompanyName}</Tag></Tooltip>
 
                     </>
                   )
@@ -262,7 +262,11 @@ export default function AllIssue() {
                   return (
                     <>
                       <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY HH:mm')}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}
+                      </label>
+                      <br />
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
                       </label>
                       <br />
                       {record.cntDueDate > 1 ?

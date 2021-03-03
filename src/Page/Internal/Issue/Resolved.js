@@ -295,7 +295,7 @@ export default function Resolved() {
                           deadline={record.DueDate}
                           createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
                           resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                          //onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                         />
                       </div>
                     </>

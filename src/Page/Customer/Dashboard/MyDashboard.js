@@ -8,29 +8,7 @@ export default function MyDashboard() {
     const [loading, setLoading] = useState(true)
     const [dashboard, setDashboard] = useState([])
 
-    var data = [
-        {
-            status: 'Open',
-            value: 1,
-        },
-        {
-            status: 'InProgress',
-            value: 2,
-        },
-        {
-            status: 'Resolved',
-            value: 10,
-        },
-        {
-            status: 'Cancel',
-            value: 3,
-        },
-        {
-            status: 'Complete',
-            value: 20,
-        },
 
-    ];
     var config = {
 
         xField: 'Status',
@@ -57,7 +35,7 @@ export default function MyDashboard() {
             position: 'bottom'
         },
         color: function color(x) {
-            if (x.Status === "Open") { return "gray" }
+            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
             if (x.Status === "InProgress") { return "#5B8FF9" }
             if (x.Status === "Resolved") { return "#FF5500" }
             if (x.Status === "Cancel") { return "#CD201F" }
@@ -102,15 +80,32 @@ export default function MyDashboard() {
                     <Col span={4}>
                         <Card bordered={true} style={{ width: "100%" }}>
                             <div>
-                             <label className="dashboard-card-status" >
-                                    Open
-                            </label>
-
+                                <Row>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-status" >
+                                            Open
+                                          </label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-status" >
+                                            Hold
+                                         </label>
+                                    </Col>
+                                </Row>
                             </div>
                             <div>
-                                <label className="dashboard-card-value">
-                                    {dashboard[0]?.Value}
-                                </label>
+                                <Row>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-value">
+                                            {dashboard[0]?.Value}
+                                        </label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-value">
+                                            {dashboard[4]?.Value}
+                                        </label>
+                                    </Col>
+                                </Row>
                             </div>
                         </Card>
                     </Col>
@@ -123,7 +118,7 @@ export default function MyDashboard() {
 
                             </div>
                             <div>
-                                <label className="dashboard-card-value" style={{color:"#5B8FF9"}}>
+                                <label className="dashboard-card-value" style={{ color: "#5B8FF9" }}>
                                     {dashboard[1]?.Value}
                                 </label>
                             </div>
@@ -138,7 +133,7 @@ export default function MyDashboard() {
 
                             </div>
                             <div>
-                                <label className="dashboard-card-value" style={{color:"#FF5500"}}>
+                                <label className="dashboard-card-value" style={{ color: "#FF5500" }}>
                                     {dashboard[2]?.Value}
                                 </label>
                             </div>
@@ -153,7 +148,7 @@ export default function MyDashboard() {
 
                             </div>
                             <div>
-                                <label className="dashboard-card-value" style={{color:"#CD201F"}}>
+                                <label className="dashboard-card-value" style={{ color: "#CD201F" }}>
                                     {dashboard[3]?.Value}
                                 </label>
                             </div>
@@ -168,8 +163,8 @@ export default function MyDashboard() {
 
                             </div>
                             <div>
-                                <label className="dashboard-card-value" style={{color:"#87D068"}}>
-                                    {dashboard[4]?.Value}
+                                <label className="dashboard-card-value" style={{ color: "#87D068" }}>
+                                    {dashboard[5]?.Value}
                                 </label>
                             </div>
                         </Card>
@@ -184,7 +179,7 @@ export default function MyDashboard() {
                             </div>
                             <div>
                                 <label className="dashboard-card-value">
-                                    {dashboard[5]?.Value}
+                                    {dashboard[6]?.Value}
                                 </label>
                             </div>
                         </Card>

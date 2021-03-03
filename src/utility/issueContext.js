@@ -34,6 +34,7 @@ export const customerState = {
         data: []
     },
     actionflow: [],
+    mailbox: [],
     node: {
         input_id: 0,
         output_id: 0,
@@ -73,6 +74,7 @@ export const userState = {
         data: []
     },
     actionflow: [],
+    mailbox: [],
     node: {
         input_id: 0,
         output_id: 0,
@@ -101,6 +103,7 @@ export const customerReducer = createReducer(customerState, {
 
     LOAD_ISSUE: (state, { payload }) => { state.issuedata.data = payload },
     LOAD_ISSUEDETAIL: (state, {payload}) => {state.issuedata.details = payload},
+    LOAD_MAILBOX: (state, {payload}) => {state.mailbox = payload},
     LOAD_TASKDATA: (state, {payload}) => {state.taskdata.data = payload},
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
@@ -126,6 +129,7 @@ export const userReducer = createReducer(userState, {
 
     LOAD_ISSUE: (state, { payload }) => { state.issuedata.data = payload },
     LOAD_ISSUEDETAIL: (state, {payload}) => {state.issuedata.details = payload},
+    LOAD_MAILBOX: (state, {payload}) => {state.mailbox = payload},
     LOAD_TASKDATA: (state, {payload}) => {state.taskdata.data = payload},
     LOAD_COMPANY: (state, { payload }) => { state.masterdata.companyState = payload },
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },

@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Modal, DatePicker, Row, Col, Form, Input } from 'antd';
-import UploadFile from '../../UploadFile'
+import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 import { Editor } from '@tinymce/tinymce-react';
-import IssueContext from '../../../utility/issueContext';
+import IssueContext from '../../../../utility/issueContext';
 
 
-export default function ModalChangeDueDate({ visible = false, onOk, onCancel, details, ...props }) {
+export default function ModalSaveDueDate({ visible = false, onOk, onCancel, details, ...props }) {
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
@@ -44,7 +44,7 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
     const SaveDueDate = async (values) => {
         try {
             const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/update-duedate",
+                url: process.env.REACT_APP_API_URL + "/tickets/save-duedate",
                 method: "PATCH",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -52,11 +52,12 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
                 data: {
                     ticketid: details && details.ticketid,
                     duedate: values.duedate,
-                    description: values.description
+                    type: details.type
                 }
             });
 
             if (result.status === 200) {
+                onOk();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -65,8 +66,9 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
                         </div>
                     ),
                     onOk() {
-                        onOk();
                         form.resetFields();
+                       // window.location.reload(false)
+
                     },
                 });
             }
@@ -132,22 +134,7 @@ export default function ModalChangeDueDate({ visible = false, onOk, onCancel, de
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row style={{ marginTop: 30 }}>
-                    <Col span={24}>
-                        <label className="header-text">รายละเอียด :</label><br />
-                        <Form.Item
-                            name="description"
-                            rules={[
-                                {
-                                    required: false,
-                                    message: 'กรุณาระบุ รายละเอียดในการเปลี่ยน DueDate',
-                                },
-                            ]}
-                        >
-                            <Input.TextArea rows={5} ref={textAreaRef} />
-                        </Form.Item>
-                    </Col>
-                </Row>
+               
 
                 <Row>
                     <Col span={24}>

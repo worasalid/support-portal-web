@@ -36,6 +36,11 @@ import MasterCompany from './Page/Internal/Setting/MasterCompany';
 import MappingCompany from './Page/Internal/Setting/MapCompany';
 import MappingDeveloper from './Page/Internal/Setting/MapDeveloper';
 import Charts from './Page/Internal/Report/charts';
+import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
+import ConfigReOpen from './Page/Internal/Setting/System/ConfigReOpen';
+import ConfigVersion from './Page/Internal/Setting/System/ConfigVersion';
+import ConfigReOpenEmail from './Page/Internal/Setting/System/ConfigReOpenEmail';
+
 
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
 import ServiceDesk from "./Page/Customer/ServiceDesk/Index";
@@ -67,11 +72,16 @@ export default function Routes() {
                                     <Route path="/internal/user/profile" exact component={Profile} />
                                     <Route path="/internal/issue" exact component={MyTask} />
                                     <Route path="/internal/issue/unassign" exact component={UnAssign} />
-                                    <Route path="/internal/issue/setting/mastercompany" exact component={MasterCompany} />
-                                    <Route path="/internal/issue/setting/mapcompany" exact component={MappingCompany} />
-                                    <Route path="/internal/issue/setting/mapdeveloper" exact component={MappingDeveloper} />
+                                    <Route path="/internal/setting/mastercompany" exact component={MasterCompany} />
+                                    <Route path="/internal/setting/mapcompany" exact component={MappingCompany} />
+                                    <Route path="/internal/setting/mapdeveloper" exact component={MappingDeveloper} />
+                                    <Route path="/internal/setting/system" exact component={SystemConfig} />
+                                    <Route path="/internal/setting/system/reopen" exact component={ConfigReOpen} />
+                                    <Route path="/internal/setting/system/version" exact component={ConfigVersion} />
+                                    <Route path="/internal/setting/system/reopen_email" exact component={ConfigReOpenEmail} />
+
                                     <Route path="/internal/dashboard" exact component={Dashboard} />
-                                    <Route path="/internal/issue/all" exact component={AllIssue} />
+                                    <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
                                     <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />
                                     <Route path="/internal/issue/inprogress/:id?" exact component={InProgress} />

@@ -1,11 +1,14 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import { List, Avatar } from 'antd';
 import Axios from 'axios';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
+import AuthenContext from "../../../utility/authenContext";
 
 export default function Notifications(props) {
+    const { state, dispatch } = useContext(AuthenContext);
+
     const history = useHistory()
     const [notification, setNotification] = useState([]);
 
@@ -38,6 +41,7 @@ export default function Notifications(props) {
         GetNotification();
     }, [])
 
+
     return (
         <>
             <List
@@ -50,7 +54,7 @@ export default function Notifications(props) {
                             title={
                                 <>
                                     <label className="text-link"
-                                        onClick={() => { return (history.push({ pathname: "/internal/issue/subject/" + item.ticketid }), window.location.reload("false")) }}
+                                        onClick={() => { return (history.push({ pathname: "/customer/issue/subject/" + item.ticketid }), window.location.reload("false")) }}
 
                                     >
                                         {item.title}

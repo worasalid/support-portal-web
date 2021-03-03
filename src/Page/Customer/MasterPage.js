@@ -74,22 +74,6 @@ export default function MasterPage({bgColor='#fff',...props}) {
     }
   }
 
-  const data = [
-    {
-      title: 'ISSUE-001-20120020',
-      description: "มีงานใหม่ส่งถึงคุณ"
-    },
-    {
-      title: 'ISSUE-001-20120019',
-      description: "มีการ Update Comment"
-    },
-    {
-      title: 'ISSUE-001-20120018',
-      description: "มีการ Update Comment"
-    },
-
-  ];
-
   useEffect(() => {
     if (!state.authen) {
       getuser()
@@ -154,13 +138,13 @@ export default function MasterPage({bgColor='#fff',...props}) {
                     </Menu>
                   )} trigger="click">
 
-                  <Button type="text" style={{ marginRight: 5 }} size="middle"
+                  <Button type="text" style={{ marginRight: 15 }} size="middle"
                     icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
                   >
                   </Button>
                 </Dropdown>
               </Tooltip>
-              <Dropdown
+              {/* <Dropdown
                 placement="topCenter"
                 overlayStyle={{
                   width: 200,
@@ -175,6 +159,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
                     <Menu.Item key="2" onClick={() => alert("Setting")}>
                       Setting
                     </Menu.Item>
+                     {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
                     <Divider style={{ margin: 4 }} />
                     <Menu.Item key="2" onClick={() => history.push("/Login")}>
                       Log Out
@@ -195,10 +180,17 @@ export default function MasterPage({bgColor='#fff',...props}) {
                     </label>
                   </div>
                 </Button>
+              </Dropdown> */}
+              <div style={{ display: "inline-block", alignItems: "center" }}>
+                    <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
-
-              </Dropdown>
-
+                    </Avatar>
+                  </div>
+                  <div style={{ display: "inline-block", marginLeft: 8 }}>
+                    <label className="user-login">
+                      {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
+                    </label>
+                  </div>
             </Col>
           </Row>
         </Menu>
@@ -320,22 +312,17 @@ export default function MasterPage({bgColor='#fff',...props}) {
                 Completed
               </Menu.Item>
             </SubMenu>
-            <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
+            {/* <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
               <Menu.Item key="10" onClick={() => history.push('/customer/report/charts')}>
                 - Report
                   <Badge count={1}>
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 </Badge>
               </Menu.Item>
-            </SubMenu>
+            </SubMenu> */}
           </Menu>
         </Sider>
 
-        {/* <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
-            </Breadcrumb> */}
 
         <Content
           style={{

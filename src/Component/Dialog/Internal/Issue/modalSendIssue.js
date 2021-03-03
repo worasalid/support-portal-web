@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
-import {  Modal, Form } from 'antd';
+import { Modal, Form } from 'antd';
 import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 import TextEditor from '../../../TextEditor';
@@ -46,11 +46,11 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 data: {
                     ticketid: details.ticketid,
                     mailboxid: details && details.mailboxid,
-                    flowoutputid: details.flowoutput.FlowOutputId
-                    // value: {
-                    //     comment_text: editorRef.current.getValue()
-                    // }
-                  
+                    flowoutputid: details.flowoutput.FlowOutputId,
+                    value: {
+                        comment_text: editorRef.current.getValue()
+                    }
+
                 }
             });
 
@@ -66,12 +66,15 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                     ),
                     onOk() {
                         editorRef.current.setvalue();
-                        if(details.flowoutput.value === "Resolved"){
+                        if (details.flowoutput.value === "ApproveCR") {
+                            window.location.reload(false)
+                        }
+                        if (details.flowoutput.value === "Resolved") {
                             history.push({ pathname: "/internal/issue/resolved" })
-                        }else{
+                        } else {
                             history.push({ pathname: "/internal/issue/inprogress" })
                         }
-                    
+
                     },
                 });
             }
@@ -95,7 +98,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
     const onFinish = (values) => {
         SendFlow();
     };
-    
+
     return (
         <Modal
             visible={visible}
@@ -106,7 +109,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-  
+
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
                 name="qa-test"
                 layout="vertical"
@@ -120,9 +123,9 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                     // style={{ minWidth: 300, maxWidth: 300 }}
                     name="remark"
                     label="Remark :"
-                    
+
                 >
-                     <TextEditor ref={editorRef} />
+                    <TextEditor ref={editorRef} />
                     <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                 </Form.Item>

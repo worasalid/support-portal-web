@@ -36,7 +36,8 @@ export default function NormalLoginForm() {
         method: "POST",
         data: {
           email: value.username,
-          password: btoa(value.password)
+          // password: btoa(value.password)
+          password: btoa("password")
         },
       });
 

@@ -338,7 +338,7 @@ export default function Complete() {
                         deadline={moment(record.SLA).format('YYYY-MM-DD, HH:mm')}
                         createdate={record.CreateDate === null ? undefined : record.CreateDate}
                         resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                        onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                       // onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                       />
                     </>
                   )

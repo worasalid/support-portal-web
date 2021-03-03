@@ -10,6 +10,7 @@ import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
 import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
+import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
 import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
@@ -36,6 +37,7 @@ export default function SubTask() {
   const match = useRouteMatch();
   const history = useHistory();
   const selectRef = useRef(null)
+  const { state, dispatch } = useContext(AuthenContext);
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
   const [defaultFlow, setDefaultFlow] = useState(undefined)
@@ -159,36 +161,35 @@ export default function SubTask() {
   }
 
   function HandleChange(value, item) {
-    console.log("HandleChange", item)
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    if (item.data.NodeName === "support") {
-      // if (item.data.value === "ResolvedTask") {
-      //   setVisible(true)
-      // }
-      if (item.data.value === "Resolved") { setModalresolved_visible(true) }
+    // if (item.data.NodeName === "support") {
+    //   // if (item.data.value === "ResolvedTask") {
+    //   //   setVisible(true)
+    //   // }
+    //   if (item.data.value === "Resolved") { setModalresolved_visible(true) }
 
 
-    }
-    if (item.data.NodeName === "developer_2") {
-      if (item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
-      if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
-      if (item.data.value === "LeaderReject") { setModalsendtask_visible(true) }
-    }
-    if (item.data.NodeName === "developer_1") {
-      if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-      if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
-    }
-    if (item.data.NodeName === "qa_leader") {
+    // }
+    // if (item.data.NodeName === "developer_2") {
+    //   if (item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
+    //   if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
+    //   if (item.data.value === "LeaderReject") { setModalsendtask_visible(true) }
+    // }
+    // if (item.data.NodeName === "developer_1") {
+    //   if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+    //   if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
+    // }
+    // if (item.data.NodeName === "qa_leader") {
 
-    }
-    if (item.data.NodeName === "qa") {
-      if (item.data.value === "QAReject") { setModalsendtask_visible(true) }
-      setModalQA_visible(true)
-    }
+    // }
+    // if (item.data.NodeName === "qa") {
+    //   if (item.data.value === "QAReject") { setModalsendtask_visible(true) }
+    //   setModalQA_visible(true)
+    // }
 
     // Flow Bug
-    if (userstate.issuedata.details[0]?.IssueType === "Bug") {
+    if (userstate?.taskdata?.data[0]?.IssueType === "Bug") {
       if (item.data.NodeName === "support") {
         if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
         if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
@@ -198,7 +199,14 @@ export default function SubTask() {
       if (item.data.NodeName === "developer_2") {
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
         if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+        if (item.data.value === "LeaderQC") {
+          setModalsendtask_visible(true)
+        }
         if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "developer_1") {
+        if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+        if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
       }
       if (item.data.NodeName === "qa_leader") {
         if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
@@ -209,7 +217,7 @@ export default function SubTask() {
 
     }
     // Flow CR
-    if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest") {
+    if (userstate?.taskdata?.data[0]?.IssueType === "ChangeRequest") {
       if (item.data.NodeName === "support") {
         if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR") { setModalsendtask_visible(true) }
       }
@@ -223,7 +231,13 @@ export default function SubTask() {
         if (item.data.value === "SendManday") { setModalmanday_visible(true) }
         if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+        if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject") {
+          setModalsendtask_visible(true)
+        }
+      }
+      if (item.data.NodeName === "developer_1") {
         if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+        if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
       }
       if (item.data.NodeName === "qa_leader") {
         if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
@@ -231,10 +245,19 @@ export default function SubTask() {
         if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
         if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
       }
+      if (item.data.NodeName === "qa") {
+        if (item.data.value === "QApass") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "QAReject") {
+          setModalsendtask_visible(true)
+        }
+
+      }
     }
 
     // Flow Use
-    if (userstate.issuedata.details[0]?.IssueType === "Use") {
+    if (userstate?.taskdata?.data[0]?.IssueType === "Use") {
       if (item.data.NodeName === "support") {
         if (item.data.value === "RequestInfoDev") { setModalRequestInfoDev(true) }
       }
@@ -314,14 +337,14 @@ export default function SubTask() {
   }
 
   useEffect(() => {
-    getdetail();
+    // getdetail();
     GetTaskDetail();
-    getflow_output(userstate?.issuedata?.details[0]?.TransId)
+    getflow_output(userstate?.taskdata?.data[0]?.TransId)
   }, [])
 
-  useEffect(() => {
-    getdetail();
-  }, [SLA])
+  // useEffect(() => {
+  //   getdetail();
+  // }, [SLA])
 
   useEffect(() => {
     if (historyduedate_visible) {
@@ -330,23 +353,10 @@ export default function SubTask() {
   }, [historyduedate_visible])
 
   useEffect(() => {
-    getflow_output(userstate?.issuedata?.details[0]?.TransId)
-  }, [userstate?.issuedata?.details[0]?.TransId])
-
-
-  //   if (userstate.taskdata.data.length === 0) {
-  //   return (
-  //     <MasterPage>
-  //       <Result
-  //         status="403"
-  //         title="403"
-  //         subTitle="Sorry, you are not authorized to access this page."
-  //         extra={<Button type="primary">Back Home</Button>}
-  //       />
-  //     </MasterPage>
-  //   )
-  // }
-  console.log("IsReleaseNote", userstate.taskdata.data[0]?.IsReleaseNote)
+    if (userstate?.taskdata?.data[0] !== undefined) {
+      getflow_output(userstate?.taskdata?.data[0]?.TransId)
+    }
+  }, [userstate?.taskdata?.data[0]?.TransId])
 
   return (
     <MasterPage>
@@ -387,13 +397,13 @@ export default function SubTask() {
                 <Row style={{ marginRight: 24 }}>
                   <Col span={24}>
 
-                    <label className="topic-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Number}</label>
+                    <label className="topic-text">{userstate?.taskdata?.data[0]?.TicketNumber}</label>
                     <div className="issue-detail-box">
                       <Row>
                         <Col span={16} style={{ display: "inline" }}>
                           <Typography.Title level={4}>
                             {/* <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title} */}
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.taskdata.data[0] && userstate.taskdata.data[0].Title}
+                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.taskdata?.data[0]?.Title}
                           </Typography.Title>
                         </Col>
                         <Col span={8} style={{ display: "inline", textAlign: "right" }}>
@@ -472,57 +482,49 @@ export default function SubTask() {
                 <Col span={18}
                   style={{
                     marginTop: 10,
-                    display: userstate.taskdata.data[0]?.MailType === "in" ? "block" : "none"
+                    display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
                   }}
                 >
                   <Select ref={selectRef}
                     value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
-                    onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
+                    onClick={() => getflow_output(userstate?.taskdata?.data[0]?.TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
-                    disabled={
-                      userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "out"
-                        || (userstate.taskdata.data[0] && userstate.taskdata.data[0].MailType === "in" && userstate.taskdata.data[0].Status === "Complete" &&
-                          userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalStatus !== "ReOpen"
-                          && userstate.issuedata.details[0].InternalStatus !== "Pass") ? true : false
-                    }
                   />
                 </Col>
                 <Col span={18}
                   style={{
                     display:
-                      userstate.taskdata.data[0]?.Status === "Resolved" &&
-                        userstate.taskdata.data[0]?.MailType === "in" &&
-                        divProgress === "hide" ? "block" : "none"
+                    userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
                   }}>
-                  <label className="value-text">{userstate.taskdata.data[0]?.FlowStatus}</label>
+                  <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
                 </Col>
-                <Col span={18}
-                  style={{ display: userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none" }}>
-                  <label className="value-text">{userstate.taskdata.data[0]?.FlowStatus}</label>
-                </Col>
+
               </Row>
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Priority</label>
                   <br />
-                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].Priority}</label>
+                  <label className="value-text">{userstate?.taskdata?.data[0]?.Priority}</label>
                 </Col>
               </Row>
 
               <Row style={{
                 marginBottom: 20,
                 display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" &&
-                  userstate.taskdata.data[0]?.DueDate !== null ? "block" : "none"
+                  userstate.taskdata.data[0]?.DueDate !== null ? "inline-block" : "none"
               }}
               >
-                <Col span={3} style={{ marginTop: "10px" }}>
+                {/* <Col span={3} style={{ marginTop: "10px" }}>
                   <label className="header-text">SLA</label>
-                </Col>
-                <Col span={18} >
+                </Col> */}
+                <Col span={24} >
+                <label className="header-text">SLA</label>
                   {
+                    
                     userstate.taskdata.data[0] &&
+                    
                     <Clock
                       showseconds={false}
                       deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
@@ -543,7 +545,8 @@ export default function SubTask() {
 
                   {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
                   {
-                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "cr_center"
+                    // userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "cr_center"
+                    userstate?.mailbox[0]?.NodeName === "cr_center"
                       ? <Button type="link"
                         onClick={() => setModalduedate_visible(true)}
                       >

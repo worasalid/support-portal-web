@@ -91,7 +91,7 @@ export default function IssueCreate() {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
-                companyid: state?.usersdata?.users?.company_id
+                company_id: state?.usersdata?.users?.company_id
             }
         });
         if (products.status === 200) {

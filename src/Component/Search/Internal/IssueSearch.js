@@ -231,7 +231,9 @@ export default function Issuesearch({ Progress = "hide" }) {
                     />
                 </Col>
                 <Col span={8}>
-                    <Input placeholder="IssueNo / Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}></Input>
+                    <Input placeholder="IssueNo / Subject" name="subject" prefix="" 
+                  //  suffix={<SearchOutlined />} 
+                    onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}></Input>
                 </Col>
             </Row>
         </>

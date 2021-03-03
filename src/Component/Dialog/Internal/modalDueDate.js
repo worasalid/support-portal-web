@@ -76,8 +76,9 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                         </div>
                     ),
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        editorRef.current.editor.setContent("");
+                        window.location.reload(false)
+                        // history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
@@ -165,9 +166,10 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
 
     useEffect(() => {
 
-    }, [])
+    }, [visible])
 
-    
+
+
     return (
         <Modal
             visible={visible}
@@ -199,9 +201,9 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                             ]}
                         >
                             <DatePicker
-                            format="DD/MM/YYYY"
-                            defaultValue={details.duedate === null ? "" : moment(details?.duedate,"DD/MM/YYYY")}
-                            onChange={(date, datestring) => { form.setFieldsValue({ duedate: datestring }); setDuedate(datestring) }} /><br />
+                                format="DD/MM/YYYY"
+                                defaultValue={details.duedate === null ? "" : moment(details?.duedate, "DD/MM/YYYY")}
+                                onChange={(date, datestring) => { form.setFieldsValue({ duedate: datestring }); setDuedate(datestring) }} /><br />
                         </Form.Item>
                     </Col>
                 </Row>

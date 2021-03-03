@@ -10,13 +10,15 @@ import { ArrowRightOutlined, DeleteOutlined, FileOutlined, UpCircleOutlined, Dow
 export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
     const history = useHistory();
     const [listdata, setListdata] = useState([]);
+    const [countdata,setCountdata] = useState(null)
 
     //div
     const [divcollapse, setDivcollapse] = useState("none")
     const [collapseicon, setCollapseicon] = useState(<UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
 
     useImperativeHandle(ref, () => ({
-        GetTask: () => GetTask()
+        GetTask: () => GetTask(),
+        CountData:() => countdata
     }));
 
     const GetTask = async () => {
@@ -28,10 +30,12 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: ticketId,
-                    mailtype: mailtype
+                    ticketId: ticketId
+                   // mailtype: mailtype
                 }
             });
+
+            setCountdata(task.data.length)
 
             setListdata(task.data.map((value) => {
                 return {
@@ -115,13 +119,9 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
     useEffect(() => {
         GetTask();
         setDivcollapse("block")
-    }, [mailtype])
+    }, [ticketId])
 
-    // useEffect(() => {
-    //     GetTask();
 
-    // }, [listdata.length])
-    //  console.log("mailtype", mailtype)
 
     return (
         <>

@@ -84,7 +84,7 @@ export default function MasterPage(props) {
         }
       });
       masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in").length });
-      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "Hold" || x.GroupStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Resolved" || x.GroupStatus === "Pass" || x.GroupStatus === "Deploy")).length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length });
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.InternalStatus === "Complete").length })
@@ -105,25 +105,44 @@ export default function MasterPage(props) {
 
 
   useEffect(() => {
-    if (match.url.search("mytask") > 0) {
+    if(match.url.search("issue") > 0){
+      setActivemenu(activemenu.push("sub1"))
+    }
+    if(match.url.search("setting") > 0){
+      setActivemenu(activemenu.push("sub4"))
+    }
+    ///////
+    if (match.url.search("alltask") > 0) {
       setActive_submenu(active_submenu.push("1"))
     }
-    if (match.url.search("inprogress") > 0) {
+    if (match.url.search("other") > 0) {
+      setActive_submenu(active_submenu.push("0"))
+    }
+    if (match.url.search("my") > 0) {
       setActive_submenu(active_submenu.push("2"))
     }
-    if (match.url.search("resolved") > 0) {
+    if (match.url.search("inprogress") > 0) {
       setActive_submenu(active_submenu.push("3"))
     }
-    if (match.url.search("cancel") > 0) {
+    if (match.url.search("resolved") > 0) {
       setActive_submenu(active_submenu.push("4"))
     }
-    if (match.url.search("complete") > 0) {
+    if (match.url.search("cancel") > 0) {
       setActive_submenu(active_submenu.push("5"))
     }
-    if (match.url.search("ricef") > 0) {
+    if (match.url.search("complete") > 0) {
       setActive_submenu(active_submenu.push("6"))
     }
 
+    // Ricef
+    if (match.url.search("ricef") > 0) {
+      setActive_submenu(active_submenu.push(""))
+    }
+
+    //Setting
+    if(match.url.search("system") > 0){
+      setActive_submenu(active_submenu.push("14"))
+    }
 
   }, [])
 
@@ -132,7 +151,8 @@ export default function MasterPage(props) {
     <Layout style={{ height: "100vh" }}>
       {/* <Header style={{ backgroundColor: "#be1e2d" }}> */}
       {/* <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']} style={{ backgroundColor: "#0099FF" }}> */}
-      <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']}
+      <Menu theme="light" mode="horizontal" 
+      //defaultSelectedKeys={['0']}
         style={{
           backgroundColor: "#be1e2d",
           height: "60px",
@@ -225,23 +245,24 @@ export default function MasterPage(props) {
           <Menu theme="light"
             style={{ backgroundColor: "#edebec" }}
             mode="inline"
-            defaultOpenKeys={["sub1"]}
+            //defaultOpenKeys={["sub1"]}
+            defaultOpenKeys={activemenu}
             defaultSelectedKeys={active_submenu}
 
           >
              <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
-              <Menu.Item key="0" onClick={() => history.push('/internal/dashboard')}>
+              <Menu.Item key="20" onClick={() => history.push('/internal/dashboard')}>
                 - DashBoard
                 
               </Menu.Item>
             </SubMenu>
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issue" >
-            <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/all' })}
+            <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/other' })}
               //  style={{
               //   display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
               // }}
               >
-                All Issue
+                Other Issue
                
               </Menu.Item>
               <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
@@ -291,26 +312,26 @@ export default function MasterPage(props) {
 
             </SubMenu>
 
-            <SubMenu
+            <SubMenu  key="sub2"
               style={{
-                display: state.usersdata?.organize.OrganizeCode === "consult" || 
-                state.usersdata?.organize.OrganizeCode === "support" ||
-                  state.usersdata?.organize.OrganizeCode === "dev" ? "block" : "none"
+                display: state.usersdata?.organize?.OrganizeCode === "consult" || 
+                state.usersdata?.organize?.OrganizeCode === "support" ||
+                  state.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
               }}
-              key="sub2" icon={<AuditOutlined />} title="RICEF">
-              <Menu.Item key="6" onClick={() => history.push('/internal/ricef')}>
+              icon={<AuditOutlined />} title="RICEF">
+              <Menu.Item key="7" onClick={() => history.push('/internal/ricef')}>
                 - All Task
                   {/* <Badge count={1}> */}
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
-              <Menu.Item key="7" onClick={() => history.push('/internal/ricef/mytask')}>
+              <Menu.Item key="8" onClick={() => history.push('/internal/ricef/mytask')}>
                 - My Task
                   {/* <Badge count={1}> */}
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
-              <Menu.Item key="8" onClick={() => history.push('/internal/ricef/inprogress')}>
+              <Menu.Item key="9" onClick={() => history.push('/internal/ricef/inprogress')}>
                 - InProgress
                   {/* <Badge count={1}> */}
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
@@ -329,14 +350,17 @@ export default function MasterPage(props) {
             <SubMenu key="sub4" icon={<SettingOutlined />} title="Setting"
             style={{display: state.usersdata?.users.code !== "I0017" ? "block" : "none"}}
             >
-              <Menu.Item key="11" onClick={() => history.push('/internal/issue/setting/mastercompany')}>
+              <Menu.Item key="11" onClick={() => history.push('/internal/setting/mastercompany')}>
                 - ข้อมูลบริษัท
               </Menu.Item>
-              <Menu.Item key="12" onClick={() => history.push('/internal/issue/setting/mapcompany')}>
+              <Menu.Item key="12" onClick={() => history.push('/internal/setting/mapcompany')}>
                 - Mapping Support
               </Menu.Item>
-              <Menu.Item key="13" onClick={() => history.push('/internal/issue/setting/mapdeveloper')}>
+              <Menu.Item key="13" onClick={() => history.push('/internal/setting/mapdeveloper')}>
                 - Mapping Developer
+              </Menu.Item>
+              <Menu.Item key="14" onClick={() => history.push('/internal/setting/system')}>
+                - ตั้งค่าข้อมูลระบบ
               </Menu.Item>
             </SubMenu>
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Modal, Rate, Form, Input } from 'antd';
+import { Modal, Select, Form, Input } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -17,13 +17,34 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
 
-    // const handleEditorChange = (content, editor) => {
-    //     setTextValue(content);
-    // }
+    const [reOpenData, setReOpenData] = useState(null)
+
+    const configData = async () => {
+        try {
+            const configData = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/load-config-data",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    groups: "ReOpen"
+                }
+
+            });
+
+            if (configData.status === 200) {
+                setReOpenData(configData.data)
+            }
+
+        } catch (error) {
+
+        }
+    }
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" || editorRef.current.getValue() !== null) {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -45,8 +66,8 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-
-    const FlowReOpen = async (values) => {
+    const FlowReOpen = async (param) => {
+        onOk();
         try {
             const completeflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
@@ -57,13 +78,16 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                 data: {
                     ticketid: details.ticketid,
                     mailboxid: details.mailboxid,
-                    flowoutputid: details.flowoutputid
+                    flowoutputid: details.flowoutputid,
+                    value:{
+                        reason_id: param.reason
+                    }
                 }
 
             });
 
             if (completeflow.status === 200) {
-                onOk();
+                
                 SaveComment();
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -99,15 +123,15 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const onFinish = values => {
-        console.log('Success:', values);
+    const onFinish = (param) => {
+        console.log('Success:', param);
 
-        FlowReOpen(values)
+        FlowReOpen(param)
     };
 
     useEffect(() => {
-
-    }, [])
+        configData()
+    }, [visible])
 
     return (
         <Modal
@@ -124,13 +148,25 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
             >
-
                 <Form.Item
                     label="เหตุผลการ ReOpen"
                     name="reason"
                 >
-                    <TextArea rows={5} style={{ width: "100%" }} />
+                    <Select placeholder="Priority" style={{ width: "100%" }}
+                        allowClear
+                        maxTagCount={1}
+                        onChange={(value) => configData()}
+                        options={reOpenData && reOpenData.map((x) => ({ value: x.Id, label: x.Name }))}
+
+                    />
                 </Form.Item>
+
+                {/* <Form.Item
+                    label="เหตุผลการ ReOpen"
+                    name="reason"
+                >
+                    <TextArea rows={5} style={{ width: "100%" }} />
+                </Form.Item> */}
 
                 <Form.Item
                     label="Remark"

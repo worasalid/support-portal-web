@@ -114,15 +114,32 @@ export default function MyDashboard() {
                     <Col span={4}>
                         <Card bordered={true} style={{ width: "100%" }}>
                             <div>
-                                <label className="dashboard-card-status" >
-                                    Open
-                            </label>
-
+                                <Row>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-status" >
+                                            Open
+                                          </label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-status" >
+                                            Hold
+                                         </label>
+                                    </Col>
+                                </Row>
                             </div>
                             <div>
-                                <label className="dashboard-card-value">
-                                    {dashboard[0]?.Value}
-                                </label>
+                                <Row>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-value">
+                                            {dashboard[0]?.Value}
+                                        </label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-value">
+                                            {dashboard[4]?.Value}
+                                        </label>
+                                    </Col>
+                                </Row>
                             </div>
                         </Card>
                     </Col>
@@ -233,7 +250,7 @@ export default function MyDashboard() {
                 <Row gutter={16} style={{ marginTop: "30px" }}>
                     <Col span={12}>
                         <Table dataSource={statusbyCompany}>
-                            <Column title="No" width="5%" dataIndex="Row"/>
+                            <Column title="No" width="5%" dataIndex="Row" />
                             <Column title="Company"
                                 align="center"
                                 width="55%"
@@ -247,10 +264,11 @@ export default function MyDashboard() {
 
                                 }
                             />
-                               <Column title="Open" width="10%" dataIndex="Open" />
-                               <Column title="InProgress" width="10%" dataIndex="InProgress"/>
-                               <Column title="Resolved" width="10%" dataIndex="Resolved"/>
-                               <Column title="Complete" width="10%" dataIndex="Complete"/>
+                            <Column title="Open" width="10%" dataIndex="Open" />
+                            <Column title="InProgress" width="10%" dataIndex="InProgress" />
+                            <Column title="Resolved" width="10%" dataIndex="Resolved" />
+                            <Column title="Hold" width="10%" dataIndex="Hold" />
+                            <Column title="Complete" width="10%" dataIndex="Complete" />
                         </Table>
                     </Col>
                 </Row>

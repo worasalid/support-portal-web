@@ -24,7 +24,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -46,7 +46,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     }
 
     const SaveUnitTest = async (values) => {
-        const unittest = await Axios({
+        await Axios({
             url: process.env.REACT_APP_API_URL + "/workflow/save_unittest",
             method: "POST",
             headers: {
@@ -63,7 +63,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     }
 
     const SaveDocumentDeploy = async (values) => {
-        const unittest = await Axios({
+        await Axios({
             url: process.env.REACT_APP_API_URL + "/workflow/save_deploydocument",
             method: "POST",
             headers: {

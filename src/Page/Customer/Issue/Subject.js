@@ -49,25 +49,6 @@ export default function Subject() {
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
 
-  // const getflow_output = async (trans_id) => {
-  //   const flow_output = await Axios({
-  //     url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-  //     method: "GET",
-  //     headers: {
-  //       "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-  //     },
-  //     params: {
-  //       trans_id
-  //     }
-  //   });
-
-
-  //   customerdispatch({
-  //     type: "LOAD_ACTION_FLOW",
-  //     payload: flow_output.data.filter((x) => x.Type === "Issue" ||  x.Type === null ||
-  //                x.Type === (customerstate?.issuedata?.details[0]?.IsCloudSite === true) ? "onCloud" : "onPremiss")
-  //   })
-  // }
 
   const getflow_output = async (value) => {
     const flow_output = await Axios({
@@ -83,7 +64,7 @@ export default function Subject() {
     if (flow_output.status === 200) {
       customerdispatch({
         type: "LOAD_ACTION_FLOW",
-        payload: flow_output.data.filter((x) => x.Type === null
+        payload: flow_output.data.filter((x) => x.Type === null || x.Type === "Issue" 
           || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
         )
       })
@@ -171,15 +152,13 @@ export default function Subject() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     customerdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    // if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
-    //   return (modalSendissue_visible(true))
-    // }
 
     // BUG FLOW
     if (customerstate.issuedata.details[0].IssueType === "Bug") {
       if (item.data.NodeName === "customer" &&
-        item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" ||
-        item.data.value === "SendToDeploy") {
+        item.data.value === "AssignIcon" || item.data.value === "Continue" || item.data.value === "Pass" ||
+        item.data.value === "SendInfo" || item.data.value === "SendToDeploy") {
+
         return (modalSendissue_visible(true))
       }
       if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
@@ -189,10 +168,16 @@ export default function Subject() {
 
     // CR FLOW
     if (customerstate.issuedata.details[0].IssueType === "ChangeRequest") {
-      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
-        return (modalSendissue_visible(true))
+
+      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" || item.data.value === "Continue") {
+        modalSendissue_visible(true)
       }
-      if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") { return (setModalconfirmManday_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "Hold") {
+        modalSendissue_visible(true)
+      }
+      if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") {
+        setModalconfirmManday_visible(true)
+      }
       if (item.data.NodeName === "customer" && item.data.value === "Reject") {
         modalSendissue_visible(true)
       }
@@ -206,8 +191,8 @@ export default function Subject() {
       if (item.data.value === "ReOpen") {
         setModalreopen_visible(true)
       }
-      if (item.data.value === "Pass") {
-        modalSendissue_visible(true)
+      if (item.data.value === "Cancel") {
+        setModalcancel_visible(true)
       }
       if (item.data.value === "Complete") {
         setModalcomplete_visible(true)
@@ -434,7 +419,7 @@ export default function Subject() {
                     {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
                   </label>
 
-                  {history_duedate_data.length >= 1 ?
+                  {customerstate?.issuedata?.details[0]?.cntDueDate >= 1 ?
                     <Tag style={{ marginLeft: 16, cursor: "pointer" }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
                       <label style={{ cursor: "pointer" }}> DueDate ถูกเลื่อน</label>
 
@@ -485,6 +470,7 @@ export default function Subject() {
           ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
           mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
           flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+          flowoutput: customerstate?.node.output_data
         }}
       />
 

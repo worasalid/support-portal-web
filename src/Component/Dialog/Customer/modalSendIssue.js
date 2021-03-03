@@ -60,7 +60,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
       if(sendflow.status === 200){
         SaveComment();
         onOk();
-        if(sendflow.data === "Open"){
+        if(details.flowoutput.value === "AssignIcon" || details.flowoutput.value === "Continue"){
           await Modal.info({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -76,7 +76,39 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             },
           });
         }
-        if(sendflow.data === "Pass"){
+        if(details.flowoutput.value === "SendInfo"){
+          await Modal.info({
+            title: 'บันทึกข้อมูลสำเร็จ',
+            content: (
+              <div>
+                <p>ส่งข้อมูลเพิ่มเติม ให้ ICON ดำเนินการต่อ</p>
+              </div>
+            ),
+            onOk() {
+              editorRef.current.setvalue()
+              onOk();
+              history.push({ pathname: "/customer/issue/inprogress" })
+  
+            },
+          });
+        }
+        if(details.flowoutput.value === "Hold"){
+          await Modal.info({
+            title: 'บันทึกข้อมูลสำเร็จ',
+            content: (
+              <div>
+                <p>Hold Issue เลขที่: {customerstate.issuedata.details[0].Number}</p>
+              </div>
+            ),
+            onOk() {
+              editorRef.current.setvalue()
+              onOk();
+              history.push({ pathname: "/customer/issue/mytask" })
+  
+            },
+          });
+        }
+        if(details.flowoutput.value === "Pass"){
           await Modal.info({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -93,6 +125,8 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             },
           });
         }
+        
+
       }
 
     } catch (error) {
@@ -116,6 +150,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
   useEffect(() => {
 
   }, [])
+
 
   return (
     <Modal

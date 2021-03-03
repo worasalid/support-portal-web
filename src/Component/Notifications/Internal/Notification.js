@@ -4,61 +4,11 @@ import { List, Avatar } from 'antd';
 import Axios from 'axios';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroller';
 
 export default function Notifications(props) {
     const history = useHistory()
     const [notification, setNotification] = useState([]);
-    // const data = [
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120020',
-    //         description: "มีงานใหม่ส่งถึงคุณ"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120019',
-    //         description: "มีการ Update Comment"
-    //     },
-    //     {
-    //         title: 'ISSUE-001-20120018',
-    //         description: "มีการ Update Comment"
-    //     },
-
-    // ];
 
     const GetNotification = async () => {
         try {
@@ -91,37 +41,47 @@ export default function Notifications(props) {
 
     return (
         <>
-            <List
-                itemLayout="horizontal"
-                dataSource={notification}
-                renderItem={item => (
-                    <List.Item>
-                        <List.Item.Meta
-                            avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                            title={
-                                <>
-                                    <label className="text-link"
-                                        onClick={() => { return (history.push({ pathname: "/internal/issue/subject/" + item.ticketid }), window.location.reload("false")) }}
+            <InfiniteScroll
+                initialLoad={true}
+                pageStart={1}
+               // loadMore={(x) => GetNotification()}
+                loader={(x) => console.log("loader",x)}
+                hasMore={true}
+                onScroll={(x) => console.log("onScroll",x)}
+            >
+                <List
+                    itemLayout="horizontal"
+                    dataSource={notification}
+                    renderItem={item => (
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                title={
+                                    <>
+                                        <label className="text-link"
+                                            onClick={() => { return (history.push({ pathname: "/internal/issue/subject/" + item.ticketid }), window.location.reload("false")) }}
 
-                                    >
-                                        {item.title}
-                                    </label>
-                                    <label style={{ marginLeft: 20 }} className="value-text">
-                                        {`(${moment(item.datetime).format("DD/MM/YYYY HH:mm")})`}
-                                    </label>
-                                </>
-                            }
-                            description={
-                                <>
-                                    <label>{item.description}</label>
-                                </>
+                                        >
+                                            {item.title}
+                                        </label>
+                                        <label style={{ marginLeft: 20 }} className="value-text">
+                                            {`(${moment(item.datetime).format("DD/MM/YYYY HH:mm")})`}
+                                        </label>
+                                    </>
+                                }
+                                description={
+                                    <>
+                                        <label>{item.description}</label>
+                                    </>
 
-                            }
+                                }
 
-                        />
-                    </List.Item>
-                )}
-            />
+                            />
+                        </List.Item>
+                    )}
+                />
+            </InfiniteScroll>
+
         </>
     )
 }
