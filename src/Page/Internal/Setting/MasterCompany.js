@@ -17,9 +17,10 @@ export default function MasterCompany() {
     const [modalProduct, setModalProduct] = useState(false);
 
     //data
-    const [radioValue, setRadioValue] = useState(1);
+    const [masterCompany, setMasterCompany] = useState([]);
     const [filterCompany, setFilterCompany] = useState([]);
     const [listcompany, setListcompany] = useState([]);
+
     const [selectcompany, setSelectcompany] = useState(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
@@ -42,7 +43,7 @@ export default function MasterCompany() {
             },
         });
         if (mastercompany.status === 200) {
-            setFilterCompany(mastercompany.data)
+            setMasterCompany(mastercompany.data)
         }
     }
 
@@ -55,7 +56,7 @@ export default function MasterCompany() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    id: selectcompany && selectcompany
+                    id: filterCompany && filterCompany
                 }
             });
             if (company_all.status === 200) {
@@ -142,6 +143,32 @@ export default function MasterCompany() {
         }
     }
 
+    const deleteProduct = async (param) => {
+        try {
+            const cusproduct = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/delete-customer-products",
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    company_id: param.CompanyId,
+                    product_id: param.ProductId
+                }
+            });
+
+            if (cusproduct === 200) {
+                getCustomerProduct(param.CompanyId);
+            }
+
+
+        } catch (error) {
+
+        }
+    }
+
+
+    // Save
     const onFinishAdd = async (param) => {
         console.log(param);
         try {
@@ -162,6 +189,18 @@ export default function MasterCompany() {
                     is_cloud: param.is_cloud
                 }
             });
+            await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/add-customer-products",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    company_code: param.code,
+                    product: cusProduct && cusProduct
+                }
+            });
+
             if (addcompany.status === 200) {
                 setModalAdd(false);
                 Modal.info({
@@ -212,8 +251,20 @@ export default function MasterCompany() {
                     cost: values.cost
                 }
             });
+
+            await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/add-customer-products",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    company_code: values.code,
+                    product: selectProduct && selectProduct
+                }
+            });
+
             if (updatecompany.status === 200) {
-                // GetCompany()
                 Modal.info({
                     title: 'บันทึกข้อมูลเรียบร้อย',
                     content: (
@@ -250,12 +301,14 @@ export default function MasterCompany() {
     };
 
     useEffect(() => {
-        GetMasterCompany()
+        GetMasterCompany();
+
     }, [])
 
     useEffect(() => {
         GetCompany()
     }, [loading, search])
+
 
 
     return (
@@ -270,8 +323,8 @@ export default function MasterCompany() {
                         }
                         maxTagCount={3}
                         style={{ width: "100%" }}
-                        options={filterCompany.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
-                        onChange={(value, item) => setSelectcompany(value)}
+                        options={masterCompany.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
+                        onChange={(value, item) => setFilterCompany(value)}
                     >
 
                     </Select>
@@ -313,7 +366,6 @@ export default function MasterCompany() {
                                         return (
                                             GetCompanyById(record.Id),
                                             getCustomerProduct(record.Id),
-                                            // setRadioValue(record.IsCloudSite),
                                             form.setFieldsValue({
                                                 code: record.Code,
                                                 name: record.Name,
@@ -342,10 +394,15 @@ export default function MasterCompany() {
                 visible={modalAdd}
                 title="ข้อมูลบริษัท"
                 width={800}
-                onCancel={() => (setModalAdd(false), formAdd.resetFields())}
+                onCancel={() => {
+                    setModalAdd(false);
+                    setSelectcompany(null);
+                    formAdd.resetFields();
+                }}
                 okText="Save"
                 onOk={() => {
                     formAdd.submit();
+                    setModalAdd(false);
                 }
                 }
             >
@@ -404,7 +461,25 @@ export default function MasterCompany() {
                         </Radio.Group>
                     </Form.Item>
                 </Form>
-
+                <Row>
+                    <Col span={24}>
+                        <Button type="primary" icon={<PlusOutlined />}
+                            style={{ backgroundColor: "#00CC00" }}
+                            onClick={() => { return (setModalProduct(true), getMasterProduct()) }}
+                        >
+                            Add Product
+                    </Button>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col span={24}>
+                        <Table dataSource={[...cusProduct]}>
+                            <Column title="No" width="10%" />
+                            <Column title="Product Code" width="20%" dataIndex="Name" />
+                            <Column title="Product Name" width="60%" dataIndex="FullName" />
+                        </Table>
+                    </Col>
+                </Row>
             </Modal>
 
             {/* Edit ข้อมูลบริษัท */}
@@ -412,18 +487,14 @@ export default function MasterCompany() {
                 title={`${selectcompany && selectcompany[0]?.FullNameTH}`}
                 visible={visible}
                 width={800}
-                onOk={() => {
-                    form.submit();
-                    setVisible(false);
-                }
-                }
+                onOk={() => { form.submit() }}
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okText="Save"
                 onCancel={() => { setVisible(false); form.resetFields(); setSelectcompany(null) }}
             >
                 <Form form={form}
                     layout="horizontal"
-                    name="form-company"
+                    name="form-editcompany"
                     onFinish={onFinish}
 
                 >
@@ -468,9 +539,26 @@ export default function MasterCompany() {
                 <Row>
                     <Col span={24}>
                         <Table dataSource={[...cusProduct]}>
-                            <Column title="No" width="10%" />
+                            <Column title="No" width="10%" dataIndex="Row" />
                             <Column title="Product Code" width="20%" dataIndex="Name" />
                             <Column title="Product Name" width="60%" dataIndex="FullName" />
+                            <Column title=""
+                                align="center"
+                                width="10%"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <Button type="link"
+                                                icon={<EditOutlined />}
+                                                onClick={() => deleteProduct(record)}
+                                            >
+                                                Delete
+                                    </Button>
+                                        </>
+                                    )
+                                }
+                                }
+                            />
                         </Table>
                     </Col>
                 </Row>
@@ -482,7 +570,7 @@ export default function MasterCompany() {
                 title="ข้อมูล Product"
                 width={800}
                 onCancel={() => {
-                    setModalProduct(false) 
+                    setModalProduct(false)
                     setSelectedRowKeys([])
                 }}
                 onOk={() => {

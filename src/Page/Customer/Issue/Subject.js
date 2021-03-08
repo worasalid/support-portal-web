@@ -1,5 +1,5 @@
 import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Tag, Modal } from "antd";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useMemo } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Customer/Comment";
@@ -234,6 +234,12 @@ export default function Subject() {
     getDueDateHistory();
   }, [historyduedate_visible])
 
+  const tabDocDetail = useMemo(() => {
+    return {
+      refId: customerstate?.issuedata?.details[0]?.Id
+    }
+  }, [customerstate?.issuedata?.details[0]?.Id])
+
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
@@ -298,10 +304,7 @@ export default function Subject() {
                   <Col span={24}>
 
                     <TabsDocument
-                      details={{
-                        refId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-                        // reftype: "Master_Ticket",
-                      }}
+                      details={tabDocDetail}
                     />
                   </Col>
                 </Row>

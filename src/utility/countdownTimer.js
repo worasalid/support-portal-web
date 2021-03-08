@@ -14,11 +14,11 @@ class Clock extends Component {
       overdue: false
     };
   }
-  componentWillMount() {
-    const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
-    // this.getTimeUntil(deadline, createdate, resolvedDate);
-    // this.getTimeWorking(node_receivedate, node_senddate)
-  }
+  // componentWillMount() {
+  //   const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
+  //   // this.getTimeUntil(deadline, createdate, resolvedDate);
+  //   // this.getTimeWorking(node_receivedate, node_senddate)
+  // }
   componentDidMount() {
     const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
     // คำนวนระยะเวลาทำงาน
@@ -40,7 +40,7 @@ class Clock extends Component {
     if (this.props.resolvedDate === undefined &&
       moment(this.props.deadline).format("YYYY-MM-DD HH:mm") < moment().format("YYYY-MM-DD HH:mm") &&
       type === undefined) {
-      //setInterval(() => this.getTimeUntil(this.props.deadline), 1000);
+     // setInterval(() => this.getTimeUntil(this.props.deadline), 1000);
       this.dateTimeDiffToNow(this.props.deadline)
       //console.log("C")
     }

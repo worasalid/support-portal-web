@@ -9,7 +9,7 @@ import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
 import { DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
-import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
+import IssueContext from "../../../utility/issueContext";
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
 
@@ -26,8 +26,8 @@ export default function MyTask() {
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
 
   // data
-  //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
-  const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
+  const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+  //const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
   const { state, dispatch } = useContext(AuthenContext);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [pageCurrent, setPageCurrent] = useState(1);
@@ -68,20 +68,6 @@ export default function MyTask() {
     }
   };
 
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
-      }
-    });
-    customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
-  }
-
   const UpdateStatusMailbox = async (value) => {
     const mailbox = await Axios({
       url: process.env.REACT_APP_API_URL + "/tickets/read",
@@ -106,6 +92,14 @@ export default function MyTask() {
     customerdispatch({ type: "SEARCH", payload: false })
   }, [customerstate.search, visible, pageCurrent]);
 
+
+  useEffect(() => {
+    if (customerstate.search) {
+      console.log(customerstate.search)
+    }
+  }, [customerstate.search])
+
+  console.log(customerstate.filter);
 
   return (
     <MasterPage>
@@ -150,52 +144,82 @@ export default function MyTask() {
           >
 
             <Column
-              title="Issue No"
-              width="25%"
-
-              render={(record, index) => {
+              title="IssueNo"
+              width="5%"
+              render={(record) => {
                 return (
-                  <div>
-                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                  <>
+                    <label className="table-column-text">
                       {record.Number}
                     </label>
-                    <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                      <Tooltip title="Issue Type">
-                        <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
-                          <label style={{ fontSize: "10px" }}>
-                            {record.IssueType}
+                  </>
+                )
+              }
+              }
+            />
+
+            <Column
+              title="Details"
+              width="15%"
+              render={(record) => {
+                return (
+                  <div>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label className="table-column-text" style={{ color: "#808080" }}>
+                          Type :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                      {/* <Divider type="vertical" /> */}
-                      <Tooltip title="Priority">
-                        <Tag color="#808080">
-                          <label style={{ fontSize: "10px" }}>
-                            {record.Priority}
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.IssueType}
+                          {/* {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType} */}
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Priority :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                      {/* <Divider type="vertical" /> */}
-                      <Tooltip title="Product">
-                        <Tag color="#808080">
-                          <label style={{ fontSize: "10px" }}>
-                            {record.ProductName}
+                      </Col>
+                      <Col span={14} >
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.Priority}
+                        </label>
+                        {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Product :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                      {/* <Divider type="vertical" /> */}
-                      <Tooltip title="Module">
-                        <Tag color="#808080">
-                          <label style={{ fontSize: "10px" }}>
-                            {record.ModuleName}
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.ProductName}
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Module :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                    </div>
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.ModuleName}
+                        </label>
+                      </Col>
+                    </Row>
                   </div>
                 );
               }}
             />
+
 
             <Column title="Subject"
               render={(record) => {
@@ -258,6 +282,7 @@ export default function MyTask() {
 
                     {record.cntDueDate >= 1 ?
                       <Tag color="warning"
+                      style={{cursor:"pointer"}}
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
                           setHistoryduedate_visible(true)

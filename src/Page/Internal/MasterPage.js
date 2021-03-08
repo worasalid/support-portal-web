@@ -354,10 +354,10 @@ export default function MasterPage(props) {
                 - ข้อมูลบริษัท
               </Menu.Item>
               <Menu.Item key="12" onClick={() => history.push('/internal/setting/mapcompany')}>
-                - Mapping Support
+                - ผู้ดูแล Site
               </Menu.Item>
               <Menu.Item key="13" onClick={() => history.push('/internal/setting/mapdeveloper')}>
-                - Mapping Developer
+                - Developer Module
               </Menu.Item>
               <Menu.Item key="14" onClick={() => history.push('/internal/setting/system')}>
                 - ตั้งค่าข้อมูลระบบ

@@ -7,7 +7,7 @@ import { ArrowLeftOutlined, CheckOutlined, PlusOutlined, StopOutlined } from '@a
 
 const { Column } = Table;
 
-export default function ConfigReOpenEmail() {
+export default function ConfigReasonCancel() {
     const history = useHistory(null)
     const [form] = Form.useForm();
 
@@ -24,7 +24,7 @@ export default function ConfigReOpenEmail() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    groups: "ReOpenEmail"
+                    groups: "ResonCancel"
                 }
             });
 
@@ -77,7 +77,7 @@ export default function ConfigReOpenEmail() {
                 },
                 data: {
                     description: param.description,
-                    groups: "ReOpenEmail"
+                    groups: "ResonCancel"
                 }
             });
 
@@ -103,7 +103,7 @@ export default function ConfigReOpenEmail() {
                     onClick={() => history.goBack()}
                 />
                 &nbsp; &nbsp;
-                <h1>ตั้งค่า Email ที่ใช้ส่ง กรณี ReOpen</h1>
+                <h1> ตั้งค่าเหตุผลการยกเลิก ของลูกค้า</h1>
             </Row>
             <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
                 <Col span={24}>
@@ -117,7 +117,7 @@ export default function ConfigReOpenEmail() {
             </Row>
             <Table dataSource={dataReOpen} loading={loading}>
                 <Column title="No" width="5%" dataIndex="Sequence" />
-                <Column title="Email" dataIndex="Name" width="55%" />
+                <Column title="รายละเอียด" dataIndex="Name" width="55%" />
                 <Column title="สถานะ"
                     align="center"
                     width="15%"
@@ -141,7 +141,7 @@ export default function ConfigReOpenEmail() {
 
             <Modal
                 visible={modalVisible}
-                title="ตั้งค่า Email ในการ ReOpen"
+                title="เหตุผลในการ ยกเลิก"
                 width={500}
                 onCancel={() => {
                     setModalVisible(false);
@@ -156,9 +156,9 @@ export default function ConfigReOpenEmail() {
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        label="Email"
+                        label="เหตุผลในการ ยกเลิก"
                         name="description"
-                        rules={[{ required: true, message: 'กรุณาระบุ Email' }]}
+                        rules={[{ required: true, message: 'กรุณาระบุรายละเอียด' }]}
                     >
                         <Input />
                     </Form.Item>

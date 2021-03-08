@@ -15,7 +15,7 @@ import MasterContext from "../../../utility/masterContext";
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
-import Clock from "../../../utility/countdownTimer";
+import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
 export default function Resolved() {
@@ -120,55 +120,84 @@ export default function Resolved() {
             >
 
               <Column
-                title="Issue No"
-                width="25%"
+                title="IssueNo"
+                width="5%"
                 render={(record) => {
                   return (
-                    <div>
+                    <>
                       <label className="table-column-text">
                         {record.Number}
                       </label>
+                    </>
+                  )
+                }
+                }
+              />
 
-                      <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        <Tooltip title="Issue Type">
-                          <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
-                            <label style={{ fontSize: "10px" }}>
-                              {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Priority">
-                          <Tag color="#808080">
-                            <label style={{ fontSize: "10px" }}>
-                              {record.Priority}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Product">
-                          <Tag color="#808080">
-                            <label style={{ fontSize: "10px" }}>
-                              {record.ProductName}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Module">
-                          <Tag color="#808080">
-                            <label style={{ fontSize: "10px" }}>
-                              {record.ModuleName}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                      </div>
+              <Column
+                title="Details"
+                width="15%"
+                render={(record) => {
+                  return (
+                    <div>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label className="table-column-text" style={{ color: "#808080" }}>
+                            Type :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
+                          </label>
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Priority :
+                          </label>
+                        </Col>
+                        <Col span={14} >
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Priority}
+                          </label>
+                          {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Product :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.ProductName}
+                          </label>
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Module :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {/* {record.ModuleName} */}
+                            CustomerService
+                          </label>
+                        </Col>
+                      </Row>
                     </div>
                   );
                 }}
               />
 
               <Column title="Subject"
-                width="30%"
+                width="35%"
                 render={(record) => {
                   return (
                     <>
@@ -221,7 +250,7 @@ export default function Resolved() {
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
-                      <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
+                      <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
 
                     </>
                   )
@@ -290,12 +319,11 @@ export default function Resolved() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
-                        <Clock
-                          showseconds={false}
-                          deadline={record.DueDate}
-                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                          //onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                      <ClockSLA
+                          start={moment(record.AssignIconDate)}
+                          due={moment(record.DueDate)}
+                          end={ record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
+
                         />
                       </div>
                     </>

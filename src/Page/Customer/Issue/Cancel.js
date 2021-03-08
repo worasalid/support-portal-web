@@ -100,7 +100,7 @@ export default function Cancel() {
     }, 1000)
 
     customerdispatch({ type: "SEARCH", payload: false })
-  }, [customerstate.search, visible,pageCurrent]);
+  }, [customerstate.search, visible, pageCurrent]);
 
 
   return (
@@ -114,19 +114,19 @@ export default function Cancel() {
       <Row>
         <Col span={24}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
-           footer={(x) => {
-            return (
-              <>
-                <div style={{ textAlign: "right" }}>
-                  <label>จำนวนเคส : </label>
-                  <label>{x.length}</label>
-                </div>
-              </>
-            )
-          }}
-          pagination={{ pageSize: pageSize, total: pageTotal }}
+            footer={(x) => {
+              return (
+                <>
+                  <div style={{ textAlign: "right" }}>
+                    <label>จำนวนเคส : </label>
+                    <label>{x.length}</label>
+                  </div>
+                </>
+              )
+            }}
+            pagination={{ pageSize: pageSize, total: pageTotal }}
 
-          onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+            onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
             onRow={(record, rowIndex) => {
               // console.log(record, rowIndex)
               return {
@@ -146,27 +146,77 @@ export default function Cancel() {
           >
 
             <Column
-              title="Issue No"
-              width="25%"
-
-              render={(record, index) => {
+              title="IssueNo"
+              width="5%"
+              render={(record) => {
                 return (
-                  <div>
+                  <>
                     <label className="table-column-text">
                       {record.Number}
                     </label>
-                    <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                      {
-                        record.IssueType === 'Bug' ?
-                          <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip> :
-                          <Tooltip title="Issue Type"><Tag color="#108ee9">{record.IssueType}</Tag></Tooltip>
-                      }
-                      <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-                      <Divider type="vertical" />
-                      <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
-                      <Divider type="vertical" />
-                      <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
-                    </div>
+                  </>
+                )
+              }
+              }
+            />
+
+            <Column
+              title="Details"
+              width="15%"
+              render={(record) => {
+                return (
+                  <div>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label className="table-column-text" style={{ color: "#808080" }}>
+                          Type :
+                          </label>
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.IssueType}
+                          {/* {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType} */}
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Priority :
+                          </label>
+                      </Col>
+                      <Col span={14} >
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.Priority}
+                        </label>
+                        {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Product :
+                          </label>
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.ProductName}
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Module :
+                          </label>
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.ModuleName}
+                        </label>
+                      </Col>
+                    </Row>
                   </div>
                 );
               }}
@@ -199,6 +249,7 @@ export default function Cancel() {
               }
               }
             />
+            
             <Column title="Issue Date"
               align="center"
               width="10%"

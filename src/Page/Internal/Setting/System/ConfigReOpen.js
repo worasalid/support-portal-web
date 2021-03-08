@@ -83,6 +83,7 @@ export default function ConfigReOpen() {
 
             if (result.status === 200) {
                 setModalVisible(false);
+                form.resetFields();
                 getData();
             }
         } catch (error) {
@@ -142,7 +143,10 @@ export default function ConfigReOpen() {
                 visible={modalVisible}
                 title="เหตุผลในการ ReOpen"
                 width={500}
-                onCancel={() => setModalVisible(false)}
+                onCancel={() => {
+                    setModalVisible(false);
+                    form.resetFields();
+                }}
                 onOk={() => form.submit()}
                 okText="Save"
             >

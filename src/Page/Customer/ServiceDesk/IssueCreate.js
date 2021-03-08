@@ -355,7 +355,7 @@ export default function IssueCreate() {
                         <Select
                             placeholder="Product"
                             onChange={(value) => customerdispatch({ type: "SELECT_PRODUCT", payload: value })}
-                            options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
+                            options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: `${x.Name} - (${x.FullName})` }))}
                         />
                     </Form.Item>
 

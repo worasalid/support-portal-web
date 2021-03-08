@@ -11,7 +11,7 @@ import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
-import Clock from "../../../utility/countdownTimer";
+import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
 export default function AllIssue() {
@@ -163,30 +163,77 @@ export default function AllIssue() {
               }
               }
             >
+              <Column
+                title="IssueNo"
+                width="5%"
+                render={(record) => {
+                  return (
+                    <>
+                      <label className="table-column-text">
+                        {record.Number}
+                      </label>
+                    </>
+                  )
+                }
+                }
+              />
 
               <Column
-                title="Issue No"
-                width="25%"
+                title="Details"
+                width="15%"
                 render={(record) => {
                   return (
                     <div>
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                        {record.Number}
-                      </label>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label className="table-column-text" style={{ color: "#808080" }}>
+                            Type :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
+                          </label>
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Priority :
+                          </label>
+                        </Col>
+                        <Col span={14} >
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Priority}
+                          </label>
+                          {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
 
-                      <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        {
-                          record.IssueType === 'ChangeRequest' ?
-                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                            <Tooltip title="Issue Type"><Tag color="#f50">{record.IssueType}</Tag></Tooltip>
-                        }
-
-                        <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Product"><Tag color="#808080">{record.ProductName}</Tag></Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
-                      </div>
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Product :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.ProductName}
+                          </label>
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Module :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.ModuleName}
+                          </label>
+                        </Col>
+                      </Row>
                     </div>
                   );
                 }}
@@ -247,7 +294,7 @@ export default function AllIssue() {
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
-                      <Tooltip title="Company"><Tag color="gray">{record.CompanyName}</Tag></Tooltip>
+                      <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
 
                     </>
                   )
@@ -315,12 +362,10 @@ export default function AllIssue() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        <Clock
-                          showseconds={false}
-                          deadline={record.DueDate}
-                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                      <ClockSLA
+                          start={moment(record.AssignIconDate)}
+                          due={moment(record.DueDate)}
+                          end={ record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
                         />
                       </div>
                     </>

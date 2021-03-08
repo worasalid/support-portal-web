@@ -28,22 +28,7 @@ export default function SystemConfig() {
                         />
                     </Card>
                 </Col>
-                <Col span={6}>
-                    <Card className="card-box issue-active" bordered hoverable
-                        style={{ width: "100%" }}
-                        onClick={() => history.push("/internal/setting/system/version")}
-                    >
-                        <Meta
-                            title={<label className="card-title-menu">ข้อมูล Version</label>}
-                            description={
-                                <label className="value-text">
-                                    รายละเอียด Version
-                                </label>
 
-                            }
-                        />
-                    </Card>
-                </Col>
                 <Col span={6}>
                     <Card className="card-box issue-active" bordered hoverable
                         style={{ width: "100%" }}
@@ -61,13 +46,36 @@ export default function SystemConfig() {
                         />
                     </Card>
                 </Col>
+
                 <Col span={6}>
                     <Card className="card-box issue-active" bordered hoverable
                         style={{ width: "100%" }}
+                        onClick={() => history.push("/internal/setting/system/version")}
                     >
                         <Meta
-                            title={<label className="card-title-menu">xxx</label>}
-                            description={"xxxx"}
+                            title={<label className="card-title-menu">ข้อมูล Version</label>}
+                            description={
+                                <label className="value-text">
+                                    รายละเอียด Version
+                                </label>
+
+                            }
+                        />
+                    </Card>
+                </Col>
+               
+                <Col span={6}>
+                    <Card className="card-box issue-active" bordered hoverable
+                        style={{ width: "100%" }}
+                        onClick={() => history.push("/internal/setting/system/reason_cancel")}
+                    >
+                        <Meta
+                            title={<label className="card-title-menu">เหตุผลการยกเลิก</label>}
+                            description={
+                                <label className="value-text">
+                                    ตั้งค่าเหตุผลการยกเลิก ของลูกค้า
+                                </label>
+                            } 
                         />
                     </Card>
                 </Col>

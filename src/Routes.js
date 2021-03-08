@@ -34,6 +34,7 @@ import UnAssign from './Page/Internal/Issue/UnAssign';
 import Login from './Page/Internal/Login';
 import MasterCompany from './Page/Internal/Setting/MasterCompany';
 import MappingCompany from './Page/Internal/Setting/MapCompany';
+import SupportSiteConfig from './Page/Internal/Setting/SupportSiteConfig';
 import MappingDeveloper from './Page/Internal/Setting/MapDeveloper';
 import Charts from './Page/Internal/Report/charts';
 import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
@@ -50,6 +51,7 @@ import MasterContext, { masterReducer, masterState } from "./utility/masterConte
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
 import UserContext, { userReducer, userState } from "./utility/issueContext";
 import RicefContext, { ricefReducer, ricefState } from './utility/ricefContext';
+import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
 
 
 
@@ -74,11 +76,13 @@ export default function Routes() {
                                     <Route path="/internal/issue/unassign" exact component={UnAssign} />
                                     <Route path="/internal/setting/mastercompany" exact component={MasterCompany} />
                                     <Route path="/internal/setting/mapcompany" exact component={MappingCompany} />
+                                    <Route path="/internal/setting/support_site_config/userid-:id?" exact component={SupportSiteConfig} />
                                     <Route path="/internal/setting/mapdeveloper" exact component={MappingDeveloper} />
                                     <Route path="/internal/setting/system" exact component={SystemConfig} />
                                     <Route path="/internal/setting/system/reopen" exact component={ConfigReOpen} />
                                     <Route path="/internal/setting/system/version" exact component={ConfigVersion} />
                                     <Route path="/internal/setting/system/reopen_email" exact component={ConfigReOpenEmail} />
+                                    <Route path="/internal/setting/system/reason_cancel" exact component={ConfigReasonCancel} />
 
                                     <Route path="/internal/dashboard" exact component={Dashboard} />
                                     <Route path="/internal/issue/other" exact component={AllIssue} />

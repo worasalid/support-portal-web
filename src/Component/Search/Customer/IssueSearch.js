@@ -28,9 +28,12 @@ export default function Issuesearch({Progress = "hide"}) {
         },
     ]
 
+
     const handleChange = (e) => {
+        //console.log(e.target.name,e.target.value)
         if (e.target.name === "issuetype") {
             customerdispatch({ type: "SELECT_TYPE", payload: e.target.value })
+            //console.log(e.target.value)
         }
         if (e.target.name === "product") {
             customerdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })

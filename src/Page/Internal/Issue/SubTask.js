@@ -457,7 +457,7 @@ export default function SubTask() {
 
                     {
                       <Tabs defaultActiveKey="1" >
-                        <TabPane tab="Internal Note" key="1" >
+                        <TabPane tab="Task Note" key="1" >
                           <TaskComment />
                         </TabPane>
                         <TabPane tab="History Log" key="2">

@@ -9,7 +9,7 @@ import moment from "moment"
 
 const { TabPane } = Tabs;
 
-export default function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
+function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
     //const history = useHistory();
     //const match = useRouteMatch();
 
@@ -1055,3 +1055,5 @@ export default function TabsDocument({ visible = false, onOk, onCancel, details,
         </>
     )
 }
+
+export default React.memo(TabsDocument)

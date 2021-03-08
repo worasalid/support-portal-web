@@ -35,6 +35,8 @@ export default function InProgress() {
   const loadIssue = async (value) => {
     // setLoadding(true);
     try {
+      customerdispatch({ type: "LOADING", payload: true })
+
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-customer",
         method: "GET",
@@ -60,15 +62,11 @@ export default function InProgress() {
         customerdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
 
       }
+      customerdispatch({ type: "LOADING", payload: false })
     } catch (error) {
-
+      customerdispatch({ type: "LOADING", payload: false })
     }
   };
-
-  // useEffect(() => {
-
-  // }, []);
-
 
 
   useEffect(() => {
@@ -79,7 +77,8 @@ export default function InProgress() {
     }, 1000)
 
     customerdispatch({ type: "SEARCH", payload: false })
-  }, [customerstate.search, pageCurrent]);
+  }, [customerstate.search, visible, pageCurrent]);
+
 
 
   return (
@@ -125,48 +124,77 @@ export default function InProgress() {
           >
 
             <Column
-              title="Issue No"
-              width="25%"
-
-              render={(record, index) => {
+              title="IssueNo"
+              width="5%"
+              render={(record) => {
                 return (
-                  <div>
+                  <>
                     <label className="table-column-text">
                       {record.Number}
                     </label>
-                    <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                      <Tooltip title="Issue Type">
-                        <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
-                          <label style={{ fontSize: "10px" }}>
-                            {record.IssueType}
+                  </>
+                )
+              }
+              }
+            />
+
+            <Column
+              title="Details"
+              width="15%"
+              render={(record) => {
+                return (
+                  <div>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label className="table-column-text" style={{ color: "#808080" }}>
+                          Type :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                      {/* <Divider type="vertical" /> */}
-                      <Tooltip title="Priority">
-                        <Tag color="#808080">
-                          <label style={{ fontSize: "10px" }}>
-                            {record.Priority}
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.IssueType}
+                          {/* {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType} */}
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Priority :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                      {/* <Divider type="vertical" /> */}
-                      <Tooltip title="Product">
-                        <Tag color="#808080">
-                          <label style={{ fontSize: "10px" }}>
-                            {record.ProductName}
+                      </Col>
+                      <Col span={14} >
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.Priority}
+                        </label>
+                        {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Product :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                      {/* <Divider type="vertical" /> */}
-                      <Tooltip title="Module">
-                        <Tag color="#808080">
-                          <label style={{ fontSize: "10px" }}>
-                            {record.ModuleName}
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.ProductName}
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Module :
                           </label>
-                        </Tag>
-                      </Tooltip>
-                    </div>
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.ModuleName}
+                        </label>
+                      </Col>
+                    </Row>
                   </div>
                 );
               }}
@@ -230,6 +258,7 @@ export default function InProgress() {
                     <br />
                     {record.cntDueDate >= 1 ?
                       <Tag style={{ marginLeft: 16 }} color="warning"
+                        style={{ cursor: "pointer" }}
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
                           setHistoryduedate_visible(true)

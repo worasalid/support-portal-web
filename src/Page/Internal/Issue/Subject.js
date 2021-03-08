@@ -1,5 +1,5 @@
 import { Col, Tag, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Popconfirm } from "antd";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Internal/Comment";
@@ -45,7 +45,8 @@ export default function Subject() {
   const { state, dispatch } = useContext(AuthenContext);
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
-
+  const [top, setTop] = useState(500);
+  const [bottom, setBottom] = useState(600);
   //modal
   // const [visible, setVisible] = useState(false);
   const [modalpreview, setModalpreview] = useState(false)
@@ -426,16 +427,13 @@ export default function Subject() {
     if (userstate?.issuedata?.details[0] !== undefined) {
       getdetail();
       getMailBox();
-
     }
-
   }, [])
 
   useEffect(() => {
     if (userstate?.mailbox[0]?.TransId !== undefined) {
       getflow_output(userstate?.mailbox[0]?.TransId);
     }
-
   }, [userstate?.mailbox[0]?.TransId])
 
   useEffect(() => {
@@ -448,52 +446,50 @@ export default function Subject() {
 
   useEffect(() => {
     if (historyduedate_visible) {
-      GetDueDateHistory();
+      // GetDueDateHistory();
     }
   }, [historyduedate_visible])
 
   useEffect(() => {
     if (modalSaveDuedate === false) {
-      getdetail();
+      // getdetail();
     }
   }, [modalSaveDuedate])
 
-  // useEffect(() => {
-  //   let interval;
 
-  //   interval = setInterval(() => console.log("GetTask", subTaskRef?.current?.CountData()), 1000);
-  //   return () => {
-  //     clearInterval(interval)
-  //   }
-  // }, [])
-
-  console.log("SLA_DueDate",userstate?.issuedata?.details[0]?.SLA_DueDate)
+  const tabDocDetail = useMemo(() => {
+    return {
+      refId: userstate?.issuedata?.details[0]?.Id
+    }
+  }, [userstate?.issuedata?.details[0]?.Id])
 
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
         <div className="scrollable-container" ref={setContainer} >
-          <Affix target={() => container}>
-            <Row>
-              <Col>
-                <a
-                  href="/#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    history.goBack();
-                  }}
-                >
-                  Back
+          {/* <Affix target={() => container}> */}
+          <Row>
+            <Col>
+              <a
+                href="/#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  history.goBack();
+                }}
+              >
+                Back
           </a>
-              </Col>
-            </Row>
-          </Affix>
+            </Col>
+          </Row>
+          {/* </Affix> */}
+
 
           <Row>
             {/* Content */}
             <Col span={16} style={{ paddingTop: 10 }}>
               <div style={{ height: "80vh", overflowY: "scroll" }}>
                 {/* Issue Description */}
+
                 <Row style={{ marginRight: 24 }}>
                   <Col span={24}>
 
@@ -534,18 +530,17 @@ export default function Subject() {
                         </div>
                       </Row>
                     </div>
+
                   </Col>
                 </Row>
 
                 {/* TAB Document */}
+
                 <Row style={{ marginTop: 36, marginRight: 24 }}>
                   <Col span={24}>
 
                     <TabsDocument
-                      details={{
-                        refId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-                        //reftype: "Master_Ticket",
-                      }}
+                      details={tabDocDetail}
                     />
                   </Col>
                 </Row>
@@ -607,6 +602,7 @@ export default function Subject() {
                     {
                       userstate?.mailbox[0]?.NodeName === "support"
                         ?
+
                         <Tabs defaultActiveKey="1" >
                           <TabPane tab="Comment" key="1">
                             <CommentBox />
@@ -618,10 +614,9 @@ export default function Subject() {
                             <Historylog loading={history_loading} />
                           </TabPane>
                         </Tabs>
-
                         :
                         <Tabs defaultActiveKey="1" >
-                          <TabPane tab="Internal Note" key="1" >
+                          <TabPane tab="Issue Note" key="1" >
                             <InternalCommentBox />
                           </TabPane>
                           <TabPane tab="History Log" key="2">
@@ -712,7 +707,7 @@ export default function Subject() {
                 marginBottom: 20,
                 display: (userstate.issuedata.details[0]?.IssueType === "Bug" || userstate.issuedata.details[0]?.IssueType === "Use") &&
                   (userstate.issuedata.details[0]?.SLA_DueDate !== undefined &&
-                  userstate.issuedata.details[0]?.SLA_DueDate !== null) ? "block" : "none"
+                    userstate.issuedata.details[0]?.SLA_DueDate !== null) ? "block" : "none"
               }}
               >
 
@@ -726,7 +721,7 @@ export default function Subject() {
                       deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].SLA_DueDate}
                       createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
                       resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
-                     // onClick={() => { setModaltimetracking_visible(true) }}
+                    // onClick={() => { setModaltimetracking_visible(true) }}
                     />
                   }
                   <label className="header-text">DueDate</label>
@@ -962,7 +957,8 @@ export default function Subject() {
         details={{
           ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
           mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          title: userstate?.issuedata?.details[0]?.Title
+          title: userstate?.issuedata?.details[0]?.Title,
+          productid: userstate?.issuedata?.details[0]?.ProductId
 
         }}
       />

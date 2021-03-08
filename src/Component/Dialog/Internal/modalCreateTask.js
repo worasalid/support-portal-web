@@ -13,6 +13,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
     const editorRef = useRef(null)
+    console.log("details",details)
 
     const LoadModule = async () => {
         try {
@@ -23,7 +24,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    productId: details.productId
+                    productId: details.productid
                 }
             });
             userdispatch({ type: "LOAD_MODULE", payload: module.data })

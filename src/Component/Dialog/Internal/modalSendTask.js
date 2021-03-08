@@ -17,7 +17,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
     const SaveComment = async () => {
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
-               await Axios({
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -82,17 +82,19 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                 });
             }
         } catch (error) {
-            await Modal.info({
+            onCancel();
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
-                onOk() {
+                okButtonProps: { hidden: true },
+                okCancel() {
+                    
                     editorRef.current.setvalue();
-                    onOk();
-                    history.push({ pathname: "/internal/issue/inprogress" })
+                    window.location.reload();
                 },
             });
         }

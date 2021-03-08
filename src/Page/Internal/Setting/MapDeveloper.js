@@ -1,24 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import MasterPage from '../MasterPage'
 import Axios from 'axios';
-import { Button, Table, Modal, message } from 'antd';
+import { Button, Table, Modal, message, Tabs, Row, Col, Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 //import MapCompany from './MapCompany';
 
 const { Column } = Table;
-//const { TabPane } = Tabs;
+const { TabPane } = Tabs;
 
 export default function MapDeveloper() {
 
     const [visible, setVisible] = useState(false);
     const [product_visible, setProduct_visible] = useState(false);
     const [module_visible, setModule_visible] = useState(false);
-   // const [expandedRow, setExpandedRow] = useState(false);
+    // const [expandedRow, setExpandedRow] = useState(false);
 
 
     // data
     const [userid, setUserid] = useState(null);
     const [username, setUsername] = useState(null);
+    const [HeadDeveloperList, setHeadDeveloperList] = useState([]);
     const [developerlist, setDeveloperlist] = useState([]);
+
+    // filter
+    const [filterHdev, setFilterHdev] = useState([]);
+    const [filterDev, setFilterDev] = useState([]);
+    const [keyword, setKeyword] = useState([]);
+
     const [productlist, setProductlist] = useState([]);
     const [modulelist, setModulelist] = useState([]);
     const [productid, setProductid] = useState(null);
@@ -26,6 +34,9 @@ export default function MapDeveloper() {
 
     const [selectproduct, setSelectproduct] = useState([]);
     const [selectmodule, setSelectmodule] = useState([]);
+
+    //modal
+    const [moduleRowKeys, setModuleRowKey] = useState([])
 
     const GetProduct = async () => {
         const products = await Axios({
@@ -61,6 +72,30 @@ export default function MapDeveloper() {
         }
     }
 
+    const GetHeadDeveloper = async () => {
+        try {
+            const headdeveloper = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/developer-list",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    position: 0,
+                    keyword: keyword
+                }
+            });
+
+            if (headdeveloper.status === 200) {
+                setHeadDeveloperList(headdeveloper.data)
+
+            }
+        } catch (error) {
+
+        }
+
+    }
+
     const GetDeveloper = async () => {
         try {
             const developer = await Axios({
@@ -68,6 +103,10 @@ export default function MapDeveloper() {
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    position: 1,
+                    keyword: keyword
                 }
             });
 
@@ -103,15 +142,15 @@ export default function MapDeveloper() {
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectproduct(selectedRowKeys);
-            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 
         },
     };
 
     const rowModuleSelection = {
+        selectedRowKeys: moduleRowKeys,
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectmodule(selectedRowKeys);
-            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            setModuleRowKey(selectedRowKeys)
 
         },
     };
@@ -167,7 +206,7 @@ export default function MapDeveloper() {
         }
     }
 
-    const DeleteModule = async (moduleId,productId) => {
+    const DeleteModule = async (moduleId, productId) => {
         const result = await Axios({
             url: process.env.REACT_APP_API_URL + "/master/delete-developer-module",
             method: "DELETE",
@@ -181,7 +220,7 @@ export default function MapDeveloper() {
             }
         });
 
-        if(result.status === 200){
+        if (result.status === 200) {
             Success();
             GetDeveloperModule();
         }
@@ -198,6 +237,7 @@ export default function MapDeveloper() {
     };
 
     useEffect(() => {
+        GetHeadDeveloper();
         GetDeveloper();
     }, [])
 
@@ -212,45 +252,120 @@ export default function MapDeveloper() {
     return (
         <MasterPage>
             <div >
-                <Table dataSource={developerlist} loading={false}
-                // expandable={{
-                //     expandedRowRender: record => <p style={{ margin: 0 }}>{record.username}</p>,
-
-                // }}
-                >
-                    <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
-                    <Column title="ชื่อพนักงาน" width="20%" dataIndex="UserName" />
-                    <Column title="Module ที่ดูแล"
-                        align="center"
-                        width="15%"
-                        render={(record) => {
-                            return (
-                                <>
-                                    <Button type="link"
-                                        onClick={() => {
-                                            return (
-                                                setVisible(true),
-                                                setUserid(record.UserId),
-                                                setUsername(record.UserName),
-                                                GetDeveloperModule(record.UserId)
-                                            )
+                <Tabs defaultActiveKey="1" type="card">
+                    <TabPane tab="H.Developer" key="1">
+                        <Row gutter={[16, 16]}>
+                            <Col span={12}>
+                            </Col>
+                            <Col span={9}>
+                                <Input placeholder="Basic usage" allowClear
+                                    onKeyDown={(x) => {
+                                        if (x.keyCode === 13) {
+                                            GetHeadDeveloper()
                                         }
-                                        }
-                                    >
-                                        <label>View</label>
-                                    </Button>
-                                </>
-                            )
-                        }
-                        }
-                    />
+                                    }}
+                                    onChange={(x) => setKeyword(x.target.value)}
+                                />
+                            </Col>
+                            <Col span={2}>
+                                <Button type="primary" shape="round" icon={<SearchOutlined />}
+                                    style={{ backgroundColor: "#00CC00" }}
+                                    onClick={() => GetHeadDeveloper()}
+                                >
+                                    Search
+                                 </Button>
+                            </Col>
+                        </Row>
+                        <Table dataSource={HeadDeveloperList} loading={false}>
+                            <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
+                            <Column title="ชื่อพนักงาน" dataIndex="UserName" />
+                            <Column title="Module ที่ดูแล"
+                                align="center"
+                                width="15%"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <Button type="link"
+                                                onClick={() => {
+                                                    return (
+                                                        setVisible(true),
+                                                        setUserid(record.UserId),
+                                                        setUsername(record.UserName),
+                                                        GetDeveloperModule(record.UserId)
+                                                    )
+                                                }
+                                                }
+                                            >
+                                                <label>View</label>
+                                            </Button>
+                                        </>
+                                    )
+                                }
+                                }
+                            />
 
-                </Table>
+                        </Table>
+                    </TabPane>
+                    <TabPane tab="Developer" key="2">
+                        <Row gutter={[16, 16]}>
+                            <Col span={12}>
+                            </Col>
+                            <Col span={9}>
+                                <Input placeholder="Basic usage" allowClear
+                                    onKeyDown={(x) => {
+                                        if (x.keyCode === 13) {
+                                            GetDeveloper()
+                                        }
+                                    }}
+                                    onChange={(x) => setKeyword(x.target.value)}
+                                />
+                            </Col>
+                            <Col span={2}>
+                                <Button type="primary" shape="round" icon={<SearchOutlined />}
+                                    style={{ backgroundColor: "#00CC00" }}
+                                    onClick={() => GetDeveloper()}
+                                >
+                                    Search
+                                 </Button>
+                            </Col>
+                        </Row>
+                        <Table dataSource={developerlist} loading={false}>
+                            <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
+                            <Column title="ชื่อพนักงาน" dataIndex="UserName" />
+                            <Column title="Module ที่ดูแล"
+                                align="center"
+                                width="15%"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <Button type="link"
+                                                onClick={() => {
+                                                    return (
+                                                        setVisible(true),
+                                                        setUserid(record.UserId),
+                                                        setUsername(record.UserName),
+                                                        GetDeveloperModule(record.UserId)
+                                                    )
+                                                }
+                                                }
+                                            >
+                                                <label>View</label>
+                                            </Button>
+                                        </>
+                                    )
+                                }
+                                }
+                            />
+
+                        </Table>
+                    </TabPane>
+                </Tabs>
+
             </div>
 
             {/* Modal */}
 
-            {/* Modal list module */}
+            {/* Modal list Detail */}
             <Modal
                 title={username}
                 visible={visible}
@@ -291,10 +406,10 @@ export default function MapDeveloper() {
                                             width="10%"
                                             render={(value, record, index) => {
                                                 return (
-                                                   <Button type="link" 
-                                                   onClick= {() => DeleteModule(record.ModuleId,record.ProductId) }
-                                                   >Delete</Button>
-                                                //    console.log("delete",userid,record.ModuleId,record.ProductId)
+                                                    <Button type="link"
+                                                        onClick={() => DeleteModule(record.ModuleId, record.ProductId)}
+                                                    >Delete</Button>
+                                                    //    console.log("delete",userid,record.ModuleId,record.ProductId)
                                                 )
                                             }}
                                         ></Column>
@@ -357,7 +472,10 @@ export default function MapDeveloper() {
                 width={800}
                 onOk={() => { return (MappingModule()) }}
                 okText="Add"
-                onCancel={() => { return (setModule_visible(false)) }}
+                onCancel={() => {
+                    setModule_visible(false);
+                    setModuleRowKey([])
+                }}
             >
                 <Table dataSource={modulelist} size="small"
                     rowSelection={{

@@ -1,4 +1,4 @@
-import { Comment, Avatar, Form, Button, List, Row, Col, Divider, Modal, Popconfirm } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col, Divider, Modal, Popconfirm, Affix } from 'antd';
 import moment from 'moment';
 import React, { useState, useEffect, useRef, createElement } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -19,6 +19,8 @@ export default function CommentBox() {
     const match = useRouteMatch();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(true);
+
+    const container = useState(null);
 
     // data
     const [commentdata, setCommentdata] = useState([]);
@@ -186,9 +188,8 @@ export default function CommentBox() {
     }, [loading])
 
 
-
     return (
-        <>
+        <div>
             <List
                 loading={loading}
                 itemLayout="horizontal"
@@ -235,49 +236,56 @@ export default function CommentBox() {
                 )}
             />
 
-            <Tabs defaultActiveKey="1">
-                <TabPane tab="Reply To Customer" key="1">
-                    <Form
-                        form={form}
-                        name="Customer"
-                        initialValues={{
-                            // product: "REM",
-                            // module: "CRM",
-                            // issue_type: "Bug",
-                        }}
-                        layout="vertical"
-                        onFinish={onFinish}
-                    >
-                        <Form.Item name="customer_comment">
+            {/* {
+                container && <Affix target={() => container}>
+                    
+                </Affix>
+            } */}
 
-                            <TextEditor ref={editorRef} />
-                        </Form.Item>
-                        <Form.Item name="customer_fileattach">
-                            <Row>
-                                <Col span={2} style={{ display: "inline" }} >
-                                    Attach :
-                            </Col>
-                                <Col span={4} style={{ display: "inline" }} >
-                                    <Uploadfile ref={uploadRef} />
-                                </Col>
-                                <Col span={18} style={{ textAlign: "right" }}>
-                                    <Popconfirm title="Comment หาลูกค้า ใช่หรือไม่"
-                                        okText="Yes" cancelText="No"
-                                        onConfirm={form.submit}
-                                        style={{ width: "300px" }}
-                                    >
-                                        <Button htmlType="submit" type="primary">
-                                            Add Comment
-                                    </Button>
-                                    </Popconfirm>
+<Tabs defaultActiveKey="1">
+                        <TabPane tab="Reply To Customer" key="1">
+                            <Form
+                                form={form}
+                                name="Customer"
+                                initialValues={{
+                                    // product: "REM",
+                                    // module: "CRM",
+                                    // issue_type: "Bug",
+                                }}
+                                layout="vertical"
+                                onFinish={onFinish}
+                            >
+                                <Form.Item name="customer_comment">
 
-                                </Col>
+                                    <TextEditor ref={editorRef} />
+                                </Form.Item>
+                                <Form.Item name="customer_fileattach">
+                                    <Row>
+                                        <Col span={2} style={{ display: "inline" }} >
+                                            Attach :
+                </Col>
+                                        <Col span={4} style={{ display: "inline" }} >
+                                            <Uploadfile ref={uploadRef} />
+                                        </Col>
+                                        <Col span={18} style={{ textAlign: "right" }}>
+                                            <Popconfirm title="Comment หาลูกค้า ใช่หรือไม่"
+                                                okText="Yes" cancelText="No"
+                                                onConfirm={form.submit}
+                                                style={{ width: "300px" }}
+                                            >
+                                                <Button htmlType="submit" type="primary">
+                                                    Add Comment
+                        </Button>
+                                            </Popconfirm>
 
-                            </Row>
-                        </Form.Item>
-                    </Form>
-                </TabPane>
-            </Tabs>
+                                        </Col>
+
+                                    </Row>
+                                </Form.Item>
+                            </Form>
+                        </TabPane>
+                    </Tabs>
+
 
             {/* Modal */}
             <ModalFileDownload
@@ -297,7 +305,7 @@ export default function CommentBox() {
 
             />
 
-        </>
+        </div>
     );
 }
 

@@ -159,7 +159,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     renderItem={item => (
                         <Row align="middle">
                             <Col span={23} className="task-active"
-                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px" }}
+                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px" }}
                                 onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.taskId })}
                             >
                                 <List.Item >

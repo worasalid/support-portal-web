@@ -264,10 +264,10 @@ export default function CommentBox({ loadingComment = false }) {
                                     </Button> */}
                                     <Button type="primary"
                                         onClick={() => {
-                                                return (
-                                                    (editorRef?.current?.getValue() === "" || editorRef?.current?.getValue() === null ? alert("กรุณาระบุ Comment!") :  setModalemail_visible(true)),
-                                                    LoadUserInmailbox()
-                                                )
+                                            return (
+                                                (editorRef?.current?.getValue() === "" || editorRef?.current?.getValue() === null ? alert("กรุณาระบุ Comment!") : setModalemail_visible(true)),
+                                                LoadUserInmailbox()
+                                            )
                                         }
                                         }
                                     >
