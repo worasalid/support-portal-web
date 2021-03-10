@@ -1,11 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Modal, Form, Input, Select, Button } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import AuthenContext from "../../../utility/authenContext";
 
 export default function ModalLeaderAssign({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const { state, dispatch } = useContext(AuthenContext);
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
@@ -62,7 +64,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
         }
     }
 
-    const SendFlow = async (value) => {
+    const SendFlow = async (param) => {
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -75,7 +77,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
-                        assigneeid: value,
+                        assigneeid: param,
                         comment_text: textValue
                     }
 
@@ -85,7 +87,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -95,8 +97,12 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("");
-                        
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        if (param === state?.usersdata?.users?.id) {
+                            window.location.reload()
+                        } else {
+                            history.push({ pathname: "/internal/issue/inprogress" })
+                        }
+
                     },
                 });
             }
@@ -111,7 +117,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                 onOk() {
                     editorRef.current.editor.setContent("");
                     onOk();
-                   
+
                 },
             });
         }

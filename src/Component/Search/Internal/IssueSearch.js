@@ -129,7 +129,7 @@ export default function Issuesearch({ Progress = "hide" }) {
         <>
 
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-            <Col span={4}>
+                <Col span={4}>
                     <Select placeholder="Progress"
                         style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
                         mode="multiple"
@@ -213,7 +213,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                     />
 
                 </Col>
-               
+
                 <Col span={2}>
                     <Button type="primary" shape="round" icon={<SearchOutlined />}
                         style={{ backgroundColor: "#00CC00" }}
@@ -231,9 +231,15 @@ export default function Issuesearch({ Progress = "hide" }) {
                     />
                 </Col>
                 <Col span={8}>
-                    <Input placeholder="IssueNo / Subject" name="subject" prefix="" 
-                  //  suffix={<SearchOutlined />} 
-                    onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}></Input>
+                    <Input placeholder="IssueNo / Subject" name="subject" prefix=""
+                        suffix={<SearchOutlined />} 
+                        onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}
+                        onKeyDown={(x) => {
+                            if (x.keyCode === 13) {
+                                userdispatch({ type: "SEARCH", payload: true })
+                            }
+                        }}
+                    />
                 </Col>
             </Row>
         </>

@@ -3,13 +3,13 @@ import MasterPage from '../MasterPage'
 import Axios from 'axios';
 import { Button, Table, Modal, message, Tabs, Row, Col, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-//import MapCompany from './MapCompany';
+import { useHistory } from 'react-router';
 
 const { Column } = Table;
 const { TabPane } = Tabs;
 
 export default function MapDeveloper() {
-
+    const history = useHistory(null);
     const [visible, setVisible] = useState(false);
     const [product_visible, setProduct_visible] = useState(false);
     const [module_visible, setModule_visible] = useState(false);
@@ -297,6 +297,22 @@ export default function MapDeveloper() {
                                                 }
                                             >
                                                 <label>View</label>
+                                            </Button>
+                                        </>
+                                    )
+                                }
+                                }
+                            />
+                            <Column title="Module ที่รับผิดชอบ"
+                                align="center"
+                                width="15%"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <Button type="link"
+                                                onClick={() => history.push({ pathname: "/internal/setting/config_developer/userid-" + record.UserId })}
+                                            >
+                                               view
                                             </Button>
                                         </>
                                     )

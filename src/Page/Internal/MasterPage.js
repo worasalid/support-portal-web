@@ -258,9 +258,9 @@ export default function MasterPage(props) {
             </SubMenu>
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issue" >
             <Menu.Item key="0" onClick={() => history.push({ pathname: '/internal/issue/other' })}
-              //  style={{
-              //   display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
-              // }}
+               style={{
+                display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
+              }}
               >
                 Other Issue
                

@@ -12,8 +12,8 @@ import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
-import Clock from "../../../utility/countdownTimer";
-import ClockTimer from "../../../utility/countTimer";
+// import Clock from "../../../utility/countdownTimer";
+import ClockSLA from "../../../utility/SLATime";
 import moment from "moment";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
@@ -715,13 +715,19 @@ export default function Subject() {
                   <label className="header-text">SLA</label>
                   {
                     userstate.issuedata.details[0] &&
-                    <Clock
-                      ref={clockRef}
-                      showseconds={false}
-                      deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].SLA_DueDate}
-                      createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
-                      resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
-                    // onClick={() => { setModaltimetracking_visible(true) }}
+                    // <Clock
+                    //   ref={clockRef}
+                    //   showseconds={false}
+                    //   deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].SLA_DueDate}
+                    //   createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
+                    //   resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
+                    // // onClick={() => { setModaltimetracking_visible(true) }}
+                    // />
+                    <ClockSLA
+                      start={moment(userstate?.issuedata?.details[0]?.AssignIconDate)}
+                      due={moment(userstate?.issuedata?.details[0]?.SLA_DueDate)}
+                      end={userstate?.issuedata?.details[0]?.ResolvedDate === null ? moment() : moment(userstate?.issuedata?.details[0]?.ResolvedDate)}
+
                     />
                   }
                   <label className="header-text">DueDate</label>

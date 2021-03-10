@@ -36,6 +36,7 @@ import MasterCompany from './Page/Internal/Setting/MasterCompany';
 import MappingCompany from './Page/Internal/Setting/MapCompany';
 import SupportSiteConfig from './Page/Internal/Setting/SupportSiteConfig';
 import MappingDeveloper from './Page/Internal/Setting/MapDeveloper';
+import ConfigDeveloper from './Page/Internal/Setting/ConfigDeveloper';
 import Charts from './Page/Internal/Report/charts';
 import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
 import ConfigReOpen from './Page/Internal/Setting/System/ConfigReOpen';
@@ -52,6 +53,7 @@ import CustomerContext, { customerReducer, customerState } from "./utility/issue
 import UserContext, { userReducer, userState } from "./utility/issueContext";
 import RicefContext, { ricefReducer, ricefState } from './utility/ricefContext';
 import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
+
 
 
 
@@ -78,6 +80,7 @@ export default function Routes() {
                                     <Route path="/internal/setting/mapcompany" exact component={MappingCompany} />
                                     <Route path="/internal/setting/support_site_config/userid-:id?" exact component={SupportSiteConfig} />
                                     <Route path="/internal/setting/mapdeveloper" exact component={MappingDeveloper} />
+                                    <Route path="/internal/setting/config_developer/userid-:id?" exact component={ConfigDeveloper} />
                                     <Route path="/internal/setting/system" exact component={SystemConfig} />
                                     <Route path="/internal/setting/system/reopen" exact component={ConfigReOpen} />
                                     <Route path="/internal/setting/system/version" exact component={ConfigVersion} />

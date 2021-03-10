@@ -307,8 +307,8 @@ export default function Complete() {
                       <label className="table-column-text">{record.GroupStatus}</label>
                     </div>
                     <div>
-                      <label className="table-column-text">
-                        {record.CompleteDate === null ? "" : moment(record.CompleteDate).format("DD/MM/YYYY HH:mm")}
+                      <label className="table-column-text" style={{display: record.CompleteDate === null ? "none" : "block"}}>
+                           {moment(record.CompleteDate).format("DD/MM/YYYY")} <br/> {moment(record.CompleteDate).format("HH:mm") }
                       </label>
                     </div>
                   </>

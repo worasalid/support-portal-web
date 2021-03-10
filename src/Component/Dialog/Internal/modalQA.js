@@ -38,7 +38,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 ticketId: details && details.ticketid,
                 taskid: details.taskid,
                 files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.linkurl,
+                unit_test_url: values.unit_test_url,
                 grouptype: "test_result_QA"
             }
         })
@@ -120,7 +120,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
+        //console.log('Success:', values);
         SendFlow(values);
     };
 
@@ -146,7 +146,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             >
                 <Form.Item
                     // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="linkurl"
+                    name="unit_test_url"
                     label="URL"
                     rules={[
                         {

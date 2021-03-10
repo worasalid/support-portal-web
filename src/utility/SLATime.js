@@ -153,13 +153,21 @@ function calculateWorkTimeByPeriod(
 }
 
 function timeFormat(time) {
-  const minutes = Math.floor(time % 60);
-  const hours = parseInt(Math.floor((time / 60) % 8));
-  const days = parseInt(Math.floor(time / 60) / 8);
+  // const minutes = Math.floor(time % 60);
+  // const hours = parseInt(Math.floor((time / 60) % 8));
+  // const days = parseInt(Math.floor(time / 60) / 8);
+
+  const minutes = Math.floor(Math.abs(time) % 60);
+  const hours = parseInt(Math.floor((Math.abs(time) / 60) % 8));
+  const days = parseInt(Math.floor(Math.abs(time) / 60) / 8);
+
+  // console.log("time",Math.abs(time))
+  // const hoursxx = parseInt(Math.floor((Math.abs(time) / 60) % 8));
+  // console.log("hours",hoursxx)
 
   const result = 
   (days === 0 ? "" :  Math.abs(days) + "d ") +
-  Math.abs(days !== 0 ? hours + 0 : hours) + "h " + 
+  (hours === 0 ? "" : Math.abs(hours) + "h ") +
   Math.abs(minutes) + "m"
 
   return result

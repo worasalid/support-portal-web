@@ -1,15 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Modal, Form, Table, Tabs } from 'antd';
+import React, { useState, useRef, useContext } from 'react';
+import { useHistory, } from "react-router-dom";
+import { Modal,Form, Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-import { DownloadOutlined } from '@ant-design/icons';
-import Column from 'antd/lib/table/Column';
+
+import AuthenContext from "../../../utility/authenContext";
 
 const { TabPane } = Tabs;
 
 export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const { state, dispatch } = useContext(AuthenContext);
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
@@ -63,7 +64,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     value: {
                         comment_text: textValue
                     }
-                  
+
                 }
             });
 
@@ -79,7 +80,12 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        if (state?.usersdata?.organize?.PositionLevel === 0) {
+                            // ถ้า H.Dev แก้ไขงานเอง ให้ refresh หน้าจอ แล้วทำงานต่อ ไม่ต้องเปลียน page
+                            window.location.reload();
+                        } else {
+                            history.push({ pathname: "/internal/issue/inprogress" })
+                        }
                     },
                 });
             }
@@ -101,10 +107,9 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
+        //console.log('Success:', values);
         SendFlow();
     };
-
 
     return (
         <Modal
@@ -116,7 +121,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-  
+
             <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
                 name="qa-test"
                 layout="vertical"

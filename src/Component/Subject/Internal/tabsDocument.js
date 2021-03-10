@@ -143,8 +143,9 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
+                                                <label style={{fontSize:10}}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}&nbsp;&nbsp;
+                                                    {/* <br /> */}
                                                     {moment(record.ModifyDate).format("HH:mm")}
                                                 </label>
                                             </>
@@ -160,7 +161,7 @@ const { TabPane } = Tabs;
                                                 <Button type="link"
                                                     onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
                                                 >
-                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                                    {record.FileId === null || record.FileName === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
                                                 </Button>
 

@@ -579,7 +579,7 @@ export default function MapCompany() {
                     </Row>
                     <Table dataSource={master_company}
                         //loading={loadingCompany}
-                        pagination={{ pageSize: 8, total: 100 }}
+                        //pagination={{ pageSize: 8, total: 100 }}
                         rowSelection={{
                             type: "checkbox",
                             ...rowSelection,

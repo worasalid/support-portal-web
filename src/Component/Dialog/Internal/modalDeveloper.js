@@ -1,14 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Input, Select, Button, Row, Col } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { Modal, Form } from 'antd';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
 import TextEditor from '../../TextEditor';
+import AuthenContext from "../../../utility/authenContext";
 
 export default function ModalDeveloper({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const { state, dispatch } = useContext(AuthenContext);
+
     const history = useHistory();
     const uploadRef = useRef(null);
     const uploadRef_unittest = useRef(null);
@@ -56,7 +57,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 ticketid: details && details.ticketid,
                 taskid: details.taskid,
                 files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.urltest,
+                unit_test_url: values.unit_test_url,
                 grouptype: "unittest"
             }
         })
@@ -112,7 +113,13 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     ),
                     onOk() {
                         editorRef.current.setvalue();
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                       if (state?.usersdata?.organize?.PositionLevel === 0) { 
+                            // ถ้า H.Dev แก้ไขงานเอง ให้ refresh หน้าจอ แล้วทำงานต่อ ไม่ต้องเปลียน page
+                            window.location.reload();
+                        } else {
+                            history.push({ pathname: "/internal/issue/inprogress" })
+                        }
+
                     },
                 });
             }
@@ -133,12 +140,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
         }
     }
 
-
     const onFinish = (values) => {
-        console.log('Success:', values);
+      //  console.log('Success:', values);
         SendFlow(values);
         onOk();
     };
+
 
     return (
         <Modal
@@ -162,7 +169,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             >
                 <Form.Item
                     label="URL"
-                    name="urltest"
+                    name="unit_test_url"
                     rules={[
                         {
                             required: false,

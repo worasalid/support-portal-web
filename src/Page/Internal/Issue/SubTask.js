@@ -18,7 +18,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalLeaderQC from "../../../Component/Dialog/Internal/modalLeaderQC";
 import ModalLeaderAssign from "../../../Component/Dialog/Internal/modalLeaderAssign";
-import Clock from "../../../utility/countdownTimer";
+import ClockSLA from "../../../utility/SLATime";
 import moment from "moment";
 import ModalqaAssign from "../../../Component/Dialog/Internal/modalqaAssign";
 import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
@@ -199,10 +199,11 @@ export default function SubTask() {
       if (item.data.NodeName === "developer_2") {
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
         if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-        if (item.data.value === "LeaderQC") {
+        if (item.data.value === "LeaderQC" || item.data.value === "LeaderReject") {
           setModalsendtask_visible(true)
         }
         if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
+        if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
       }
       if (item.data.NodeName === "developer_1") {
         if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
@@ -212,7 +213,17 @@ export default function SubTask() {
         if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
         if (item.data.value === "QApass") { setModalQA_visible(true) }
         if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
-        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
+        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") {
+          setModalsendtask_visible(true)
+        }
+      }
+      if (item.data.NodeName === "qa") {
+        if (item.data.value === "SendQALeader") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "QAReject") {
+          setModalsendtask_visible(true)
+        }
       }
 
     }
@@ -234,6 +245,7 @@ export default function SubTask() {
         if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject") {
           setModalsendtask_visible(true)
         }
+
       }
       if (item.data.NodeName === "developer_1") {
         if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
@@ -483,6 +495,7 @@ export default function SubTask() {
                   style={{
                     marginTop: 10,
                     display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
+                    //display:  userstate?.actionflow?.length !== 0 ? "block" : "none"
                   }}
                 >
                   <Select ref={selectRef}
@@ -496,7 +509,8 @@ export default function SubTask() {
                 <Col span={18}
                   style={{
                     display:
-                    userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
+                      userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
+                    //userstate?.actionflow?.length === 0 ? "block" : "none"
                   }}>
                   <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
                 </Col>
@@ -520,16 +534,23 @@ export default function SubTask() {
                   <label className="header-text">SLA</label>
                 </Col> */}
                 <Col span={24} >
-                <label className="header-text">SLA</label>
+                  <label className="header-text">SLA</label>
                   {
-                    
+
                     userstate.taskdata.data[0] &&
-                    
-                    <Clock
-                      showseconds={false}
-                      deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
-                      createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
-                      resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
+
+                    // <Clock
+                    //   showseconds={false}
+                    //   deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
+                    //   createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
+                    //   resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
+                    //   onClick={() => { setModaltimetracking_visible(true) }}
+                    // />
+
+                    <ClockSLA
+                      start={moment(userstate?.taskdata?.data[0]?.AssignIconDate)}
+                      due={moment(userstate?.taskdata?.data[0]?.SLA_DueDate)}
+                      end={userstate?.taskdata?.data[0]?.ResolvedDate === null ? moment() : moment(userstate?.taskdata?.data[0]?.ResolvedDate)}
                       onClick={() => { setModaltimetracking_visible(true) }}
                     />
                   }
