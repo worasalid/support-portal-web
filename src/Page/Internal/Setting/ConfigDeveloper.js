@@ -1,6 +1,5 @@
 import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, Checkbox, message, Tabs, Row, Col, Select, Input } from 'antd';
-import useSelection from 'antd/lib/table/hooks/useSelection';
+import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -12,6 +11,7 @@ const { TabPane } = Tabs;
 export default function ConfigDeveloper() {
     const match = useRouteMatch();
     const history = useHistory(null);
+    const [loading, setLoading] = useState(false)
 
     // modal
     const [divModule, setDivModule] = useState("none")
@@ -118,20 +118,27 @@ export default function ConfigDeveloper() {
             });
 
             if (products.status === 200) {
+                setModalProduct(false);
                 getProductOwner();
-                Modal.success({
-                    title: 'บันทึกข้อมูลเรียบร้อย',
-                    content: (
-                        <div>
-                            <p></p>
-                        </div>
-                    ),
-                    onOk() {
-                        // setBinding(true)
-                        setTimeout(() => {
-                            // setBinding(false)
-                        }, 1000)
-                        setModalProduct(false)
+                // Modal.success({
+                //     title: 'บันทึกข้อมูลเรียบร้อย',
+                //     content: (
+                //         <div>
+                //             <p></p>
+                //         </div>
+                //     ),
+                //     onOk() {
+                //         // setBinding(true)
+                //         setTimeout(() => {
+                //             // setBinding(false)
+                //         }, 1000)
+                //         setModalProduct(false)
+                //     },
+                // });
+                message.success({
+                    content: 'บันทึกข้อมูลสำเร็จ',
+                    style: {
+                        marginTop: '10vh',
                     },
                 });
             }
@@ -159,18 +166,21 @@ export default function ConfigDeveloper() {
                 getProductOwner();
                 getModuleOwner(param);
                 setDivModule("none");
-                Modal.success({
-                    title: 'ลบข้อมูลเรียบร้อย',
-                    content: (
-                        <div>
-                            <p></p>
-                        </div>
-                    ),
-                    onOk() {
-                        // setBinding(true)
-                        setTimeout(() => {
-                            // setBinding(false)
-                        }, 1000)
+                // Modal.success({
+                //     title: 'ลบข้อมูลเรียบร้อย',
+                //     content: (
+                //         <div>
+                //             <p></p>
+                //         </div>
+                //     ),
+                //     onOk() {
+
+                //     },
+                // });
+                message.success({
+                    content: 'ลบข้อมูลสำเร็จ',
+                    style: {
+                        marginTop: '10vh',
                     },
                 });
             }
@@ -235,19 +245,25 @@ export default function ConfigDeveloper() {
             if (products.status === 200) {
                 setModalModule(false);
                 getModuleOwner(selectProductRow?.ProductId);
-                Modal.success({
-                    title: 'บันทึกข้อมูลเรียบร้อย',
-                    content: (
-                        <div>
-                            <p></p>
-                        </div>
-                    ),
-                    onOk() {
-                        // setBinding(true)
-                        setTimeout(() => {
-                            // setBinding(false)
-                        }, 1000)
-                        setModalModule(false)
+                // Modal.success({
+                //     title: 'บันทึกข้อมูลเรียบร้อย',
+                //     content: (
+                //         <div>
+                //             <p></p>
+                //         </div>
+                //     ),
+                //     onOk() {
+                //         // setBinding(true)
+                //         setTimeout(() => {
+                //             // setBinding(false)
+                //         }, 1000)
+                //         setModalModule(false)
+                //     },
+                // });
+                message.success({
+                    content: 'บันทึกข้อมูลสำเร็จ',
+                    style: {
+                        marginTop: '10vh',
                     },
                 });
             }
@@ -258,6 +274,7 @@ export default function ConfigDeveloper() {
     }
 
     const deleteModuleOwner = async (param) => {
+        setLoading(true)
         try {
             const products = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/setting/dev/module-owner",
@@ -273,19 +290,29 @@ export default function ConfigDeveloper() {
             });
 
             if (products.status === 200) {
+                setTimeout(() => {
+                    setLoading(false)
+                },500) 
+                
                 getModuleOwner(param.ProductId);
-                Modal.success({
-                    title: 'ลบข้อมูลเรียบร้อย',
-                    content: (
-                        <div>
-                            <p></p>
-                        </div>
-                    ),
-                    onOk() {
-                        // setBinding(true)
-                        setTimeout(() => {
-                            // setBinding(false)
-                        }, 1000)
+                // Modal.success({
+                //     title: 'ลบข้อมูลเรียบร้อย',
+                //     content: (
+                //         <div>
+                //             <p></p>
+                //         </div>
+                //     ),
+                //     onOk() {
+                //         // setBinding(true)
+                //         setTimeout(() => {
+                //             // setBinding(false)
+                //         }, 1000)
+                //     },
+                // });
+                message.success({
+                    content: 'ลบข้อมูลสำเร็จ',
+                    style: {
+                        marginTop: '10vh',
                     },
                 });
             }
@@ -304,6 +331,7 @@ export default function ConfigDeveloper() {
 
     return (
         <MasterPage>
+             <Spin spinning={loading}  tip="Loading...">
             {/* ชื่อ */}
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
 
@@ -396,7 +424,7 @@ export default function ConfigDeveloper() {
                     </Table>
                 </Col>
                 <Col span={2}></Col>
-                <Col span={12} style={{ display: divModule}}>
+                <Col span={12} style={{ display: divModule }}>
                     <Table dataSource={moduleOwner} bordered
                         pagination={false}
                         //scroll={{ y: 500 }}
@@ -423,7 +451,7 @@ export default function ConfigDeveloper() {
                                 </>
                             )
                         }}>
-                        <Column title="Module" dataIndex="ModuleName"/>
+                        <Column title="Module" dataIndex="ModuleName" />
                         <Column title=""
                             align="center"
                             width="10%"
@@ -553,7 +581,7 @@ export default function ConfigDeveloper() {
 
                 </Table>
             </Modal>
-
+            </Spin>
         </MasterPage>
     )
 }

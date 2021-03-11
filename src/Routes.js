@@ -39,6 +39,8 @@ import MappingDeveloper from './Page/Internal/Setting/MapDeveloper';
 import ConfigDeveloper from './Page/Internal/Setting/ConfigDeveloper';
 import Charts from './Page/Internal/Report/charts';
 import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
+import MasterProduct from './Page/Internal/Setting/System/MasterProduct';
+import MasterModule from './Page/Internal/Setting/System/MasterModule';
 import ConfigReOpen from './Page/Internal/Setting/System/ConfigReOpen';
 import ConfigVersion from './Page/Internal/Setting/System/ConfigVersion';
 import ConfigReOpenEmail from './Page/Internal/Setting/System/ConfigReOpenEmail';
@@ -53,6 +55,7 @@ import CustomerContext, { customerReducer, customerState } from "./utility/issue
 import UserContext, { userReducer, userState } from "./utility/issueContext";
 import RicefContext, { ricefReducer, ricefState } from './utility/ricefContext';
 import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
+
 
 
 
@@ -82,6 +85,8 @@ export default function Routes() {
                                     <Route path="/internal/setting/mapdeveloper" exact component={MappingDeveloper} />
                                     <Route path="/internal/setting/config_developer/userid-:id?" exact component={ConfigDeveloper} />
                                     <Route path="/internal/setting/system" exact component={SystemConfig} />
+                                    <Route path="/internal/setting/system/product" exact component={MasterProduct} />
+                                    <Route path="/internal/setting/system/module" exact component={MasterModule} />
                                     <Route path="/internal/setting/system/reopen" exact component={ConfigReOpen} />
                                     <Route path="/internal/setting/system/version" exact component={ConfigVersion} />
                                     <Route path="/internal/setting/system/reopen_email" exact component={ConfigReOpenEmail} />

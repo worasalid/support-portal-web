@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import MasterPage from '../MasterPage'
 import Axios from 'axios';
 import { Button, Table, Modal, message, Tabs, Row, Col, Input } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { EditOutlined, SearchOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router';
 
 const { Column } = Table;
@@ -258,7 +258,7 @@ export default function MapDeveloper() {
                             <Col span={12}>
                             </Col>
                             <Col span={9}>
-                                <Input placeholder="Basic usage" allowClear
+                                <Input placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
                                     onKeyDown={(x) => {
                                         if (x.keyCode === 13) {
                                             GetHeadDeveloper()
@@ -278,8 +278,10 @@ export default function MapDeveloper() {
                         </Row>
                         <Table dataSource={HeadDeveloperList} loading={false}>
                             <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
-                            <Column title="ชื่อพนักงาน" dataIndex="UserName" />
-                            <Column title="Module ที่ดูแล"
+                            <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
+                            <Column title="ชื่อเล่น" dataIndex="NickName" />
+                            <Column title="ตำแหน่ง" dataIndex="PositionName" />
+                            {/* <Column title="Module ที่ดูแล"
                                 align="center"
                                 width="15%"
                                 render={(record) => {
@@ -302,7 +304,7 @@ export default function MapDeveloper() {
                                     )
                                 }
                                 }
-                            />
+                            /> */}
                             <Column title="Module ที่รับผิดชอบ"
                                 align="center"
                                 width="15%"
@@ -312,7 +314,7 @@ export default function MapDeveloper() {
                                             <Button type="link"
                                                 onClick={() => history.push({ pathname: "/internal/setting/config_developer/userid-" + record.UserId })}
                                             >
-                                               view
+                                                <EditOutlined/>
                                             </Button>
                                         </>
                                     )
@@ -327,7 +329,7 @@ export default function MapDeveloper() {
                             <Col span={12}>
                             </Col>
                             <Col span={9}>
-                                <Input placeholder="Basic usage" allowClear
+                                <Input placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
                                     onKeyDown={(x) => {
                                         if (x.keyCode === 13) {
                                             GetDeveloper()
@@ -347,32 +349,25 @@ export default function MapDeveloper() {
                         </Row>
                         <Table dataSource={developerlist} loading={false}>
                             <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
-                            <Column title="ชื่อพนักงาน" dataIndex="UserName" />
-                            <Column title="Module ที่ดูแล"
+                            <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
+                            <Column title="ชื่อเล่น" dataIndex="NickName" />
+                            <Column title="ตำแหน่ง" dataIndex="PositionName" />
+                            <Column title="Module ที่รับผิดชอบ"
                                 align="center"
                                 width="15%"
                                 render={(record) => {
                                     return (
                                         <>
                                             <Button type="link"
-                                                onClick={() => {
-                                                    return (
-                                                        setVisible(true),
-                                                        setUserid(record.UserId),
-                                                        setUsername(record.UserName),
-                                                        GetDeveloperModule(record.UserId)
-                                                    )
-                                                }
-                                                }
+                                                onClick={() => history.push({ pathname: "/internal/setting/config_developer/userid-" + record.UserId })}
                                             >
-                                                <label>View</label>
+                                                <EditOutlined/>
                                             </Button>
                                         </>
                                     )
                                 }
                                 }
                             />
-
                         </Table>
                     </TabPane>
                 </Tabs>
