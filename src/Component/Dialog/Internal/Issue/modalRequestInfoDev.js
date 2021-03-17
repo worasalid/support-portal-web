@@ -86,13 +86,14 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                 SaveComment();
                 onOk();
                 
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>Assign งานให้ {select_assign}</p>
+                            <p>สอบถามข้อมูลกับทาง Developer</p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         editorRef.current.editor.setContent("");
                         
@@ -101,7 +102,7 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                 });
             }
         } catch (error) {
-            await Modal.info({
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>

@@ -62,7 +62,7 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
 
             if (sendflow.status === 200) {
                 SaveComment();
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>

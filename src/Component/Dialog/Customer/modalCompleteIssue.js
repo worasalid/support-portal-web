@@ -25,6 +25,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   };
 
   const FlowComplete = async (values) => {
+    onCancel()
     try {
       const completeflow = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/customer-complete",
@@ -49,8 +50,8 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
       });
 
       if (completeflow.status === 200) {
-        onCancel();
-        await Modal.info({
+
+        await Modal.success({
           title: 'บันทึกข้อมูลสำเร็จ',
           content: (
             <div>
@@ -67,7 +68,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
 
     } catch (error) {
       onCancel();
-      await Modal.info({
+      await Modal.error({
         title: 'บันทึกข้อมูลไม่สำเร็จ',
         content: (
           <div>
@@ -85,8 +86,8 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   }
 
   const onFinish = values => {
-    console.log('Success:', values);
-    console.log("sdsds",textValue)
+    console.log('onFinish:', values);
+    console.log("textValue", textValue)
      FlowComplete(values)
   };
 
@@ -94,13 +95,15 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
 
   }, [])
 
- 
+
 
   return (
     <Modal
       visible={visible}
       onOk={() => { return (form.submit()) }}
-      okButtonProps={""}
+      okButtonProps={{ className: "modal-button-save" }}
+      okText="Save"
+
       onCancel={() => { return onCancel(), form.resetFields() }}
       {...props}
     >
@@ -112,7 +115,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
         onFinish={onFinish}
 
       >
-        
+
         <Form.Item
           style={{ border: "1px solid", marginBottom: 0 }}
           label="แก้ไขปัญหาได้ถูกต้อง"
@@ -174,6 +177,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           </Rate>
         </Form.Item>
 
+
         <Row style={{ marginTop: 40 }}>
           <Col span={24}>
             แนะนำคำติชม
@@ -181,7 +185,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
         </Row>
         <Row>
           <Col span={24}>
-            <TextArea rows={5} style={{ width: "100%" }} onChange={(x) => setTextValue(x)} />
+            <TextArea rows={5} style={{ width: "100%" }} onChange={(x) => setTextValue(x.target.value)} />
           </Col>
         </Row>
       </Form >

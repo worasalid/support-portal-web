@@ -35,15 +35,24 @@ import Login from './Page/Internal/Login';
 import MasterCompany from './Page/Internal/Setting/MasterCompany';
 import MappingCompany from './Page/Internal/Setting/MapCompany';
 import SupportSiteConfig from './Page/Internal/Setting/SupportSiteConfig';
+import CompanySiteConfig from './Page/Internal/Setting/CompanySiteConfig';
 import MappingDeveloper from './Page/Internal/Setting/MapDeveloper';
 import ConfigDeveloper from './Page/Internal/Setting/ConfigDeveloper';
+import MapQA from './Page/Internal/Setting/MapQA';
+import ConfigQA from './Page/Internal/Setting/ConfigQA';
+import MapSA from './Page/Internal/Setting/MapSA';
+import ConfigSA from './Page/Internal/Setting/ConfigSA';
+
 import Charts from './Page/Internal/Report/charts';
 import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
+import Organization from './Page/Internal/Setting/System/OrgChart';
 import MasterProduct from './Page/Internal/Setting/System/MasterProduct';
 import MasterModule from './Page/Internal/Setting/System/MasterModule';
 import ConfigReOpen from './Page/Internal/Setting/System/ConfigReOpen';
 import ConfigVersion from './Page/Internal/Setting/System/ConfigVersion';
 import ConfigReOpenEmail from './Page/Internal/Setting/System/ConfigReOpenEmail';
+import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
+import ConfigReasonReject from './Page/Internal/Setting/System/ConfigReasonReject';
 
 
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
@@ -54,7 +63,7 @@ import MasterContext, { masterReducer, masterState } from "./utility/masterConte
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
 import UserContext, { userReducer, userState } from "./utility/issueContext";
 import RicefContext, { ricefReducer, ricefState } from './utility/ricefContext';
-import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
+
 
 
 
@@ -82,15 +91,22 @@ export default function Routes() {
                                     <Route path="/internal/setting/mastercompany" exact component={MasterCompany} />
                                     <Route path="/internal/setting/mapcompany" exact component={MappingCompany} />
                                     <Route path="/internal/setting/support_site_config/userid-:id?" exact component={SupportSiteConfig} />
+                                    <Route path="/internal/setting/company_site_config/comid-:id?" exact component={CompanySiteConfig} />
                                     <Route path="/internal/setting/mapdeveloper" exact component={MappingDeveloper} />
                                     <Route path="/internal/setting/config_developer/userid-:id?" exact component={ConfigDeveloper} />
+                                    <Route path="/internal/setting/mapqa" exact component={MapQA} />
+                                    <Route path="/internal/setting/config_qa/userid-:id?" exact component={ConfigQA} />
+                                    <Route path="/internal/setting/mapsa" exact component={MapSA} />
+                                    <Route path="/internal/setting/config_sa/userid-:id?" exact component={ConfigSA} />
                                     <Route path="/internal/setting/system" exact component={SystemConfig} />
+                                    <Route path="/internal/setting/system/orgchart" exact component={Organization} />
                                     <Route path="/internal/setting/system/product" exact component={MasterProduct} />
                                     <Route path="/internal/setting/system/module" exact component={MasterModule} />
                                     <Route path="/internal/setting/system/reopen" exact component={ConfigReOpen} />
                                     <Route path="/internal/setting/system/version" exact component={ConfigVersion} />
                                     <Route path="/internal/setting/system/reopen_email" exact component={ConfigReOpenEmail} />
                                     <Route path="/internal/setting/system/reason_cancel" exact component={ConfigReasonCancel} />
+                                    <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
 
                                     <Route path="/internal/dashboard" exact component={Dashboard} />
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
@@ -105,7 +121,7 @@ export default function Routes() {
                                     <Route path="/internal/report/charts" exact component={Charts} />
 
 
-                                    <Route path="/internal/ricef" exact component={Ricef} />
+                                    <Route path="/internal/ricef/all" exact component={Ricef} />
                                     <Route path="/internal/ricef/comp-:compid?" exact component={RicefHeader} />
                                     <Route path="/internal/ricef/comp-:compid?/batch-:batchid?" exact component={RicefDetails} />
                                     <Route path="/internal/ricef/mytask" exact component={RicefMyTask} />

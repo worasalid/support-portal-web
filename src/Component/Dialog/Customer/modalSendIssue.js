@@ -61,7 +61,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
         SaveComment();
         onOk();
         if(details.flowoutput.value === "AssignIcon" || details.flowoutput.value === "Continue"){
-          await Modal.info({
+          await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
               <div>
@@ -77,13 +77,14 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           });
         }
         if(details.flowoutput.value === "SendInfo"){
-          await Modal.info({
+          await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
               <div>
                 <p>ส่งข้อมูลเพิ่มเติม ให้ ICON ดำเนินการต่อ</p>
               </div>
             ),
+            okText:"Close",
             onOk() {
               editorRef.current.setvalue()
               onOk();
@@ -93,13 +94,14 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           });
         }
         if(details.flowoutput.value === "Hold"){
-          await Modal.info({
+          await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
               <div>
                 <p>Hold Issue เลขที่: {customerstate.issuedata.details[0].Number}</p>
               </div>
             ),
+            okText:"Close",
             onOk() {
               editorRef.current.setvalue()
               onOk();
@@ -109,7 +111,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
           });
         }
         if(details.flowoutput.value === "Pass"){
-          await Modal.info({
+          await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
               <div>
@@ -117,6 +119,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 <p>รอดำเนินการ Deploy PRD </p>
               </div>
             ),
+            okText:"Close",
             onOk() {
               editorRef.current.setvalue()
               onOk();
@@ -130,7 +133,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
       }
 
     } catch (error) {
-      await Modal.info({
+      await Modal.error({
         title: 'บันทึกข้อมูลไม่สำเร็จ',
         content: (
           <div>
@@ -138,6 +141,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             <p>{error.response.data}</p>
           </div>
         ),
+        okText:"Close",
         onOk() {
           editorRef.current.setvalue()
 

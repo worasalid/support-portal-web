@@ -71,7 +71,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
@@ -90,7 +90,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                 });
             }
         } catch (error) {
-            await Modal.info({
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>

@@ -90,7 +90,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 SaveUnitTest(values);
                 onOk();
 
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
@@ -104,7 +104,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 });
             }
         } catch (error) {
-            await Modal.info({
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>

@@ -1,9 +1,10 @@
 import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, Checkbox, message, Tabs, Row, Col, Select, Input } from 'antd';
+import { Button, Table, Modal, Checkbox, message, Tabs, Row, Col, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import MasterPage from '../MasterPage'
+import _ from 'lodash'
 
 const { Column } = Table;
 const { TabPane } = Tabs;
@@ -12,13 +13,18 @@ export default function SupportSiteConfig() {
     const match = useRouteMatch();
     const history = useHistory(null);
 
+    //loading
+    const [loadingCompany, setLoadingCompany] = useState(false)
+
     // data
     const [user, setUser] = useState(null);
     const [configList, setConfigList] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([])
     const [master_company, setMaster_company] = useState([])
+    const [filterTable, setFilterTable] = useState(null)
     const [selectcompanylist, setSelectCompanylist] = useState([])
     const [configProduct, setConfigProduct] = useState([]);
+    const [selectCompanyRow, setSelectCompanyRow] = useState([]);
 
     // Modal
     const [modalAddCompany, setModalAddCompany] = useState(false);
@@ -27,13 +33,40 @@ export default function SupportSiteConfig() {
     const [filterCompany, setFilterCompany] = useState(null);
 
     const rowSelection = {
-        selectedRowKeys: selectedRowKeys,
-        onChange: (selectedRowKeys, selectedRows) => {
-            setSelectCompanylist(selectedRowKeys);
-            setSelectedRowKeys(selectedRowKeys)
+        selectedRowKeys: [...selectedRowKeys],
+
+        // onChange: (RowKeys, selectedRows) => {
+
+        //     setSelectCompanylist(selectedRowKeys);
+
+        // },
+        onSelect: (record, selected) => {
+            let newKeys = [...selectedRowKeys]
+            if (selected) {
+                newKeys.push(record.key)
+            } else {
+                newKeys = _.filter(newKeys, n => n !== record.key)
+            }
+            setSelectedRowKeys(newKeys)
+            setSelectCompanylist(newKeys)
         },
+        
+        // onSelectAll: (selected, selectedRows) => {
+        //     console.log(selected, selectedRows);
+        // }
     };
 
+    const search = (param) => {
+        let result = master_company.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterTable(result);
+        setSelectedRowKeys([...selectedRowKeys])
+    }
 
     //////////////////////////////////// function ///////////////////////////////
     const GetUser = async () => {
@@ -57,27 +90,35 @@ export default function SupportSiteConfig() {
     }
     // โหลดข้อมูล Master บริษัท
     const getCompany = async () => {
-        const company = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/loadcompany_byuser",
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            params: {
-                userId: match.params.id,
-                keyword: filterCompany
-            }
-        });
-
-        if (company.status === 200) {
-            setMaster_company(company.data.map((data) => {
-                return {
-                    key: data.Id,
-                    com_code: data.Code,
-                    company_name: data.Name
+        setLoadingCompany(true);
+        setSelectedRowKeys([...selectedRowKeys])
+        try {
+            const company = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/loadcompany_byuser",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    userId: match.params.id,
+                    keyword: filterCompany
                 }
-            }));
+            });
+
+            if (company.status === 200) {
+                setLoadingCompany(false);
+                setMaster_company(company.data.map((data) => {
+                    return {
+                        key: data.Id,
+                        com_code: data.Code,
+                        company_name: data.Name
+                    }
+                }));
+            }
+        } catch (error) {
+
         }
+
     }
 
 
@@ -96,16 +137,7 @@ export default function SupportSiteConfig() {
         });
 
         if (config.status === 200) {
-            setConfigList(config.data.map((data) => {
-                return {
-                    key: data.Id,
-                    com_code: data.Code,
-                    company_name: data.CompanyName,
-                    isreceive: data.IsReceive,
-                    isview: data.IsView,
-                    display_name: data.DisplayName
-                }
-            }))
+            setConfigList(config.data);
         }
     }
 
@@ -149,23 +181,29 @@ export default function SupportSiteConfig() {
 
             if (result.status === 200) {
                 loadSupport_Config();
-                Modal.info({
-                    title: 'บันทึกข้อมูลเรียบร้อย',
-                    content: (
-                        <div>
-                            <p></p>
-                        </div>
-                    ),
-                    onOk() {
-                        // setBinding(true)
-                        setTimeout(() => {
-                            // setBinding(false)
-                        }, 1000)
-                        setModalAddCompany(false)
+
+                message.success({
+                    content: 'บันทึกข้อมูลสำเร็จ',
+                    style: {
+                        marginTop: '10vh',
                     },
                 });
+                setModalAddCompany(false)
             }
         } catch (error) {
+            setModalAddCompany(false);
+            Modal.error({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
+                    setModalAddCompany(true);
+                },
+            });
 
         }
     }
@@ -191,6 +229,7 @@ export default function SupportSiteConfig() {
                     message.success({ content: 'Success!', duration: 0.5 });
                     loadSupport_Config();
                     getProductConfig(value);
+                    setSelectCompanyRow([]);
                 }, 1000);
 
             }
@@ -243,6 +282,7 @@ export default function SupportSiteConfig() {
         }
     }, [modalAddCompany])
 
+
     return (
         <MasterPage>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
@@ -270,27 +310,55 @@ export default function SupportSiteConfig() {
             </Row>
 
             <Row style={{ marginTop: 20 }}>
-                <Col span={10}>
+                <Col span={14}>
                     <Table dataSource={configList}>
                         <Column title="Code"
                             width="10%"
                             render={(record) => {
                                 return (
-                                    <div onClick={() => getProductConfig(record.key)} style={{ cursor: "pointer" }}>
+                                    <div onClick={() => {
+                                        setSelectCompanyRow(record);
+                                        getProductConfig(record.Id);
+                                    }}
+                                        style={{ cursor: "pointer" }}
+                                    >
                                         <label className="value-text">
-                                            {record.com_code}
+                                            {record.Code}
                                         </label>
                                     </div>
                                 )
                             }
                             }
                         />
-                        <Column title="CompanyName"
+                        <Column title="Name"
                             render={(record) => {
                                 return (
-                                    <div onClick={() => getProductConfig(record.key)} style={{ cursor: "pointer" }}>
+                                    <div onClick={() => {
+                                        setSelectCompanyRow(record);
+                                        getProductConfig(record.Id);
+                                    }}
+                                        style={{ cursor: "pointer" }}
+                                    >
                                         <label className="value-text">
-                                            {record.company_name}
+                                            {record.CompanyName}
+                                        </label>
+                                    </div>
+
+                                )
+                            }
+                            }
+                        />
+                        <Column title="FullName"
+                            render={(record) => {
+                                return (
+                                    <div onClick={() => {
+                                        setSelectCompanyRow(record);
+                                        getProductConfig(record.Id);
+                                    }}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <label className="value-text">
+                                            {record.CompanyFullName}
                                         </label>
                                     </div>
 
@@ -310,7 +378,7 @@ export default function SupportSiteConfig() {
                                                 return (
 
                                                     setTimeout(() => {
-                                                        deleteCompanyConfig(record.key)
+                                                        deleteCompanyConfig(record.Id)
                                                     }, 1000)
 
                                                 )
@@ -326,9 +394,23 @@ export default function SupportSiteConfig() {
                     </Table>
                 </Col>
                 <Col span={2}></Col>
-                <Col span={12}>
-                    <Table dataSource={configProduct} pagination={false}>
-                        <Column title="Company" dataIndex="ComCode" width="20%" />
+                <Col span={8}>
+                    <Table dataSource={configProduct} pagination={false}
+                        title={(record) => {
+                            return (
+                                <>
+                                    <Row>
+                                        <Col span={24}>
+                                            <label style={{ display: selectCompanyRow.length === 0 ? "none" : "block" }}>
+                                                {`${selectCompanyRow?.Code} - ${selectCompanyRow?.CompanyFullName}`}
+                                            </label>
+
+                                        </Col>
+                                    </Row>
+                                </>
+                            )
+                        }}
+                    >
                         <Column title="Product" dataIndex="ProductCode" width="20%" />
                         <Column title="รับ Issue"
                             align="center"
@@ -385,7 +467,7 @@ export default function SupportSiteConfig() {
             <Modal
                 title="ข้อมูลบริษัท"
                 width="700px"
-                style={{ height: 500 }}
+                //style={{ height: 500 }}
                 visible={modalAddCompany}
                 onCancel={() => {
                     // setModalConfig(false);
@@ -401,34 +483,60 @@ export default function SupportSiteConfig() {
                     <Col span={8}>
                     </Col>
                     <Col span={12}>
-                        <Input placeholder="ชื่อบริษัท" allowClear
+                        <Input.Search placeholder="ชื่อบริษัท" allowClear
+                            enterButton
+                            onSearch={search}
                             onKeyDown={(x) => {
                                 if (x.keyCode === 13) {
-                                    getCompany()
+                                    // companyFilter(master_company)
                                 }
                             }}
-                            onChange={(x) => setFilterCompany(x.target.value)}
+                        //onChange={(x) => setFilterCompany(x.target.value)}
                         />
                     </Col>
                     <Col span={2}>
                         <Button type="primary" shape="round" icon={<SearchOutlined />}
                             style={{ backgroundColor: "#00CC00", marginLeft: 10 }}
-                            onClick={() => getCompany()}
+                        //onClick={() => companyFilter(master_company)}
                         >
                             Search
                                  </Button>
                     </Col>
                 </Row>
-                <Table dataSource={master_company}
-                    //loading={loadingCompany}
-                    pagination={{ pageSize: 8, total: 100 }}
+                <Table
+                    dataSource={filterTable == null ? master_company : filterTable}
+                    //dataSource={master_company}
+                    loading={loadingCompany}
+                    pagination={{ pageSize: 10 }}
+
                     rowSelection={{
                         type: "checkbox",
-                        ...rowSelection,
+                        ...rowSelection
+                        
                     }}
                 >
-                    <Column title="Code" dataIndex="com_code"></Column>
-                    <Column title="CompanyName" dataIndex="company_name"></Column>
+                    <Column title="Code"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <label className="value-text">
+                                        {record.com_code}
+                                    </label>
+                                </>
+                            )
+                        }}
+                    />
+                    <Column title="CompanyName"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <label className="value-text">
+                                        {record.company_name}
+                                    </label>
+                                </>
+                            )
+                        }}
+                    />
                 </Table>
             </Modal>
 

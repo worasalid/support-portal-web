@@ -11,16 +11,18 @@ export default function MasterModule() {
     const history = useHistory(null)
     const [form] = Form.useForm();
 
-    // element
+    // modal
     const [modalVisible, setModalVisible] = useState(false);
 
     // data
-    const [page, setPage] = useState(1)
-    const [product, setProduct] = useState([])
-    const [module, setModule] = useState([])
-    const [selectProduct, setSelectProduct] = useState(null)
+    const [page, setPage] = useState(1);
+    const [product, setProduct] = useState([]);
+    const [module, setModule] = useState([]);
+    const [selectProduct, setSelectProduct] = useState(null);
+    const [filterModule, setFilterModule] = useState(null);
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [disable, setDisable] = useState(true);
 
     const getProduct = async () => {
         try {
@@ -33,7 +35,8 @@ export default function MasterModule() {
             });
 
             if (product.status === 200) {
-                setProduct(product.data)
+                setProduct(product.data);
+                setDisable(false);
             }
         } catch (error) {
             Modal.error({
@@ -45,14 +48,13 @@ export default function MasterModule() {
                 ),
                 okText: "Close",
                 onOk() {
-                    setLoading(false)
+                    setLoading(false);
                 },
             });
         }
     }
 
     const getModule = async (param) => {
-        setLoading(true)
         try {
             const module = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/modules",
@@ -66,8 +68,8 @@ export default function MasterModule() {
             });
 
             if (module.status === 200) {
-                setLoading(false)
-                setModule(module.data)
+                setLoading(false);
+                setModule(module.data);
             }
         } catch (error) {
 
@@ -105,9 +107,8 @@ export default function MasterModule() {
     }
 
     const onFinish = async (param) => {
-        console.log(param)
-        setLoading(true)
         try {
+            setLoading(true);
             const result = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/modules",
                 method: "POST",
@@ -150,6 +151,17 @@ export default function MasterModule() {
         }
     }
 
+    const searchModule = (param) => {
+        let result = module.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterModule(result);
+    }
+
     useEffect(() => {
         getProduct()
     }, [])
@@ -165,8 +177,9 @@ export default function MasterModule() {
                 <h1>ข้อมูล Module</h1>
             </Row>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={12}>
+                <Col span={6}>
                     <Select placeholder="Select Product" allowClear
+                        disabled={disable}
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
@@ -175,22 +188,33 @@ export default function MasterModule() {
                         options={product.map((x) => ({
                             value: x.Id,
                             label: `${x.Name} (${x.FullName})`,
+                            name: x.Name,
                             fullname: x.FullName
                         }))}
-                    
+
                     />
                 </Col>
-                <Col span={12}>
+                <Col span={18} style={{ textAlign: "right", display: selectProduct?.value === undefined ? "none" : "inline-block" }}>
+                    <Input.Search placeholder="Module" allowClear
+                        style={{ width: "50%" }}
+                        enterButton
+                        onSearch={searchModule}
+                    />
+                    &nbsp; &nbsp;
                     <Button type="primary" icon={<PlusOutlined />}
-                        style={{ backgroundColor: "#00CC00", display: selectProduct?.value === undefined ? "none" : "block" }}
+                        style={{ backgroundColor: "#00CC00", }}
                         onClick={() => setModalVisible(true)}
                     >
                         เพิ่มข้อมูล
                     </Button>
                 </Col>
             </Row>
-            <Table dataSource={module} loading={loading}
+
+            <Table
+                dataSource={filterModule === null ? module : filterModule}
+                loading={loading}
                 onChange={(x) => setPage(x.current)}
+                pagination={{ pageSize: 6 }}
             >
                 <Column title="No" width="5%"
                     render={(value, record, index) => {
@@ -223,11 +247,16 @@ export default function MasterModule() {
             </Table>
 
             <Modal
+
                 visible={modalVisible}
-                title={`${selectProduct?.fullname} (${selectProduct?.label})`}
+                title={`${selectProduct?.label}`}
                 width={500}
                 onCancel={() => setModalVisible(false)}
                 onOk={() => form.submit()}
+                okButtonProps={{
+                    style: { backgroundColor: "#00CC00", border: "1px solid" }
+                }}
+
                 okText="Save"
             >
                 <Form

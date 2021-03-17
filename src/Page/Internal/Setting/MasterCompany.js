@@ -1,4 +1,4 @@
-import { EditOutlined, SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, SearchOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Select, Radio } from 'antd';
 
 import Column from 'antd/lib/table/Column';
@@ -18,7 +18,7 @@ export default function MasterCompany() {
 
     //data
     const [masterCompany, setMasterCompany] = useState([]);
-    const [filterCompany, setFilterCompany] = useState([]);
+    const [filterCompany, setFilterCompany] = useState(null);
     const [listcompany, setListcompany] = useState([]);
 
     const [selectcompany, setSelectcompany] = useState(null);
@@ -32,7 +32,16 @@ export default function MasterCompany() {
     const [search, setSearch] = useState(false);
     const [loading, setLoading] = useState(true)
 
-
+    const searchCompany= (param) => {
+        let result = listcompany.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterCompany(result);
+    }
     // Company
     const GetMasterCompany = async (value) => {
         const mastercompany = await Axios({
@@ -314,9 +323,15 @@ export default function MasterCompany() {
     return (
         <MasterPage>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={14}>
+                <Col span={16}>
                 </Col>
-                <Col span={8} >
+                <Col span={8}>
+                    <Input.Search placeholder="code / Name / FullName" allowClear
+                        enterButton
+                        onSearch={searchCompany}
+                    />
+                </Col>
+                {/* <Col span={8} >
                     <Select placeholder="Company" mode="multiple" allowClear
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -335,7 +350,7 @@ export default function MasterCompany() {
                     >
                         Search
                     </Button>
-                </Col>
+                </Col> */}
             </Row>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
                 <Col span={24}>
@@ -350,7 +365,10 @@ export default function MasterCompany() {
                     </Button>
                 </Col>
             </Row>
-            <Table dataSource={listcompany} loading={loading}>
+            <Table
+                dataSource={filterCompany === null ? listcompany : filterCompany}
+                //dataSource={listcompany}
+                loading={loading}>
                 <Column title="Code" width="10%" dataIndex="Code" />
                 <Column title="CompanyName" width="20%" dataIndex="Name" />
                 <Column title="FullName" width="60%" dataIndex="FullNameTH" />
@@ -549,11 +567,11 @@ export default function MasterCompany() {
                                     return (
                                         <>
                                             <Button type="link"
-                                                icon={<EditOutlined />}
+                                                icon={<DeleteOutlined />}
                                                 onClick={() => deleteProduct(record)}
                                             >
-                                                Delete
-                                    </Button>
+
+                                            </Button>
                                         </>
                                     )
                                 }

@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Column } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
 import { Row, Col, Card, Spin } from 'antd';
+import { FileOutlined } from '@ant-design/icons';
 import Axios from "axios";
+
+const { Meta } = Card;
 
 export default function MyDashboard() {
     const [loading, setLoading] = useState(true)
@@ -78,7 +81,7 @@ export default function MyDashboard() {
             <Spin spinning={loading}>
                 <Row gutter={16}>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <Row>
                                     <Col span={12}>
@@ -108,9 +111,24 @@ export default function MyDashboard() {
                                 </Row>
                             </div>
                         </Card>
+                    */}
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>Open</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[0]?.Value}
+                                    </label>
+
+                                }
+                            />
+                        </Card>
                     </Col>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
                                     InProgress
@@ -122,10 +140,24 @@ export default function MyDashboard() {
                                     {dashboard[1]?.Value}
                                 </label>
                             </div>
+                        </Card> */}
+                         <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>InProgress</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[1]?.Value}
+                                    </label>
+
+                                }
+                            />
                         </Card>
                     </Col>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
                                     Resolved
@@ -137,10 +169,24 @@ export default function MyDashboard() {
                                     {dashboard[2]?.Value}
                                 </label>
                             </div>
+                        </Card> */}
+                         <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Resolved</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[2]?.Value}
+                                    </label>
+
+                                }
+                            />
                         </Card>
                     </Col>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
                                     Cancel
@@ -152,10 +198,24 @@ export default function MyDashboard() {
                                     {dashboard[3]?.Value}
                                 </label>
                             </div>
+                        </Card> */}
+                         <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[3]?.Value}
+                                    </label>
+
+                                }
+                            />
                         </Card>
                     </Col>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
                                     Complete
@@ -167,6 +227,20 @@ export default function MyDashboard() {
                                     {dashboard[5]?.Value}
                                 </label>
                             </div>
+                        </Card> */}
+                         <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[5]?.Value}
+                                    </label>
+
+                                }
+                            />
                         </Card>
                     </Col>
                     <Col span={4}>

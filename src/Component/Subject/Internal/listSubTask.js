@@ -68,13 +68,14 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
             });
 
             if (deletetask.status === 200) {
-                await Modal.info({
+                await Modal.success({
                     title: 'ลบ Task งานสำเร็จ',
                     content: (
                         <div>
                             <p></p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         GetTask()
                     },

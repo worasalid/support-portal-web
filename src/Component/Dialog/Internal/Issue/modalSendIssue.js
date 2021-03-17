@@ -57,13 +57,14 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            {/* <p>บันทึกข้อมูลสำเร็จ</p> */}
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         editorRef.current.setvalue();
                         if (details.flowoutput.value === "ApproveCR") {
@@ -79,17 +80,19 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 });
             }
         } catch (error) {
-            await Modal.info({
+            onOk();
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
                     editorRef.current.setvalue();
-                    onOk();
-                    history.push({ pathname: "/internal/issue/inprogress" })
+                  
+                   
                 },
             });
         }

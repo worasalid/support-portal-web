@@ -32,6 +32,29 @@ export default function ModalTimetracking({ visible = false, onOk, onCancel, dat
 
     }
 
+    function convertNodeName(param) {
+        switch (param) {
+            case "developer_2":
+                return "H.Developer"
+                break;
+            case "developer_1":
+                return "Developer"
+                break;
+            case "qa_leader":
+                return "H.QA"
+                break;
+            case "qa":
+                return "QA"
+                break;
+            default:
+                return param;
+
+        }
+        // if (param === "developer_2") {
+        //     return "H.Dev"
+        // }
+    }
+
     useEffect(() => {
         Timetracking()
     }, [visible])
@@ -54,7 +77,8 @@ export default function ModalTimetracking({ visible = false, onOk, onCancel, dat
                                 style={{ padding: 0 }}
                                 className="header-text"
                             >
-                                {item.NodeName}
+                                {convertNodeName(item.NodeName)}
+
                             </label>
                              &nbsp;&nbsp;&nbsp;
                             {moment(item.ReceiveDate).format("DD/MM/YYYY H:mm")}

@@ -60,13 +60,14 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                 SaveComment();
                 onOk();
 
-                await Modal.info({
+                 Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            {/* <p>บันทึกข้อมูลสำเร็จ</p> */}
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         editorRef.current.setvalue();
                         if (details.flowoutput.value === "SendTask" || details.flowoutput.value === "ResolvedTask") {
@@ -75,9 +76,6 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                         else {
                             history.push({ pathname: "/internal/issue/inprogress" });
                         }
-
-
-
                     },
                 });
             }
@@ -92,7 +90,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                 ),
                 okButtonProps: { hidden: true },
                 okCancel() {
-                    
+
                     editorRef.current.setvalue();
                     window.location.reload();
                 },

@@ -76,8 +76,7 @@ export default function MyTask() {
 
 
             <Table dataSource={ricef} loading={ricefstate.loading}>
-                {/* <Column align="center" title="No" width="1%" dataIndex="RowNo" /> */}
-                <Column align="left" title="IssueNumber" width="20%" dataIndex=""
+                {/* <Column align="left" title="IssueNumber" width="20%" dataIndex=""
                     render={(record) => {
                         return (
                             <div>
@@ -94,13 +93,91 @@ export default function MyTask() {
 
                                     <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
 
-                                    {/* <Divider type="vertical" /> */}
+         
                                     <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
                                 </div>
                             </div>
                         );
                     }}
+                /> */}
+                <Column
+                    title="IssueNo"
+                    width="5%"
+                    render={(record) => {
+                        return (
+                            <>
+                                <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                                    {record.IssueNumber}
+                                </label>
+                            </>
+                        )
+                    }
+                    }
                 />
+
+                <Column
+                    title="Details"
+                    width="15%"
+                    render={(record) => {
+                        return (
+                            <div>
+                                <Row style={{ borderBottom: "1px dotted" }}>
+                                    <Col span={8}>
+                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080" }}>
+                                            Type :
+                          </label>
+                                    </Col>
+                                    <Col span={14}>
+                                        <label
+                                            style={{ color: "#808080", fontSize: "10px" }}
+                                        >
+                                            {record.TypeName === 'ChangeRequest' ? "CR" : record.TypeName}
+                                        </label>
+                                    </Col>
+                                </Row>
+                                <Row style={{ borderBottom: "1px dotted" }}>
+                                    <Col span={8}>
+                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                            Priority :
+                          </label>
+                                    </Col>
+                                    <Col span={14} >
+                                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                                            {record.Priority}
+                                        </label>
+                                        {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                                    </Col>
+                                </Row>
+                                <Row style={{ borderBottom: "1px dotted" }}>
+                                    <Col span={8}>
+                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                            Product :
+                          </label>
+                                    </Col>
+                                    <Col span={14}>
+                                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                                            {record.ProductName}
+                                        </label>
+                                    </Col>
+                                </Row>
+                                <Row style={{ borderBottom: "1px dotted" }}>
+                                    <Col span={8}>
+                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                            Module :
+                          </label>
+                                    </Col>
+                                    <Col span={14}>
+                                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                                            {record.ModuleName}
+                                        </label>
+                                    </Col>
+                                </Row>
+                            </div>
+                        );
+                    }}
+                />
+
                 <Column title="Subject"
                     width="35%"
                     render={(record) => {
@@ -154,13 +231,13 @@ export default function MyTask() {
                                     </label>
                                 </div>
 
-                                <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
+                                <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
                             </>
                         )
                     }
                     }
                 />
-                <Column align="center" title="Progress" width="5%" 
+                <Column align="center" title="Progress" width="5%"
                     render={(record) => {
                         return (
                             <>

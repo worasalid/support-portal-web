@@ -534,7 +534,7 @@ export default function SubTask() {
                   <label className="header-text">SLA</label>
                 </Col> */}
                 <Col span={24} >
-                  <label className="header-text">SLA</label>
+                  <label className="header-text">Time Tracking</label>
                   {
 
                     userstate.taskdata.data[0] &&
@@ -547,12 +547,16 @@ export default function SubTask() {
                     //   onClick={() => { setModaltimetracking_visible(true) }}
                     // />
 
-                    <ClockSLA
-                      start={moment(userstate?.taskdata?.data[0]?.AssignIconDate)}
-                      due={moment(userstate?.taskdata?.data[0]?.SLA_DueDate)}
-                      end={userstate?.taskdata?.data[0]?.ResolvedDate === null ? moment() : moment(userstate?.taskdata?.data[0]?.ResolvedDate)}
+                    <Button type="text" 
+                    icon={ <ClockCircleOutlined style={{ fontSize: 18 }} /> }
                       onClick={() => { setModaltimetracking_visible(true) }}
                     />
+                    // <ClockSLA
+                    //   start={moment(userstate?.taskdata?.data[0]?.AssignIconDate)}
+                    //   due={moment(userstate?.taskdata?.data[0]?.SLA_DueDate)}
+                    //   end={userstate?.taskdata?.data[0]?.ResolvedDate === null ? moment() : moment(userstate?.taskdata?.data[0]?.ResolvedDate)}
+                    //   onClick={() => { setModaltimetracking_visible(true) }}
+                    // />
                   }
 
                 </Col>

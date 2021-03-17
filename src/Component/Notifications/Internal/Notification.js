@@ -6,6 +6,7 @@ import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
 
+
 export default function Notifications(props) {
     const history = useHistory()
     const [notification, setNotification] = useState([]);
@@ -55,14 +56,14 @@ export default function Notifications(props) {
                     renderItem={item => (
                         <List.Item>
                             <List.Item.Meta
-                                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                               // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
                                 title={
                                     <>
                                         <label className="text-link"
                                             onClick={() => { return (history.push({ pathname: "/internal/issue/subject/" + item.ticketid }), window.location.reload("false")) }}
 
                                         >
-                                            {item.title}
+                                            {item.title} 
                                         </label>
                                         <label style={{ marginLeft: 20 }} className="value-text">
                                             {`(${moment(item.datetime).format("DD/MM/YYYY HH:mm")})`}

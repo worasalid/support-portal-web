@@ -104,7 +104,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 SaveDocumentDeploy(values);
                 onOk();
 
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
@@ -124,7 +124,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 });
             }
         } catch (error) {
-            await Modal.info({
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>

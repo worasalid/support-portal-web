@@ -1,4 +1,4 @@
-import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
@@ -8,12 +8,13 @@ import MasterPage from '../MasterPage'
 const { Column } = Table;
 const { TabPane } = Tabs;
 
-export default function ConfigDeveloper() {
+export default function ConfigQA() {
+
     const match = useRouteMatch();
     const history = useHistory(null);
-    const [loading, setLoading] = useState(false)
-    const [loadingProduct, setLoadingProduct] = useState(false)
-    const [loadingModule, setLoadingModule] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [loadingProduct, setLoadingProduct] = useState(false);
+    const [loadingModule, setLoadingModule] = useState(false);
 
     // modal
     const [divModule, setDivModule] = useState("none")
@@ -56,7 +57,6 @@ export default function ConfigDeveloper() {
     };
 
     //////////////////////////////////// function ///////////////////////////////
-
     const getUser = async () => {
         try {
             const user = await Axios({
@@ -77,41 +77,17 @@ export default function ConfigDeveloper() {
         }
     }
 
-    const getProductOwner = async () => {
-        try {
-            const productsOwner = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product-owner",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    user_id: match.params.id
-                }
-            });
-            if (productsOwner.status === 200) {
-                setProductOwner(productsOwner.data);
-                setLoading(false);
-
-            }
-
-        } catch (error) {
-
-        }
-
-    }
-
     const getProduct = async () => {
         try {
             const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product",
+                url: process.env.REACT_APP_API_URL + "/master/setting/qa/product",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    userId: match.params.id
-                    // keyword: filterProduct
+                    userId: match.params.id,
+                    keyword: filterProduct
                 }
             });
             if (products.status === 200) {
@@ -123,11 +99,33 @@ export default function ConfigDeveloper() {
         }
     }
 
+    const getProductOwner = async () => {
+        try {
+            const products = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/setting/qa/product-owner",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    user_id: match.params.id
+                }
+            });
+            if (products.status === 200) {
+                setProductOwner(products.data);
+                setLoading(false);
+            }
+        } catch (error) {
+
+        }
+
+    }
+
     const addProductOwner = async () => {
         try {
-            setLoading(true)
+            setLoading(true);
             const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/qa/product-owner",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -150,7 +148,13 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
-
+            setLoading(false);
+            message.error({
+                content: 'บันทึกข้อมูลไม่สำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
         }
 
     }
@@ -159,7 +163,7 @@ export default function ConfigDeveloper() {
         try {
             setLoading(true);
             const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/qa/product-owner",
                 method: "DELETE",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -183,41 +187,38 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
-
+            setLoading(false);
+            message.error({
+                content: 'ลบข้อมูลไม่สำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
         }
 
     }
 
     const getModule = async () => {
-        try {
-            setLoadingModule(true);
-            const module = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    user_id: match.params.id,
-                    product_id: selectProductRow?.ProductId
-                    //keyword: filterModule
-                }
-            });
-            if (module.status === 200) {
-                setMasterModule(module.data);
-                setLoadingModule(false);
+        const module = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/setting/qa/module",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                user_id: match.params.id,
+                product_id: selectProductRow?.ProductId,
+                keyword: filterModule
             }
-
-        } catch (error) {
-
-        }
-
+        });
+        setMasterModule(module.data)
     }
 
     const getModuleOwner = async (param) => {
         try {
+
             const module_owner = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/qa/module-owner",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -229,7 +230,7 @@ export default function ConfigDeveloper() {
             });
             if (module_owner.status === 200) {
                 setLoadingModule(false);
-                setModuleOwner(module_owner.data)
+                setModuleOwner(module_owner.data);
                 setLoading(false);
             }
         } catch (error) {
@@ -240,9 +241,9 @@ export default function ConfigDeveloper() {
 
     const addModuleOwner = async () => {
         try {
-            setLoadingModule(true);
+            setLoading(true);
             const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/qa/module-owner",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -255,7 +256,6 @@ export default function ConfigDeveloper() {
             });
 
             if (products.status === 200) {
-                setModalModule(false);
                 getModuleOwner(selectProductRow?.ProductId);
 
                 message.success({
@@ -266,7 +266,7 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
-            setModalModule(false);
+            setLoading(false);
             message.error({
                 content: 'บันทึกข้อมูลไม่สำเร็จ',
                 style: {
@@ -278,11 +278,10 @@ export default function ConfigDeveloper() {
     }
 
     const deleteModuleOwner = async (param) => {
-        setLoadingModule(true);
-        setLoading(true);
         try {
-            const moduleOwner = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module-owner",
+            setLoading(true);
+            const products = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/setting/qa/module-owner",
                 method: "DELETE",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -294,9 +293,7 @@ export default function ConfigDeveloper() {
                 }
             });
 
-            if (moduleOwner.status === 200) {
-                setLoading(false)
-
+            if (products.status === 200) {
                 getModuleOwner(param.ProductId);
 
                 message.success({
@@ -307,7 +304,6 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
-            setLoadingModule(false);
             setLoading(false);
             message.error({
                 content: 'ลบข้อมูลไม่สำเร็จ',
@@ -343,12 +339,13 @@ export default function ConfigDeveloper() {
 
 
     useEffect(() => {
-        setLoading(true);
+        setLoading(true)
         if (productOwner.length === 0) {
             getUser();
             getProductOwner();
         }
     }, [productOwner.length])
+
 
     return (
         <MasterPage>
@@ -359,19 +356,13 @@ export default function ConfigDeveloper() {
                     <Button type="primary" shape="circle" icon={<ArrowLeftOutlined />}
                         onClick={() => history.goBack()}
                     />
-                    &nbsp; &nbsp;
-                  <h1>{user}</h1>
+                   &nbsp; &nbsp;
+                 <h1>{user}</h1>
                 </Row>
 
                 {/* Add */}
                 <Row>
-                    <Col span={4}>
-                        <label style={{fontSize:12, color:"red"}}>
-                            *** คลิก รายการ Product เพื่อตั้งค่า Module
-                        </label>
-
-                    </Col>
-                    <Col span={6} style={{ textAlign: "right" }}>
+                    <Col span={10} style={{ textAlign: "right" }}>
                         <Button type="primary" icon={<PlusOutlined />}
                             style={{ backgroundColor: "#00CC00" }}
                             onClick={() => {
@@ -388,7 +379,7 @@ export default function ConfigDeveloper() {
                 {/* table */}
                 <Row style={{ marginTop: 20 }}>
                     <Col span={10}>
-                        <Table dataSource={productOwner} pagination={true}
+                        <Table dataSource={productOwner} pagination={false}
                         // onRow={(record, rowIndex) => {
                         //     return {
                         //         onClick: event => {
@@ -440,13 +431,12 @@ export default function ConfigDeveloper() {
                                             }}
                                         >
                                             <label className="value-text"
+                                                style={{ cursor: "pointer" }}
                                                 onClick={() => {
                                                     setSelectProductRow(record);
                                                     getModuleOwner(record.ProductId);
                                                     setDivModule("block");
-                                                    setLoadingModule(true);
                                                 }}
-                                                style={{ cursor: "pointer" }}
                                             >
                                                 {record.ProductFullName}
                                             </label>
@@ -463,7 +453,16 @@ export default function ConfigDeveloper() {
                                         <>
                                             <Button type="link"
                                                 icon={<DeleteOutlined />}
-                                                onClick={() => deleteProductOwner(record.ProductId)}
+                                                onClick={() => {
+                                                    return (
+
+                                                        setTimeout(() => {
+                                                            deleteProductOwner(record.ProductId)
+                                                        }, 1000)
+
+                                                    )
+                                                }
+                                                }
                                             >
                                             </Button>
                                         </>
@@ -478,6 +477,7 @@ export default function ConfigDeveloper() {
                         <Table dataSource={moduleOwner} bordered
                             loading={loadingModule}
                             pagination={{ pageSize: 5 }}
+                            //scroll={{ y: 500 }}
                             title={() => {
                                 return (
                                     <>
@@ -522,11 +522,9 @@ export default function ConfigDeveloper() {
                     </Col>
                 </Row>
 
-
                 {/* Modal Add Product */}
                 <Modal
                     title="Product"
-
                     visible={modalProduct}
                     width={800}
                     onOk={() => {
@@ -561,8 +559,8 @@ export default function ConfigDeveloper() {
                             ...rowProductSelection,
                         }}
                     >
-                        <Column title="ProductName" dataIndex="Name" key="key"></Column>
-                        <Column title="ProductFullName" dataIndex="FullName" key="key"></Column>
+                        <Column title="Product Code" dataIndex="Name" key="key"></Column>
+                        <Column title="Product Name" dataIndex="FullName" key="key"></Column>
                     </Table>
                 </Modal>
 
@@ -572,6 +570,7 @@ export default function ConfigDeveloper() {
                     visible={modalModule}
                     width={800}
                     onOk={() => {
+                        setModalModule(false);
                         addModuleOwner();
                         setSelectedRowKeys([]);
 
@@ -606,7 +605,6 @@ export default function ConfigDeveloper() {
 
                     </Table>
                 </Modal>
-
             </Spin>
         </MasterPage>
     )

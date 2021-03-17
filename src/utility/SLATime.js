@@ -165,10 +165,10 @@ function timeFormat(time) {
   // const hoursxx = parseInt(Math.floor((Math.abs(time) / 60) % 8));
   // console.log("hours",hoursxx)
 
-  const result = 
-  (days === 0 ? "" :  Math.abs(days) + "d ") +
-  (hours === 0 ? "" : Math.abs(hours) + "h ") +
-  Math.abs(minutes) + "m"
+  const result =
+    (days === 0 ? "" : Math.abs(days) + "d ") +
+    (hours === 0 ? "" : Math.abs(hours) + "h ") +
+    Math.abs(minutes) + "m"
 
   return result
 }
@@ -216,7 +216,9 @@ export default function SLATime({ start, end, due }) {
         ghost={state.work_minute < state.due_minute ? true : false}
       >
         {(state.due_minute < state.work_minute) ? "-" : ""}
-        {timeFormat(state.due_minute - state.work_minute)}
+        <label className="value-text">
+          {timeFormat(state.due_minute - state.work_minute)}
+        </label>
         <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
       </Button>
     </>

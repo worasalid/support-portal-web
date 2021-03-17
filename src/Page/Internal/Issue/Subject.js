@@ -180,6 +180,7 @@ export default function Subject() {
 
     }
   }
+
   const getdetail = async () => {
     try {
       const ticket_detail = await Axios({
@@ -233,6 +234,7 @@ export default function Subject() {
     }
 
   }
+
   const UpdatePriority = async (value, item) => {
     console.log("UpdatePriority", value)
     try {
@@ -254,13 +256,14 @@ export default function Subject() {
       });
 
       if (priority.status === 200) {
-        Modal.info({
+        Modal.success({
           title: 'บันทึกข้อมูลเรียบร้อย',
           content: (
             <div>
               <p></p>
             </div>
           ),
+          okText:"Close",
           onOk() {
             getdetail();
             setHistory_loading(true);
@@ -295,7 +298,24 @@ export default function Subject() {
     if (userstate.issuedata.details[0]?.IssueType === "Bug") {
       if (userstate?.mailbox[0]?.NodeName === "support") {
         if (item.data.value === "RequestInfo" || item.data.value === "Hold") { return setModalsendissue_visible(true) }
-        if (item.data.value === "Resolved" || item.data.value === "Deploy") { return (setModalresolved_visible(true)) }
+        if (item.data.value === "Resolved" || item.data.value === "Deploy") {
+          if (userstate.issuedata.details[0]?.taskResolved > 0) {
+            Modal.info({
+              title: 'มี Task งานที่ยังไม่เสร็จ',
+              content: (
+                <div>
+                  <p></p>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
+
+              }
+            });
+          } else {
+            setModalresolved_visible(true);
+          }
+        }
       }
     }
     //CR FLOW

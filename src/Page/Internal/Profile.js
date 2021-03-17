@@ -3,8 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import Axios from 'axios';
 import MasterPage from './MasterPage';
 import AuthenContext from "../../utility/authenContext";
-import { EyeTwoTone, LaptopOutlined, MailOutlined, UserOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
-
+import { EyeTwoTone, LaptopOutlined, MailOutlined, UserOutlined, EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 
 
 export default function Profile() {
@@ -134,10 +133,10 @@ export default function Profile() {
 
     return (
         <Spin spinning={loading} tip="Loading...">
-            <MasterPage>
+            <MasterPage bgColor="#f0f2f5">
 
-                <div style={{ width: "100%" }}>
-                    <div style={{ backgroundColor: "#d1d3d4", width: "100%", height: "100px" }}>
+                <div>
+                    <div style={{ backgroundColor: "#FFFFFF" }}>
                         <img
                             style={{ width: "100%", height: "100px" }}
                         />
@@ -167,7 +166,7 @@ export default function Profile() {
                     {/* ข้อมูลโปร์ไฟล์ */}
                     <div style={{ marginTop: 0, position: "absolute", top: 250 }}>
                         <label className="header-text">ข้อมูลโปรไฟล์</label>
-                        <Card size="default" bordered hoverable
+                        <Card size="default" bordered 
                             style={{
                                 width: "500px",
                                 marginTop: 20
@@ -197,7 +196,7 @@ export default function Profile() {
                                         <Input placeholder="นามสกุล" />
                                     </Form.Item>
                                     <Form.Item
-                                        label={<><UserOutlined /> </>}
+                                        label={<><EyeOutlined /> </>}
                                         name="password"
 
                                     >
@@ -221,8 +220,10 @@ export default function Profile() {
                                 </Form>
                                 <Row style={{ textAlign: "right" }}>
                                     <Col span={24} >
-                                        <Button onClick={() => form.submit()} type="primary"
-                                        >บันทึก</Button>
+                                        <Button 
+                                        style={{ backgroundColor: "#00CC00", marginLeft: 10 }}
+                                         onClick={() => form.submit()} type="primary"
+                                        >Save</Button>
                                     </Col>
                                 </Row>
                             </div>
@@ -237,7 +238,7 @@ export default function Profile() {
                                 width: "100%",
                                 marginTop: 20
                             }}>
-                            เพิ่มเติมในอนาคต
+                            ...........
                     </Card>
                     </div>
 
@@ -248,7 +249,7 @@ export default function Profile() {
                                 width: "100%",
                                 marginTop: 20
                             }}>
-                            เพิ่มเติมในอนาคต
+                            ...........
                     </Card>
                     </div>
 

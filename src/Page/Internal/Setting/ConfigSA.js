@@ -1,4 +1,4 @@
-import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
@@ -8,12 +8,12 @@ import MasterPage from '../MasterPage'
 const { Column } = Table;
 const { TabPane } = Tabs;
 
-export default function ConfigDeveloper() {
+export default function ConfigSA() {
+
     const match = useRouteMatch();
     const history = useHistory(null);
-    const [loading, setLoading] = useState(false)
-    const [loadingProduct, setLoadingProduct] = useState(false)
-    const [loadingModule, setLoadingModule] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [loadingProduct, setLoadingProduct] = useState(false);
 
     // modal
     const [divModule, setDivModule] = useState("none")
@@ -55,8 +55,18 @@ export default function ConfigDeveloper() {
         },
     };
 
-    //////////////////////////////////// function ///////////////////////////////
+    const searchProduct = (param) => {
+        let result = masterProduct.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterProduct(result);
+    }
 
+    //////////////////////////////////// function ///////////////////////////////
     const getUser = async () => {
         try {
             const user = await Axios({
@@ -77,10 +87,34 @@ export default function ConfigDeveloper() {
         }
     }
 
+    const getProduct = async () => {
+        try {
+            const products = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/setting/sa/product",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    userId: match.params.id,
+                    keyword: filterProduct
+                }
+            });
+
+            if (products.status === 200) {
+                setLoadingProduct(false);
+                setMasterProduct(products.data);
+            }
+        } catch (error) {
+
+        }
+
+    }
+
     const getProductOwner = async () => {
         try {
-            const productsOwner = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product-owner",
+            const products = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/setting/sa/product-owner",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -89,45 +123,24 @@ export default function ConfigDeveloper() {
                     user_id: match.params.id
                 }
             });
-            if (productsOwner.status === 200) {
-                setProductOwner(productsOwner.data);
+            if (products.status === 200) {
+                setProductOwner(products.data);
+                setLoadingProduct(true);
                 setLoading(false);
 
             }
-
         } catch (error) {
 
         }
 
-    }
-
-    const getProduct = async () => {
-        try {
-            const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    userId: match.params.id
-                    // keyword: filterProduct
-                }
-            });
-            if (products.status === 200) {
-                setLoadingProduct(false);
-                setMasterProduct(products.data);
-            }
-        } catch (error) {
-
-        }
     }
 
     const addProductOwner = async () => {
         try {
-            setLoading(true)
+            setLoading(true);
+            setLoadingProduct(true);
             const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/sa/product-owner",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -150,6 +163,13 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
+            setModalProduct(false);
+            message.success({
+                content: 'บันทึกข้อมูลไม่สำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
 
         }
 
@@ -158,8 +178,9 @@ export default function ConfigDeveloper() {
     const deleteProductOwner = async (param) => {
         try {
             setLoading(true);
+            setLoadingProduct(true);
             const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/product-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/sa/product-owner",
                 method: "DELETE",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -183,41 +204,38 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
-
+            setLoading(false);
+            setLoadingProduct(false);
+            message.error({
+                content: 'ลบข้อมูลไม่สำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
         }
 
     }
 
     const getModule = async () => {
-        try {
-            setLoadingModule(true);
-            const module = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    user_id: match.params.id,
-                    product_id: selectProductRow?.ProductId
-                    //keyword: filterModule
-                }
-            });
-            if (module.status === 200) {
-                setMasterModule(module.data);
-                setLoadingModule(false);
+        const module = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/setting/sa/module",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                user_id: match.params.id,
+                product_id: selectProductRow?.ProductId,
+                keyword: filterModule
             }
-
-        } catch (error) {
-
-        }
-
+        });
+        setMasterModule(module.data)
     }
 
     const getModuleOwner = async (param) => {
         try {
             const module_owner = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/sa/module-owner",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -228,21 +246,17 @@ export default function ConfigDeveloper() {
                 }
             });
             if (module_owner.status === 200) {
-                setLoadingModule(false);
                 setModuleOwner(module_owner.data)
-                setLoading(false);
             }
         } catch (error) {
-            setLoadingModule(false);
-            setLoading(false);
+
         }
     }
 
     const addModuleOwner = async () => {
         try {
-            setLoadingModule(true);
             const products = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module-owner",
+                url: process.env.REACT_APP_API_URL + "/master/setting/sa/module-owner",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -257,7 +271,21 @@ export default function ConfigDeveloper() {
             if (products.status === 200) {
                 setModalModule(false);
                 getModuleOwner(selectProductRow?.ProductId);
-
+                // Modal.success({
+                //     title: 'บันทึกข้อมูลเรียบร้อย',
+                //     content: (
+                //         <div>
+                //             <p></p>
+                //         </div>
+                //     ),
+                //     onOk() {
+                //         // setBinding(true)
+                //         setTimeout(() => {
+                //             // setBinding(false)
+                //         }, 1000)
+                //         setModalModule(false)
+                //     },
+                // });
                 message.success({
                     content: 'บันทึกข้อมูลสำเร็จ',
                     style: {
@@ -266,23 +294,16 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
-            setModalModule(false);
-            message.error({
-                content: 'บันทึกข้อมูลไม่สำเร็จ',
-                style: {
-                    marginTop: '10vh',
-                },
-            });
+
         }
 
     }
 
     const deleteModuleOwner = async (param) => {
-        setLoadingModule(true);
-        setLoading(true);
+        setLoading(true)
         try {
-            const moduleOwner = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/setting/dev/module-owner",
+            const products = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/setting/sa/module-owner",
                 method: "DELETE",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -294,11 +315,26 @@ export default function ConfigDeveloper() {
                 }
             });
 
-            if (moduleOwner.status === 200) {
-                setLoading(false)
+            if (products.status === 200) {
+                setTimeout(() => {
+                    setLoading(false)
+                }, 500)
 
                 getModuleOwner(param.ProductId);
-
+                // Modal.success({
+                //     title: 'ลบข้อมูลเรียบร้อย',
+                //     content: (
+                //         <div>
+                //             <p></p>
+                //         </div>
+                //     ),
+                //     onOk() {
+                //         // setBinding(true)
+                //         setTimeout(() => {
+                //             // setBinding(false)
+                //         }, 1000)
+                //     },
+                // });
                 message.success({
                     content: 'ลบข้อมูลสำเร็จ',
                     style: {
@@ -307,48 +343,18 @@ export default function ConfigDeveloper() {
                 });
             }
         } catch (error) {
-            setLoadingModule(false);
-            setLoading(false);
-            message.error({
-                content: 'ลบข้อมูลไม่สำเร็จ',
-                style: {
-                    marginTop: '10vh',
-                },
-            });
+
         }
 
     }
-
-    const searchProduct = (param) => {
-        let result = masterProduct.filter(o =>
-            Object.keys(o).some(k =>
-                String(o[k])
-                    .toLowerCase()
-                    .includes(param.toLowerCase())
-            )
-        );
-        setFilterProduct(result);
-    }
-
-    const searchModule = (param) => {
-        let result = masterModule.filter(o =>
-            Object.keys(o).some(k =>
-                String(o[k])
-                    .toLowerCase()
-                    .includes(param.toLowerCase())
-            )
-        );
-        setFilterModule(result);
-    }
-
-
     useEffect(() => {
-        setLoading(true);
+        setLoading(true)
         if (productOwner.length === 0) {
             getUser();
             getProductOwner();
         }
     }, [productOwner.length])
+
 
     return (
         <MasterPage>
@@ -359,19 +365,13 @@ export default function ConfigDeveloper() {
                     <Button type="primary" shape="circle" icon={<ArrowLeftOutlined />}
                         onClick={() => history.goBack()}
                     />
-                    &nbsp; &nbsp;
-                  <h1>{user}</h1>
+                   &nbsp; &nbsp;
+                 <h1>{user}</h1>
                 </Row>
 
                 {/* Add */}
                 <Row>
-                    <Col span={4}>
-                        <label style={{fontSize:12, color:"red"}}>
-                            *** คลิก รายการ Product เพื่อตั้งค่า Module
-                        </label>
-
-                    </Col>
-                    <Col span={6} style={{ textAlign: "right" }}>
+                    <Col span={10} style={{ textAlign: "right" }}>
                         <Button type="primary" icon={<PlusOutlined />}
                             style={{ backgroundColor: "#00CC00" }}
                             onClick={() => {
@@ -388,13 +388,13 @@ export default function ConfigDeveloper() {
                 {/* table */}
                 <Row style={{ marginTop: 20 }}>
                     <Col span={10}>
-                        <Table dataSource={productOwner} pagination={true}
+                        <Table dataSource={productOwner} pagination={false}
                         // onRow={(record, rowIndex) => {
                         //     return {
                         //         onClick: event => {
                         //             setSelectProductRow(record);
                         //             getModuleOwner(record.ProductId);
-                        //             setDivModule("block");
+                        //             //setDivModule("block");
                         //         }, // click row
                         //     };
                         // }}
@@ -403,23 +403,8 @@ export default function ConfigDeveloper() {
                                 width="10%"
                                 render={(record) => {
                                     return (
-                                        <div style={{ cursor: "pointer" }}
-                                            onClick={() => {
-                                                setSelectProductRow(record);
-                                                getModuleOwner(record.ProductId);
-                                                setDivModule("block");
-                                                setLoadingModule(true);
-                                            }}
-                                        >
-                                            <label className="value-text"
-                                                style={{ cursor: "pointer" }}
-                                                onClick={() => {
-                                                    setSelectProductRow(record);
-                                                    getModuleOwner(record.ProductId);
-                                                    setDivModule("block");
-                                                    setLoadingModule(true);
-                                                }}
-                                            >
+                                        <div>
+                                            <label className="value-text">
                                                 {record.ProductName}
                                             </label>
                                         </div>
@@ -428,26 +413,11 @@ export default function ConfigDeveloper() {
                                 }
                             />
                             <Column title="FullName"
-                                width="80%"
+                                width="10%"
                                 render={(record) => {
                                     return (
-                                        <div style={{ cursor: "pointer" }}
-                                            onClick={() => {
-                                                setSelectProductRow(record);
-                                                getModuleOwner(record.ProductId);
-                                                setDivModule("block");
-                                                setLoadingModule(true);
-                                            }}
-                                        >
-                                            <label className="value-text"
-                                                onClick={() => {
-                                                    setSelectProductRow(record);
-                                                    getModuleOwner(record.ProductId);
-                                                    setDivModule("block");
-                                                    setLoadingModule(true);
-                                                }}
-                                                style={{ cursor: "pointer" }}
-                                            >
+                                        <div>
+                                            <label className="value-text">
                                                 {record.ProductFullName}
                                             </label>
                                         </div>
@@ -457,7 +427,7 @@ export default function ConfigDeveloper() {
                             />
                             <Column title=""
                                 align="center"
-                                width="10%"
+                                width="15%"
                                 render={(record) => {
                                     return (
                                         <>
@@ -474,10 +444,12 @@ export default function ConfigDeveloper() {
                         </Table>
                     </Col>
                     <Col span={2}></Col>
+
+                    {/* SA ไม่ต้องกำหนด Module เนื่องจากดูแล ตาม Product */}
                     <Col span={12} style={{ display: divModule }}>
                         <Table dataSource={moduleOwner} bordered
-                            loading={loadingModule}
-                            pagination={{ pageSize: 5 }}
+                            pagination={false}
+                            //scroll={{ y: 500 }}
                             title={() => {
                                 return (
                                     <>
@@ -510,7 +482,15 @@ export default function ConfigDeveloper() {
                                         <>
                                             <Button type="link"
                                                 icon={<DeleteOutlined />}
-                                                onClick={() => deleteModuleOwner(record)}
+                                                onClick={() => {
+                                                    return (
+                                                        setTimeout(() => {
+                                                            deleteModuleOwner(record)
+                                                        }, 1000)
+
+                                                    )
+                                                }
+                                                }
                                             >
                                             </Button>
                                         </>
@@ -522,11 +502,9 @@ export default function ConfigDeveloper() {
                     </Col>
                 </Row>
 
-
                 {/* Modal Add Product */}
                 <Modal
                     title="Product"
-
                     visible={modalProduct}
                     width={800}
                     onOk={() => {
@@ -536,6 +514,7 @@ export default function ConfigDeveloper() {
 
                     }}
                     okText="Add"
+                    okButtonProps={{ style: { backgroundColor: "#00CC00" } }}
                     onCancel={() => {
                         setModalProduct(false)
                         setSelectedRowKeys([]);
@@ -561,8 +540,8 @@ export default function ConfigDeveloper() {
                             ...rowProductSelection,
                         }}
                     >
-                        <Column title="ProductName" dataIndex="Name" key="key"></Column>
-                        <Column title="ProductFullName" dataIndex="FullName" key="key"></Column>
+                        <Column title="Product Code" dataIndex="Name" key="key"></Column>
+                        <Column title="Product Name" dataIndex="FullName" key="key"></Column>
                     </Table>
                 </Modal>
 
@@ -583,20 +562,29 @@ export default function ConfigDeveloper() {
                     }}
                 >
                     <Row style={{ marginBottom: 20 }}>
-                        <Col span={16}>
-                        </Col>
                         <Col span={8}>
-                            <Input.Search placeholder="Module" allowClear
-                                enterButton
-                                onSearch={searchModule}
+                        </Col>
+                        <Col span={12}>
+                            <Input placeholder="module" allowClear
+                                onKeyDown={(x) => {
+                                    if (x.keyCode === 13) {
+                                        getModule()
+                                    }
+                                }}
+                                onChange={(x) => setFilterModule(x.target.value)}
                             />
+                        </Col>
+                        <Col span={2}>
+                            <Button type="primary" shape="round" icon={<SearchOutlined />}
+                                style={{ backgroundColor: "#00CC00", marginLeft: 10 }}
+                                onClick={() => getModule()}
+                            >
+                                Search
+                                 </Button>
                         </Col>
                     </Row>
 
-                    <Table
-                        dataSource={filterModule === null ? masterModule : filterModule}
-                        loading={loadingModule}
-                        pagination={{ pageSize: 6 }}
+                    <Table dataSource={masterModule}
                         rowSelection={{
                             type: "checkbox",
                             ...rowModuleSelection,
@@ -606,7 +594,6 @@ export default function ConfigDeveloper() {
 
                     </Table>
                 </Modal>
-
             </Spin>
         </MasterPage>
     )

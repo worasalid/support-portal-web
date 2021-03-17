@@ -277,7 +277,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
                   // }
                 }
               >
-                Pass
+                Resolved
                 {
                   masterstate.toolbar.sider_menu.issue.pass.count === 0
                     ? ""

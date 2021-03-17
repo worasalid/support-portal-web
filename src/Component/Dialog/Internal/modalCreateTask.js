@@ -13,7 +13,6 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
     const editorRef = useRef(null)
-    console.log("details",details)
 
     const LoadModule = async () => {
         try {
@@ -50,13 +49,14 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                 }
             });
             if (createtask.status === 200) {
-                await Modal.info({
+                await Modal.success({
                     title: 'สร้าง Task งานสำเร็จ',
                     content: (
                         <div>
                             <p></p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         onOk();
                         form.resetFields();
@@ -64,7 +64,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                 });
             }
         } catch (error) {
-            await Modal.info({
+            await Modal.error({
                 title: 'สร้าง Task งานไม่สำเร็จ',
                 content: (
                     <div>
@@ -98,7 +98,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
             visible={visible}
             onOk={() => { form.submit(); onCancel() }}
             okText="Create"
-            okButtonProps={{ type: "primary", htmlType: "submit" }}
+            okButtonProps={{ type: "primary", htmlType: "submit",color:"#00CC00" }}
             onCancel={() => {
                 return (form.resetFields(), onCancel())
             }

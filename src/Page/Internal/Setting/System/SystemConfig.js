@@ -10,18 +10,25 @@ const { Meta } = Card;
 export default function SystemConfig() {
     const history = useHistory(null)
     return (
-        <MasterPage>
+        <MasterPage bgColor="#f0f2f5">
             <Row gutter={[16, 16]}>
                 <Col span={6}>
                     <Card className="card-box issue-active" bordered hoverable
                         style={{ width: "100%" }}
-                    //onClick={() => history.push("/internal/setting/system/reopen")}
+                        onClick={() => history.push("/internal/setting/system/orgchart")}
                     >
                         <Meta
-                            title={<label className="card-title-menu">Organize Chart</label>}
+                            avatar={
+                                <img
+                                    style={{ height: "50px", width: "50px" }}
+                                    src={`${process.env.PUBLIC_URL}/icons-organization-chart.png`}
+                                    alt=""
+                                />
+                            }
+                            title={<label className="card-title-menu">Organization</label>}
                             description={
                                 <label className="value-text">
-                                    Organize Chart
+                                    Organization Chart
                                 </label>
 
                             }
@@ -35,6 +42,13 @@ export default function SystemConfig() {
                         onClick={() => history.push("/internal/setting/system/product")}
                     >
                         <Meta
+                            avatar={
+                                <img
+                                    style={{ height: "50px", width: "50px" }}
+                                    src={`${process.env.PUBLIC_URL}/icons-product.png`}
+                                    alt=""
+                                />
+                            }
                             title={<label className="card-title-menu">ข้อมูล Product</label>}
                             description={
                                 <label className="value-text">
@@ -55,7 +69,7 @@ export default function SystemConfig() {
                             avatar={
                                 <img
                                     style={{ height: "50px", width: "50px" }}
-                                    src={`${process.env.PUBLIC_URL}/icon-module.png`}
+                                    src={`${process.env.PUBLIC_URL}/icons-module.png`}
                                     alt=""
                                 />
                             }
@@ -76,6 +90,13 @@ export default function SystemConfig() {
                         onClick={() => history.push("/internal/setting/system/version")}
                     >
                         <Meta
+                            avatar={
+                                <img
+                                    style={{ height: "40px", width: "40px" }}
+                                    src={`${process.env.PUBLIC_URL}/icons-document.png`}
+                                    alt=""
+                                />
+                            }
                             title={<label className="card-title-menu">ข้อมูล Version</label>}
                             description={
                                 <label className="value-text">
@@ -95,7 +116,13 @@ export default function SystemConfig() {
                         onClick={() => history.push("/internal/setting/system/reopen")}
                     >
                         <Meta
-                            avatar={<FileOutlined style={{ fontSize: 35 }} />}
+                            avatar={
+                                <img
+                                    style={{ height: "40px", width: "40px" }}
+                                    src={`${process.env.PUBLIC_URL}/icons-document-reopen.png`}
+                                    alt=""
+                                />
+                            }
                             title={<label className="card-title-menu">เหตุผลการ ReOpen</label>}
                             description={
                                 <label className="value-text">
@@ -113,11 +140,17 @@ export default function SystemConfig() {
                         onClick={() => history.push("/internal/setting/system/reopen_email")}
                     >
                         <Meta
-                            avatar={<FileOutlined style={{ fontSize: 35 }} />}
+                            avatar={
+                                <img
+                                    style={{ height: "40px", width: "40px" }}
+                                    src={`${process.env.PUBLIC_URL}/icons-email.png`}
+                                    alt=""
+                                />
+                            }
                             title={<label className="card-title-menu">ตั้งค่า Email ReOpen</label>}
                             description={
                                 <label className="value-text">
-                                    ตั้งค่าการส่ง Email กรณี มีการ ReOpen เกิน 3 ครั้ง
+                                    ตั้งค่าการส่ง Email กรณี มีการ ReOpen
                                 </label>
 
                             }
@@ -132,11 +165,40 @@ export default function SystemConfig() {
                         onClick={() => history.push("/internal/setting/system/reason_cancel")}
                     >
                         <Meta
-                            avatar={<FileOutlined style={{ fontSize: 35 }} />}
+                            avatar={
+                                <img
+                                    style={{ height: "40px", width: "40px" }}
+                                    src={`${process.env.PUBLIC_URL}/icons-document-cancel.png`}
+                                    alt=""
+                                />
+                            }
                             title={<label className="card-title-menu">เหตุผลการยกเลิก</label>}
                             description={
                                 <label className="value-text">
                                     ตั้งค่าเหตุผลการยกเลิก ของลูกค้า
+                                </label>
+                            }
+                        />
+                    </Card>
+                </Col>
+
+                <Col span={6}>
+                    <Card className="card-box issue-active" bordered hoverable
+                        style={{ width: "100%" }}
+                        onClick={() => history.push("/internal/setting/system/reason_reject")}
+                    >
+                        <Meta
+                            avatar={
+                                <img
+                                    style={{ height: "40px", width: "40px" }}
+                                    src={`${process.env.PUBLIC_URL}/icons-document-cancel.png`}
+                                    alt=""
+                                />
+                            }
+                            title={<label className="card-title-menu">เหตุผลการ Reject งาน</label>}
+                            description={
+                                <label className="value-text">
+                                    ตั้งค่าเหตุผลการ Reject
                                 </label>
                             }
                         />
