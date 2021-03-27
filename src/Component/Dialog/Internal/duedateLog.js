@@ -29,7 +29,9 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
     }
 
     useEffect(() => {
-        getDueDateHistory();
+        if (visible) {
+            getDueDateHistory();
+        }
     }, [visible])
 
     return (

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Input, Select, Button } from 'antd';
+import { Modal, Form, Input, Select, Button, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
@@ -10,10 +10,10 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
-    const editorRef = useRef(null)
 
-    const [assignlist, setAssignlist] = useState([]);
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -62,6 +62,8 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
 
             if (sendflow.status === 200) {
                 SaveComment();
+                setLoading(false);
+
                 await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -81,21 +83,23 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const onFinish = (values,item) => {
-        console.log('Success:', values, item);
+    const onFinish = (values, item) => {
+        setLoading(true);
         SendFlow();
     };
 
     useEffect(() => {
         if (visible) {
-
+            console.log("abcdefg")
         }
 
     }, [visible])
+   
 
     return (
         <Modal
             visible={visible}
+            confirmLoading={true}
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
@@ -103,51 +107,51 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                layout="vertical"
-                name="leader-reject"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="remark"
-                    label="Remark"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    layout="vertical"
+                    name="leader-reject"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    {/* Remark : */}
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form>
 
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="remark"
+                        label="Remark"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        {/* Remark : */}
+                        <Editor
+                            apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                            ref={editorRef}
+                            initialValue=""
+                            init={{
+                                height: 300,
+                                menubar: false,
+                                plugins: [
+                                    'advlist autolink lists link image charmap print preview anchor',
+                                    'searchreplace visualblocks code fullscreen',
+                                    'insertdatetime media table paste code help wordcount'
+                                ],
+                                toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                                toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                            }}
+                            onEditorChange={handleEditorChange}
+                        />
+                        <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
+                    </Form.Item>
+                </Form>
+            </Spin>
         </Modal>
     )
 }

@@ -6,7 +6,7 @@ import Column from 'antd/lib/table/Column';
 import { DownloadOutlined } from '@ant-design/icons';
 
 export default function ModalFileDownload({ visible = false, onOk, onCancel, details, ...props }) {
- //const history = useHistory();
+    //const history = useHistory();
     const [listFiledownload, setListFiledownload] = useState([]);
 
     const getfile = async () => {
@@ -59,8 +59,32 @@ export default function ModalFileDownload({ visible = false, onOk, onCancel, det
                     }
                     }
                 />
-                <Column title="ชื่อไฟล์" dataIndex="FileName" ></Column>
-                <Column title="Size" dataIndex="FileSize" ></Column>
+                <Column title="ชื่อไฟล์"
+                    render={(value, record, index) => {
+                        return (
+                            <>
+                                <label className="value-text">
+                                    {record.FileName}
+                                </label>
+
+                            </>
+                        )
+                    }
+                    }
+                />
+                <Column title="Size"
+                    render={(value, record, index) => {
+                        return (
+                            <>
+                                <label className="value-text">
+                                    {record.FileSize}
+                                </label>
+
+                            </>
+                        )
+                    }
+                    }
+                />
                 <Column title=""
                     render={(value, record, index) => {
                         return (

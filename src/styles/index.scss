@@ -22,7 +22,7 @@ label.table-column-text-unread {
 }
 
 label.table-column-text {
-    font-size: 10px !important;
+    font-size: 11px !important;
 }
 
 label.text-hover:hover {
@@ -40,6 +40,15 @@ label.text-link:hover {
     text-decoration-color: #1890ff;
     color: #1890ff;
     cursor: pointer;
+}
+
+label.noti-text-unread {
+    font-size: 12px !important;
+    font-weight: bold;
+}
+
+label.noti-text {
+    font-size: 12px !important;
 }
 
 
@@ -95,22 +104,30 @@ div.issue-detail-box {
     border: solid 1px;
     border-color: rgb(223, 225, 230);
     width: 100%;
-    display: inline-block;
+    //display: inline-block;
     padding: 16px;
     margin-top: 16px;
 
 }
 
+//////////////////////////////////////////// Class ////////////////////////////////////////////
+
 .issue-description {
     font-size: 12px !important;
     img {
-       max-width: 100%;
+       max-width: 30%;
+    //    width: auto;
+       height: auto;
+       cursor: pointer;
     }
 }
 .comment-description {
     font-size: 12px !important;
     img {
-       max-width: 100%;
+       max-width: 50%;
+    //    width: auto;
+       height: auto;
+       cursor: pointer;
     }
 }
 
@@ -141,6 +158,7 @@ div.sd-page-topic {
     border: 1px solid;
     color: #1890ff;
 }
+
 .task-active:hover {
     // border: 1px solid;
     // color: #1890ff;
@@ -178,3 +196,10 @@ div.sd-page-topic {
     background-color: #00CC00;
 }
 
+.ant-spin-nested-loading {
+ height: 100%;
+}
+
+.ant-spin-container{
+  height: 100%;
+}

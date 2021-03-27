@@ -9,7 +9,7 @@ import moment from "moment"
 
 const { TabPane } = Tabs;
 
- function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
+function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
     const history = useHistory();
     const match = useRouteMatch();
 
@@ -18,7 +18,7 @@ const { TabPane } = Tabs;
 
     //div
     const [divcollapse, setDivcollapse] = useState("block")
-    const [collapseicon, setCollapseicon] = useState(<UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+    const [collapseicon, setCollapseicon] = useState(<DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
 
 
     const GetDocument = async () => {
@@ -81,7 +81,7 @@ const { TabPane } = Tabs;
                     }}
                 >
                     <Tabs defaultActiveKey="1" type="card">
-                        <TabPane tab="Unit Test" key="1">
+                        <TabPane tab="Unit Test" key="1" style={{ fontSize: "8 px" }}>
                             <Table dataSource={listfile.filter((x) => x.GroupType === "unittest")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
                                 <Column title="No"
                                     width="2%"
@@ -143,10 +143,10 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label style={{fontSize:10}}>
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}&nbsp;&nbsp;
-                                                    {/* <br /> */}
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{ fontSize: 9 }}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
+                                                    {/* &nbsp;&nbsp; */}
+                                                    {/* {moment(record.ModifyDate).format("HH:mm")} */}
                                                 </label>
                                             </>
                                         )
@@ -248,9 +248,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{ fontSize: 10, color: "#CCCCCC" }}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -321,12 +320,11 @@ const { TabPane } = Tabs;
                                     render={(value, record, index) => {
                                         return (
                                             <>
-                                                <label className="value-text">
+                                               <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{ fontSize: 10, color: "#CCCCCC" }}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -428,9 +426,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{ fontSize: 10, color: "#CCCCCC" }}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -504,9 +501,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{ fontSize: 10, color: "#CCCCCC" }}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -534,7 +530,7 @@ const { TabPane } = Tabs;
                         </TabPane>
                         <TabPane tab="QA Test Result" key="3">
                             <Table dataSource={listfile.filter((x) => x.GroupType === "test_result_QA")} style={{ width: "100%" }} pagination={false}
-                                scroll={{ x: "10vw"}}
+                                scroll={{ x: "10vw" }}
                             >
                                 <Column title="No"
                                     width="5%"
@@ -596,9 +592,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{fontSize:10, color:"#CCCCCC"}}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -696,9 +691,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{fontSize:10, color:"#CCCCCC"}}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -772,9 +766,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{fontSize:10, color:"#CCCCCC"}}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -847,9 +840,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{fontSize:10, color:"#CCCCCC"}}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )
@@ -922,9 +914,8 @@ const { TabPane } = Tabs;
                                                 <label className="value-text">
                                                     {record.OwnerName}<br />
                                                 </label>
-                                                <label className="value-text">
-                                                    {moment(record.ModifyDate).format("DD/MM/YYYY")}<br />
-                                                    {moment(record.ModifyDate).format("HH:mm")}
+                                                <label style={{fontSize:10, color:"#CCCCCC"}}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
                                         )

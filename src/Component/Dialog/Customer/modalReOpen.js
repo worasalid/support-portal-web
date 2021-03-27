@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Modal, Select, Form, Input } from 'antd';
+import { Modal, Select, Form, Input, Spin } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -13,11 +13,10 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     const history = useHistory();
     const uploadRef = useRef(null);
     const editorRef = useRef(null)
-    // const [textValue, setTextValue] = useState("")
     const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
-
-    const [reOpenData, setReOpenData] = useState(null)
+    const [reOpenData, setReOpenData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const configData = async () => {
         try {
@@ -67,7 +66,6 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     }
 
     const FlowReOpen = async (param) => {
-        onOk();
         try {
             const completeflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
@@ -79,7 +77,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                     ticketid: details.ticketid,
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
-                    value:{
+                    value: {
                         reason_id: param.reason
                     }
                 }
@@ -87,15 +85,17 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
             });
 
             if (completeflow.status === 200) {
-                
                 SaveComment();
-                await Modal.info({
+                setLoading(false);
+
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         form.resetFields();
                         onOk();
@@ -105,8 +105,10 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
             }
 
         } catch (error) {
+            setLoading(false);
             onCancel();
-            await Modal.info({
+
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
@@ -114,6 +116,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     form.resetFields();
                     onOk();
@@ -124,62 +127,65 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     }
 
     const onFinish = (param) => {
-        console.log('Success:', param);
-
-        FlowReOpen(param)
+        setLoading(true);
+        FlowReOpen(param);
     };
 
+
     useEffect(() => {
-        configData()
+        if (visible) {
+            configData()
+        }
     }, [visible])
+
 
     return (
         <Modal
             visible={visible}
-            onOk={() => { return (form.submit()) }}
+            confirmLoading={loading}
+            onOk={() => form.submit()}
             okButtonProps={""}
             onCancel={() => { return onCancel(), form.resetFields() }}
             {...props}
         >
-            <Form
-                form={form}
-                name="reopen"
-                layout="vertical"
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    label="เหตุผลการ ReOpen"
-                    name="reason"
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form
+                    form={form}
+                    name="reopen"
+                    layout="vertical"
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
                 >
-                    <Select placeholder="Priority" style={{ width: "100%" }}
-                        allowClear
-                        maxTagCount={1}
-                        onChange={(value) => configData()}
-                        options={reOpenData && reOpenData.map((x) => ({ value: x.Id, label: x.Name }))}
+                    <Form.Item
+                        label="เหตุผลการ ReOpen"
+                        name="reason"
+                    >
+                        <Select placeholder="Priority" style={{ width: "100%" }}
+                            allowClear
+                            maxTagCount={1}
+                            onChange={(value) => configData()}
+                            options={reOpenData && reOpenData.map((x) => ({ value: x.Id, label: x.Name }))}
 
-                    />
-                </Form.Item>
+                        />
+                    </Form.Item>
 
-                {/* <Form.Item
+                    {/* <Form.Item
                     label="เหตุผลการ ReOpen"
                     name="reason"
                 >
                     <TextArea rows={5} style={{ width: "100%" }} />
                 </Form.Item> */}
 
-                <Form.Item
-                    label="Remark"
-                    name="remark"
-                >
-                    <TextEditor ref={editorRef} />
-                    <br />
+                    <Form.Item
+                        label="Remark"
+                        name="remark"
+                    >
+                        <TextEditor ref={editorRef} />
+                        <br />
       AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form >
-
-
-
+                    </Form.Item>
+                </Form >
+            </Spin>
         </Modal>
     );
 }

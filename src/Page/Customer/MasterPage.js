@@ -33,7 +33,8 @@ export default function MasterPage({bgColor='#fff',...props}) {
       dispatch({ type: 'Authen', payload: true });
       dispatch({ type: 'LOGIN', payload: result.data.usersdata });
     } catch (error) {
-
+         //alert(error.response);
+         //history.push("/login");
     }
   }
 
@@ -326,7 +327,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
         <Content
           style={{
-            padding: 24,
+           // padding: 24,
             margin: 0,
             minHeight: 280,
 

@@ -90,6 +90,7 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.editor.setContent("");
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -104,6 +105,7 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.editor.setContent("");
                     onOk();

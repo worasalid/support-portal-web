@@ -99,18 +99,17 @@ export default function MyTask() {
     }
   }, [customerstate.search])
 
-  console.log(customerstate.filter);
 
   return (
     <MasterPage>
-      <Row style={{ marginBottom: 16, textAlign: "left" }}>
+      <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
         <Col span={24}>
           <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
         </Col>
       </Row>
       <IssueSearch />
       <Row>
-        <Col span={24}>
+        <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
             footer={(x) => {
               return (
@@ -166,7 +165,7 @@ export default function MyTask() {
                   <div>
                     <Row style={{ borderBottom: "1px dotted" }}>
                       <Col span={8}>
-                        <label className="table-column-text" style={{ color: "#808080" }}>
+                        <label  style={{ color: "#808080",fontSize: "10px" }}>
                           Type :
                           </label>
                       </Col>
@@ -203,7 +202,7 @@ export default function MyTask() {
                         </label>
                       </Col>
                     </Row>
-                    <Row style={{ borderBottom: "1px dotted" }}>
+                    {/* <Row style={{ borderBottom: "1px dotted" }}>
                       <Col span={8}>
                         <label style={{ color: "#808080", fontSize: "10px" }}>
                           Module :
@@ -212,6 +211,18 @@ export default function MyTask() {
                       <Col span={14}>
                         <label style={{ color: "#808080", fontSize: "10px" }}>
                           {record.ModuleName}
+                        </label>
+                      </Col>
+                    </Row> */}
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Scene :
+                          </label>
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.Scene}
                         </label>
                       </Col>
                     </Row>
@@ -282,7 +293,7 @@ export default function MyTask() {
 
                     {record.cntDueDate >= 1 ?
                       <Tag color="warning"
-                      style={{cursor:"pointer"}}
+                        style={{ cursor: "pointer" }}
                         onClick={() => {
                           customerdispatch({ type: "SELECT_DATAROW", payload: record })
                           setHistoryduedate_visible(true)

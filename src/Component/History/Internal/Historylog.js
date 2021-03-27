@@ -40,6 +40,7 @@ export default function Historylog({ type = "Issue" }) {
                             usertype: values.UserType
                         }
                     }));
+                    setLoading(false);
                 }
             } else {
                 const issue_historylog = await Axios({
@@ -56,7 +57,7 @@ export default function Historylog({ type = "Issue" }) {
                 });
 
                 if (issue_historylog.status === 200) {
-                    setHistorylog(issue_historylog.data.map((values) => {
+                   await setHistorylog(issue_historylog.data.map((values) => {
                         return {
                             createname: values.CreateName,
                             createdate: values.CreateDate,
@@ -69,6 +70,8 @@ export default function Historylog({ type = "Issue" }) {
                             email: values.Email
                         }
                     }));
+                    setLoading(false);
+                              
                 }
             }
 
@@ -77,25 +80,25 @@ export default function Historylog({ type = "Issue" }) {
         }
     }
 
-    useEffect(() => {
-        GetHistoryLog();
-        setLoading(false)
-    }, [])
+    // useEffect(() => {
+    //     GetHistoryLog();
+    // }, [])
 
     useEffect(() => {
-        GetHistoryLog();
-        setLoading(false)
-
+        if (historylog.length === 0) {
+            GetHistoryLog();
+        }
     }, [historylog.length])
 
     return (
         <List
+       
             loading={loading}
             itemLayout="horizontal"
             bordered={false}
             dataSource={historylog}
             renderItem={item => (
-                <List.Item>
+                <List.Item >
                     <List.Item.Meta
                         avatar={<Avatar src={item.avatar} icon={item.email.substring(0, 1).toLocaleUpperCase()} />}
                         title={
@@ -103,8 +106,8 @@ export default function Historylog({ type = "Issue" }) {
                                 <label className="value-text"><b>{item.createname}</b></label>  &nbsp;&nbsp;
 
                                 <label className="value-text" style={{ color: "#fa8c16" }} > {item.description}</label>&nbsp;&nbsp;&nbsp;
-                                <label className="value-text">{`(${item.value})` }</label>
-                                <ClockCircleOutlined style={{ fontSize: 18,marginLeft:10 }} />&nbsp;&nbsp;
+                                {/* <label className="value-text">{`(${item.value})`}</label> */}
+                                <ClockCircleOutlined style={{ fontSize: 18, marginLeft: 0 }} />&nbsp;&nbsp;
                                 <label className="value-text">{moment(item.createdate).format("DD/MM/YYYY H:mm")}</label>
 
                             </>

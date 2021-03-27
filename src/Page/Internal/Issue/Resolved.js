@@ -55,6 +55,7 @@ export default function Resolved() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
@@ -88,14 +89,14 @@ export default function Resolved() {
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
-        <Row style={{ marginBottom: 16, textAlign: "left" }}>
+        <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
           <Col span={24}>
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
         <IssueSearch />
         <Row>
-          <Col span={24}>
+          <Col span={24} style={{ padding: "0px 0px 0px 24px" }}>
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
@@ -178,7 +179,7 @@ export default function Resolved() {
                           </label>
                         </Col>
                       </Row>
-                      <Row style={{ borderBottom: "1px dotted" }}>
+                      {/* <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
                             Module :
@@ -186,8 +187,19 @@ export default function Resolved() {
                         </Col>
                         <Col span={14}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            {/* {record.ModuleName} */}
-                            CustomerService
+                            {record.ModuleName}
+                          </label>
+                        </Col>
+                      </Row> */}
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={10}>
+                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                            Scene :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Scene}
                           </label>
                         </Col>
                       </Row>
@@ -319,10 +331,10 @@ export default function Resolved() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
-                      <ClockSLA
+                        <ClockSLA
                           start={moment(record.AssignIconDate)}
                           due={moment(record.DueDate)}
-                          end={ record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
+                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
 
                         />
                       </div>

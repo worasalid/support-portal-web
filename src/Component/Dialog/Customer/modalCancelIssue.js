@@ -1,8 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Modal, Form, Input } from 'antd';
-
+import { Modal, Form, Input, Spin } from 'antd';
 import Axios from 'axios';
-//import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import { useHistory } from 'react-router-dom';
 
 const { TextArea } = Input;
@@ -10,9 +8,8 @@ const { TextArea } = Input;
 
 export default function ModalCancelIssue({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
-    // const [textValue, setTextValue] = useState("")
-    //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
 
 
     const FlowCancel = async (values) => {
@@ -32,26 +29,31 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
             });
 
             if (cancelflow.status === 200) {
+                setLoading(false);
                 onCancel();
-                await Modal.info({
+
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         onOk();
                         history.push({ pathname: "/customer/issue/cancel" })
                         form.resetFields();
-                        
+
                     },
                 });
             }
 
         } catch (error) {
+            setLoading(false);
             onCancel();
-            await Modal.info({
+
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
@@ -59,6 +61,7 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     form.resetFields();
                     onOk();
@@ -69,40 +72,44 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
     }
 
     const onFinish = values => {
-        console.log('Success:', values);
-
-        FlowCancel(values)
+        setLoading(true);
+        FlowCancel(values);
     };
 
     useEffect(() => {
+        if (visible) {
 
-    }, [])
+        }
+    }, [visible])
+
     return (
         <Modal
             visible={visible}
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit()}
             okButtonProps={""}
-            onCancel={() => { return onCancel(), form.resetFields() }}
+            onCancel={() => {
+                onCancel();
+                form.resetFields();
+            }}
             {...props}
         >
-            <Form
-                form={form}
-                layout="vertical"
-                name="issuecancel"
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    label="เหตุผลในการยกเลิก"
-                    name="description"
-                    rules={[{ required: true, message: 'กรุณาระบุเหตุผลในการยกเลิก' }]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form
+                    form={form}
+                    layout="vertical"
+                    name="issuecancel"
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
                 >
-                    <TextArea rows={5} style={{ width: "100%" }} />
-                </Form.Item>
-            </Form >
-
-
-
+                    <Form.Item
+                        label="เหตุผลในการยกเลิก"
+                        name="description"
+                        rules={[{ required: true, message: 'กรุณาระบุเหตุผลในการยกเลิก' }]}
+                    >
+                        <TextArea rows={5} style={{ width: "100%" }} />
+                    </Form.Item>
+                </Form >
+            </Spin>
         </Modal>
     );
 }

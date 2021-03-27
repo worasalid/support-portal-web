@@ -7,7 +7,7 @@ import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, LeftCircleOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import moment from 'moment';
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
@@ -18,6 +18,7 @@ import ModalReOpen from "../../../Component/Dialog/Customer/modalReOpen";
 import ModalConfirmManday from "../../../Component/Dialog/Customer/modalConfirmManday";
 import ModalPO from "../../../Component/Dialog/Customer/modalPO";
 import ModalDueDate from "../../../Component/Dialog/Customer/modalDueDate";
+import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -43,11 +44,13 @@ export default function Subject() {
   const [modalconfirmManday_visible, setModalconfirmManday_visible] = useState(false);
   const [modalPO_visible, setModalPO_visible] = useState(false);
   const [modalDueDate_visible, setModalDueDate_visible] = useState(false);
+  const [modalPreview, setModalPreview] = useState(false);
 
   // data
   const [ticketdata, setTicketdata] = useState([]);
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
+  const [imgUrl, setImgUrl] = useState(null);
 
 
   const getflow_output = async (value) => {
@@ -64,7 +67,7 @@ export default function Subject() {
     if (flow_output.status === 200) {
       customerdispatch({
         type: "LOAD_ACTION_FLOW",
-        payload: flow_output.data.filter((x) => x.Type === null || x.Type === "Issue" 
+        payload: flow_output.data.filter((x) => x.Type === null || x.Type === "Issue"
           || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
         )
       })
@@ -225,13 +228,19 @@ export default function Subject() {
   }
 
   useEffect(() => {
+   
     getdetail();
+
+    var now  = "2021-03-27 15:00";
+    var then = "2021-03-27 17:20";
+    var result =   moment(then,"YYYY-MM-DD HH:mm").diff(moment(now,"YYYY-MM-DD HH:mm"),'minute')
+  console.log(result)
   }, [])
 
-
   useEffect(() => {
-    getdetail();
-    getDueDateHistory();
+    if (historyduedate_visible) {
+      getDueDateHistory();
+    }
   }, [historyduedate_visible])
 
   const tabDocDetail = useMemo(() => {
@@ -243,88 +252,94 @@ export default function Subject() {
   return (
     <MasterPage>
       <div style={{ height: "100%" }} >
-        <div className="scrollable-container" ref={setContainer} >
-          <Affix target={() => container}>
-            <Row>
-              <Col>
-                <a
-                  href="/#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    history.goBack();
-                  }}
-                >
-                  Back
-          </a>
-              </Col>
-            </Row>
-          </Affix>
+        <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
+          <Row style={{ padding: "0px 0px 0px 24px" }}>
+            <Col>
+              <Button
+                type="link"
+                icon={<LeftCircleOutlined />}
+                style={{ fontSize: 18, padding: 0 }}
+                onClick={() => history.goBack()}
+              >
+                Back
+                </Button>
+            </Col>
+          </Row>
 
-          <Row>
+          <Row style={{ height: 'calc(100% - 32px)' }}>
             {/* Content */}
-            <Col span={16} style={{ paddingTop: 0 }}>
-              <div style={{ height: "80vh", overflowY: "scroll" }}>
-                {/* Issue Description */}
-                <Row style={{ marginRight: 24 }}>
-                  <Col span={24}>
-                    {/* <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label> */}
-                    <label className="topic-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</label>
-                    <div className="issue-detail-box">
-                      <Row>
-                        <Col span={16} style={{ display: "inline" }}>
-                          <Typography.Title level={4}>
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Title}
-                          </Typography.Title>
-                        </Col>
-                        <Col span={8} style={{ display: "inline", textAlign: "right" }}>
-                          <Button type="link"
-                            onClick={
-                              () => {
-                                return (
-                                  setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                  setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
-                                )
-                              }
+            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+
+              {/* Issue Description */}
+              <Row style={{ marginRight: 24 }}>
+                <Col span={24}>
+                  {/* <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label> */}
+                  <label className="topic-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</label>
+                  <div className="issue-detail-box">
+                    <Row>
+                      <Col span={16} style={{ display: "inline" }}>
+                        <Typography.Title level={4}>
+                          <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Title}
+                        </Typography.Title>
+                      </Col>
+                      <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                        <Button type="link"
+                          onClick={
+                            () => {
+                              return (
+                                setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
+                              )
                             }
-                          >{collapsetext}
-                          </Button>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <div style={{ display: divcollapse }}>
-                          <div className="issue-description" dangerouslySetInnerHTML={{ __html: customerstate?.issuedata?.details[0]?.Description }} ></div>
+                          }
+                        >{collapsetext}
+                        </Button>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <div style={{ display: divcollapse }}>
+                        <div className="issue-description"
+                          dangerouslySetInnerHTML={{ __html: customerstate?.issuedata?.details[0]?.Description }}
+                          onClick={e => {
+                            if (e.target.tagName == "IMG") {
+                              setImgUrl(e.target.src);
+                              setModalPreview(true);
+                            }
+                          }}>
+
                         </div>
-                      </Row>
-                    </div>
-                  </Col>
-                </Row>
+                      </div>
+                    </Row>
+                  </div>
+                </Col>
+              </Row>
 
-                {/* TAB Document */}
-                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                  <Col span={24}>
+              {/* TAB Document */}
+              <Row style={{ marginTop: 36, marginRight: 24 }}>
+                <Col span={24}>
 
-                    <TabsDocument
-                      details={tabDocDetail}
-                    />
-                  </Col>
-                </Row>
+                  <TabsDocument
+                    details={tabDocDetail}
+                  />
+                </Col>
+              </Row>
 
-                {/* TAB Activity */}
-                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                  <Col span={24}>
-                    <label className="header-text">Activity</label>
-                    <Tabs defaultActiveKey="1">
-                      <TabPane tab="Comment" key="1">
-                        <CommentBox />
-                      </TabPane>
+              {/* TAB Activity */}
+              <Row style={{ marginTop: 36, marginRight: 24 }}>
+                <Col span={24}>
+                  <label className="header-text">Activity</label>
+                  <Tabs defaultActiveKey="1">
+                    <TabPane tab="Comment" key="1">
+                      <CommentBox />
+                    </TabPane>
 
-                      <TabPane tab="History Log" key="2">
-                        <Historylog />
-                      </TabPane>
-                    </Tabs>
-                  </Col>
-                </Row>
-              </div>
+                    <TabPane tab="History Log" key="2">
+                      <Historylog />
+                    </TabPane>
+                  </Tabs>
+                </Col>
+              </Row>
+
             </Col>
             {/* Content */}
 
@@ -394,11 +409,19 @@ export default function Subject() {
                 </Col>
               </Row>
 
-              <Row style={{ marginBottom: 20 }}>
+              {/* <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Module</label>
                   <br />
                   <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleName}</label>
+                </Col>
+              </Row> */}
+
+              <Row style={{ marginBottom: 20 }}>
+                <Col span={18}>
+                  <label className="header-text">Scene</label>
+                  <br />
+                  <label className="value-text">{customerstate?.issuedata.details[0]?.Scene}</label>
                 </Col>
               </Row>
 
@@ -562,6 +585,18 @@ export default function Subject() {
           mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
           flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
         }}
+      />
+
+      <PreviewImg
+        title="Preview"
+        visible={modalPreview}
+        width={800}
+        footer={null}
+        onCancel={() => {
+          setModalPreview(false);
+          setImgUrl(null);
+        }}
+        pathUrl={imgUrl}
       />
 
     </MasterPage>

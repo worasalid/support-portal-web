@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Form } from 'antd';
+import { Modal, Form, Spin } from 'antd';
 import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 import TextEditor from '../../../TextEditor';
@@ -10,7 +10,8 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     const SaveComment = async () => {
         try {
@@ -57,6 +58,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
+                setLoading(false);
                 await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -64,7 +66,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                             {/* <p>บันทึกข้อมูลสำเร็จ</p> */}
                         </div>
                     ),
-                    okText:"Close",
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
                         if (details.flowoutput.value === "ApproveCR") {
@@ -81,6 +83,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             }
         } catch (error) {
             onOk();
+            setLoading(false);
             await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
@@ -88,23 +91,25 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                         <p>{error.response.data}</p>
                     </div>
                 ),
-                okText:"Close",
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
-                  
-                   
+
+
                 },
             });
         }
     }
 
     const onFinish = (values) => {
+        setLoading(true);
         SendFlow();
     };
 
     return (
         <Modal
             visible={visible}
+            confirmLoading={loading}
             okText="Send"
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
@@ -112,28 +117,28 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="qa-test"
-                layout="vertical"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="remark"
-                    label="Remark :"
-
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    name="qa-test"
+                    layout="vertical"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <TextEditor ref={editorRef} />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form>
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="remark"
+                        label="Remark :"
 
+                    >
+                        <TextEditor ref={editorRef} />
+                        <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
+                    </Form.Item>
+                </Form>
+            </Spin>
         </Modal>
     )
 }

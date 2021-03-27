@@ -47,6 +47,7 @@ export default function ModalMandayLog({ visible = false, onOk, onCancel, dataro
     useEffect(() => {
         if (visible === true) {
             GetTask();
+            setTotalmanday(details.totalmanday);
         }
 
     }, [visible])
@@ -54,10 +55,6 @@ export default function ModalMandayLog({ visible = false, onOk, onCancel, dataro
     manday = manday.reduce(function (a, b) {
         return a + b;
     }, 0);
-
-    useEffect(() => {
-        setTotalmanday(details.totalmanday)
-    }, [])
 
 
     return (

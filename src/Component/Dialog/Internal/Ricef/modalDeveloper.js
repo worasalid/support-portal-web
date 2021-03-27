@@ -105,7 +105,6 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
         }
     }
 
-
     const onFinish = (values) => {
         console.log('Success:', values);
         SendFlow(values);

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, InputNumber, Input, List, Row, Col, Radio, Tag } from 'antd';
+import { Modal, Form, InputNumber, Spin, List, Row, Col, Radio, Tag } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -11,7 +11,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     const [form] = Form.useForm();
     const [form2] = Form.useForm();
     const [hidden_form, setHidden_form] = useState(true)
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     //data
     let [manday, setManday] = useState([])
@@ -78,7 +79,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null){
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -122,6 +123,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
+                setLoading(false);
                 await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -129,6 +131,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -136,6 +139,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                 });
             }
         } catch (error) {
+            setLoading(false);
             await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
@@ -143,6 +147,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -176,28 +181,32 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
             if (SendFlowIssue.status === 200) {
                 SaveComment();
                 onOk();
-                await Modal.info({
+                setLoading(false);
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
-                     
+
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -209,12 +218,14 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
 
     const onFinish = (values) => {
+        setLoading(true);
         details.flowoutput.Type === "Task" ? SendFlowTask(values) : SendFlowIssue(values)
     };
 
     useEffect(() => {
-        GetTask();
-
+        if (visible) {
+            GetTask();
+        }
     }, [visible])
 
 
@@ -237,6 +248,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     return (
         <Modal
             visible={visible}
+            confirmLoading={loading}
             okText="Send"
             onOk={() => { return details.flowoutput.Type === "Task" ? form.submit() : form2.submit() }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
@@ -251,138 +263,138 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
             {...props}
         >
 
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }} {...formProps}
+                    name="form-taskmanday"
 
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }} {...formProps}
-                name="form-taskmanday"
-
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    name="manday"
-                    label="Manday (Devs)"
+                    onFinish={onFinish}
                 >
-                    <InputNumber min={0.25} max={100} step={0.25} style={{ width: "30%" }} />
-                </Form.Item>
-            </Form>
+                    <Form.Item
+                        name="manday"
+                        label="Manday (Devs)"
+                    >
+                        <InputNumber min={0.25} max={100} step={0.25} style={{ width: "30%" }} />
+                    </Form.Item>
+                </Form>
 
-            <Form form={form2} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }} {...form2Props}
-                name="form-issuemanday"
+                <Form form={form2} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }} {...form2Props}
+                    name="form-issuemanday"
 
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
+                >
 
-                <Row>
+                    <Row>
 
 
 
-                    <Col span={8}>
-                        <fieldset style={{ border: "solid 1px", borderRadius: "25px", padding: "15px" }}>
-                            <Form.Item
-                                name="freecost"
-                                label="ค่าใช้จ่าย"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'กรุณาระบุ ค่าใช้จ่าย',
-                                    },
-                                ]}
-                            >
-                                <Row>
-                                    <Col span={24}>
-                                        <Radio.Group onChange={(e) => e.target.value}>
-                                            <Radio style={radioStyle} value={1} onChange={(x) => setCostmanday(0)}>
-                                                ไม่มีค่าใช้จ่าย (ฟรี)
+                        <Col span={8}>
+                            <fieldset style={{ border: "solid 1px", borderRadius: "25px", padding: "15px" }}>
+                                <Form.Item
+                                    name="freecost"
+                                    label="ค่าใช้จ่าย"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'กรุณาระบุ ค่าใช้จ่าย',
+                                        },
+                                    ]}
+                                >
+                                    <Row>
+                                        <Col span={24}>
+                                            <Radio.Group onChange={(e) => e.target.value}>
+                                                <Radio style={radioStyle} value={1} onChange={(x) => setCostmanday(0)}>
+                                                    ไม่มีค่าใช้จ่าย (ฟรี)
                                 </Radio>
-                                            <Radio style={radioStyle} value={2} onChange={(x) => setCostmanday(details.costmanday)}>
-                                                มีค่าใช้จ่าย
+                                                <Radio style={radioStyle} value={2} onChange={(x) => setCostmanday(details.costmanday)}>
+                                                    มีค่าใช้จ่าย
                                </Radio>
 
-                                        </Radio.Group>
-                                    </Col>
-                                </Row>
-                            </Form.Item>
-                        </fieldset>
-                    </Col>
-                    <Col span={16}>
-                        <List
-                            itemLayout="horizontal"
-                            dataSource={listdata}
-                            renderItem={item => (
-                                <>
-                                    <Row>
-                                        <Col span={10} style={{ textAlign: "right" }}>
-                                            <Tag color="#f50">{item.module}</Tag>
-                                        </Col>
-                                        <Col span={10}>
-
-                                            <InputNumber defaultValue={item.manday} disabled={true} style={{ width: "100%" }} />
-
-                                        </Col>
-                                        <Col span={4} style={{ textAlign: "center" }}>
-                                            <label>Manday</label>
+                                            </Radio.Group>
                                         </Col>
                                     </Row>
+                                </Form.Item>
+                            </fieldset>
+                        </Col>
+                        <Col span={16}>
+                            <List
+                                itemLayout="horizontal"
+                                dataSource={listdata}
+                                renderItem={item => (
+                                    <>
+                                        <Row>
+                                            <Col span={10} style={{ textAlign: "right" }}>
+                                                <Tag color="#f50">{item.module}</Tag>
+                                            </Col>
+                                            <Col span={10}>
 
-                                </>
-                            )} >
-                        </List>
+                                                <InputNumber defaultValue={item.manday} disabled={true} style={{ width: "100%" }} />
+
+                                            </Col>
+                                            <Col span={4} style={{ textAlign: "center" }}>
+                                                <label>Manday</label>
+                                            </Col>
+                                        </Row>
+
+                                    </>
+                                )} >
+                            </List>
 
 
-                        <Row>
-                            <Col span={10} style={{ textAlign: "right" }}>
-                                <label>Cr Center</label>
-                            </Col>
-                            <Col span={10}>
-                                <InputNumber min={0} max={100} step={0.25} defaultValue={0} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
-                                    onChange={(value) => {
-                                        setCrCenterManday(value)
-                                    }
-                                    } />
-                            </Col>
-                            <Col span={4} style={{ textAlign: "center" }}>
-                                <label>Manday</label>
-                            </Col>
-                        </Row>
+                            <Row>
+                                <Col span={10} style={{ textAlign: "right" }}>
+                                    <label>Cr Center</label>
+                                </Col>
+                                <Col span={10}>
+                                    <InputNumber min={0} max={100} step={0.25} defaultValue={0} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
+                                        onChange={(value) => {
+                                            setCrCenterManday(value)
+                                        }
+                                        } />
+                                </Col>
+                                <Col span={4} style={{ textAlign: "center" }}>
+                                    <label>Manday</label>
+                                </Col>
+                            </Row>
 
-                        <Row>
-                            <Col span={10} style={{ textAlign: "right" }}>
-                                <label>Total Manday</label>
-                            </Col>
-                            <Col span={10} style={{ textAlign: "right" }}>
-                                <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalmanday}</label>
-                            </Col>
-                            <Col span={4} style={{ textAlign: "center" }}>
-                                <label>Manday</label>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={10} style={{ textAlign: "right" }}>
-                                <label>Total Cost</label>
-                            </Col>
-                            <Col span={10} style={{ textAlign: "right", borderBottom: "1px solid" }}>
-                                <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label>
-                                <u></u>
-                            </Col>
-                            <Col span={4} style={{ textAlign: "center" }}>
-                                <label>บาท</label>
-                            </Col>
-                        </Row>
+                            <Row>
+                                <Col span={10} style={{ textAlign: "right" }}>
+                                    <label>Total Manday</label>
+                                </Col>
+                                <Col span={10} style={{ textAlign: "right" }}>
+                                    <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalmanday}</label>
+                                </Col>
+                                <Col span={4} style={{ textAlign: "center" }}>
+                                    <label>Manday</label>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={10} style={{ textAlign: "right" }}>
+                                    <label>Total Cost</label>
+                                </Col>
+                                <Col span={10} style={{ textAlign: "right", borderBottom: "1px solid" }}>
+                                    <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label>
+                                    <u></u>
+                                </Col>
+                                <Col span={4} style={{ textAlign: "center" }}>
+                                    <label>บาท</label>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                </Form>
+
+                <Row style={{ marginTop: 50 }}>
+                    <Col span={24}>
+                        <label>Remark :</label> <br />
+                        <TextEditor ref={editorRef} />
+                        <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
                     </Col>
                 </Row>
-            </Form>
-
-            <Row style={{ marginTop: 50 }}>
-                <Col span={24}>
-                    <label>Remark :</label> <br />
-                    <TextEditor ref={editorRef} />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
-                </Col>
-            </Row>
-
+            </Spin>
         </Modal>
     )
 }

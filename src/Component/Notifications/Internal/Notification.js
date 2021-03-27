@@ -1,34 +1,50 @@
 
 import React, { useEffect, useState } from 'react';
-import { List, Avatar } from 'antd';
+import { List, Avatar, Spin, Badge } from 'antd';
 import Axios from 'axios';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
 
 
+
 export default function Notifications(props) {
     const history = useHistory()
+    const [pageStart, setPageStart] = useState(1)
+    const [loading, setLoading] = useState(true)
     const [notification, setNotification] = useState([]);
+    const [hasMore, setHasMore] = useState(true)
 
-    const GetNotification = async () => {
+    const GetNotification = async (page) => {
         try {
+            setLoading(true)
             const noti = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/notification",
+                url: process.env.REACT_APP_API_URL + "/master/notification-details",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    limit: 10,
+                    offset: (page - 1) * 10
                 }
             });
+
             if (noti.status === 200) {
-                setNotification(noti.data.map((value) => {
-                    return {
-                        ticketid: value.TicketId,
-                        title: value.TicketNumber,
-                        description: value.Description,
-                        datetime: value.CreateDate
-                    }
-                }));
+                setLoading(false);
+                setHasMore(noti.data.hasMore)
+                setNotification([
+                    ...notification, ...noti.data.data.map((value) => {
+                        return {
+                            id: value.Id,
+                            ticketid: value.TicketId,
+                            title: value.TicketNumber,
+                            description: value.Description,
+                            datetime: value.CreateDate,
+                            readdate: value.ReadDate
+                        }
+                    })
+                ]);
             }
 
         } catch (error) {
@@ -36,19 +52,50 @@ export default function Notifications(props) {
         }
     }
 
+    const updateCountNoti = async (param) => {
+        try {
+            const result = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/notification",
+                method: "PATCH",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    id: param
+                }
+            });
+
+            if (result.status === 200) {
+                console.log("Success")
+            }
+        } catch (error) {
+
+        }
+    }
+
     useEffect(() => {
-        GetNotification();
+        GetNotification(pageStart);
     }, [])
 
+
     return (
-        <>
+        <div
+            style={{
+                height: "300px",
+                padding: "8px 24px",
+                overflow: "auto",
+                border: "1px solid #e8e8e8"
+
+            }}
+        >
             <InfiniteScroll
-                initialLoad={true}
+                initialLoad={false}
                 pageStart={1}
-               // loadMore={(x) => GetNotification()}
-                loader={(x) => console.log("loader",x)}
-                hasMore={true}
-                onScroll={(x) => console.log("onScroll",x)}
+                loadMore={(page) => page > 6 ? "" : GetNotification(page)}
+                //loader={(x) => console.log("loader", x)}
+                hasMore={!loading && hasMore}
+                useWindow={false}
+
             >
                 <List
                     itemLayout="horizontal"
@@ -56,23 +103,41 @@ export default function Notifications(props) {
                     renderItem={item => (
                         <List.Item>
                             <List.Item.Meta
-                               // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
                                 title={
                                     <>
                                         <label className="text-link"
-                                            onClick={() => { return (history.push({ pathname: "/internal/issue/subject/" + item.ticketid }), window.location.reload("false")) }}
+                                            onClick={() => {
+                                                history.push({ pathname: "/internal/issue/subject/" + item.ticketid });
+                                                window.location.reload("false");
+                                                updateCountNoti(item.id);
+                                            }}
 
                                         >
-                                            {item.title} 
+                                            <Badge dot={true}
+                                                 offset={[-5]}
+                                                style={{ display: item?.readdate === null ? "inline-block" : "none" }}
+                                            >
+                                                {/* {item.title} */}
+                                            </Badge>
+
+                                            <label>
+                                                {item.title}
+                                            </label>
+
                                         </label>
-                                        <label style={{ marginLeft: 20 }} className="value-text">
+                                        <label
+                                            style={{ marginLeft: 20 }}
+                                            className={item?.readdate === null ? "noti-text-unread" : "noti-text"}
+                                        >
                                             {`(${moment(item.datetime).format("DD/MM/YYYY HH:mm")})`}
                                         </label>
                                     </>
                                 }
                                 description={
                                     <>
-                                        <label>{item.description}</label>
+                                        <label
+                                            className={item?.readdate === null ? "noti-text-unread" : "noti-text"}
+                                        >{item.description}</label>
                                     </>
 
                                 }
@@ -80,9 +145,21 @@ export default function Notifications(props) {
                             />
                         </List.Item>
                     )}
-                />
+                >
+                    {loading && hasMore && (
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '40px',
+                            width: '100%',
+                            textAlign: 'center',
+                        }}>
+                            <Spin />
+                        </div>
+                    )}
+                </List>
             </InfiniteScroll>
 
-        </>
+        </div >
     )
 }
+

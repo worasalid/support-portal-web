@@ -105,14 +105,14 @@ export default function Cancel() {
 
   return (
     <MasterPage>
-      <Row style={{ marginBottom: 16, textAlign: "left" }}>
+      <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
         <Col span={24}>
           <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
         </Col>
       </Row>
       <IssueSearch />
       <Row>
-        <Col span={24}>
+        <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
             footer={(x) => {
               return (
@@ -205,7 +205,7 @@ export default function Cancel() {
                         </label>
                       </Col>
                     </Row>
-                    <Row style={{ borderBottom: "1px dotted" }}>
+                    {/* <Row style={{ borderBottom: "1px dotted" }}>
                       <Col span={8}>
                         <label style={{ color: "#808080", fontSize: "10px" }}>
                           Module :
@@ -214,6 +214,18 @@ export default function Cancel() {
                       <Col span={14}>
                         <label style={{ color: "#808080", fontSize: "10px" }}>
                           {record.ModuleName}
+                        </label>
+                      </Col>
+                    </Row> */}
+                    <Row style={{ borderBottom: "1px dotted" }}>
+                      <Col span={8}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          Scene :
+                          </label>
+                      </Col>
+                      <Col span={14}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
+                          {record.Scene}
                         </label>
                       </Col>
                     </Row>
@@ -249,7 +261,7 @@ export default function Cancel() {
               }
               }
             />
-            
+
             <Column title="Issue Date"
               align="center"
               width="10%"

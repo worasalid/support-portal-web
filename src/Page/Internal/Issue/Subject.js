@@ -1,4 +1,4 @@
-import { Col, Tag, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Popconfirm } from "antd";
+import { Col, Tag, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Popconfirm, Spin } from "antd";
 import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -7,7 +7,10 @@ import InternalCommentBox from "../../../Component/Comment/Internal/Internal_com
 import Historylog from "../../../Component/History/Customer/Historylog";
 import InternalHistorylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, LeftCircleOutlined, UserOutlined,
+  UpCircleOutlined, DownCircleOutlined
+} from "@ant-design/icons";
 import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
@@ -29,6 +32,7 @@ import ModalQuotation from "../../../Component/Dialog/Internal/modalQuotation";
 import ModalChangeDueDate from "../../../Component/Dialog/Internal/modalChangeDueDate";
 import ModalSaveDueDate from "../../../Component/Dialog/Internal/Issue/modalSaveDueDate";
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
+import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 
 
 const { Option } = Select;
@@ -44,9 +48,9 @@ export default function Subject() {
   const clockRef2 = useRef(null)
   const { state, dispatch } = useContext(AuthenContext);
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
+  const [loadingPage, setLoadingPage] = useState(true);
+  const [tabKey, setTabKey] = useState("1")
 
-  const [top, setTop] = useState(500);
-  const [bottom, setBottom] = useState(600);
   //modal
   // const [visible, setVisible] = useState(false);
   const [modalpreview, setModalpreview] = useState(false)
@@ -64,12 +68,18 @@ export default function Subject() {
   const [modalmandaylog_visible, setModalmandaylog_visible] = useState(false);
   const [modalAssessment_visible, setModalAssessment_visible] = useState(false);
   const [modalQuotation_visible, setModalQuotation_visible] = useState(false);
+  const [modalPreview, setModalPreview] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
   const [divProgress, setDivProgress] = useState("hide")
+  const [imgUrl, setImgUrl] = useState(null);
+
+  //div
+  const [activityCollapse, setActivityCollapse] = useState("block")
+  const [activityIcon, setActivityIcon] = useState(<DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
 
 
   // data
@@ -195,6 +205,7 @@ export default function Subject() {
       });
 
       if (ticket_detail.status === 200) {
+        setLoadingPage(false);
         userdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
         // getflow_output(ticket_detail.data[0].TransId)
       }
@@ -263,7 +274,7 @@ export default function Subject() {
               <p></p>
             </div>
           ),
-          okText:"Close",
+          okText: "Close",
           onOk() {
             getdetail();
             setHistory_loading(true);
@@ -300,11 +311,11 @@ export default function Subject() {
         if (item.data.value === "RequestInfo" || item.data.value === "Hold") { return setModalsendissue_visible(true) }
         if (item.data.value === "Resolved" || item.data.value === "Deploy") {
           if (userstate.issuedata.details[0]?.taskResolved > 0) {
-            Modal.info({
+            Modal.warning({
               title: 'มี Task งานที่ยังไม่เสร็จ',
               content: (
                 <div>
-                  <p></p>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Resolved งานก่อน</label>
                 </div>
               ),
               okText: "Close",
@@ -448,7 +459,18 @@ export default function Subject() {
       getdetail();
       getMailBox();
     }
+    if (userstate?.mailbox[0]?.NodeName === "support") {
+      // setTabKey("1");
+      if (userstate?.mailbox[0]?.NodeName !== "support" && userstate?.mailbox[0]?.NodeName !== undefined) {
+        setTabKey("4")
+      }
+
+    }
+
+
+
   }, [])
+
 
   useEffect(() => {
     if (userstate?.mailbox[0]?.TransId !== undefined) {
@@ -483,175 +505,206 @@ export default function Subject() {
     }
   }, [userstate?.issuedata?.details[0]?.Id])
 
+  const ticketTaskId = useMemo(() => {
+    return {
+      refId: userstate?.issuedata?.details[0]?.Id
+    }
+  }, [userstate?.issuedata?.details[0]?.Id])
+
+
   return (
     <MasterPage>
-      <div style={{ height: "100%" }} >
-        <div className="scrollable-container" ref={setContainer} >
-          {/* <Affix target={() => container}> */}
-          <Row>
+      <Spin spinning={loadingPage} tip="Loading..." style={{ height: "100%" }}>
+        <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
+          <Row style={{ padding: "0px 0px 0px 24px" }}>
             <Col>
-              <a
-                href="/#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  history.goBack();
-                }}
+              <Button
+                type="link"
+                icon={<LeftCircleOutlined />}
+                style={{ fontSize: 18, padding: 0 }}
+                onClick={() => history.goBack()}
               >
                 Back
-          </a>
+                </Button>
             </Col>
           </Row>
           {/* </Affix> */}
 
-
-          <Row>
+          <Row style={{ height: 'calc(100% - 32px)' }}>
             {/* Content */}
-            <Col span={16} style={{ paddingTop: 10 }}>
-              <div style={{ height: "80vh", overflowY: "scroll" }}>
-                {/* Issue Description */}
+            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "auto" }}>
 
-                <Row style={{ marginRight: 24 }}>
-                  <Col span={24}>
-
-                    <label className="topic-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Number}</label>
-                    <div className="issue-detail-box">
-                      <Row>
-                        <Col span={16} style={{ display: "inline" }}>
-                          <Typography.Title level={4}>
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
-                          </Typography.Title>
-                        </Col>
-                        <Col span={8} style={{ display: "inline", textAlign: "right" }}>
-                          <Button title="preview" type="link"
-                            icon={<img
-                              style={{ height: "20px", width: "20px" }}
-                              src={`${process.env.PUBLIC_URL}/icons-expand.png`}
-                              alt=""
-                            />}
-                            onClick={() => setModalpreview(true)}
-                          />
-                          <Divider type="vertical" />
-                          <Button type="link"
-                            onClick={
-                              () => {
-                                return (
-                                  setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                  setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
-                                )
-                              }
+              {/* Issue Description */}
+              <Row style={{ marginRight: 24 }}>
+                <Col span={24}>
+                  <label className="topic-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Number}</label>
+                  <div className="issue-detail-box">
+                    <Row>
+                      <Col span={16} style={{ display: "inline" }}>
+                        <Typography.Title level={4}>
+                          <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
+                        </Typography.Title>
+                      </Col>
+                      <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                        <Button title="preview" type="link"
+                          icon={<img
+                            style={{ height: "20px", width: "20px" }}
+                            src={`${process.env.PUBLIC_URL}/icons-expand.png`}
+                            alt=""
+                          />}
+                          onClick={() => setModalpreview(true)}
+                        />
+                        <Divider type="vertical" />
+                        <Button type="link"
+                          onClick={
+                            () => {
+                              return (
+                                setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
+                              )
                             }
-                          >{collapsetext}
-                          </Button>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <div style={{ display: divcollapse }}>
-                          <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }} ></div>
+                          }
+                        >{collapsetext}
+                        </Button>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <div style={{ display: divcollapse }}>
+                        <div className="issue-description"
+                          dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }}
+                          onClick={e => {
+                            if (e.target.tagName == "IMG") {
+                              setImgUrl(e.target.src);
+                              setModalPreview(true);
+                            }
+                          }}>
+
                         </div>
-                      </Row>
-                    </div>
+                      </div>
+                    </Row>
+                  </div>
 
-                  </Col>
-                </Row>
+                </Col>
+              </Row>
 
-                {/* TAB Document */}
+              {/* TAB Document */}
+              <Row style={{ marginTop: 36, marginRight: 24 }}>
+                <Col span={24}>
 
-                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                  <Col span={24}>
+                  <TabsDocument
+                    details={tabDocDetail}
+                  />
+                </Col>
+              </Row>
 
-                    <TabsDocument
-                      details={tabDocDetail}
-                    />
-                  </Col>
-                </Row>
+              {/* SubTask */}
+              <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
 
-                {/* SubTask */}
-                <Row style={{ marginTop: 26, marginRight: 24, textAlign: "right" }}>
+                {/* ปุ่ม Create CR */}
+                <Col span={24}
+                  style={{
+                    display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
+                      userstate?.mailbox[0]?.NodeName === "cr_center" &&
+                      userstate.issuedata.details[0]?.Manday === null ? "block" : "none"
+                  }} >
 
-                  {/* ปุ่ม Create CR */}
-                  <Col span={24}
-                    style={{
-                      display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
-                        userstate?.mailbox[0]?.NodeName === "cr_center" &&
-                        userstate.issuedata.details[0]?.Manday === null ? "block" : "none"
-                    }} >
-
-                    <Button icon={<FileAddOutlined />}
-                      disabled={userstate.issuedata.details[0]?.FlowStatus === "Waiting SA" ? true : false}
-                      shape="round"
-                      onClick={() => setModaladdtask(true)} >
-                      CreateTask
+                  <Button icon={<FileAddOutlined />}
+                    disabled={userstate.issuedata.details[0]?.FlowStatus === "Waiting SA" ? true : false}
+                    shape="round"
+                    onClick={() => setModaladdtask(true)} >
+                    CreateTask
                         </Button>
-                  </Col>
+                </Col>
 
-                  {/* ปุ่ม Create Bug, Use */}
-                  <Col span={24}
-                    style={{
-                      display: (userstate?.issuedata?.details[0]?.IssueType === "Bug" || userstate?.issuedata?.details[0]?.IssueType === "Use") &&
-                        userstate?.mailbox[0]?.NodeName === "support" ? "block" : "none"
-                    }}>
-                    <Button icon={<FileAddOutlined />}
-                      shape="round"
-                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
-                        Modal.info({
-                          title: 'กรุณา ระบุ Priority',
-                          okText: "Close"
-                        })
-                        : setModaladdtask(true)}
-                    >
-                      CreateTask
+                {/* ปุ่ม Create Bug, Use */}
+                <Col span={24}
+                  style={{
+                    display: (userstate?.issuedata?.details[0]?.IssueType === "Bug" || userstate?.issuedata?.details[0]?.IssueType === "Use") &&
+                      userstate?.mailbox[0]?.NodeName === "support" ? "block" : "none"
+                  }}>
+                  <Button icon={<FileAddOutlined />}
+                    shape="round"
+                    onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
+                      Modal.info({
+                        title: 'กรุณา ระบุ Priority',
+                        okText: "Close"
+                      })
+                      : setModaladdtask(true)}
+                  >
+                    CreateTask
                         </Button>
-                  </Col>
-                </Row>
-                <Row style={{ marginRight: 24 }}>
-                  <Col span={24}>
-                    <ListSubTask
-                      // ticketId={match.params.id} ref={subTaskRef}
-                      ticketId={userstate?.issuedata?.details[0]?.Id}
-                      ref={subTaskRef}
-                    // mailtype={userstate?.mailbox[0]?.MailType}
-                    />
-                  </Col>
-                </Row>
+                </Col>
+              </Row>
+              <Row style={{ marginRight: 24 }}>
+                <Col span={24}>
+                  <ListSubTask
+                    ticketId={match.params.id} ref={subTaskRef}
+                    //  ticketId={userstate?.issuedata?.details[0]?.Id}
+                    // ticketId={ticketTaskId}
+                    ref={subTaskRef}
+                  // mailtype={userstate?.mailbox[0]?.MailType}
+                  />
+                </Col>
+              </Row>
 
-                {/* TAB Activity */}
-                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                  <Col span={24}>
-                    <label className="header-text">Activity</label>
-
-                    {
-                      userstate?.mailbox[0]?.NodeName === "support"
-                        ?
-
-                        <Tabs defaultActiveKey="1" >
-                          <TabPane tab="Comment" key="1">
-                            <CommentBox />
-                          </TabPane>
-                          <TabPane tab="Comment (Internal)" key="2">
-                            <InternalCommentBox />
-                          </TabPane>
-                          <TabPane tab="History Log" key="3">
-                            <Historylog loading={history_loading} />
-                          </TabPane>
-                        </Tabs>
-                        :
-                        <Tabs defaultActiveKey="1" >
-                          <TabPane tab="Issue Note" key="1" >
-                            <InternalCommentBox />
-                          </TabPane>
-                          <TabPane tab="History Log" key="2">
-                            <Historylog loading={history_loading} />
-                          </TabPane>
-                        </Tabs>
+              {/* TAB Activity */}
+              <Row style={{ marginTop: 36, marginRight: 24 }}>
+                <Col span={24}>
+                  <label className="header-text">Activity</label>
+                  <span
+                    style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
+                    onClick={
+                      () => {
+                        return (
+                          setActivityCollapse(activityCollapse === 'block' ? 'none' : 'block'),
+                          setActivityIcon(activityCollapse === 'block' ? <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+                        )
+                      }
                     }
-                  </Col>
-                </Row>
-              </div>
+                  >
+                    {activityIcon}
+                  </span>
+
+                    <div style={{ display: activityCollapse }}>
+                      {
+                        userstate?.mailbox[0]?.NodeName === "support"
+                          ?
+
+                          <Tabs defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
+                            <TabPane tab="Comment" key="1">
+                              <CommentBox />
+                            </TabPane>
+                            <TabPane tab="Comment (Internal)" key="2">
+                              {
+                                tabKey === "2" ? <InternalCommentBox /> : ""
+                              }
+
+                            </TabPane>
+                            <TabPane tab="History Log" key="3">
+                              <Historylog loading={history_loading} />
+                            </TabPane>
+                          </Tabs>
+                          :
+                          <Tabs defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
+                            <TabPane tab="Issue Note" key="1" >
+                              {
+                                tabKey === "1" ? <InternalCommentBox /> : ""
+                              }
+                            </TabPane>
+                            <TabPane tab="History Log" key="2">
+                              <Historylog loading={history_loading} />
+                            </TabPane>
+                          </Tabs>
+                      }
+                    </div>
+                </Col>
+              </Row>
+              {/* </div> */}
             </Col>
             {/* Content */}
 
             {/* SideBar */}
-            <Col span={6} style={{ backgroundColor: "", height: 500, marginLeft: 20 }}>
+            <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Progress Status</label>
@@ -904,11 +957,18 @@ export default function Subject() {
                   <label className="value-text">{userstate.issuedata.details[0] && `${userstate.issuedata.details[0].ProductName} - (${userstate.issuedata.details[0].ProductFullName})`}</label>
                 </Col>
               </Row>
+              {/* <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Module</label>
+                    <br />
+                    <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
+                  </Col>
+                </Row> */}
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
-                  <label className="header-text">Module</label>
+                  <label className="header-text">Scene</label>
                   <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
+                  <label className="value-text">{userstate?.issuedata?.details[0]?.Scene}</label>
                 </Col>
               </Row>
 
@@ -938,213 +998,227 @@ export default function Subject() {
             {/* SideBar */}
           </Row>
         </div>
-      </div>
 
+        {/* Modal */}
+        <Modal
+          title="Preview"
+          width={1000}
+          visible={modalpreview}
+          okButtonProps={{ hidden: true }}
+          cancelText="Close"
+          onCancel={() => setModalpreview(false)}
+        >
+          <Row>
+            <Col span={16} style={{ display: "inline" }}>
+              <Typography.Title level={4}>
+                <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
+              </Typography.Title>
+            </Col>
+          </Row>
 
+          <div className="issue-description"
+            dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }} >
 
-      {/* Modal */}
-      <Modal
-        title="Preview"
-        width={1000}
-        visible={modalpreview}
-        okButtonProps={{ hidden: true }}
-        cancelText="Close"
-        onCancel={() => setModalpreview(false)}
-      >
-        <Row>
-          <Col span={16} style={{ display: "inline" }}>
-            <Typography.Title level={4}>
-              <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
-            </Typography.Title>
-          </Col>
-        </Row>
+          </div>
+          {/* <img 
+            src="https://space-api.iconrem.com/files/16"
+            /> */}
+        </Modal>
 
-        <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }} ></div>
-      </Modal>
+        <DuedateLog
+          title="ประวัติ DueDate"
+          visible={historyduedate_visible}
+          onCancel={() => setHistoryduedate_visible(false)}
+          details={{
+            ticketId: userstate?.issuedata.details[0]?.Id
+          }}
+        />
 
-      <DuedateLog
-        title="ประวัติ DueDate"
-        visible={historyduedate_visible}
-        onCancel={() => setHistoryduedate_visible(false)}
-        details={{
-          ticketId: userstate?.issuedata.details[0]?.Id
-        }}
-      />
+        <ModalCreateTask
+          title={ProgressStatus}
+          visible={modaladdtask}
+          width={800}
+          onCancel={() => { return (setModaladdtask(false)) }}
+          onOk={() => {
+            setModaladdtask(false);
+            subTaskRef.current.GetTask()
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            title: userstate?.issuedata?.details[0]?.Title,
+            productid: userstate?.issuedata?.details[0]?.ProductId
 
-      <ModalCreateTask
-        title={ProgressStatus}
-        visible={modaladdtask}
-        width={800}
-        onCancel={() => { return (setModaladdtask(false)) }}
-        onOk={() => {
-          setModaladdtask(false);
-          subTaskRef.current.GetTask()
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          title: userstate?.issuedata?.details[0]?.Title,
-          productid: userstate?.issuedata?.details[0]?.ProductId
+          }}
+        />
 
-        }}
-      />
+        <ModalDueDate
+          title="DueDate"
+          visible={modalduedate_visible}
+          width={800}
+          onCancel={() => setModalduedate_visible(false)}
+          onOk={() => {
+            setModalduedate_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            duedate: userstate.issuedata.details[0]?.DueDate === null ? null : moment(userstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
+          }}
+        />
 
-      <ModalDueDate
-        title="DueDate"
-        visible={modalduedate_visible}
-        width={800}
-        onCancel={() => setModalduedate_visible(false)}
-        onOk={() => {
-          setModalduedate_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          flowoutput: userstate.node.output_data,
-          duedate: userstate.issuedata.details[0]?.DueDate === null ? null : moment(userstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
-        }}
-      />
+        <ModalSaveDueDate
+          title="กำหนด Due Date"
+          visible={modalSaveDuedate}
+          width={800}
+          onCancel={() => setModalSaveDuedate(false)}
+          onOk={() => {
+            setModalSaveDuedate(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            type: duedateType
+          }}
+        />
 
-      <ModalSaveDueDate
-        title="กำหนด Due Date"
-        visible={modalSaveDuedate}
-        width={800}
-        onCancel={() => setModalSaveDuedate(false)}
-        onOk={() => {
-          setModalSaveDuedate(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          type: duedateType
-        }}
-      />
+        <ModalChangeDueDate
+          title="เปลียน Due Date"
+          visible={modalChangeduedate}
+          width={800}
+          onCancel={() => setModalChangeduedate(false)}
+          onOk={() => {
+            setModalChangeduedate(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+          }}
+        />
 
-      <ModalChangeDueDate
-        title="เปลียน Due Date"
-        visible={modalChangeduedate}
-        width={800}
-        onCancel={() => setModalChangeduedate(false)}
-        onOk={() => {
-          setModalChangeduedate(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-        }}
-      />
+        <ModalTimetracking
+          title="Time Tracking"
+          width={600}
+          visible={modaltimetracking_visible}
+          onCancel={() => { return (setModaltimetracking_visible(false)) }}
+          details={{
+            transgroupId: userstate?.mailbox[0]?.TransGroupId,
 
-      <ModalTimetracking
-        title="Time Tracking"
-        width={600}
-        visible={modaltimetracking_visible}
-        onCancel={() => { return (setModaltimetracking_visible(false)) }}
-        details={{
-          transgroupId: userstate?.mailbox[0]?.TransGroupId,
+          }}
+        />
 
-        }}
-      />
+        <ModalSendIssue
+          title={ProgressStatus}
+          visible={modalsendissue_visible}
+          width={800}
+          onCancel={() => { return (setModalsendissue_visible(false)) }}
+          onOk={() => {
+            setModalsendissue_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
-      <ModalSendIssue
-        title={ProgressStatus}
-        visible={modalsendissue_visible}
-        width={800}
-        onCancel={() => { return (setModalsendissue_visible(false)) }}
-        onOk={() => {
-          setModalsendissue_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalSA
+          title={ProgressStatus}
+          visible={modalsa_visible}
+          width={800}
+          onCancel={() => { return (setModalsa_visible(false)) }}
+          onOk={() => {
+            setModalsa_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
-      <ModalSA
-        title={ProgressStatus}
-        visible={modalsa_visible}
-        width={800}
-        onCancel={() => { return (setModalsa_visible(false)) }}
-        onOk={() => {
-          setModalsa_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalResolved
+          title="Resolved"
+          visible={modalresolved_visible}
+          width={800}
+          onCancel={() => { return (setModalresolved_visible(false)) }}
+          onOk={() => {
+            setModalresolved_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            iscloudsite: userstate?.issuedata?.details[0]?.IsCloudSite
 
-      <ModalResolved
-        title="Resolved"
-        visible={modalresolved_visible}
-        width={800}
-        onCancel={() => { return (setModalresolved_visible(false)) }}
-        onOk={() => {
-          setModalresolved_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          flowoutput: userstate.node.output_data,
-          iscloudsite: userstate?.issuedata?.details[0]?.IsCloudSite
+          }}
+        />
 
-        }}
-      />
+        <ModalManday
+          title={ProgressStatus}
+          visible={modalmanday_visible}
+          width={800}
+          onCancel={() => { return (setModalmanday_visible(false)) }}
+          onOk={() => {
+            setModalmanday_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            costmanday: userstate.issuedata.details[0]?.CostPerManday
+          }}
+        />
 
-      <ModalManday
-        title={ProgressStatus}
-        visible={modalmanday_visible}
-        width={800}
-        onCancel={() => { return (setModalmanday_visible(false)) }}
-        onOk={() => {
-          setModalmanday_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          flowoutput: userstate.node.output_data,
-          costmanday: userstate.issuedata.details[0]?.CostPerManday
-        }}
-      />
+        <ModalMandayLog
+          title="ข้อมูล Manday"
+          visible={modalmandaylog_visible}
+          width={800}
+          onCancel={() => { return (setModalmandaylog_visible(false)) }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailtype: userstate?.mailbox[0]?.MailType,
+            cost: userstate.issuedata.details[0]?.Cost,
+            totalmanday: userstate.issuedata.details[0]?.Manday
+          }}
+        />
 
-      <ModalMandayLog
-        title="ข้อมูล Manday"
-        visible={modalmandaylog_visible}
-        width={800}
-        onCancel={() => { return (setModalmandaylog_visible(false)) }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailtype: userstate?.mailbox[0]?.MailType,
-          cost: userstate.issuedata.details[0]?.Cost,
-          totalmanday: userstate.issuedata.details[0]?.Manday
-        }}
-      />
+        <ModalSA_Assessment
+          title="ข้อมูลประเมิน ผลกระทบ"
+          visible={modalAssessment_visible}
+          width={600}
+          onCancel={() => { return (setModalAssessment_visible(false)) }}
+          details={{
+            ticketid: userstate.issuedata.details[0]?.Id,
+          }}
+        />
 
-      <ModalSA_Assessment
-        title="ข้อมูลประเมิน ผลกระทบ"
-        visible={modalAssessment_visible}
-        width={600}
-        onCancel={() => { return (setModalAssessment_visible(false)) }}
-        details={{
-          ticketid: userstate.issuedata.details[0]?.Id,
-        }}
-      />
+        <ModalQuotation
+          title={ProgressStatus}
+          visible={modalQuotation_visible}
+          width={800}
+          onCancel={() => { return (setModalQuotation_visible(false)) }}
+          onOk={() => {
+            setModalQuotation_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
-      <ModalQuotation
-        title={ProgressStatus}
-        visible={modalQuotation_visible}
-        width={800}
-        onCancel={() => { return (setModalQuotation_visible(false)) }}
-        onOk={() => {
-          setModalQuotation_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate?.mailbox[0]?.MailBoxId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
-
-
+        <PreviewImg
+          title="Preview"
+          visible={modalPreview}
+          width={800}
+          footer={null}
+          onCancel={() => {
+            setModalPreview(false);
+            setImgUrl(null);
+          }}
+          pathUrl={imgUrl}
+        />
+      </Spin>
     </MasterPage >
   );
 }

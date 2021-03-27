@@ -131,7 +131,7 @@ export default function MapCompany() {
         setFilterSupport(result);
     }
 
-    const searchConsult= (param) => {
+    const searchConsult = (param) => {
         let result = consultList.filter(o =>
             Object.keys(o).some(k =>
                 String(o[k])
@@ -142,7 +142,7 @@ export default function MapCompany() {
         setFilterConsult(result);
     }
 
-    const searchCompany= (param) => {
+    const searchCompany = (param) => {
         let result = companyList.filter(o =>
             Object.keys(o).some(k =>
                 String(o[k])
@@ -187,7 +187,9 @@ export default function MapCompany() {
                         </Row>
                         <Table
                             dataSource={filterSupport == null ? supportlist : filterSupport}
-                            loading={loadingSupport}>
+                            loading={loadingSupport}
+                            pagination={{ pageSize: 6 }}
+                        >
                             <Column title="รหัสพนักงาน" dataIndex="code" width="10%" />
                             <Column title="ชื่อพนักงาน" dataIndex="username" />
                             <Column title="ชื่อเล่น" dataIndex="nickname" width="10%" />
@@ -227,11 +229,12 @@ export default function MapCompany() {
                                     onSearch={searchConsult}
                                 />
                             </Col>
-
                         </Row>
                         <Table
                             dataSource={filterConsult === null ? consultList : filterConsult}
-                            loading={loadingConsult}>
+                            loading={loadingConsult}
+                            pagination={{ pageSize: 6 }}
+                        >
                             <Column title="รหัสพนักงาน" dataIndex="code" width="10%" />
                             <Column title="ชื่อพนักงาน" dataIndex="username" />
                             <Column title="ชื่อเล่น" dataIndex="nickname" width="10%" />
@@ -275,7 +278,9 @@ export default function MapCompany() {
                         </Row>
                         <Table
                             dataSource={filterCompany === null ? companyList : filterCompany}
-                            loading={loadingCompany}>
+                            loading={loadingCompany}
+                            pagination={{ pageSize: 6 }}
+                        >
                             <Column title="Code" width="10%" dataIndex="Code" />
                             <Column title="CompanyName" width="20%" dataIndex="Name" />
                             <Column title="FullName" width="60%" dataIndex="FullNameTH" />

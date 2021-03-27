@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Form, Tabs } from 'antd';
+import { Modal, Form, Tabs, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -16,7 +16,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     const uploadRef_unittest = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     //data
     // const [listunittest, setListunittest] = useState([]);
@@ -89,6 +90,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 SaveComment();
                 SaveUnitTest(values);
                 onOk();
+                setLoading(false);
 
                 await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -97,6 +99,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                             <p>ตรวจสอบผ่าน</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -104,6 +107,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 });
             }
         } catch (error) {
+            setLoading(false);
             await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
@@ -111,6 +115,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -120,7 +125,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        //console.log('Success:', values);
+        setLoading(true);
         SendFlow(values);
     };
 
@@ -128,6 +133,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     return (
         <Modal
             visible={visible}
+            confirmLoading={loading}
             onOk={() => { return (form.submit()) }}
             okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
@@ -135,47 +141,48 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white", marginTop: 0 }}
-                name="qa-test"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="unit_test_url"
-                    label="URL"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white", marginTop: 0 }}
+                    name="qa-test"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <TextArea rows="2" style={{ width: "100%" }} />
-                </Form.Item>
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="unit_test_url"
+                        label="URL"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        <TextArea rows="2" style={{ width: "100%" }} />
+                    </Form.Item>
 
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Unit Test"
-                    name="unittest"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_unittest} />
-                </Form.Item>
-            </Form>
+                    <Form.Item
+                        style={{ minWidth: 300, maxWidth: 300 }}
+                        label="Unit Test"
+                        name="unittest"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={uploadRef_unittest} />
+                    </Form.Item>
+                </Form>
                  Remark :
             <TextEditor ref={editorRef} />
-            <br />
+                <br />
                      AttachFile : <UploadFile ref={uploadRef} />
+            </Spin>
 
         </Modal>
     )

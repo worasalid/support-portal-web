@@ -16,7 +16,6 @@ export default function IssueMenu() {
     const { state, dispatch } = useContext(AuthenContext);
     const [issuedata, setIssuedata] = useState([])
 
-
     const GetIssueType = async () => {
         try {
             const issuetype = await Axios({
@@ -39,7 +38,6 @@ export default function IssueMenu() {
 
         }
     }
-
 
     useEffect(() => {
         GetIssueType();

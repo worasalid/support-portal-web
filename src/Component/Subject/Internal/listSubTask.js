@@ -3,22 +3,23 @@ import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'rea
 import { List, Row, Col, Button, Popconfirm, Modal, Tag } from 'antd'
 import Axios from 'axios'
 import { useHistory } from 'react-router-dom'
-import { ArrowRightOutlined, DeleteOutlined, FileOutlined, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, DeleteOutlined, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
 
 
 
 export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
     const history = useHistory();
     const [listdata, setListdata] = useState([]);
-    const [countdata,setCountdata] = useState(null)
+    const [countdata, setCountdata] = useState(null)
 
     //div
     const [divcollapse, setDivcollapse] = useState("none")
-    const [collapseicon, setCollapseicon] = useState(<UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+    const [collapseicon, setCollapseicon] = useState(<DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+
 
     useImperativeHandle(ref, () => ({
         GetTask: () => GetTask(),
-        CountData:() => countdata
+        CountData: () => countdata
     }));
 
     const GetTask = async () => {
@@ -31,7 +32,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                 },
                 params: {
                     ticketId: ticketId
-                   // mailtype: mailtype
+                    // mailtype: mailtype
                 }
             });
 
@@ -75,7 +76,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                             <p></p>
                         </div>
                     ),
-                    okText:"Close",
+                    okText: "Close",
                     onOk() {
                         GetTask()
                     },
@@ -132,22 +133,19 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     <>
                         <label className="header-text">Task</label>
                         <span
-
                             style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
                             onClick={
                                 () => {
                                     return (
                                         setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                        setCollapseicon(divcollapse === 'block' ? <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+                                        setCollapseicon(divcollapse === 'block' ? <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
                                     )
                                 }
                             }
                         >
                             {collapseicon}
                         </span>
-                        {/* <div>
-                            <Progress percent={30} strokeColor="#52c41a"></Progress>
-                        </div> */}
+
                     </>
                     : ""
 
@@ -160,17 +158,21 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     renderItem={item => (
                         <Row align="middle">
                             <Col span={23} className="task-active"
-                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px" }}
+                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom:20}}
                                 onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.taskId })}
                             >
                                 <List.Item >
                                     <List.Item.Meta
                                         title={
-                                            <Row >
+                                            <Row style={{padding: "0px 0px 0px 10px"}}>
                                                 <Col span={23} >
                                                     <Row>
-                                                        <Col span={1}>{<FileOutlined />}</Col>
-                                                        <Col span={17}>
+                                                        <Col span={18}>
+                                                            <img
+                                                                style={{ height: "25px", width: "25px" }}
+                                                                src={`${process.env.PUBLIC_URL}/icons-doc-task.png`}
+                                                                alt=""
+                                                            />&nbsp;
                                                             <label className="value-text">
                                                                 {item.title}
                                                             </label>
@@ -220,6 +222,10 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     )}
                 />
             </div>
+            <div className="task-animation">
+
+            </div>
         </>
     )
 });
+

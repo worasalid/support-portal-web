@@ -8,6 +8,8 @@ import Axios from 'axios';
 import { DownloadOutlined } from '@ant-design/icons';
 import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 import TextEditor from '../../TextEditor';
+import PreviewImg from '../../Dialog/Internal/modalPreviewImg';
+import _ from 'lodash'
 
 
 const { TabPane } = Tabs;
@@ -19,6 +21,7 @@ export default function CommentBox() {
     const match = useRouteMatch();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(true);
+    const [elementDisable, setElementDisable] = useState(false);
 
     const container = useState(null);
 
@@ -26,9 +29,12 @@ export default function CommentBox() {
     const [commentdata, setCommentdata] = useState([]);
     const [commenttext, setCommenttext] = useState("");
     const [commentid, setCommentid] = useState(null);
+    const [divcollapse, setDivcollapse] = useState([])
+    const [imgUrl, setImgUrl] = useState(null);
 
     // Modal
     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+    const [modalPreview, setModalPreview] = useState(false);
 
     const image_upload_handler = (blobInfo, success, failure, progress) => {
         var xhr, formData;
@@ -91,8 +97,10 @@ export default function CommentBox() {
                 }
             });
             if (commment_list.status === 200) {
+                setLoading(false);
                 setCommentdata(commment_list.data.map((values) => {
                     return {
+                        key: values.Id,
                         id: values.Id,
                         author: values.CreateName,
                         datetime: moment(values.CreateDate).format("DD/MM/YYYY H:mm"),
@@ -110,12 +118,12 @@ export default function CommentBox() {
     }
 
     const onFinish = async (values) => {
-        // console.log("file", uploadRef.current.getFiles().map((n) => n.response.id))
         try {
 
             if (editorRef.current.getValue() === "" || editorRef.current.getValue() === null) {
                 throw ("กรุณาระบุ Comment!")
             }
+            setLoading(true);
             const createcomment = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                 method: "POST",
@@ -131,27 +139,27 @@ export default function CommentBox() {
             });
 
             if (createcomment.status === 200) {
-                Modal.info({
+                loadCustomerComment();
+                Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
-                    content: (
-                        <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
-                        </div>
-                    ),
+                    // content: (
+                    //     <div>
+                    //         <p>บันทึกข้อมูลสำเร็จ</p>
+                    //     </div>
+                    // ),
                     onOk() {
-                        editorRef.current.setvalue()
-                        setLoading(true);
+                        editorRef.current.setvalue();
+                        setElementDisable(false);
 
                     },
-                    onCancel() {
+                    okText: "Close",
 
-                    }
                 });
 
 
             }
         } catch (error) {
-            Modal.info({
+            Modal.warning({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
 
                 okText: "Close",
@@ -164,28 +172,28 @@ export default function CommentBox() {
                 onOk() {
                     editorRef.current.setvalue();
                     form.resetFields();
+                    setElementDisable(false);
+                    setLoading(false);
                 },
                 onCancel() {
-
+                    setElementDisable(false);
+                    setLoading(false);
                 }
             });
         }
     }
 
     useEffect(() => {
-        setTimeout(() => {
-            loadCustomerComment()
-            setLoading(false)
-        }, 1000)
+        loadCustomerComment()
     }, [])
 
-    useEffect(() => {
-        setTimeout(() => {
-            loadCustomerComment()
-            setLoading(false)
-        }, 1000)
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         loadCustomerComment()
+    //         setLoading(false)
+    //     }, 1000)
 
-    }, [loading])
+    // }, [loading])
 
 
     return (
@@ -197,35 +205,110 @@ export default function CommentBox() {
                 renderItem={item => (
                     <Comment
                         author={
-                            <p><b>{item.author}</b></p>
+                            <p
+                                style={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    let newKeys = [...divcollapse];
+                                    if (newKeys.includes(item.key)) {
+                                        newKeys = _.filter(newKeys, n => n !== item.key)
+                                    } else {
+                                        newKeys.push(item.key)
+                                    }
+                                    setDivcollapse(newKeys)
+                                }}
+                            ><b>{item.author}</b></p>
                         }
                         datetime={
-                            <p>{item.datetime}</p>
+                            <>
+                                <label
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => {
+                                        let newKeys = [...divcollapse];
+                                        if (newKeys.includes(item.key)) {
+                                            newKeys = _.filter(newKeys, n => n !== item.key)
+                                        } else {
+                                            newKeys.push(item.key)
+                                        }
+                                        setDivcollapse(newKeys)
+                                    }}
+                                >
+                                    {item.datetime}
+                                </label>
+
+                                {
+                                    divcollapse.includes(item.key) &&
+                                    (
+                                        <label
+                                            // style={{ cursor: "pointer",fontSize:20,color:"#C7C7C7" }}
+                                            onClick={() => {
+                                                let newKeys = [...divcollapse];
+                                                if (newKeys.includes(item.key)) {
+                                                    newKeys = _.filter(newKeys, n => n !== item.key)
+                                                } else {
+                                                    newKeys.push(item.key)
+                                                }
+                                                setDivcollapse(newKeys)
+                                            }}
+                                        >
+                                            {/* <EllipsisOutlined style={{ fontSize: 20,color:"#C7C7C7" }} /> */}
+
+                                        </label>
+                                    )
+                                }
+
+                            </>
                         }
                         avatar={
-                            <Avatar
-                                src={item.avatar}
-                                icon={item.email.substring(0, 1).toLocaleUpperCase()}
-                            />
+                            <>
+                                &nbsp;&nbsp;
+                                <Avatar
+                                    onClick={() => {
+                                        let newKeys = [...divcollapse];
+                                        if (newKeys.includes(item.key)) {
+                                            newKeys = _.filter(newKeys, n => n !== item.key)
+                                        } else {
+                                            newKeys.push(item.key)
+                                        }
+                                        setDivcollapse(newKeys)
+                                    }}
+                                    src={item.avatar}
+                                    icon={item.email.substring(0, 1).toLocaleUpperCase()}
+                                />
+                            </>
                         }
                         content={
                             <>
-                                <div className="comment-description" dangerouslySetInnerHTML={{ __html: item.content }} ></div>
-                                <Divider style={{ marginTop: 20 }} />
-                                {item.cntfile === 0 ? "" :
-                                    <div>
-                                        <Row>
-                                            <Col span={24}>
-                                                <label
-                                                    // onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                                                    onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
-                                                    className="text-link">
-                                                    <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
-                                                </label>
+                                {
 
-                                            </Col>
-                                        </Row>
-                                    </div>
+                                    divcollapse.includes(item.key) === false ? (
+                                        <div className="comment-description" dangerouslySetInnerHTML={{ __html: item.content }}
+                                            style={{ display: divcollapse }}
+                                            onClick={e => {
+                                                if (e.target.tagName == "IMG") {
+                                                    setImgUrl(e.target.src);
+                                                    setModalPreview(true);
+                                                }
+                                            }}>
+
+                                        </div>
+                                    )
+                                        : ""
+                                }
+
+                                <Divider style={{ margin: 0, marginBottom: 10 }} />
+                                {
+                                    item.cntfile === 0 ? "" :
+                                        <div>
+                                            <Row>
+                                                <Col span={24}>
+                                                    <label
+                                                        onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
+                                                        className="text-link value-text">
+                                                        <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
+                                                </label>
+                                                </Col>
+                                            </Row>
+                                        </div>
                                 }
                             </>
                         }
@@ -242,49 +325,53 @@ export default function CommentBox() {
                 </Affix>
             } */}
 
-<Tabs defaultActiveKey="1">
-                        <TabPane tab="Reply To Customer" key="1">
-                            <Form
-                                form={form}
-                                name="Customer"
-                                initialValues={{
-                                    // product: "REM",
-                                    // module: "CRM",
-                                    // issue_type: "Bug",
-                                }}
-                                layout="vertical"
-                                onFinish={onFinish}
-                            >
-                                <Form.Item name="customer_comment">
+            <Tabs defaultActiveKey="1">
+                <TabPane tab="Reply To Customer" key="1">
+                    <Form
+                        form={form}
+                        name="Customer"
+                        initialValues={{
+                            // product: "REM",
+                            // module: "CRM",
+                            // issue_type: "Bug",
+                        }}
+                        layout="vertical"
+                        onFinish={onFinish}
+                    >
+                        <Form.Item name="customer_comment">
 
-                                    <TextEditor ref={editorRef} />
-                                </Form.Item>
-                                <Form.Item name="customer_fileattach">
-                                    <Row>
-                                        <Col span={2} style={{ display: "inline" }} >
-                                            Attach :
+                            <TextEditor ref={editorRef} />
+                        </Form.Item>
+                        <Form.Item name="customer_fileattach">
+                            <Row>
+                                <Col span={2} style={{ display: "inline" }} >
+                                    Attach :
                 </Col>
-                                        <Col span={4} style={{ display: "inline" }} >
-                                            <Uploadfile ref={uploadRef} />
-                                        </Col>
-                                        <Col span={18} style={{ textAlign: "right" }}>
-                                            <Popconfirm title="Comment หาลูกค้า ใช่หรือไม่"
-                                                okText="Yes" cancelText="No"
-                                                onConfirm={form.submit}
-                                                style={{ width: "300px" }}
-                                            >
-                                                <Button htmlType="submit" type="primary">
-                                                    Add Comment
+                                <Col span={4} style={{ display: "inline" }} >
+                                    <Uploadfile ref={uploadRef} />
+                                </Col>
+                                <Col span={18} style={{ textAlign: "right" }}>
+                                    <Popconfirm title="Comment หาลูกค้า ใช่หรือไม่"
+                                        okText="Yes" cancelText="No"
+                                        onConfirm={() => {
+                                            form.submit();
+                                            setElementDisable(true);
+                                        }}
+                                        style={{ width: "300px" }}
+                                        disabled={elementDisable}
+                                    >
+                                        <Button htmlType="submit" type="primary" disabled={elementDisable}>
+                                            Add Comment
                         </Button>
-                                            </Popconfirm>
+                                    </Popconfirm>
 
-                                        </Col>
+                                </Col>
 
-                                    </Row>
-                                </Form.Item>
-                            </Form>
-                        </TabPane>
-                    </Tabs>
+                            </Row>
+                        </Form.Item>
+                    </Form>
+                </TabPane>
+            </Tabs>
 
 
             {/* Modal */}
@@ -303,6 +390,18 @@ export default function CommentBox() {
                     grouptype: "comment"
                 }}
 
+            />
+
+            <PreviewImg
+                title="Preview"
+                visible={modalPreview}
+                width={800}
+                footer={null}
+                onCancel={() => {
+                    setModalPreview(false);
+                    setImgUrl(null);
+                }}
+                pathUrl={imgUrl}
             />
 
         </div>

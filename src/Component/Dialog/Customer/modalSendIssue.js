@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Modal, Rate } from 'antd';
+import { Modal, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -15,6 +15,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
   const editorRef = useRef(null)
   //const [textValue, setTextValue] = useState("")
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+  const [loading, setLoading] = useState(false);
 
   // const handleEditorChange = (content, editor) => {
   //   setTextValue(content);
@@ -22,7 +23,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
 
   const SaveComment = async () => {
     try {
-      if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null) {
+      if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
         await Axios({
           url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
           method: "POST",
@@ -57,10 +58,12 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
         }
       });
 
-      if(sendflow.status === 200){
+      if (sendflow.status === 200) {
         SaveComment();
         onOk();
-        if(details.flowoutput.value === "AssignIcon" || details.flowoutput.value === "Continue"){
+        setLoading(false);
+
+        if (details.flowoutput.value === "AssignIcon" || details.flowoutput.value === "Continue") {
           await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -69,14 +72,15 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 <p>ให้ ICON ดำเนินการแก้ไข</p>
               </div>
             ),
+            okText: "Close",
             onOk() {
               editorRef.current.setvalue()
               onOk();
-                history.push({ pathname: "/customer/issue/inprogress" })
+              history.push({ pathname: "/customer/issue/inprogress" })
             },
           });
         }
-        if(details.flowoutput.value === "SendInfo"){
+        if (details.flowoutput.value === "SendInfo") {
           await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -84,16 +88,16 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 <p>ส่งข้อมูลเพิ่มเติม ให้ ICON ดำเนินการต่อ</p>
               </div>
             ),
-            okText:"Close",
+            okText: "Close",
             onOk() {
               editorRef.current.setvalue()
               onOk();
               history.push({ pathname: "/customer/issue/inprogress" })
-  
+
             },
           });
         }
-        if(details.flowoutput.value === "Hold"){
+        if (details.flowoutput.value === "Hold") {
           await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -101,16 +105,16 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 <p>Hold Issue เลขที่: {customerstate.issuedata.details[0].Number}</p>
               </div>
             ),
-            okText:"Close",
+            okText: "Close",
             onOk() {
               editorRef.current.setvalue()
               onOk();
               history.push({ pathname: "/customer/issue/mytask" })
-  
+
             },
           });
         }
-        if(details.flowoutput.value === "Pass"){
+        if (details.flowoutput.value === "Pass") {
           await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -119,16 +123,16 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                 <p>รอดำเนินการ Deploy PRD </p>
               </div>
             ),
-            okText:"Close",
+            okText: "Close",
             onOk() {
               editorRef.current.setvalue()
               onOk();
               history.push({ pathname: "/customer/issue/pass" })
-  
+
             },
           });
         }
-        
+
 
       }
 
@@ -141,7 +145,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             <p>{error.response.data}</p>
           </div>
         ),
-        okText:"Close",
+        okText: "Close",
         onOk() {
           editorRef.current.setvalue()
 
@@ -152,23 +156,29 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
   }
 
   useEffect(() => {
+    if (visible) {
+    }
 
-  }, [])
+  }, [visible])
 
 
   return (
     <Modal
-      // title={title}
+      confirmLoading={loading}
       visible={visible}
       okText="Send"
-      onOk={() => { return (SendFlow()) }}
+      onOk={() => {
+        setLoading(true);
+         SendFlow();
+      }}
       onCancel={() => { return (editorRef.current.setvalue(), onCancel()) }}
       {...props}
     >
-
-      <TextEditor ref={editorRef} />
-      <br />
+      <Spin spinning={loading} size="large" tip="Loading...">
+        <TextEditor ref={editorRef} />
+        <br />
       AttachFile : <UploadFile ref={uploadRef} />
+      </Spin>
     </Modal>
   );
 }

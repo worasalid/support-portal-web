@@ -1,4 +1,4 @@
-import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { LeftCircleOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
@@ -356,17 +356,21 @@ export default function ConfigDeveloper() {
                 {/* ชื่อ */}
                 <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
 
-                    <Button type="primary" shape="circle" icon={<ArrowLeftOutlined />}
+                    <Button type="link"
+                        icon={<LeftCircleOutlined />}
+                        style={{ fontSize: 18, padding: 0 }}
                         onClick={() => history.goBack()}
-                    />
-                    &nbsp; &nbsp;
-                  <h1>{user}</h1>
+                    >
+                        Back
+                      </Button>
                 </Row>
-
+                <Row>
+                    <h1>{user}</h1>
+                </Row>
                 {/* Add */}
                 <Row>
                     <Col span={4}>
-                        <label style={{fontSize:12, color:"red"}}>
+                        <label style={{ fontSize: 10, color: "red" }}>
                             *** คลิก รายการ Product เพื่อตั้งค่า Module
                         </label>
 

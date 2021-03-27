@@ -56,7 +56,9 @@ export default function ModalTimetracking({ visible = false, onOk, onCancel, dat
     }
 
     useEffect(() => {
-        Timetracking()
+        if (visible) {
+            Timetracking()
+        }
     }, [visible])
 
 
@@ -81,7 +83,10 @@ export default function ModalTimetracking({ visible = false, onOk, onCancel, dat
 
                             </label>
                              &nbsp;&nbsp;&nbsp;
-                            {moment(item.ReceiveDate).format("DD/MM/YYYY H:mm")}
+                            <label  style={{ fontSize: 12, color:"#CCCCCC"  }}>
+                                {moment(item.ReceiveDate).format("DD/MM/YYYY H:mm")}
+                            </label>
+
                             <Clock
                                 timeformat="th"
                                 showseconds={false}
@@ -90,7 +95,9 @@ export default function ModalTimetracking({ visible = false, onOk, onCancel, dat
                                 type="timeworking"
                             />
                             <br />
-                            <p>{item.Description}</p>
+                            <label style={{ fontSize: 12}}>
+                                {item.Description}
+                            </label>
                         </Timeline.Item>
                     )
                 })}

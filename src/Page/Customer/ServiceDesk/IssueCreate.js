@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext, useReducer } from 'react'
-import { Button, Form, Input, Select, Card, Dropdown, Menu, Row, Col, Modal } from "antd";
+import { Button, Form, Input, Select, Card, Dropdown, Menu, Row, Col, Modal, List } from "antd";
 import { PhoneOutlined, DatabaseOutlined, FileOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from "react-router-dom";
 import MasterPage from "./MasterPage"
@@ -29,7 +29,9 @@ export default function IssueCreate() {
 
     const match = useRouteMatch();
     const [hiddenForm, sethiddenForm] = useState(false);
+    const [issueType, setIssueType] = useState([]);
     const [title, setTitle] = useState(match.params.id);
+    const [typeDes, setTypeDes] = useState();
     const [description, setDescription] = useState();
 
     const [form] = Form.useForm();
@@ -82,6 +84,51 @@ export default function IssueCreate() {
         xhr.send(formData);
     };
 
+    const cusScene = [
+        {
+            name: "None",
+            value: "None"
+        },
+        {
+            name: "Application",
+            value: "Application"
+        },
+        {
+            name: "Report",
+            value: "Report"
+        },
+        {
+            name: "Printform",
+            value: "Printform"
+        },
+        {
+            name: "Data",
+            value: "Data"
+        }
+    ]
+
+    const GetIssueType = async () => {
+        try {
+            const issuetype = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/issue-types",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                }
+            });
+            if (issuetype.status === 200) {
+                setIssueType(issuetype.data.map((value) => {
+                    return {
+                        id: value.Id,
+                        name: value.Name,
+                        description: value.Description
+                    }
+                }))
+            }
+        } catch (error) {
+
+        }
+    }
 
     const getproducts = async () => {
         const products = await Axios({
@@ -129,11 +176,11 @@ export default function IssueCreate() {
         getproducts();
         // getmodule();
         getpriority();
+        GetIssueType();
 
     }
 
     const onFinish = async (values) => {
-
         try {
             let createTicket = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create",
@@ -146,6 +193,7 @@ export default function IssueCreate() {
                     type: match.params.id,
                     product_id: values.product,
                     module_id: values.module,
+                    scene: values.scene,
                     priority: values.priority,
                     title: values.subject,
                     description: description,
@@ -179,7 +227,7 @@ export default function IssueCreate() {
     };
 
     useEffect(() => {
-        setDescription(
+        setTypeDes(
             match.params.id === "1" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด" :
                 match.params.id === "2" ? "แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ" :
                     match.params.id === "3" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
@@ -262,13 +310,37 @@ export default function IssueCreate() {
                     >
                         <Dropdown
                             placement="topCenter"
+                            style={{ height: 80 }}
                             overlayStyle={{
                                 width: 200,
                                 boxShadow:
                                     "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
                             }}
                             overlay={
-                                <Menu mode="inline" theme="light" onMouseOver="" >
+                                // <List
+                                //     itemLayout="horizontal"
+                                //     dataSource={issueType}
+                                //     renderItem={item => (
+                                //         <>
+                                //             <Menu mode="inline" theme="light" onMouseOver=""  >
+                                //                 <Menu.Item key={item.id} style={{height:100}}>
+                                //                     <Card className="issue-active" hoverable style={{width:"100%", padding:0,margin:0}}>
+                                //                         <Meta
+                                //                             avatar={
+                                //                                 <BugOutlined style={{ fontSize: 30 }} />
+                                //                             }
+                                //                             title={<label className="card-title-menu">{item.name}</label>}
+                                //                             description={item.description}
+                                //                         />
+                                //                     </Card>
+                                //                 </Menu.Item>
+                                //             </Menu>
+
+                                //         </>
+                                //     )}
+                                // />
+                                <Menu mode="inline" theme="light" onMouseOver=""
+                                >
                                     <Menu.Item key="1" onClick={
                                         () => { return (setTitle("Bug"), history.push("/customer/servicedesk/issuecreate/1")) }}>
                                         <Card className="issue-active" hoverable>
@@ -276,8 +348,8 @@ export default function IssueCreate() {
                                                 avatar={
                                                     <BugOutlined style={{ fontSize: 30 }} />
                                                 }
-                                                title={<label className="card-title-menu">Bug</label>}
-                                                description={description}
+                                                title={<label className="card-title-menu">{issueType[0]?.name}</label>}
+                                                description={issueType[0]?.description}
                                             />
                                         </Card>
                                     </Menu.Item>
@@ -288,8 +360,8 @@ export default function IssueCreate() {
                                                 avatar={
                                                     <FileOutlined style={{ fontSize: 30 }} />
                                                 }
-                                                title={<label className="card-title-menu">Change Request</label>}
-                                                description={description}
+                                                title={<label className="card-title-menu">{issueType[1]?.name}</label>}
+                                                description={issueType[1]?.description}
                                             />
                                         </Card>
                                     </Menu.Item>
@@ -300,8 +372,8 @@ export default function IssueCreate() {
                                                 avatar={
                                                     <DatabaseOutlined style={{ fontSize: 30 }} />
                                                 }
-                                                title={<label className="card-title-menu">Data</label>}
-                                                description={description}
+                                                title={<label className="card-title-menu">{issueType[2]?.name}</label>}
+                                                description={issueType[2]?.description}
                                             />
                                         </Card>
                                     </Menu.Item>
@@ -312,13 +384,15 @@ export default function IssueCreate() {
                                                 avatar={
                                                     <PhoneOutlined style={{ fontSize: 30 }} />
                                                 }
-                                                title={<label style={{ color: "rgb(0, 116, 224)" }}>Use</label>}
-                                                description={description}
+                                                title={<label style={{ color: "rgb(0, 116, 224)" }}>{issueType[3]?.name}</label>}
+                                                description={issueType[3]?.description}
                                             />
                                         </Card>
                                     </Menu.Item>
                                 </Menu>
+
                             }
+
                             trigger="click"
 
                         >
@@ -335,7 +409,7 @@ export default function IssueCreate() {
                                             {title}
                                         </label>
                                     }
-                                    description={description}
+                                    description={typeDes}
                                 />
                             </Card>
 
@@ -359,16 +433,36 @@ export default function IssueCreate() {
                         />
                     </Form.Item>
 
-                    <Form.Item label="Module" name="module">
+
+                    <Form.Item label="Scene" name="scene">
                         <Select
-                            placeholder="Module"
-                            defaultValue="None"
+                            placeholder="Scene"
+                            //mode="multiple"
+                            // defaultValue="None"
                             showSearch
                             allowClear
                             filterOption={(input, option) =>
                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
-                            options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.Id, label: x.Name }))}>
+                            // options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.Id, label: x.Name }))}
+                            options={cusScene.map(x => ({ value: x.value, label: x.name }))}
+                        >
+
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item label="Module" name="module">
+                        <Select
+                            placeholder="Module"
+                            mode="multiple"
+                            // defaultValue="None"
+                            showSearch
+                            allowClear
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.Id, label: x.Name }))}
+                        >
 
                         </Select>
                     </Form.Item>

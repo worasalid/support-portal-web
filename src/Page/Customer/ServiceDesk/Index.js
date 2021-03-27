@@ -40,8 +40,8 @@ export default function Index() {
                         avatar={
                             <HomeOutlined style={{ fontSize: 30 }} />
                         }
-                        title={<label className="card-title-menu">เข้าสู่ระบบ</label>}
-                        description="เข้าใช้งานระบบ / Home"
+                        title={<label className="card-title-menu">หน้าหลัก</label>}
+                        description="เข้าสู่ หน้าหลัก / Home"
                     />
                 </Card>
             </div>

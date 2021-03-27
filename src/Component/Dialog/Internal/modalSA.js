@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Checkbox, Radio } from 'antd';
+import { Modal, Form, Input, Spin, Radio } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -20,7 +20,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     const [radiovalue, setRadiovalue] = useState(null);
     const [radiovalue2, setRadiovalue2] = useState(null);
     const [stdversion, setStdversion] = useState(null);
-    // const [radiochecked, setRadiochecked] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const editorRef = useRef(null)
 
@@ -78,13 +78,15 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                await Modal.info({
+                setLoading(false);
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>ประเมินผลกระทบส่งให้ CR Center</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -92,13 +94,15 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -109,12 +113,14 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
+        setLoading(true);
         SendFlow(values);
     };
 
     return (
         <Modal
             visible={visible}
+            confirmLoading={loading}
             okText="Send"
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
@@ -122,84 +128,84 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
             onCancel={() => { return (form.resetFields(), setRadiovalue(null), setRadiovalue2(null), onCancel()) }}
             {...props}
         >
-
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="qa-test"
-                layout="vertical"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-
-                <Form.Item
-                    name="check_std"
-                    label="อยู่ใน Version STD"
-                    // valuePropName="checked"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'กรุณาระบุ version',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    name="qa-test"
+                    layout="vertical"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <Radio.Group onChange={(e) => { return setRadiovalue(e.target.value), setStdversion(null) }}>
-                        <Radio style={radioStyle} value={2}>ไม่ใช่ STD</Radio>
-                        <Radio style={radioStyle} value={1}>
-                            STD
+
+                    <Form.Item
+                        name="check_std"
+                        label="อยู่ใน Version STD"
+                        // valuePropName="checked"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'กรุณาระบุ version',
+                            },
+                        ]}
+                    >
+                        <Radio.Group onChange={(e) => { return setRadiovalue(e.target.value), setStdversion(null) }}>
+                            <Radio style={radioStyle} value={2}>ไม่ใช่ STD</Radio>
+                            <Radio style={radioStyle} value={1}>
+                                STD
                             <Input placeholder="Version" onChange={(e) => setStdversion(e.target.value)}
-                                style={{ width: 300, marginLeft: 10, display: radiovalue === 1 ? "inline" : "none" }}
-                            />
+                                    style={{ width: 300, marginLeft: 10, display: radiovalue === 1 ? "inline" : "none" }}
+                                />
+                            </Radio>
+
+                        </Radio.Group>
+                    </Form.Item>
+                    <Form.Item
+                        name="check_effect"
+                        // valuePropName="checked"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'กรุณาประเมินผลกระทบ',
+                            },
+                        ]}
+                    >
+                        <Radio.Group onChange={(e) => { return setRadiovalue2(e.target.value), form.setFieldsValue({ description: null }) }}>
+                            <Radio value={1}>
+                                มีผลกระทบ
                         </Radio>
+                            <Radio value={2}>ไม่มีผลกระทบ</Radio>
+                        </Radio.Group>
+                    </Form.Item>
 
-                    </Radio.Group>
-                </Form.Item>
-                <Form.Item
-                    name="check_effect"
-                    // valuePropName="checked"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'กรุณาประเมินผลกระทบ',
-                        },
-                    ]}
-                >
-                    <Radio.Group onChange={(e) => { return setRadiovalue2(e.target.value), form.setFieldsValue({ description: null }) }}>
-                        <Radio value={1}>
-                            มีผลกระทบ
-                        </Radio>
-                        <Radio value={2}>ไม่มีผลกระทบ</Radio>
-                    </Radio.Group>
-                </Form.Item>
-
-                <Form.Item
-                    style={{ display: radiovalue2 === 1 ? "block" : "none" }}
-                    name="description"
-                    label="ประเมินผลกระทบ"
-                    rules={[
-                        {
-                            required: radiovalue2 === 1 ? true : false,
-                            message: 'กรุณา ประเมินผลกระทบ',
-                        },
-                    ]}
-                >
-                    <TextArea rows={5} style={{ width: "100%" }} />
-                </Form.Item>
+                    <Form.Item
+                        style={{ display: radiovalue2 === 1 ? "block" : "none" }}
+                        name="description"
+                        label="ประเมินผลกระทบ"
+                        rules={[
+                            {
+                                required: radiovalue2 === 1 ? true : false,
+                                message: 'กรุณา ประเมินผลกระทบ',
+                            },
+                        ]}
+                    >
+                        <TextArea rows={5} style={{ width: "100%" }} />
+                    </Form.Item>
 
 
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="remark"
-                    label="Remark :"
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="remark"
+                        label="Remark :"
 
-                >
-                    <TextEditor ref={editorRef} />
-                    <br />
+                    >
+                        <TextEditor ref={editorRef} />
+                        <br />
                      AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form>
-
+                    </Form.Item>
+                </Form>
+            </Spin>
         </Modal>
     )
 }

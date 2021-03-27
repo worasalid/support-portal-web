@@ -29,7 +29,10 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
     }
 
     useEffect(() => {
-        getDueDateHistory();
+        if (visible) {
+            getDueDateHistory();
+        }
+
     }, [visible])
 
     return (
@@ -83,8 +86,8 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
 
                                         </Button>
                                     </Col>
-                                    <Divider type="vertical"/>
-                                    <Col span={12} style={{marginTop:"10px"}}>
+                                    <Divider type="vertical" />
+                                    <Col span={12} style={{ marginTop: "10px" }}>
                                         <label className="value-text" >
                                             <p>{item.description}</p>
                                         </label>

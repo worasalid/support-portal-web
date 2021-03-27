@@ -34,6 +34,9 @@ export const masterState = {
                     visible: true
                 }
             }
+        },
+        top_menu: {
+            notification: 0
         }
     }
 }
@@ -44,7 +47,8 @@ export const masterReducer = createReducer(masterState, {
     COUNT_RESOLVED: (state, {payload}) => {state.toolbar.sider_menu.issue.resolved.count = payload},
     COUNT_PASS: (state, {payload}) => {state.toolbar.sider_menu.issue.pass.count = payload},
     COUNT_CANCEL: (state, {payload}) => {state.toolbar.sider_menu.issue.cancel.count = payload},
-    COUNT_COMPLETE: (state, {payload}) => {state.toolbar.sider_menu.issue.complete.count = payload}
+    COUNT_COMPLETE: (state, {payload}) => {state.toolbar.sider_menu.issue.complete.count = payload},
+    COUNT_NOTI : (state, {payload}) => {state.toolbar.top_menu.notification= payload}
 })
 
 export default MasterContext;

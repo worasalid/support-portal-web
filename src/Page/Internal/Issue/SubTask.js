@@ -1,14 +1,13 @@
-import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Divider, Checkbox, message } from "antd";
+import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Divider, Checkbox, message, Spin } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import CommentBox from "../../../Component/Comment/Internal/Comment";
-import InternalComment from "../../../Component/Comment/Internal/Internal_comment";
+
 import TaskComment from "../../../Component/Comment/Internal/TaskComment";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined, LeftCircleOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
@@ -41,6 +40,7 @@ export default function SubTask() {
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
   const [defaultFlow, setDefaultFlow] = useState(undefined)
+  const [pageLoading, setPageLoading] = useState(true);
 
   //modal
   const [visible, setVisible] = useState(false);
@@ -313,6 +313,8 @@ export default function SubTask() {
         userdispatch({ type: "LOAD_TASKDATA", payload: task_detail.data })
         setCreateddate(task_detail.data.CreateDate);
         setResolveddate(task_detail.data.ResolvedDate)
+
+        setPageLoading(false);
       }
 
     } catch (error) {
@@ -335,12 +337,8 @@ export default function SubTask() {
       });
       message.loading({ content: 'Loading...', duration: 0.5 });
       if (result.status === 200) {
-
-        setTimeout(() => {
-
-          message.success({ content: 'Success!', duration: 1 });
-          GetTaskDetail();
-        }, 1000);
+        message.success({ content: 'Success!', duration: 1 });
+        GetTaskDetail();
       }
 
     } catch (error) {
@@ -349,9 +347,7 @@ export default function SubTask() {
   }
 
   useEffect(() => {
-    // getdetail();
     GetTaskDetail();
-    getflow_output(userstate?.taskdata?.data[0]?.TransId)
   }, [])
 
   // useEffect(() => {
@@ -372,121 +368,107 @@ export default function SubTask() {
 
   return (
     <MasterPage>
+      <Spin spinning={pageLoading} tip="Loading...">
+        <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
+          <Row style={{ padding: "0px 0px 0px 24px" }}>
+            <Col>
+              <Button
+                type="link"
+                icon={<LeftCircleOutlined />}
+                style={{ fontSize: 18, padding: 0 }}
+                onClick={() => history.goBack()}
+              >
+                Back
+                </Button>
+            </Col>
+          </Row>
 
-      {/* {
-
-        <Result
-          status="403"
-          title="403"
-          subTitle="Sorry, you are not authorized to access this page."
-          extra={<Button type="primary">Back Home</Button>}
-        />
-      } */}
-
-      <div style={{ height: "100%" }} >
-        <div className="scrollable-container" ref={setContainer} >
-          <Affix target={() => container}>
-            <Row>
-              <Col>
-                <a
-                  href="/#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    history.goBack();
-                  }}
-                >
-                  Back
-          </a>
-              </Col>
-            </Row>
-          </Affix>
-
-          <Row>
+          <Row style={{ height: 'calc(100% - 32px)' }}>
             {/* Content */}
-            <Col span={16} style={{ paddingTop: 0 }}>
-              <div style={{ height: "80vh", overflowY: "scroll" }}>
-                {/* Issue Description */}
-                <Row style={{ marginRight: 24 }}>
-                  <Col span={24}>
+            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+              {/* <div style={{ height: "80vh", overflowY: "scroll" }}> */}
+              {/* Issue Description */}
+              <Row style={{ marginRight: 24 }}>
+                <Col span={24}>
 
-                    <label className="topic-text">{userstate?.taskdata?.data[0]?.TicketNumber}</label>
-                    <div className="issue-detail-box">
-                      <Row>
-                        <Col span={16} style={{ display: "inline" }}>
-                          <Typography.Title level={4}>
-                            {/* <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title} */}
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.taskdata?.data[0]?.Title}
-                          </Typography.Title>
-                        </Col>
-                        <Col span={8} style={{ display: "inline", textAlign: "right" }}>
-                          <Button title="preview" type="link"
-                            icon={<img
-                              style={{ height: "20px", width: "20px" }}
-                              src={`${process.env.PUBLIC_URL}/icons-expand.png`}
-                              alt=""
-                            />}
-                            onClick={() => setModalpreview(true)}
-                          />
-                          <Divider type="vertical" />
-                          <Button type="link"
-                            onClick={
-                              () => {
-                                return (
-                                  setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                  setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
-                                )
-                              }
+                  <label className="topic-text">{userstate?.taskdata?.data[0]?.TicketNumber}</label>
+                  <div className="issue-detail-box">
+                    <Row>
+                      <Col span={16} style={{ display: "inline" }}>
+                        <Typography.Title level={4}>
+                          {/* <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title} */}
+                          <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.taskdata?.data[0]?.Title}
+                        </Typography.Title>
+                      </Col>
+                      <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                        <Button title="preview" type="link"
+                          icon={<img
+                            style={{ height: "20px", width: "20px" }}
+                            src={`${process.env.PUBLIC_URL}/icons-expand.png`}
+                            alt=""
+                          />}
+                          onClick={() => setModalpreview(true)}
+                        />
+                        <Divider type="vertical" />
+                        <Button type="link"
+                          onClick={
+                            () => {
+                              return (
+                                setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
+                              )
                             }
-                          >{collapsetext}
-                          </Button>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <div style={{ display: divcollapse }}>
-                          <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }} ></div>
-                        </div>
-                      </Row>
-                    </div>
-                  </Col>
-                </Row>
+                          }
+                        >{collapsetext}
+                        </Button>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <div style={{ display: divcollapse }}>
+                        <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }} ></div>
+                      </div>
+                    </Row>
+                  </div>
+                </Col>
+              </Row>
 
-                {/* TAB Document */}
-                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                  <Col span={24}>
-                    <TabsDocument
-                      details={{
-                        refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-                        reftype: "Ticket_Task",
-                      }}
-                    />
-                  </Col>
-                </Row>
+              {/* TAB Document */}
+              <Row style={{ marginTop: 36, marginRight: 24 }}>
+                <Col span={24}>
+                  <TabsDocument
+                    details={{
+                      refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+                      reftype: "Ticket_Task",
+                    }}
+                  />
+                </Col>
+              </Row>
 
-                {/* TAB Activity */}
-                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                  <Col span={24}>
-                    <label className="header-text">Activity</label>
+              {/* TAB Activity */}
+              <Row style={{ marginTop: 36, marginRight: 24}} >
+                <Col span={24} >
+                  <label className="header-text">Activity</label>
 
-                    {
-                      <Tabs defaultActiveKey="1" >
-                        <TabPane tab="Task Note" key="1" >
-                          <TaskComment />
-                        </TabPane>
-                        <TabPane tab="History Log" key="2">
-                          <Historylog />
-                        </TabPane>
-                      </Tabs>
-                    }
+                  {
+                    <Tabs defaultActiveKey="1" size="small" >
+                      <TabPane tab="Task Note" key="1" >
+                        <TaskComment />
+                      </TabPane>
+                      <TabPane tab="History Log" key="2">
+                        <Historylog />
+                      </TabPane>
+                    </Tabs>
+                  }
 
 
-                  </Col>
-                </Row>
-              </div>
+                </Col>
+              </Row>
+              {/* </div> */}
             </Col>
             {/* Content */}
 
             {/* SideBar */}
-            <Col span={6} style={{ backgroundColor: "", height: 500, marginLeft: 20 }}>
+            <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Progress Status</label>
@@ -495,13 +477,12 @@ export default function SubTask() {
                   style={{
                     marginTop: 10,
                     display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
-                    //display:  userstate?.actionflow?.length !== 0 ? "block" : "none"
                   }}
                 >
                   <Select ref={selectRef}
                     value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
-                    onClick={() => getflow_output(userstate?.taskdata?.data[0]?.TransId)}
+                   // onClick={() => getflow_output(userstate?.taskdata?.data[0]?.TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                   />
@@ -547,8 +528,8 @@ export default function SubTask() {
                     //   onClick={() => { setModaltimetracking_visible(true) }}
                     // />
 
-                    <Button type="text" 
-                    icon={ <ClockCircleOutlined style={{ fontSize: 18 }} /> }
+                    <Button type="link"
+                      icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
                       onClick={() => { setModaltimetracking_visible(true) }}
                     />
                     // <ClockSLA
@@ -566,7 +547,7 @@ export default function SubTask() {
                 <Col span={24}>
                   <label className="header-text">DueDate</label>
                   <br />
-                  <ClockCircleOutlined style={{ fontSize: 18 }} onClick={() => setHistoryduedate_visible(true)} />
+
 
                   {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
                   {
@@ -580,11 +561,12 @@ export default function SubTask() {
                       </Button>
                       : <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
                   }
-                  {/* {history_duedate_data.length > 1 ?
-                    <Tag color="warning">
-                      DueDate ถูกเลื่อน
-                   </Tag> : ""
-                  } */}
+
+                  <Button type="link"
+                    icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
+                    onClick={() => { setHistoryduedate_visible(true) }}
+                  />
+                  {/* <ClockCircleOutlined style={{ fontSize: 18 }} onClick={() => setHistoryduedate_visible(true)} /> */}
                 </Col>
               </Row>
 
@@ -650,275 +632,273 @@ export default function SubTask() {
             {/* SideBar */}
           </Row>
         </div>
-      </div>
 
-      {/* Modal */}
-      <Modal
-        title="Preview"
-        width={1000}
-        visible={modalpreview}
-        onCancel={() => setModalpreview(false)}
-      >
-        <Row>
-          <Col span={16} style={{ display: "inline" }}>
-            <Typography.Title level={4}>
-              <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.taskdata?.data[0]?.Title}
-            </Typography.Title>
-          </Col>
-        </Row>
-        <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }} ></div>
-      </Modal>
+        {/* Modal */}
+        <Modal
+          title="Preview"
+          width={1000}
+          visible={modalpreview}
+          onCancel={() => setModalpreview(false)}
+        >
+          <Row>
+            <Col span={16} style={{ display: "inline" }}>
+              <Typography.Title level={4}>
+                <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.taskdata?.data[0]?.Title}
+              </Typography.Title>
+            </Col>
+          </Row>
+          <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }} ></div>
+        </Modal>
 
-      <Modal
-        title="ประวัติ DueDate"
-        visible={historyduedate_visible}
-        onCancel={() => setHistoryduedate_visible(false)}
-        cancelText="Close"
-        okButtonProps={{ hidden: true }}
-      >
-        <Timeline>
-          {history_duedate_data.map((item, index) => {
-            return (
-              <Timeline.Item>
-                <p><b>ครั้งที่ {index + 1}  <ClockCircleOutlined style={{ fontSize: 18 }} />
-                  {new Date(item.due_date).toLocaleDateString('en-GB')}</b></p>
-                <p>{item.description}</p>
-              </Timeline.Item>
-            )
-          })}
-        </Timeline>
-      </Modal>
+        <Modal
+          title="ประวัติ DueDate"
+          visible={historyduedate_visible}
+          onCancel={() => setHistoryduedate_visible(false)}
+          cancelText="Close"
+          okButtonProps={{ hidden: true }}
+        >
+          <Timeline>
+            {history_duedate_data.map((item, index) => {
+              return (
+                <Timeline.Item>
+                  <p><b>ครั้งที่ {index + 1}  <ClockCircleOutlined style={{ fontSize: 18 }} />
+                    {new Date(item.due_date).toLocaleDateString('en-GB')}</b></p>
+                  <p>{item.description}</p>
+                </Timeline.Item>
+              )
+            })}
+          </Timeline>
+        </Modal>
 
-      <ModalSendTask
-        title={ProgressStatus}
-        visible={modalsendtask_visible}
-        width={800}
-        onCancel={() => { return (setModalsendtask_visible(false), setSelected(null)) }}
-        onOk={() => {
-          setModalsendtask_visible(false);
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalSendTask
+          title={ProgressStatus}
+          visible={modalsendtask_visible}
+          width={800}
+          onCancel={() => { return (setModalsendtask_visible(false), setSelected(null)) }}
+          onOk={() => {
+            setModalsendtask_visible(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
-      <ModalSupport
-        title={ProgressStatus}
-        visible={visible}
-        width={800}
-        onCancel={() => { return (setVisible(false), setSelected(null)) }}
-        onOk={() => {
-          setVisible(false);
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalSupport
+          title={ProgressStatus}
+          visible={visible}
+          width={800}
+          onCancel={() => { return (setVisible(false), setSelected(null)) }}
+          onOk={() => {
+            setVisible(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
-      <ModalManday
-        title={ProgressStatus}
-        visible={modalmanday_visible}
-        width={800}
-        onCancel={() => { return (setModalmanday_visible(false)) }}
-        onOk={() => {
-          setModalmanday_visible(false);
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutput: userstate.node.output_data,
+        <ModalManday
+          title={ProgressStatus}
+          visible={modalmanday_visible}
+          width={800}
+          onCancel={() => { return (setModalmanday_visible(false)) }}
+          onOk={() => {
+            setModalmanday_visible(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutput: userstate.node.output_data,
 
-        }}
-      />
+          }}
+        />
 
-      <ModalLeaderAssign
-        title={ProgressStatus}
-        visible={modalleaderassign_visible}
-        onCancel={() => {
-          return (setModalleaderassign_visible(false), setSelected(null))
-        }}
-        width={800}
-        onOk={() => {
-          setModalleaderassign_visible(false);
-          setSelected(null);
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-        }}
-      />
+        <ModalLeaderAssign
+          title={ProgressStatus}
+          visible={modalleaderassign_visible}
+          onCancel={() => {
+            return (setModalleaderassign_visible(false), setSelected(null))
+          }}
+          width={800}
+          onOk={() => {
+            setModalleaderassign_visible(false);
+            setSelected(null);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId
+          }}
+        />
 
-      <ModalDeveloper
-        title={ProgressStatus}
-        visible={modaldeveloper_visible}
-        onCancel={() => { return (setModaldeveloper_visible(false), setSelected(null)) }}
-        width={800}
-        onOk={() => {
-          setModaldeveloper_visible(false);
-          setSelected(null);
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-        }}
-      />
+        <ModalDeveloper
+          title={ProgressStatus}
+          visible={modaldeveloper_visible}
+          onCancel={() => { return (setModaldeveloper_visible(false), setSelected(null)) }}
+          width={800}
+          onOk={() => {
+            setModaldeveloper_visible(false);
+            setSelected(null);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId
+          }}
+        />
 
-      <ModalLeaderQC
-        title={ProgressStatus}
-        visible={modalleaderqc_visible}
-        onCancel={() => { return (setModalleaderqc_visible(false), setSelected(null)) }}
-        width={800}
-        onOk={() => {
-          setModalleaderqc_visible(false);
-        }}
-        onCancel={() => {
-          setModalleaderqc_visible(false);
-          // window.location.reload("false");
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-        }}
-      />
+        <ModalLeaderQC
+          title={ProgressStatus}
+          visible={modalleaderqc_visible}
+          onCancel={() => { return (setModalleaderqc_visible(false), setSelected(null)) }}
+          width={800}
+          onOk={() => {
+            setModalleaderqc_visible(false);
+          }}
+          onCancel={() => {
+            setModalleaderqc_visible(false);
+            // window.location.reload("false");
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId
+          }}
+        />
 
-      <ModalReject
-        title={ProgressStatus}
-        visible={modalreject_visible}
-        onCancel={() => { return (setModalreject_visible(false)) }}
-        width={800}
-        onOk={() => {
-          setModalreject_visible(false);
-          // window.location.reload("false");
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId,
-          flowoutput: userstate.node.output_data
-        }}
+        <ModalReject
+          title={ProgressStatus}
+          visible={modalreject_visible}
+          onCancel={() => { return (setModalreject_visible(false)) }}
+          width={800}
+          onOk={() => {
+            setModalreject_visible(false);
+            // window.location.reload("false");
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            flowoutput: userstate.node.output_data
+          }}
 
-      />
+        />
 
-      <ModalDueDate
-        title={ProgressStatus}
-        visible={modalduedate_visible}
-        width={800}
-        onCancel={() => setModalduedate_visible(false)}
-        onOk={() => {
-          setModalduedate_visible(false);
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutput: userstate.node.output_data,
-          duedate: userstate.taskdata.data[0]?.DueDate === null ? null : moment(userstate.taskdata.data[0]?.DueDate).format("DD/MM/YYYY")
-        }}
-      />
+        <ModalDueDate
+          title={ProgressStatus}
+          visible={modalduedate_visible}
+          width={800}
+          onCancel={() => setModalduedate_visible(false)}
+          onOk={() => {
+            setModalduedate_visible(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutput: userstate.node.output_data,
+            duedate: userstate.taskdata.data[0]?.DueDate === null ? null : moment(userstate.taskdata.data[0]?.DueDate).format("DD/MM/YYYY")
+          }}
+        />
 
-      <ModalqaAssign
-        title={ProgressStatus}
-        visible={modalQAassign_visible}
-        width={800}
-        onCancel={() => { return (setModalQAassign_visible(false)) }}
-        onOk={() => {
-          setModalQAassign_visible(false);
-          // window.location.reload("false");
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-        }}
-      />
+        <ModalqaAssign
+          title={ProgressStatus}
+          visible={modalQAassign_visible}
+          width={800}
+          onCancel={() => { return (setModalQAassign_visible(false)) }}
+          onOk={() => {
+            setModalQAassign_visible(false);
+            // window.location.reload("false");
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId
+          }}
+        />
 
-      <ModalRequestInfoDev
-        title={ProgressStatus}
-        visible={modalRequestInfoDev}
-        onCancel={() => { return (setModalRequestInfoDev(false), setSelected(null)) }}
-        width={800}
-        onOk={() => {
-          setModalRequestInfoDev(false);
-        }}
-        onCancel={() => {
-          setModalRequestInfoDev(false);
-          // window.location.reload("false");
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalRequestInfoDev
+          title={ProgressStatus}
+          visible={modalRequestInfoDev}
+          onCancel={() => { return (setModalRequestInfoDev(false), setSelected(null)) }}
+          width={800}
+          onOk={() => {
+            setModalRequestInfoDev(false);
+          }}
+          onCancel={() => {
+            setModalRequestInfoDev(false);
+            // window.location.reload("false");
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
-      <ModalQA
-        title={ProgressStatus}
-        visible={modalQA_visible}
-        onCancel={() => { return (setModalQA_visible(false), setSelected(null)) }}
-        width={900}
-        onOk={() => {
-          setModalQA_visible(false);
-        }}
-        onCancel={() => {
-          setModalQA_visible(false);
-          // window.location.reload("false");
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-        }}
-      />
+        <ModalQA
+          title={ProgressStatus}
+          visible={modalQA_visible}
+          onCancel={() => { return (setModalQA_visible(false), setSelected(null)) }}
+          width={900}
+          onOk={() => {
+            setModalQA_visible(false);
+          }}
+          onCancel={() => {
+            setModalQA_visible(false);
+            // window.location.reload("false");
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId
+          }}
+        />
 
+        <ModalTimetracking
+          title="Time Tracking"
+          width={600}
+          visible={modaltimetracking_visible}
+          onCancel={() => { return (setModaltimetracking_visible(false)) }}
+          details={{
+            transgroupid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TransGroupId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
 
-      <ModalTimetracking
-        title="Time Tracking"
-        width={600}
-        visible={modaltimetracking_visible}
-        onCancel={() => { return (setModaltimetracking_visible(false)) }}
-        details={{
-          transgroupid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TransGroupId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+          }}
+        />
 
-        }}
-      />
-
-      <ModalComplete
-        title={ProgressStatus}
-        width={600}
-        visible={modalcomplete_visible}
-        onCancel={() => { return (setModalcomplete_visible(false)) }}
-        onOk={() => {
-          setModalcomplete_visible(false);
-        }}
-        details={{
-          ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
-          taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
-          mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-          flowoutputid: userstate.node.output_data.FlowOutputId
-        }}
-      />
-
+        <ModalComplete
+          title={ProgressStatus}
+          width={600}
+          visible={modalcomplete_visible}
+          onCancel={() => { return (setModalcomplete_visible(false)) }}
+          onOk={() => {
+            setModalcomplete_visible(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId
+          }}
+        />
+      </Spin>
     </MasterPage >
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Modal, Form } from 'antd';
+import { Modal, Form, Spin } from 'antd';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -18,6 +18,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
+    const [loading, setLoading] = useState(false);
+
+    const formItemLayout = {
+        labelCol: { span: 4 },
+        wrapperCol: { span: 20 },
+    }
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -99,10 +105,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             });
 
             if (sendflow.status === 200) {
+
                 SaveComment();
                 SaveUnitTest(values);
                 SaveDocumentDeploy(values);
                 onOk();
+                setLoading(false);
 
                 await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -111,9 +119,10 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                             <p>แก้ไขงานเสร็จ และส่ง UnitTest เรียบร้อยแล้ว</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
-                       if (state?.usersdata?.organize?.PositionLevel === 0) { 
+                        if (state?.usersdata?.organize?.PositionLevel === 0) {
                             // ถ้า H.Dev แก้ไขงานเอง ให้ refresh หน้าจอ แล้วทำงานต่อ ไม่ต้องเปลียน page
                             window.location.reload();
                         } else {
@@ -124,6 +133,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 });
             }
         } catch (error) {
+            setLoading(false);
             await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
@@ -131,6 +141,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -141,15 +152,16 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     }
 
     const onFinish = (values) => {
-      //  console.log('Success:', values);
+        setLoading(true);
         SendFlow(values);
-        onOk();
     };
 
 
     return (
+
         <Modal
             visible={visible}
+            confirmLoading={loading}
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
@@ -159,58 +171,60 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             {...props}
 
         >
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="normal_login"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    label="URL"
-                    name="unit_test_url"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'กรุณาใส่ Url ที่ใช้ test ',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form {...formItemLayout} form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    name="normal_login"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <TextArea rows="2" style={{ width: "100%" }} />
-                </Form.Item>
+                    <Form.Item
+                        label="UnitTest (URL)"
+                        name="unit_test_url"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'กรุณาใส่ Url ที่ใช้ test ',
+                            },
+                        ]}
+                    >
+                        <TextArea rows="2" style={{ width: "100%" }} />
+                    </Form.Item>
 
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Unit Test"
-                    name="unittest"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_unittest} />
-                </Form.Item>
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        label="Unit Test"
+                        name="unittest"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={uploadRef_unittest} />
+                    </Form.Item>
 
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Deploy Document"
-                    name="document"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input Deploy Document!',
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_document} />
-                </Form.Item>
-            </Form>
-            <TextEditor ref={editorRef} />
-            <br />
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        label="Deploy Document"
+                        name="document"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input Deploy Document!',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={uploadRef_document} />
+                    </Form.Item>
+                </Form>
+                <TextEditor ref={editorRef} />
+                <br />
                      AttachFile : <UploadFile ref={uploadRef} />
+            </Spin>
         </Modal>
     )
 }

@@ -116,7 +116,7 @@ export default function MyDashboard() {
     return (
         <MasterPage bgColor="#f0f2f5">
             <Spin spinning={loading}>
-                <Row gutter={16}>
+                <Row gutter={16} style={{padding: "24px 24px 24px 24px"}}>
                     <Col span={4}>
                         {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
@@ -297,7 +297,7 @@ export default function MyDashboard() {
                         </Card>
                     </Col>
                 </Row>
-                <Row gutter={16} style={{ marginTop: "30px" }}>
+                <Row gutter={16} style={{ marginTop: "30px", padding: "24px 24px 24px 24px" }}>
                     <Col span={18}>
                         <div >
                             <Card title="Issue By Company" bordered={true} style={{ width: "100%" }}>
@@ -325,7 +325,7 @@ export default function MyDashboard() {
                         </div>
                     </Col>
                 </Row>
-                <Row gutter={16} style={{ marginTop: "30px" }}>
+                <Row gutter={16} style={{ marginTop: "30px", padding: "24px 24px 24px 24px" }}>
                     <Col span={12}>
                         <Table dataSource={statusbyCompany}>
                             <Column title="No" width="5%" dataIndex="Row" />

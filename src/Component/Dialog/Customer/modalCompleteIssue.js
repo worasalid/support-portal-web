@@ -1,7 +1,6 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Modal, Rate, Form, Input, Row, Col } from 'antd';
+import { Modal, Rate, Form, Input, Row, Col, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
-import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import { useHistory } from 'react-router-dom';
@@ -14,6 +13,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   const [textValue, setTextValue] = useState("")
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   const layout = {
     labelCol: {
@@ -25,7 +25,6 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   };
 
   const FlowComplete = async (values) => {
-    onCancel()
     try {
       const completeflow = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/customer-complete",
@@ -50,14 +49,16 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
       });
 
       if (completeflow.status === 200) {
+        setLoading(false);
 
         await Modal.success({
           title: 'บันทึกข้อมูลสำเร็จ',
           content: (
             <div>
-              <p>บันทึกข้อมูลสำเร็จ</p>
+              {/* <p>บันทึกข้อมูลสำเร็จ</p> */}
             </div>
           ),
+          okText: "Close",
           onOk() {
             form.resetFields();
             onOk();
@@ -67,7 +68,9 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
       }
 
     } catch (error) {
+      setLoading(false);
       onCancel();
+
       await Modal.error({
         title: 'บันทึกข้อมูลไม่สำเร็จ',
         content: (
@@ -76,6 +79,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
             <p>{error.response.data}</p>
           </div>
         ),
+        okText: "Close",
         onOk() {
           form.resetFields();
           onOk();
@@ -86,9 +90,8 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   }
 
   const onFinish = values => {
-    console.log('onFinish:', values);
-    console.log("textValue", textValue)
-     FlowComplete(values)
+    setLoading(true);
+    FlowComplete(values);
   };
 
   useEffect(() => {
@@ -100,98 +103,98 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   return (
     <Modal
       visible={visible}
-      onOk={() => { return (form.submit()) }}
+      confirmLoading={loading}
+      onOk={() => form.submit()}
       okButtonProps={{ className: "modal-button-save" }}
       okText="Save"
 
       onCancel={() => { return onCancel(), form.resetFields() }}
       {...props}
     >
-      <Form
-        {...layout}
-        form={form}
-        name="satisfication"
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
+      <Spin spinning={loading} size="large" tip="Loading...">
+        <Form
+          {...layout}
+          form={form}
+          name="satisfication"
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
 
-      >
+        >
 
-        <Form.Item
-          style={{ border: "1px solid", marginBottom: 0 }}
-          label="แก้ไขปัญหาได้ถูกต้อง"
-          name="score"
-          rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
-        >
-          <Rate
-            tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-            onChange={(x) => console.log(x)}
+          <Form.Item
+            style={{ border: "1px solid", marginBottom: 0 }}
+            label="แก้ไขปัญหาได้ถูกต้อง"
+            name="score"
+            rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
           >
-          </Rate>
-        </Form.Item>
-        <Form.Item
-          style={{ border: "1px solid", marginBottom: 0 }}
-          label="แก้ไขปัญหาได้ภายในเวลาที่กำหนด"
-          name="score2"
-          rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
-        >
-          <Rate
-            tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-            onChange={(x) => console.log(x)}
+            <Rate
+              tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
+              onChange={(x) => console.log(x)}
+            >
+            </Rate>
+          </Form.Item>
+          <Form.Item
+            style={{ border: "1px solid", marginBottom: 0 }}
+            label="แก้ไขปัญหาได้ภายในเวลาที่กำหนด"
+            name="score2"
+            rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
           >
-          </Rate>
-        </Form.Item>
-        <Form.Item
-          style={{ border: "1px solid", marginBottom: 0 }}
-          label="ความสะดวกในการการติดต่อประสานงาน"
-          name="score3"
-          rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
-        >
-          <Rate
-            tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-            onChange={(x) => console.log(x)}
+            <Rate
+              tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
+              onChange={(x) => console.log(x)}
+            >
+            </Rate>
+          </Form.Item>
+          <Form.Item
+            style={{ border: "1px solid", marginBottom: 0 }}
+            label="ความสะดวกในการการติดต่อประสานงาน"
+            name="score3"
+            rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
           >
-          </Rate>
-        </Form.Item>
-        <Form.Item
-          style={{ border: "1px solid", marginBottom: 0 }}
-          label="การให้บริการ (Service Mind)"
-          name="score4"
-          rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
-        >
-          <Rate
-            tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-            onChange={(x) => console.log(x)}
+            <Rate
+              tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
+              onChange={(x) => console.log(x)}
+            >
+            </Rate>
+          </Form.Item>
+          <Form.Item
+            style={{ border: "1px solid", marginBottom: 0 }}
+            label="การให้บริการ (Service Mind)"
+            name="score4"
+            rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
           >
-          </Rate>
-        </Form.Item>
-        <Form.Item
-          style={{ border: "1px solid", marginBottom: 0 }}
-          label="คะแนนการให้บริการโดยรวม"
-          name="score5"
-          rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
-        >
-          <Rate
-            tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-            onChange={(x) => console.log(x)}
+            <Rate
+              tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
+              onChange={(x) => console.log(x)}
+            >
+            </Rate>
+          </Form.Item>
+          <Form.Item
+            style={{ border: "1px solid", marginBottom: 0 }}
+            label="คะแนนการให้บริการโดยรวม"
+            name="score5"
+            rules={[{ required: true, message: 'กรุณาให้คะแนนความพึงพอใจ!' }]}
           >
-          </Rate>
-        </Form.Item>
+            <Rate
+              tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
+              onChange={(x) => console.log(x)}
+            >
+            </Rate>
+          </Form.Item>
 
 
-        <Row style={{ marginTop: 40 }}>
-          <Col span={24}>
-            แนะนำคำติชม
+          <Row style={{ marginTop: 40 }}>
+            <Col span={24}>
+              แนะนำคำติชม
           </Col>
-        </Row>
-        <Row>
-          <Col span={24}>
-            <TextArea rows={5} style={{ width: "100%" }} onChange={(x) => setTextValue(x.target.value)} />
-          </Col>
-        </Row>
-      </Form >
-
-
-
+          </Row>
+          <Row>
+            <Col span={24}>
+              <TextArea rows={5} style={{ width: "100%" }} onChange={(x) => setTextValue(x.target.value)} />
+            </Col>
+          </Row>
+        </Form >
+      </Spin>
     </Modal>
   );
 }

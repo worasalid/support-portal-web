@@ -1,12 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Select, Table, Button, Tabs } from 'antd';
+import { Modal, Form, Spin, Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-import Column from 'antd/lib/table/Column';
-import { DownloadOutlined } from '@ant-design/icons';
-import TextArea from 'antd/lib/input/TextArea';
 
 const { TabPane } = Tabs;
 
@@ -17,7 +14,8 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
     const upload_quotation = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     //data
 
@@ -51,7 +49,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                      ticketid: details && details.ticketid,
+                        ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: textValue,
                         comment_type: "internal",
@@ -86,6 +84,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                 SaveComment();
                 SaveQuotation();
                 onOk();
+                setLoading(false);
 
                 await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -94,6 +93,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                             <p>ส่งใบเสนอราคา</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.editor.setContent("");
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -101,6 +101,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                 });
             }
         } catch (error) {
+            setLoading(false);
             await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
@@ -108,6 +109,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.editor.setContent("");
                     onOk();
@@ -117,15 +119,16 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
+        setLoading(true);
         SendFlow(values);
-        
+
     };
 
-  
+
     return (
         <Modal
             visible={visible}
+            confirmLoading={loading}
             onOk={() => { return (form.submit()) }}
             okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
@@ -133,52 +136,52 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" ,marginTop: 0 }}
-                name="form-quotation"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-            
-                
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="ใบเสนอราคา"
-                    name="quotation"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'กรุณาระบุ ใบเสนอราคา',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white", marginTop: 0 }}
+                    name="form-quotation"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <UploadFile ref={upload_quotation} />
-                </Form.Item>
-            </Form>
-                 Remark :
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
 
+
+                    <Form.Item
+                        style={{ minWidth: 300, maxWidth: 300 }}
+                        label="ใบเสนอราคา"
+                        name="quotation"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'กรุณาระบุ ใบเสนอราคา',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={upload_quotation} />
+                    </Form.Item>
+                </Form>
+                 Remark :
+            <Editor
+                    apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                    ref={editorRef}
+                    initialValue=""
+                    init={{
+                        height: 300,
+                        menubar: false,
+                        plugins: [
+                            'advlist autolink lists link image charmap print preview anchor',
+                            'searchreplace visualblocks code fullscreen',
+                            'insertdatetime media table paste code help wordcount'
+                        ],
+                        toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                        toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                    }}
+                    onEditorChange={handleEditorChange}
+                />
+                <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
+            </Spin>
         </Modal>
     )
 }

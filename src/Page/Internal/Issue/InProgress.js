@@ -57,6 +57,7 @@ export default function InProgress() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
@@ -112,20 +113,22 @@ export default function InProgress() {
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
-        <Row style={{ marginBottom: 16, textAlign: "left" }}>
+        <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
           <Col span={24}>
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
         <IssueSearch />
         <Row>
-          <Col span={24}>
+          <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
-              // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
-
               pagination={{ pageSize: 10, total: 10 }}
               onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              // expandable={{
+              //   expandedRowRender: record => <p style={{ margin: 0 }}>{record.Number}</p>,
+
+              // }}
               footer={(x) => {
                 return (
                   <>
@@ -144,6 +147,7 @@ export default function InProgress() {
                   onContextMenu: event => { }, // right button click row
                   onMouseEnter: event => { setRecHover(rowIndex) }, // mouse enter row
                   onMouseLeave: event => { setRecHover(-1) }, // mouse leave row
+
                 };
               }}
               rowClassName={(record, index) => {
@@ -164,7 +168,9 @@ export default function InProgress() {
                       <label className="table-column-text">
                         {record.Number}
                       </label>
+
                     </>
+
                   )
                 }
                 }
@@ -215,7 +221,7 @@ export default function InProgress() {
                           </label>
                         </Col>
                       </Row>
-                      <Row style={{ borderBottom: "1px dotted" }}>
+                      {/* <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
                             Module :
@@ -223,8 +229,19 @@ export default function InProgress() {
                         </Col>
                         <Col span={14}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            {/* {record.ModuleName} */}
-                            CustomerService
+                            {record.ModuleName}
+                          </label>
+                        </Col>
+                      </Row> */}
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Scene :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Scene}
                           </label>
                         </Col>
                       </Row>

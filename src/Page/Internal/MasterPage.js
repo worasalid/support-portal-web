@@ -12,6 +12,7 @@ import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
 import MasterContext from "../../utility/masterContext";
 import Notifications from '../../Component/Notifications/Internal/Notification';
+import axios from 'axios';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -41,7 +42,7 @@ export class Menucollapsed extends Component {
 }
 
 export default function MasterPage({bgColor='#fff',...props}) {
-
+  axios.defaults.headers = { "Authorization": "Bearer " + localStorage.getItem("sp-ssid")}
 
   const history = useHistory();
   const match = useRouteMatch();
@@ -52,6 +53,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
   const [show_notice, setshow_notice] = useState(true)
   const [activemenu, setActivemenu] = useState('')
   const [active_submenu, setActive_submenu] = useState('')
+  //const [notiCount, setNotiCount] = useState(0);
 
   //Menu
   const rootSubmenuKeys = ['sub0', 'sub1', 'sub2','sub3'];
@@ -78,10 +80,15 @@ export default function MasterPage({bgColor='#fff',...props}) {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
       });
-      dispatch({ type: 'Authen', payload: true });
-      dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+      if(result.status === 200){
+        dispatch({ type: 'Authen', payload: true });
+        dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+      }
+     
     } catch (error) {
-
+      console.log("message",error.response.data)
+      alert(error.response.data)
+         history.push("/login");
     }
   }
 
@@ -108,14 +115,33 @@ export default function MasterPage({bgColor='#fff',...props}) {
     }
   }
 
-  useEffect(() => {
-    if (!state.authen) {
-      getuser()
-    }
-    getuser();
-    CountStatus();
-  }, [])
+  const getNotification = async() => {
+    try {
+      const countNoti = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        }
+      });
 
+      if(countNoti.status === 200) {
+        masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
+        //setNotiCount(countNoti.data.total);
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  useEffect(() => {
+    if (state.authen === false) {
+      getuser();
+      getNotification();
+      CountStatus();
+    }
+
+  }, [state.authen])
 
   useEffect(() =>{
 
@@ -210,21 +236,28 @@ export default function MasterPage({bgColor='#fff',...props}) {
                     <Menu.Item key="1">
                       <div>
                       <label style={{ fontSize: 24, fontWeight: "bold" }}><NotificationOutlined /> &nbsp; Notifications</label><br />
-                      <div style={{ height: "50vh", overflowY: "scroll" }}>
+                      {/* <div style={{ height: "50vh", overflowY: "scroll" }}> */}
                         <Row style={{ padding: 16 }}>
                           <Col span={24}>
                            
                                <Notifications />
                           </Col>
                         </Row>
-                      </div>
+                      {/* </div> */}
                       </div>
                     </Menu.Item>
                   </Menu>
                 )} trigger="click">
 
-                <Button type="text" style={{ marginRight: 20 }} size="middle"
-                  icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
+                <Button type="text" style={{ marginRight: 20,marginTop:10 }} size="middle"
+                  icon={
+                  <Badge 
+                   offset={[10,0]}
+                 // dot={show_notice} 
+                  count={masterstate?.toolbar?.top_menu?.notification}>
+                    <NotificationOutlined style={{ fontSize: 20 }} />
+                    </Badge>
+                    }
                 >
                 </Button>
               </Dropdown>
@@ -416,12 +449,14 @@ export default function MasterPage({bgColor='#fff',...props}) {
         <Content
           className="site-layout-background"
           style={{
-            padding: 24,
+            //padding: 24,
             margin: 0,
             minHeight: 280,
             backgroundColor: bgColor,
             //backgroundImage: `url("http://r7c3n5k2.stackpathcdn.com/wp-content/uploads/2015/06/windows-xp-default-background.jpg")`,
             //backgroundSize:"900px 500px"
+            height: '100%',
+            overflowY: 'auto'
           }}
         >
 
