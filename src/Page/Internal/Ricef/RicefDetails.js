@@ -76,7 +76,7 @@ export default function RicefDetails() {
 
     useEffect(() => {
         GetCompany(match.params.compid)
-        GetRicef(match.params.batchid)
+       // GetRicef(match.params.batchid)
 
     }, [])
 
@@ -93,158 +93,210 @@ export default function RicefDetails() {
 
     return (
         <MasterPage>
+            <div style={{ padding: "24px 24px 24px 24px" }}>
+                <Row style={{ marginBottom: 30 }}>
+                    <Col span={24}>
+                        <Button type="link"
+                            onClick={() => history.goBack()}
+                        >
+                            <LeftCircleOutlined style={{ fontSize: 30 }} title="Back" />
+                        </Button>
+                        <label style={{ fontSize: 20, verticalAlign: "top" }}>{company && company[0].FullNameTH}</label>
+                    </Col>
+                </Row>
+                <RicefSearch />
 
-            <Row style={{ marginBottom: 30 }}>
-                <Col span={24}>
-                    <Button type="link"
-                        onClick={() => history.goBack()}
-                    >
-                        <LeftCircleOutlined style={{ fontSize: 30 }} title="Back" />
-                    </Button>
-                    <label style={{ fontSize: 20, verticalAlign: "top" }}>{company && company[0].FullNameTH}</label>
-                </Col>
-            </Row>
-            <RicefSearch />
+                <Table dataSource={ricef} loading={ricefstate.loading}>
+                    {/* <Column align="center" title="No" width="1%" dataIndex="RowNo" /> */}
+                    <Column align="left" title="IssueNumber" width="5%" dataIndex=""
 
-            <Table dataSource={ricef} loading={ricefstate.loading}>
-                {/* <Column align="center" title="No" width="1%" dataIndex="RowNo" /> */}
-                <Column align="left" title="IssueNumber" width="20%" dataIndex=""
-
-                    render={(record) => {
-                        return (
-                            <div>
-                                <label className="table-column-text">
-                                    {record.IssueNumber}
-                                </label>
-
-                                <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                                    {
-                                        record.IssueType === 'ChangeRequest' ?
-                                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                                            <Tooltip title="Issue Type"><Tag color="#f50">{record.TypeName}</Tag></Tooltip>
-                                    }
-
-                                    <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-
-                                    {/* <Divider type="vertical" /> */}
-                                    <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
-                                </div>
-                            </div>
-                        );
-                    }}
-                />
-                <Column title="Subject"
-                    width="35%"
-                    render={(record) => {
-                        return (
-                            <>
+                        render={(record) => {
+                            return (
                                 <div>
                                     <label className="table-column-text">
-                                        {record.Title}
+                                        {record.IssueNumber}
                                     </label>
+
                                 </div>
+                            );
+                        }}
+                    />
+
+                    <Column
+                        title="Details"
+                        width="14%"
+                        render={(record) => {
+                            return (
                                 <div>
-                                    <label
-                                        onClick={() => {
-                                            return (
-                                                history.push({ pathname: "/internal/ricef/subject-" + record.RicefId })
-
-                                            )
-                                        }
-                                        }
-                                        className="table-column-detail">
-                                        รายละเอียด
+                                    <Row style={{ borderBottom: "1px dotted" }}>
+                                        <Col span={10}>
+                                            <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                                Type :
                           </label>
+                                        </Col>
+                                        <Col span={14}>
+                                            <label
+                                                style={{ color: "#808080", fontSize: "10px" }}
+                                            >
+                                                {record.IssueType === 'ChangeRequest' ? "CR" : record.TypeName}
+                                            </label>
+                                        </Col>
+                                    </Row>
+                                    <Row style={{ borderBottom: "1px dotted" }}>
+                                        <Col span={10}>
+                                            <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                                Priority :
+                          </label>
+                                        </Col>
+                                        <Col span={14} >
+                                            <label style={{ color: "#808080", fontSize: "10px" }}>
+                                                {record.Priority}
+                                            </label>
+                                            {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                                        </Col>
+                                    </Row>
+                                    <Row style={{ borderBottom: "1px dotted" }}>
+                                        <Col span={10}>
+                                            <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                                Product :
+                          </label>
+                                        </Col>
+                                        <Col span={14}>
+                                            <label style={{ color: "#808080", fontSize: "10px" }}>
+                                                {record.ProductName}
+                                            </label>
+                                        </Col>
+                                    </Row>
+
+                                    <Row style={{ borderBottom: "1px dotted" }}>
+                                        <Col span={10}>
+                                            <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                                Scene :
+                          </label>
+                                        </Col>
+                                        <Col span={14}>
+                                            <label style={{ color: "#808080", fontSize: "10px" }}>
+                                                {record.Scene}
+                                            </label>
+                                        </Col>
+                                    </Row>
                                 </div>
+                            );
+                        }}
+                    />
 
-                            </>
-                        )
-                    }
-                    }
-                />
-
-                <Column align="center" title="Owner" width="20%"
-                    render={(record) => {
-                        return (
-                            <>
-                                <label className="table-column-text">
-                                    {record.OwnerName}<br />
-                                </label>
-                                <label className="table-column-text">
-                                    {record.OwnerName2}
-                                </label>
-                            </>
-                        )
-                    }
-                    }
-                />
-
-                <Column align="center" title="Progress" width="5%" 
-                    render={(record) => {
-                        return (
-                            <>
-                                <label className="table-column-text">
-                                    {record.Status}
-                                </label>
-                            </>
-                        )
-                    }
-                    }
-                />
-                <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
-                    width="20%"
-                    align="center"
-                    render={(record) => {
-                        return (
-                            <>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text">Due Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">{moment(record.DueDate).format("DD/MM/YYYY")}</label>
-                                    </Col>
-                                </Row>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text">Assign Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">
-                                            {record.AssignDate === "" ? "-" : moment(record.AssignDate).format("DD/MM/YYYY")}
+                    <Column title="Subject"
+                        width="35%"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <div>
+                                        <label className="table-column-text">
+                                            {record.Title}
                                         </label>
-                                    </Col>
-                                </Row>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text">Resolved Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">
-                                            {record.ResolvedDate === "" ? "-" : moment(record.ResolvedDate).format("DD/MM/YYYY")}
-                                        </label>
+                                    </div>
+                                    <div>
+                                        <label
+                                            onClick={() => {
+                                                return (
+                                                    history.push({ pathname: "/internal/ricef/subject-" + record.RicefId })
 
-                                    </Col>
-                                </Row>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text"> Complete Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">
-                                            {record.CompleteDate === "" ? "-" : moment(record.CompleteDate).format("DD/MM/YYYY")}
-                                        </label>
+                                                )
+                                            }
+                                            }
+                                            className="table-column-detail">
+                                            รายละเอียด
+                          </label>
+                                    </div>
 
-                                    </Col>
-                                </Row>
-                            </>
-                        )
-                    }
-                    }
-                />
-            </Table>
+                                </>
+                            )
+                        }
+                        }
+                    />
 
+                    <Column align="center" title="Owner" width="20%"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <label className="table-column-text">
+                                        {record.OwnerName}<br />
+                                    </label>
+                                    <label className="table-column-text">
+                                        {record.OwnerName2}
+                                    </label>
+                                </>
+                            )
+                        }
+                        }
+                    />
 
+                    <Column align="center" title="Progress" width="5%"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <label className="table-column-text">
+                                        {record.Status}
+                                    </label>
+                                </>
+                            )
+                        }
+                        }
+                    />
+                    <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
+                        width="20%"
+                        align="center"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <Row style={{ textAlign: "right" }}>
+                                        <Col span={12}>
+                                            <label className="value-text">Due Date</label>
+                                        </Col>
+                                        <Col span={12}>
+                                            <label className="value-text">{moment(record.DueDate).format("DD/MM/YYYY")}</label>
+                                        </Col>
+                                    </Row>
+                                    <Row style={{ textAlign: "right" }}>
+                                        <Col span={12}>
+                                            <label className="value-text">Assign Date</label>
+                                        </Col>
+                                        <Col span={12}>
+                                            <label className="value-text">
+                                                {record.AssignDate === "" ? "-" : moment(record.AssignDate).format("DD/MM/YYYY")}
+                                            </label>
+                                        </Col>
+                                    </Row>
+                                    <Row style={{ textAlign: "right" }}>
+                                        <Col span={12}>
+                                            <label className="value-text">Resolved Date</label>
+                                        </Col>
+                                        <Col span={12}>
+                                            <label className="value-text">
+                                                {record.ResolvedDate === "" ? "-" : moment(record.ResolvedDate).format("DD/MM/YYYY")}
+                                            </label>
+
+                                        </Col>
+                                    </Row>
+                                    <Row style={{ textAlign: "right" }}>
+                                        <Col span={12}>
+                                            <label className="value-text"> Complete Date</label>
+                                        </Col>
+                                        <Col span={12}>
+                                            <label className="value-text">
+                                                {record.CompleteDate === "" ? "-" : moment(record.CompleteDate).format("DD/MM/YYYY")}
+                                            </label>
+
+                                        </Col>
+                                    </Row>
+                                </>
+                            )
+                        }
+                        }
+                    />
+                </Table>
+            </div>
         </MasterPage>
     )
 }

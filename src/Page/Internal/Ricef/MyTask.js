@@ -72,7 +72,7 @@ export default function MyTask() {
                 </Col>
             </Row>
 
-            <RicefSearch />
+            <RicefSearch Company="show" />
 
 
             <Table dataSource={ricef} loading={ricefstate.loading}>

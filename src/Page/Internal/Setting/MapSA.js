@@ -61,43 +61,45 @@ export default function MapSA() {
 
     return (
         <MasterPage >
-            <Row gutter={[16, 16]}>
-                <Col span={16}>
-                </Col>
-                <Col span={8}>
-                    <Input.Search placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
-                        enterButton
-                        onSearch={searchSA}
+            <div style={{ padding: "24px 24px 24px 24px" }}>
+                <Row gutter={[16, 16]}>
+                    <Col span={16}>
+                    </Col>
+                    <Col span={8}>
+                        <Input.Search placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
+                            enterButton
+                            onSearch={searchSA}
+                        />
+                    </Col>
+                </Row>
+                <Table
+                    dataSource={filterSA === null ? saList : filterSA}
+                    loading={loading}>
+
+                    <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
+                    <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
+                    <Column title="ชื่อเล่น" dataIndex="NickName" />
+                    <Column title="ตำแหน่ง" dataIndex="PositionName" />
+
+                    <Column title="Product ที่รับผิดชอบ"
+                        align="center"
+                        width="15%"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <Button type="link"
+                                        onClick={() => history.push({ pathname: "/internal/setting/config_sa/userid-" + record.UserId })}
+                                    >
+                                        <EditOutlined />
+                                    </Button>
+                                </>
+                            )
+                        }
+                        }
                     />
-                </Col>
-            </Row>
-            <Table
-                dataSource={filterSA === null ? saList : filterSA}
-                loading={loading}>
 
-                <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
-                <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
-                <Column title="ชื่อเล่น" dataIndex="NickName" />
-                <Column title="ตำแหน่ง" dataIndex="PositionName" />
-
-                <Column title="Product ที่รับผิดชอบ"
-                    align="center"
-                    width="15%"
-                    render={(record) => {
-                        return (
-                            <>
-                                <Button type="link"
-                                    onClick={() => history.push({ pathname: "/internal/setting/config_sa/userid-" + record.UserId })}
-                                >
-                                    <EditOutlined />
-                                </Button>
-                            </>
-                        )
-                    }
-                    }
-                />
-
-            </Table>
+                </Table>
+            </div>
         </MasterPage>
     )
 }

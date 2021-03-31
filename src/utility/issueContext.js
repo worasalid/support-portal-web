@@ -59,6 +59,7 @@ export const userState = {
         TypeState: [],
         priorityState: [],
         progress: [],
+        isReleaseNote: "",
         date: {
             startdate: "",
             enddate: ""
@@ -129,6 +130,7 @@ export const userReducer = createReducer(userState, {
     SELECT_SCENE: (state, { payload }) => { state.filter.scene = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
+    SELECT_ISRELEASENOTE: (state, { payload }) => { state.filter.isReleaseNote = payload },
     SEARCH: (state, { payload }) => { state.search = payload },
     LOADING: (state, { payload }) => { state.loading = payload },
     SELECT_DATAROW: (state, { payload }) => { state.issuedata.datarow = payload },

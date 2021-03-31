@@ -203,7 +203,7 @@ export default function IssueCreate() {
             });
 
             if (createTicket.status === 200) {
-                Modal.info({
+                Modal.success({
                     title: 'แจ้งปัญหาเรียบร้อยแล้ว',
                     content: (
                         <div>
@@ -451,7 +451,7 @@ export default function IssueCreate() {
                         </Select>
                     </Form.Item>
 
-                    <Form.Item label="Module" name="module">
+                    {/* <Form.Item label="Module" name="module">
                         <Select
                             placeholder="Module"
                             mode="multiple"
@@ -465,7 +465,7 @@ export default function IssueCreate() {
                         >
 
                         </Select>
-                    </Form.Item>
+                    </Form.Item> */}
 
                     <Form.Item label="Priority" name="priority">
                         <Select

@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Button, Table, Modal, Row, Col, Form, Input, message } from 'antd';
 import Axios from 'axios';
 import MasterPage from '../../MasterPage';
-import { ArrowLeftOutlined, CheckOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons';
+import { LeftCircleOutlined, CheckOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 
@@ -52,7 +52,6 @@ export default function MasterProduct() {
     }
 
     const updateStatus = async (param) => {
-        setLoading(true)
         try {
             const result = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/products",
@@ -145,62 +144,76 @@ export default function MasterProduct() {
 
     return (
         <MasterPage>
-            <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+            <div style={{ padding: "24px 24px 24px 24px" }}>
 
-                <Button type="primary" shape="circle" icon={<ArrowLeftOutlined />}
-                    onClick={() => history.goBack()}
-                />
-                &nbsp; &nbsp;
-                <h1>ข้อมูล Product</h1>
-            </Row>
-            <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
-                <Col span={24}>
-                    <Button type="primary" icon={<PlusOutlined />}
-                        style={{ backgroundColor: "#00CC00" }}
-                        onClick={() => setModalVisible(true)}
-                    >
-                        เพิ่มข้อมูล
+                <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+                    <Col>
+                        <Button
+                            type="link"
+                            icon={<LeftCircleOutlined />}
+                            style={{ fontSize: 18, padding: 0 }}
+                            onClick={() => history.goBack()}
+                        >
+                            Back
+                               </Button>
+                    </Col>
+                   &nbsp; &nbsp;
+
+                    </Row>
+                <Row>
+                    <Col>
+                        <h1>ข้อมูล Product</h1>
+                    </Col>
+                </Row>
+
+                <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
+                    <Col span={24}>
+                        <Button type="primary" icon={<PlusOutlined />}
+                            style={{ backgroundColor: "#00CC00" }}
+                            onClick={() => setModalVisible(true)}
+                        >
+                            เพิ่มข้อมูล
                     </Button>
-                </Col>
-            </Row>
-            <Table dataSource={product} loading={loading}
-                onChange={(x) => setPage(x.current)}
-                pagination={{pageSize:6}}
-            >
-                <Column title="No" width="5%"
-                    render={(value, record, index) => {
-                        return (
-                            <>
-                                {
-                                    page === 1 ? (index + 1) : ((page * 10) - 10 ) + (index + 1)
-                                }
-                            </>
-                        )
-                    }}
-                />
-                <Column title="Product Code" dataIndex="Name" width="15%" />
-                <Column title="Product Name" dataIndex="FullName" width="55%" />
-                <Column title="สถานะ"
-                    align="center"
-                    width="15%"
-                    render={(value, record, index) => {
-                        return (
-                            <>
-                                <Button type="text"
-                                    icon={record.IsActive === true ?
-                                        <CheckOutlined style={{ color: "green" }} /> :
-                                        <StopOutlined style={{ color: "red" }} />
+                    </Col>
+                </Row>
+                <Table dataSource={product} loading={loading}
+                    onChange={(x) => setPage(x.current)}
+                    pagination={{ pageSize: 6 }}
+                >
+                    <Column title="No" width="5%"
+                        render={(value, record, index) => {
+                            return (
+                                <>
+                                    {
+                                        page === 1 ? (index + 1) : ((page * 10) - 10) + (index + 1)
                                     }
-                                    onClick={() => updateStatus(record)}
-                                />
-                            </>
-                        )
-                    }
+                                </>
+                            )
+                        }}
+                    />
+                    <Column title="Product Code" dataIndex="Name" width="15%" />
+                    <Column title="Product Name" dataIndex="FullName" width="55%" />
+                    <Column title="สถานะ"
+                        align="center"
+                        width="15%"
+                        render={(value, record, index) => {
+                            return (
+                                <>
+                                    <Button type="text"
+                                        icon={record.IsActive === true ?
+                                            <CheckOutlined style={{ color: "green" }} /> :
+                                            <StopOutlined style={{ color: "red" }} />
+                                        }
+                                        onClick={() => { updateStatus(record); setLoading(true) }}
+                                    />
+                                </>
+                            )
+                        }
 
-                    }
-                />
-            </Table>
-
+                        }
+                    />
+                </Table>
+            </div>
             <Modal
                 visible={modalVisible}
                 title="ข้อมูล Product "

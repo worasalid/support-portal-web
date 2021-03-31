@@ -81,10 +81,13 @@ export default function ModalMandayLog({ visible = false, onOk, onCancel, dataro
 
                                 <Tag color="#f50">{item.module}</Tag>
                             </Col>
-                            <Col span={19}>
+                            <Col span={5}>
 
-                                <InputNumber defaultValue={item.manday} disabled={true} style={{ width: "30%", marginLeft: 10 }} />
-                                <label>Manday</label>
+                                <InputNumber defaultValue={item.manday} disabled={true} style={{ width: "100%" }} />
+
+                            </Col>
+                            <Col span={14} >
+                                <label style={{ fontSize: 12, marginLeft: 14 }}>Manday</label>
                             </Col>
                         </Row>
 
@@ -94,33 +97,38 @@ export default function ModalMandayLog({ visible = false, onOk, onCancel, dataro
 
             <Row>
                 <Col span={5} style={{ textAlign: "right" }}>
-                    <label>CR Center</label>
+                    <label style={{ fontSize: 12, marginRight: 10 }}>CR Center</label>
                 </Col>
-                <Col span={19}>
-                    <InputNumber value={details.totalmanday - manday} disabled={true} style={{ width: "30%", marginLeft: 10 }} />
-                    <label>Manday</label>
-                    {/* <label style={{ marginRight: 20 }}>&nbsp;&nbsp;&nbsp;{totalmanday - manday}</label> */}
+                <Col span={5}>
+                    <InputNumber value={details.totalmanday - manday} disabled={true} style={{ width: "100%" }} />
+                </Col>
+                <Col span={14}>
+                    <label style={{ fontSize: 12, marginLeft: 14 }}>Manday</label>
                 </Col>
             </Row>
-            <Row>
+            <Row style={{ marginTop: 14 }}>
                 <Col span={5} style={{ textAlign: "right" }}>
-                    <label>Total Manday</label>
+                    <label style={{ fontSize: 12, marginRight: 10 }}>Total Manday</label>
                 </Col>
-                <Col span={6} style={{ textAlign: "right" }}>
+                <Col span={5} style={{ textAlign: "right" }}>
                     <label style={{ marginRight: 10 }}>&nbsp;&nbsp;&nbsp;{details.totalmanday}</label>
                 </Col>
+                <Col span={14}>
+                    <label style={{ fontSize: 12, marginLeft: 14 }}>Manday</label>
+                </Col>
 
             </Row>
-            <Row>
+            <Row >
                 <Col span={5} style={{ textAlign: "right" }}>
-                    <label>Total Cost</label>
+                    <label style={{ fontSize: 12,  marginRight: 10 }}>Total Cost</label>
                 </Col>
-                <Col span={6} style={{ textAlign: "right" }}>
+                <Col span={5} style={{ textAlign: "right", borderBottom: "1px solid" }}>
                     <label style={{ marginRight: 10 }}>&nbsp;&nbsp;&nbsp;{details.cost}</label>
                 </Col>
+                <Col span={14}>
+                    <label style={{ fontSize: 12, marginLeft: 14 }}>บาท</label>
+                </Col>
             </Row>
-
-
 
         </Modal>
     )

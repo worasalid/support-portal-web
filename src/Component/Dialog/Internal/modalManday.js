@@ -128,7 +128,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>ประเมิน Manday แล้ว จำนวน {values.manday} วัน </p>
                         </div>
                     ),
                     okText: "Close",
@@ -186,7 +186,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>ประเมิน Manday เรียบร้อยแล้ว จำนวน {totalmanday} วัน</p>
                         </div>
                     ),
                     okText: "Close",
@@ -287,9 +287,6 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                 >
 
                     <Row>
-
-
-
                         <Col span={8}>
                             <fieldset style={{ border: "solid 1px", borderRadius: "25px", padding: "15px" }}>
                                 <Form.Item
@@ -333,8 +330,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                                 <InputNumber defaultValue={item.manday} disabled={true} style={{ width: "100%" }} />
 
                                             </Col>
-                                            <Col span={4} style={{ textAlign: "center" }}>
-                                                <label>Manday</label>
+                                            <Col span={4} style={{ textAlign: "right" }}>
+                                                <label style={{ fontSize: 12 }}>Manday</label>
                                             </Col>
                                         </Row>
 
@@ -343,9 +340,9 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                             </List>
 
 
-                            <Row>
+                            <Row style={{ marginTop: 14 }}>
                                 <Col span={10} style={{ textAlign: "right" }}>
-                                    <label>Cr Center</label>
+                                    <label style={{ fontSize: 12, marginRight: 14 }}>Cr Center</label>
                                 </Col>
                                 <Col span={10}>
                                     <InputNumber min={0} max={100} step={0.25} defaultValue={0} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
@@ -354,32 +351,32 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                         }
                                         } />
                                 </Col>
-                                <Col span={4} style={{ textAlign: "center" }}>
-                                    <label>Manday</label>
+                                <Col span={4} style={{ textAlign: "right" }}>
+                                    <label style={{ fontSize: 12 }}>Manday</label>
                                 </Col>
                             </Row>
 
-                            <Row>
+                            <Row style={{ marginTop: 24 }}>
                                 <Col span={10} style={{ textAlign: "right" }}>
-                                    <label>Total Manday</label>
+                                    <label style={{ fontSize: 12, marginRight: 14 }}>Total Manday</label>
                                 </Col>
                                 <Col span={10} style={{ textAlign: "right" }}>
                                     <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalmanday}</label>
                                 </Col>
-                                <Col span={4} style={{ textAlign: "center" }}>
-                                    <label>Manday</label>
+                                <Col span={4} style={{ textAlign: "right" }}>
+                                    <label style={{ fontSize: 12 }}>Manday</label>
                                 </Col>
                             </Row>
-                            <Row>
+                            <Row style={{ marginTop: 14 }}>
                                 <Col span={10} style={{ textAlign: "right" }}>
-                                    <label>Total Cost</label>
+                                    <label style={{ fontSize: 12, marginRight: 14 }}>Total Cost</label>
                                 </Col>
                                 <Col span={10} style={{ textAlign: "right", borderBottom: "1px solid" }}>
                                     <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label>
                                     <u></u>
                                 </Col>
-                                <Col span={4} style={{ textAlign: "center" }}>
-                                    <label>บาท</label>
+                                <Col span={4} style={{ textAlign: "right" }}>
+                                    <label style={{ fontSize: 13 }}>บาท</label>
                                 </Col>
                             </Row>
                         </Col>

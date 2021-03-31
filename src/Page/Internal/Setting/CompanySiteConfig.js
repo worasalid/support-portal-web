@@ -282,247 +282,249 @@ export default function CompanySiteConfig() {
 
     return (
         <MasterPage>
-            <Spin spinning={loadingPage} tip="Loading...">
-                {/* บริษัท */}
-                <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+            <div style={{ padding: "24px 24px 24px 24px" }}>
+                <Spin spinning={loadingPage} tip="Loading...">
+                    {/* บริษัท */}
+                    <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
 
-                    <Button type="link"
-                        icon={<LeftCircleOutlined />}
-                        style={{ fontSize: 18, padding: 0 }}
-                        onClick={() => history.goBack()}
-                    >
-                        Back
+                        <Button type="link"
+                            icon={<LeftCircleOutlined />}
+                            style={{ fontSize: 18, padding: 0 }}
+                            onClick={() => history.goBack()}
+                        >
+                            Back
                       </Button>
-                </Row>
-                <Row>
-                    <h1>{company[0]?.FullNameTH}</h1>
-                </Row>
-                {/* Add User */}
-                <Row>
-                    <Col span={14} style={{ textAlign: "right" }}>
-                        <Button type="primary" icon={<PlusOutlined />}
-                            style={{ backgroundColor: "#00CC00" }}
-                            onClick={() => {
-                                setModalAddUser(true);
-                                getUsers();
-                                setLoadingUser(true);
-                            }}
-                        >
-                            เพิ่มข้อมูล
+                    </Row>
+                    <Row>
+                        <h1>{company[0]?.FullNameTH}</h1>
+                    </Row>
+                    {/* Add User */}
+                    <Row>
+                        <Col span={14} style={{ textAlign: "right" }}>
+                            <Button type="primary" icon={<PlusOutlined />}
+                                style={{ backgroundColor: "#00CC00" }}
+                                onClick={() => {
+                                    setModalAddUser(true);
+                                    getUsers();
+                                    setLoadingUser(true);
+                                }}
+                            >
+                                เพิ่มข้อมูล
                     </Button>
-                    </Col>
-                </Row>
-
-                <Row style={{ marginTop: 20 }}>
-                    <Col span={14}>
-                        <Table dataSource={supportSiteOwner}>
-                            <Column title="ผู้ดูแล Site"
-                                render={(record) => {
-                                    return (
-                                        <>
-                                            <div style={{ cursor: "pointer" }}
-                                                onClick={() => {
-                                                    setSelectUserRow(record);
-                                                    getProductConfig({
-                                                        user_id: record.UserId
-                                                    });
-                                                }}
-                                            >
-                                                <label className="value-text" style={{ cursor: "pointer" }}>
-                                                    {record.DisplayName}
-                                                </label>
-                                            </div>
-
-                                        </>
-
-                                    )
-                                }
-                                }
-                            />
-                            <Column title="Product ที่ดูแล"
-                                render={(record) => {
-                                    return (
-                                        <>
-                                            <div style={{ cursor: "pointer" }}
-                                                onClick={() => {
-                                                    setSelectUserRow(record)
-                                                    getProductConfig({
-                                                        user_id: record.UserId
-                                                    });
-                                                }}
-                                            >
-                                                <label className="value-text" style={{ cursor: "pointer" }}>
-                                                    {record.ProductName}
-                                                </label>
-                                            </div>
-                                        </>
-
-                                    )
-                                }
-                                }
-                            />
-
-                            <Column title=""
-                                align="center"
-                                width="15%"
-                                render={(record) => {
-                                    return (
-                                        <>
-                                            <Button type="link"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => deleteUser(record.UserId)}
-                                            >
-                                            </Button>
-                                        </>
-                                    )
-                                }
-                                }
-                            />
-
-                        </Table>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={8}>
-                        <Table dataSource={productConfig} pagination={false}
-                            title={(record) => {
-                                return (
-                                    <>
-                                        <Row>
-                                            <Col span={24}>
-                                                <label style={{ display: selectUserRow.length === 0 ? "none" : "block" }}>
-                                                    {`${selectUserRow?.DisplayName}`}
-                                                </label>
-
-                                            </Col>
-                                        </Row>
-                                    </>
-                                )
-                            }}
-                        >
-                            <Column title="Product" dataIndex="ProductCode" width="20%" />
-                            <Column title="รับ Issue"
-                                align="center"
-                                width="15%"
-                                render={(record) => {
-                                    return (
-                                        <>
-                                            <Checkbox
-                                                checked={record.IsReceive}
-                                                // onChange={(e) => console.log(e.target.checked)}
-                                                onChange={(e) => updateConfig({
-                                                    user_id: record.UserId,
-                                                    product_id: record.ProductId,
-                                                    isreceive: e.target.checked,
-                                                    isview: record.IsView
-                                                })
-                                                }
-
-                                            />
-                                        </>
-                                    )
-                                }
-
-                                }
-                            />
-                            <Column title="View Issue"
-                                align="center"
-                                width="15%"
-                                render={(record) => {
-                                    return (
-                                        <>
-                                            <Checkbox
-                                                checked={record.IsView}
-                                                onChange={(e) => updateConfig({
-                                                    user_id: record.UserId,
-                                                    product_id: record.ProductId,
-                                                    isreceive: record.IsReceive,
-                                                    isview: e.target.checked
-                                                })
-                                                }
-                                            />
-                                        </>
-                                    )
-                                }
-
-                                }
-                            />
-                        </Table>
-                    </Col>
-                </Row>
-
-                {/* Modal */}
-                <Modal
-                    title="ข้อมูล User"
-                    width="700px"
-                    //style={{ height: 500 }}
-                    visible={modalAddUser}
-                    onCancel={() => {
-                        setModalAddUser(false);
-                    }}
-                    okButtonProps={{ style: { backgroundColor: "#00CC00" } }}
-                    okText="Save"
-                    onOk={() => {
-                        setModalAddUser(false);
-                        addUser();
-                    }}
-                >
-                    <Row style={{ marginBottom: 20 }}>
-                        <Col span={12}>
-                        </Col>
-                        <Col span={12}>
-                            <Input.Search placeholder="Code / ชื่อ-นามสกุล" allowClear
-                                enterButton
-                                onSearch={searchUser}
-                            />
                         </Col>
                     </Row>
-                    <Table
-                        dataSource={filterUser == null ? userList : filterUser}
-                        loading={loadingUser}
-                        pagination={{ pageSize: 6 }}
 
-                        rowSelection={{
-                            type: "checkbox",
-                            ...rowSelection
+                    <Row style={{ marginTop: 20 }}>
+                        <Col span={14}>
+                            <Table dataSource={supportSiteOwner}>
+                                <Column title="ผู้ดูแล Site"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <div style={{ cursor: "pointer" }}
+                                                    onClick={() => {
+                                                        setSelectUserRow(record);
+                                                        getProductConfig({
+                                                            user_id: record.UserId
+                                                        });
+                                                    }}
+                                                >
+                                                    <label className="value-text" style={{ cursor: "pointer" }}>
+                                                        {record.DisplayName}
+                                                    </label>
+                                                </div>
 
+                                            </>
+
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="Product ที่ดูแล"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <div style={{ cursor: "pointer" }}
+                                                    onClick={() => {
+                                                        setSelectUserRow(record)
+                                                        getProductConfig({
+                                                            user_id: record.UserId
+                                                        });
+                                                    }}
+                                                >
+                                                    <label className="value-text" style={{ cursor: "pointer" }}>
+                                                        {record.ProductName}
+                                                    </label>
+                                                </div>
+                                            </>
+
+                                        )
+                                    }
+                                    }
+                                />
+
+                                <Column title=""
+                                    align="center"
+                                    width="15%"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => deleteUser(record.UserId)}
+                                                >
+                                                </Button>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+
+                            </Table>
+                        </Col>
+                        <Col span={2}></Col>
+                        <Col span={8}>
+                            <Table dataSource={productConfig} pagination={false}
+                                title={(record) => {
+                                    return (
+                                        <>
+                                            <Row>
+                                                <Col span={24}>
+                                                    <label style={{ display: selectUserRow.length === 0 ? "none" : "block" }}>
+                                                        {`${selectUserRow?.DisplayName}`}
+                                                    </label>
+
+                                                </Col>
+                                            </Row>
+                                        </>
+                                    )
+                                }}
+                            >
+                                <Column title="Product" dataIndex="ProductCode" width="20%" />
+                                <Column title="รับ Issue"
+                                    align="center"
+                                    width="15%"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <Checkbox
+                                                    checked={record.IsReceive}
+                                                    // onChange={(e) => console.log(e.target.checked)}
+                                                    onChange={(e) => updateConfig({
+                                                        user_id: record.UserId,
+                                                        product_id: record.ProductId,
+                                                        isreceive: e.target.checked,
+                                                        isview: record.IsView
+                                                    })
+                                                    }
+
+                                                />
+                                            </>
+                                        )
+                                    }
+
+                                    }
+                                />
+                                <Column title="View Issue"
+                                    align="center"
+                                    width="15%"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <Checkbox
+                                                    checked={record.IsView}
+                                                    onChange={(e) => updateConfig({
+                                                        user_id: record.UserId,
+                                                        product_id: record.ProductId,
+                                                        isreceive: record.IsReceive,
+                                                        isview: e.target.checked
+                                                    })
+                                                    }
+                                                />
+                                            </>
+                                        )
+                                    }
+
+                                    }
+                                />
+                            </Table>
+                        </Col>
+                    </Row>
+
+                    {/* Modal */}
+                    <Modal
+                        title="ข้อมูล User"
+                        width="700px"
+                        //style={{ height: 500 }}
+                        visible={modalAddUser}
+                        onCancel={() => {
+                            setModalAddUser(false);
+                        }}
+                        okButtonProps={{ style: { backgroundColor: "#00CC00" } }}
+                        okText="Save"
+                        onOk={() => {
+                            setModalAddUser(false);
+                            addUser();
                         }}
                     >
-                        <Column title="Code" key="UserId"
-                            render={(record) => {
-                                return (
-                                    <>
-                                        <label className="value-text">
-                                            {record.user_code}
-                                        </label>
-                                    </>
-                                )
+                        <Row style={{ marginBottom: 20 }}>
+                            <Col span={12}>
+                            </Col>
+                            <Col span={12}>
+                                <Input.Search placeholder="Code / ชื่อ-นามสกุล" allowClear
+                                    enterButton
+                                    onSearch={searchUser}
+                                />
+                            </Col>
+                        </Row>
+                        <Table
+                            dataSource={filterUser == null ? userList : filterUser}
+                            loading={loadingUser}
+                            pagination={{ pageSize: 6 }}
+
+                            rowSelection={{
+                                type: "checkbox",
+                                ...rowSelection
+
                             }}
-                        />
-                        <Column title="ชื่อ - นามสกุล" key="UserId"
-                            render={(record) => {
-                                return (
-                                    <>
-                                        <label className="value-text">
-                                            {record.user_name}
-                                        </label>
-                                    </>
-                                )
-                            }}
-                        />
-                        <Column title="ชื่อเล่น" key="UserId"
-                            render={(record) => {
-                                return (
-                                    <>
-                                        <label className="value-text">
-                                            {record.nickname}
-                                        </label>
-                                    </>
-                                )
-                            }}
-                        />
-                    </Table>
-                </Modal>
-            </Spin>
+                        >
+                            <Column title="Code" key="UserId"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <label className="value-text">
+                                                {record.user_code}
+                                            </label>
+                                        </>
+                                    )
+                                }}
+                            />
+                            <Column title="ชื่อ - นามสกุล" key="UserId"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <label className="value-text">
+                                                {record.user_name}
+                                            </label>
+                                        </>
+                                    )
+                                }}
+                            />
+                            <Column title="ชื่อเล่น" key="UserId"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <label className="value-text">
+                                                {record.nickname}
+                                            </label>
+                                        </>
+                                    )
+                                }}
+                            />
+                        </Table>
+                    </Modal>
+                </Spin>
+            </div>
         </MasterPage >
     )
 }

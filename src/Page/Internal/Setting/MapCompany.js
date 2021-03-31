@@ -169,7 +169,7 @@ export default function MapCompany() {
 
     return (
         <MasterPage>
-            <>
+            <div style={{padding : "24px 24px 24px 24px"}}>
                 <Tabs defaultActiveKey="1" type="card"
                     onChange={(key) => setTabKey(key)}
                 >
@@ -311,10 +311,7 @@ export default function MapCompany() {
                         </Table>
                     </TabPane>
                 </Tabs>
-
-
-
-            </>
+            </div>
         </MasterPage >
     )
 }

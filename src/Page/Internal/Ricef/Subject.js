@@ -1,11 +1,11 @@
-import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, DatePicker } from "antd";
+import { Col, Row, Select, Typography, Spin, Button, Avatar, Tabs, Modal, DatePicker } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import RicefComment from "../../../Component/Comment/Internal/Ricef_Comment";
 import Historylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, UserOutlined, LeftCircleOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
 import RicefContext, { ricefReducer, ricefState } from "../../../utility/ricefContext";
@@ -24,10 +24,10 @@ export default function Subject() {
     const uploadRef = useRef(null);
     const editorRef = useRef(null)
     const [textValue, setTextValue] = useState("");
+    const [loadingPage, setLoadingPage] = useState(true);
 
     const { state, dispatch } = useContext(AuthenContext);
     const { state: ricefstate, dispatch: ricefdispatch } = useContext(RicefContext);
-
 
     //modal
     const [modalVisible, setModalVisible] = useState(null)
@@ -101,6 +101,7 @@ export default function Subject() {
             });
 
             if (ricef_detail.status === 200) {
+                setLoadingPage(false);
                 ricefdispatch({ type: "LOAD_RICEFDETAIL", payload: ricef_detail.data })
                 setDuedate(ricefstate?.recefdetail[0]?.DueDate)
             }
@@ -321,7 +322,7 @@ export default function Subject() {
     function HandleChange(value, item) {
         console.log("value", value)
         console.log("item", item)
-        // setProgressStatus(item.label);
+
     }
 
     function renderColorPriority(param) {
@@ -342,104 +343,98 @@ export default function Subject() {
         GetRicefDetail();
         setDuedate(ricefstate?.recefdetail[0]?.DueDate)
     }, [])
-    console.log("duedate", duedate)
+
 
     return (
         <MasterPage>
-            <div style={{ height: "100%" }} >
-                <div className="scrollable-container" ref={setContainer} >
-                    <Affix target={() => container}>
-                        <Row>
-                            <Col>
-                                <a
-                                    href="/#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        history.goBack();
-                                    }}
-                                >
-                                    Back
-          </a>
-                            </Col>
-                        </Row>
-                    </Affix>
+            <Spin spinning={loadingPage} tip="Loading..." style={{ height: "100%" }}>
+                <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
+                    <Row style={{ padding: "0px 0px 0px 24px" }}>
+                        <Col>
+                            <Button
+                                type="link"
+                                icon={<LeftCircleOutlined />}
+                                style={{ fontSize: 18, padding: 0 }}
+                                onClick={() => history.goBack()}
+                            >
+                                Back
+                               </Button>
+                        </Col>
+                    </Row>
 
-                    <Row>
+                    <Row style={{ height: 'calc(100% - 32px)' }}>
                         {/* Content */}
-                        <Col span={16} style={{ paddingTop: 10 }}>
-                            <div style={{ height: "80vh", overflowY: "scroll" }}>
-                                {/* Issue Description */}
-                                <Row style={{ marginRight: 24 }}>
-                                    <Col span={24}>
+                        <Col span={16} style={{ padding: "0px 0px 24px 24px", height: "100%", overflowY: "scroll" }}>
+                            {/* Issue Description */}
+                            <Row style={{ marginRight: 24 }}>
+                                <Col span={24}>
 
-                                        <label className="topic-text">{ricefstate.recefdetail[0]?.IssueNumber}</label>
-                                        <div className="issue-detail-box">
-                                            <Row>
-                                                <Col span={16} style={{ display: "inline" }}>
-                                                    <Typography.Title level={4}>
-                                                        <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {ricefstate.recefdetail[0]?.Title}
-                                                    </Typography.Title>
-                                                </Col>
-                                                <Col span={8} style={{ display: "inline", textAlign: "right" }}>
-                                                    <Button type="link"
-                                                        onClick={
-                                                            () => {
-                                                                return (
-                                                                    setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                                                    setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
-                                                                )
-                                                            }
+                                    <label className="topic-text">{ricefstate.recefdetail[0]?.IssueNumber}</label>
+                                    <div className="issue-detail-box">
+                                        <Row>
+                                            <Col span={16} style={{ display: "inline" }}>
+                                                <Typography.Title level={4}>
+                                                    <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {ricefstate.recefdetail[0]?.Title}
+                                                </Typography.Title>
+                                            </Col>
+                                            <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                                                <Button type="link"
+                                                    onClick={
+                                                        () => {
+                                                            return (
+                                                                setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                                                setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
+                                                            )
                                                         }
-                                                    >{collapsetext}
-                                                    </Button>
-                                                </Col>
-                                            </Row>
-                                            <Row>
-                                                <div style={{ display: divcollapse }}>
-                                                    <p>
-                                                        {ricefstate.recefdetail[0]?.Description}
-                                                    </p>
+                                                    }
+                                                >{collapsetext}
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <div style={{ display: divcollapse }}>
+                                                <p>
+                                                    {ricefstate.recefdetail[0]?.Description}
+                                                </p>
 
-                                                </div>
-                                            </Row>
-                                        </div>
-                                    </Col>
-                                </Row>
+                                            </div>
+                                        </Row>
+                                    </div>
+                                </Col>
+                            </Row>
 
-                                {/* TAB Document */}
-                                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                                    <Col span={24}>
+                            {/* TAB Document */}
+                            <Row style={{ marginTop: 36, marginRight: 24 }}>
+                                <Col span={24}>
 
-                                        <TabsDocument
-                                            details={{
-                                                refId: match.params.ricefid,
-                                                reftype: "Master_Ricef",
-                                            }}
-                                        />
-                                    </Col>
-                                </Row>
+                                    <TabsDocument
+                                        details={{
+                                            refId: match.params.ricefid,
+                                            reftype: "Master_Ricef",
+                                        }}
+                                    />
+                                </Col>
+                            </Row>
 
-
-                                {/* TAB Activity */}
-                                <Row style={{ marginTop: 36, marginRight: 24 }}>
-                                    <Col span={24}>
-                                        <label className="header-text">Activity</label>
-                                        <Tabs defaultActiveKey="1" >
-                                            <TabPane tab="Ricef Note" key="1" >
-                                                <RicefComment />
-                                            </TabPane>
-                                            <TabPane tab="History Log" key="2">
-                                                <Historylog type="RICEF" />
-                                            </TabPane>
-                                        </Tabs>
-                                    </Col>
-                                </Row>
-                            </div>
+                            {/* TAB Activity */}
+                            <Row style={{ marginTop: 36, marginRight: 24 }}>
+                                <Col span={24}>
+                                    <label className="header-text">Activity</label>
+                                    <Tabs defaultActiveKey="1" >
+                                        <TabPane tab="Ricef Note" key="1" >
+                                            <RicefComment />
+                                        </TabPane>
+                                        <TabPane tab="History Log" key="2">
+                                            <Historylog type="RICEF" />
+                                        </TabPane>
+                                    </Tabs>
+                                </Col>
+                            </Row>
                         </Col>
                         {/* Content */}
 
                         {/* SideBar */}
-                        <Col span={6} style={{ backgroundColor: "", height: 500, marginLeft: 20 }}>
+                        <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
                             <Row style={{ marginBottom: 20 }}>
                                 <Col span={18}>
                                     <label className="header-text">ProgressStatus</label>
@@ -449,7 +444,8 @@ export default function Subject() {
                                         style={{
                                             display: (state?.usersdata?.organize?.OrganizeCode === "dev" && ricefstate.recefdetail[0]?.Status === "InProgress" || ricefstate.recefdetail[0]?.Status === "ReOpen") ||
                                                 (state?.usersdata?.organize?.OrganizeCode === "consult" && ricefstate.recefdetail[0]?.Status !== "InProgress") ? "block" : "none"
-                                        }}>
+                                        }}
+                                    >
                                         <Select
                                             style={{ width: '100%' }}
                                             allowClear
@@ -605,7 +601,7 @@ export default function Subject() {
                                         }}
                                         value={moment(ricefstate?.recefdetail[0]?.DueDate, "DD/MM/YYYY")}
                                         format="DD/MM/YYYY"
-                                        onChange={(date, dateString) => onChange(dateString,{value: dateString, type: "duedate"} )}
+                                        onChange={(date, dateString) => onChange(dateString, { value: dateString, type: "duedate" })}
                                     />
                                     <label className="value-text"
                                         style={{
@@ -619,38 +615,36 @@ export default function Subject() {
                         </Col>
                         {/* SideBar */}
                     </Row>
+
                 </div>
-            </div>
 
-            <ModalConsult
-                visible={modalVisible}
-                title={flowText}
-                width={800}
-                onCancel={() => setModalVisible(false)}
-                onOk={() => setModalVisible(false)}
-                details={{
-                    ricefid: ricefstate.recefdetail[0]?.RicefId,
-                    flowstatus: flowStatus && flowStatus,
-                    status: ricefstate.recefdetail[0]?.Status
+                <ModalConsult
+                    visible={modalVisible}
+                    title={flowText}
+                    width={800}
+                    onCancel={() => setModalVisible(false)}
+                    onOk={() => setModalVisible(false)}
+                    details={{
+                        ricefid: ricefstate.recefdetail[0]?.RicefId,
+                        flowstatus: flowStatus && flowStatus,
+                        status: ricefstate.recefdetail[0]?.Status
 
-                }}
-            />
+                    }}
+                />
 
-            <ModalDeveloper
-                title={flowText}
-                visible={modalDeveloper}
-                width={800}
-                onCancel={() => setModalDeveloper(false)}
-                onOk={() => setModalDeveloper(false)}
-                details={{
-                    ricefid: ricefstate.recefdetail[0]?.RicefId,
-                    flowstatus: flowStatus && flowStatus,
-                    status: ricefstate.recefdetail[0]?.Status
-                }}
-            />
-
-
-
+                <ModalDeveloper
+                    title={flowText}
+                    visible={modalDeveloper}
+                    width={800}
+                    onCancel={() => setModalDeveloper(false)}
+                    onOk={() => setModalDeveloper(false)}
+                    details={{
+                        ricefid: ricefstate.recefdetail[0]?.RicefId,
+                        flowstatus: flowStatus && flowStatus,
+                        status: ricefstate.recefdetail[0]?.Status
+                    }}
+                />
+            </Spin>
         </MasterPage>
     );
 }

@@ -6,7 +6,7 @@ import { useRouteMatch } from 'react-router-dom';
 import { ClockCircleOutlined, SwapRightOutlined } from '@ant-design/icons';
 import AuthenContext from "../../../utility/authenContext";
 
-export default function Historylog({ type = "Issue" }) {
+export default function Historylog({ type = "Issue", subtype = "ticket" }) {
 
     const match = useRouteMatch();
     const { state, dispatch } = useContext(AuthenContext);
@@ -37,41 +37,77 @@ export default function Historylog({ type = "Issue" }) {
                             value: values.Value,
                             value2: values.Value2,
                             historytype: values.HistoryType,
-                            usertype: values.UserType
-                        }
-                    }));
-                    setLoading(false);
-                }
-            } else {
-                const issue_historylog = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/historylog",
-                    method: "GET",
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                    },
-                    params: {
-                        ticketId: match.params.id,
-                        taskid: match.params.task,
-                        type: "task"
-                    }
-                });
-
-                if (issue_historylog.status === 200) {
-                   await setHistorylog(issue_historylog.data.map((values) => {
-                        return {
-                            createname: values.CreateName,
-                            createdate: values.CreateDate,
-                            description: values.Description,
-                            value: values.Value,
-                            value2: values.Value2,
-                            historytype: values.HistoryType,
                             usertype: values.UserType,
                             avatar: values.ProfileImage,
                             email: values.Email
                         }
                     }));
                     setLoading(false);
-                              
+                }
+            }
+
+            if (type === "Issue") {
+                if (subtype === "ticket") {
+                    const ticket_historylog = await Axios({
+                        url: process.env.REACT_APP_API_URL + "/tickets/historylog",
+                        method: "GET",
+                        headers: {
+                            "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                        },
+                        params: {
+                            ticketId: match.params.id,
+                            taskid: match.params.task,
+                            type: "ticket"
+                        }
+                    });
+                    if (ticket_historylog.status === 200) {
+                        await setHistorylog(ticket_historylog.data.map((values) => {
+                            return {
+                                createname: values.CreateName,
+                                createdate: values.CreateDate,
+                                description: values.Description,
+                                value: values.Value,
+                                value2: values.Value2,
+                                historytype: values.HistoryType,
+                                usertype: values.UserType,
+                                avatar: values.ProfileImage,
+                                email: values.Email
+                            }
+                        }));
+                        setLoading(false);
+                    }
+                }
+
+                if (subtype === "task") {
+                    const task_historylog = await Axios({
+                        url: process.env.REACT_APP_API_URL + "/tickets/historylog",
+                        method: "GET",
+                        headers: {
+                            "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                        },
+                        params: {
+                            ticketId: match.params.id,
+                            taskid: match.params.task,
+                            type: "task"
+                        }
+                    });
+
+                    if (task_historylog.status === 200) {
+                        await setHistorylog(task_historylog.data.map((values) => {
+                            return {
+                                createname: values.CreateName,
+                                createdate: values.CreateDate,
+                                description: values.Description,
+                                value: values.Value,
+                                value2: values.Value2,
+                                historytype: values.HistoryType,
+                                usertype: values.UserType,
+                                avatar: values.ProfileImage,
+                                email: values.Email
+                            }
+                        }));
+                        setLoading(false);
+                    }
                 }
             }
 
@@ -79,10 +115,6 @@ export default function Historylog({ type = "Issue" }) {
 
         }
     }
-
-    // useEffect(() => {
-    //     GetHistoryLog();
-    // }, [])
 
     useEffect(() => {
         if (historylog.length === 0) {
@@ -92,7 +124,6 @@ export default function Historylog({ type = "Issue" }) {
 
     return (
         <List
-       
             loading={loading}
             itemLayout="horizontal"
             bordered={false}

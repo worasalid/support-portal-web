@@ -95,7 +95,7 @@ export default function MyTask() {
 
   useEffect(() => {
     if (customerstate.search) {
-      console.log(customerstate.search)
+
     }
   }, [customerstate.search])
 

@@ -7,7 +7,7 @@ import AuthenContext from '../../../utility/authenContext';
 import RicefContext, { ricefReducer, ricefState } from "../../../utility/ricefContext";
 
 
-export default function RicefSearch() {
+export default function RicefSearch({ Company = "hide" }) {
     const { RangePicker } = DatePicker;
     const { Option } = Select;
     const { state, dispatch } = useContext(AuthenContext);
@@ -110,10 +110,10 @@ export default function RicefSearch() {
 
     const getMasterdata = async () => {
         try {
-            getcompany();
-            getproducts();
-            getmodule();
-            getissue_type();
+            // getcompany();
+            // getproducts();
+            // getmodule();
+            // getissue_type();
         } catch (error) {
 
         }
@@ -127,24 +127,21 @@ export default function RicefSearch() {
     useEffect(() => {
         if (state.authen) {
             getmodule();
-
         }
     }, [ricefstate.filter.productState]);
 
-    console.log("ricefstate", ricefstate.filter)
 
     return (
         <>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-
                 <Col span={4} >
                     <Select placeholder="Company" mode="multiple" allowClear
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
                         maxTagCount={1}
-                        style={{ width: "100%" }}
-                        // onKeyUp={(e) => {console.log(e.target)}}
+                        style={{ width: "100%", display: Company === "show" ? "block" : "none" }}
+                         onClick={() => getcompany()}
                         onChange={(value, option) => handleChange({ target: { value: value || "", group: "company" } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.companyState.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
                     >
@@ -158,6 +155,7 @@ export default function RicefSearch() {
                         }
                         maxTagCount={1}
                         style={{ width: "100%" }}
+                        onClick={() => getissue_type()}
                         onChange={(value) => handleChange({ target: { value: value || "", group: "issuetype" } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
                     >
@@ -172,21 +170,22 @@ export default function RicefSearch() {
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
                         maxTagCount={1}
+                        onClick={() => getproducts()}
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
-                        // dropdownRender={(value) => (
-                        //     <div >
-                        //         <Row>
-                        //             <Col>
-                        //                 {value}
-                        //             </Col>
-                        //             <Col>
+                    // dropdownRender={(value) => (
+                    //     <div >
+                    //         <Row>
+                    //             <Col>
+                    //                 {value}
+                    //             </Col>
+                    //             <Col>
 
-                        //             </Col>
-                        //         </Row>
-                        //     </div>
-                        // )
-                        // }
+                    //             </Col>
+                    //         </Row>
+                    //     </div>
+                    // )
+                    // }
                     />
                 </Col>
                 <Col span={4}>
@@ -200,7 +199,8 @@ export default function RicefSearch() {
                         allowClear
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'module' } })}
                         options={ricefstate.masterdata && ricefstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onClear={() => alert()}
+                        onClick={() => getmodule()}
+                        
                     />
                 </Col>
                 <Col span={4}>
@@ -219,7 +219,7 @@ export default function RicefSearch() {
                 </Col>
 
                 <Col span={2}>
-                    <Button type="primary"  shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                    <Button type="primary" shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
                         onClick={() => ricefdispatch({ type: "SEARCH", payload: true })}
                     >
                         Search

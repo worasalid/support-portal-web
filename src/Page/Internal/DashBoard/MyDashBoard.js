@@ -26,7 +26,7 @@ export default function MyDashboard() {
         //     end: 2,
         //     maxLimit: 100,
         // },
-
+        columnWidthRatio: 0.1,
         label: {
             position: 'middle',
             content: function content(item) {
@@ -104,7 +104,6 @@ export default function MyDashboard() {
 
         } catch (error) {
             setLoading(false)
-            alert("Error")
         }
     }
 

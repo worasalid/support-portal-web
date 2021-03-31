@@ -46,7 +46,8 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     status: value.Status,
                     flowstatus: value.FlowStatus,
                     description: value.Description,
-                    releasenote: value.IsReleaseNote
+                    releasenote: value.IsReleaseNote,
+                    manday: value.Manday
                 }
             }))
         } catch (error) {
@@ -158,13 +159,13 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     renderItem={item => (
                         <Row align="middle">
                             <Col span={23} className="task-active"
-                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom:20}}
+                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom: 20 }}
                                 onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.taskId })}
                             >
                                 <List.Item >
                                     <List.Item.Meta
                                         title={
-                                            <Row style={{padding: "0px 0px 0px 10px"}}>
+                                            <Row style={{ padding: "0px 0px 0px 10px" }}>
                                                 <Col span={23} >
                                                     <Row>
                                                         <Col span={18}>
@@ -185,6 +186,14 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                             >
                                                                 ReleaseNote
                                                             </Tag>
+                                                            <label 
+                                                                style={{ 
+                                                                    display: item.manday !== 0 ? "inline-block" : "none" ,
+                                                                    fontSize: 12
+                                                                }}
+                                                            >
+                                                                ({item.manday} Manday)
+                                                            </label>
                                                         </Col>
                                                         <Col span={6} style={{ textAlign: "right" }} >{renderTaskStatus(item.status)}</Col>
                                                     </Row>

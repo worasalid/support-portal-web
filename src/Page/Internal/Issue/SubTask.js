@@ -5,7 +5,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 
 import TaskComment from "../../../Component/Comment/Internal/TaskComment";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
-import Historylog from "../../../Component/History/Internal/Historylog";
+import InternalHistorylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
 import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined, LeftCircleOutlined } from "@ant-design/icons";
 import Axios from "axios";
@@ -27,6 +27,7 @@ import ModalReject from "../../../Component/Dialog/Internal/modalReject";
 import ModalSendTask from "../../../Component/Dialog/Internal/modalSendTask";
 import ModalManday from "../../../Component/Dialog/Internal/modalManday";
 import ModalRequestInfoDev from "../../../Component/Dialog/Internal/Issue/modalRequestInfoDev";
+import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -60,13 +61,14 @@ export default function SubTask() {
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalreject_visible, setModalreject_visible] = useState(false);
   const [modalRequestInfoDev, setModalRequestInfoDev] = useState(false);
+  const [modalPreview, setModalPreview] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
   const [divProgress, setDivProgress] = useState("hide")
-
+  const [imgUrl, setImgUrl] = useState(null);
 
   // data
   const [ProgressStatus, setProgressStatus] = useState("");
@@ -425,7 +427,16 @@ export default function SubTask() {
                     </Row>
                     <Row>
                       <div style={{ display: divcollapse }}>
-                        <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }} ></div>
+                        <div className="issue-description"
+                          dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }}
+                          onClick={e => {
+                            if (e.target.tagName == "IMG") {
+                              setImgUrl(e.target.src);
+                              setModalPreview(true);
+                            }
+                          }}>
+
+                        </div>
                       </div>
                     </Row>
                   </div>
@@ -445,7 +456,7 @@ export default function SubTask() {
               </Row>
 
               {/* TAB Activity */}
-              <Row style={{ marginTop: 36, marginRight: 24}} >
+              <Row style={{ marginTop: 36, marginRight: 24 }} >
                 <Col span={24} >
                   <label className="header-text">Activity</label>
 
@@ -455,7 +466,7 @@ export default function SubTask() {
                         <TaskComment />
                       </TabPane>
                       <TabPane tab="History Log" key="2">
-                        <Historylog />
+                        <InternalHistorylog subtype="task" />
                       </TabPane>
                     </Tabs>
                   }
@@ -482,7 +493,7 @@ export default function SubTask() {
                   <Select ref={selectRef}
                     value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
-                   // onClick={() => getflow_output(userstate?.taskdata?.data[0]?.TransId)}
+                    // onClick={() => getflow_output(userstate?.taskdata?.data[0]?.TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                   />
@@ -550,8 +561,7 @@ export default function SubTask() {
 
 
                   {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
-                  {
-                    // userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "cr_center"
+                  {/* {
                     userstate?.mailbox[0]?.NodeName === "cr_center"
                       ? <Button type="link"
                         onClick={() => setModalduedate_visible(true)}
@@ -565,8 +575,8 @@ export default function SubTask() {
                   <Button type="link"
                     icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
                     onClick={() => { setHistoryduedate_visible(true) }}
-                  />
-                  {/* <ClockCircleOutlined style={{ fontSize: 18 }} onClick={() => setHistoryduedate_visible(true)} /> */}
+                  /> */}
+                  <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
                 </Col>
               </Row>
 
@@ -898,6 +908,19 @@ export default function SubTask() {
             flowoutputid: userstate.node.output_data.FlowOutputId
           }}
         />
+
+        <PreviewImg
+          title="Preview"
+          visible={modalPreview}
+          width={800}
+          footer={null}
+          onCancel={() => {
+            setModalPreview(false);
+            setImgUrl(null);
+          }}
+          pathUrl={imgUrl}
+        />
+
       </Spin>
     </MasterPage >
   );

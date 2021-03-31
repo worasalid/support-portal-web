@@ -1,5 +1,5 @@
 import { EditOutlined, SearchOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Select, Radio } from 'antd';
+import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Select, Radio, Spin } from 'antd';
 
 import Column from 'antd/lib/table/Column';
 import Axios from 'axios'
@@ -30,9 +30,10 @@ export default function MasterCompany() {
     const [selectProduct, setSelectProduct] = useState([]);
 
     const [search, setSearch] = useState(false);
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
+    const [loadingEdit, setLoadingEdit] = useState(false);
 
-    const searchCompany= (param) => {
+    const searchCompany = (param) => {
         let result = listcompany.filter(o =>
             Object.keys(o).some(k =>
                 String(o[k])
@@ -176,10 +177,8 @@ export default function MasterCompany() {
         }
     }
 
-
     // Save
     const onFinishAdd = async (param) => {
-        console.log(param);
         try {
             const addcompany = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/add-company",
@@ -219,6 +218,7 @@ export default function MasterCompany() {
                             <p></p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         setLoading(true);
                         formAdd.resetFields();
@@ -236,6 +236,7 @@ export default function MasterCompany() {
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     formAdd.resetFields();
                 },
@@ -244,7 +245,6 @@ export default function MasterCompany() {
     };
 
     const onFinish = async (values) => {
-        console.log(values);
         try {
             const updatecompany = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/company-update",
@@ -274,22 +274,39 @@ export default function MasterCompany() {
             });
 
             if (updatecompany.status === 200) {
-                Modal.info({
+                setLoadingEdit(false);
+                setVisible(false);
+                Modal.success({
                     title: 'บันทึกข้อมูลเรียบร้อย',
                     content: (
                         <div>
                             <p></p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         setVisible(false);
-                        setLoading(true)
+                        setLoading(true);
                     },
                 });
             }
 
         } catch (error) {
+            setLoadingEdit(false);
+            setVisible(false);
+            Modal.error({
+                title: 'บันทึกข้อมูล ไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
 
+                    setLoading(true);
+                },
+            });
         }
     };
 
@@ -322,91 +339,71 @@ export default function MasterCompany() {
 
     return (
         <MasterPage>
-            <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={16}>
-                </Col>
-                <Col span={8}>
-                    <Input.Search placeholder="code / Name / FullName" allowClear
-                        enterButton
-                        onSearch={searchCompany}
-                    />
-                </Col>
-                {/* <Col span={8} >
-                    <Select placeholder="Company" mode="multiple" allowClear
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        maxTagCount={3}
-                        style={{ width: "100%" }}
-                        options={masterCompany.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
-                        onChange={(value, item) => setFilterCompany(value)}
-                    >
-
-                    </Select>
-                </Col>
-                <Col span={2}>
-                    <Button type="primary" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
-                        onClick={() => { setSearch(true); setLoading(true) }}
-                    >
-                        Search
+            <div style={{ padding: "24px 24px 24px 24px" }}>
+                <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+                    <Col span={16}>
+                    </Col>
+                    <Col span={8}>
+                        <Input.Search placeholder="code / Name / FullName" allowClear
+                            enterButton
+                            onSearch={searchCompany}
+                        />
+                    </Col>
+                </Row>
+                <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+                    <Col span={24}>
+                        <Button type="primary" icon={<PlusOutlined />}
+                            style={{ backgroundColor: "#00CC00" }}
+                            onClick={() => {
+                                setModalAdd(true)
+                                setSelectedRowKeys([])
+                            }}
+                        >
+                            เพิ่มข้อมูล
                     </Button>
-                </Col> */}
-            </Row>
-            <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={24}>
-                    <Button type="primary" icon={<PlusOutlined />}
-                        style={{ backgroundColor: "#00CC00" }}
-                        onClick={() => {
-                            setModalAdd(true)
-                            setSelectedRowKeys([])
-                        }}
-                    >
-                        เพิ่มข้อมูล
-                    </Button>
-                </Col>
-            </Row>
-            <Table
-                dataSource={filterCompany === null ? listcompany : filterCompany}
-                //dataSource={listcompany}
-                loading={loading}>
-                <Column title="Code" width="10%" dataIndex="Code" />
-                <Column title="CompanyName" width="20%" dataIndex="Name" />
-                <Column title="FullName" width="60%" dataIndex="FullNameTH" />
-                <Column title=""
-                    align="center"
-                    width="10%"
-                    render={(record) => {
-                        return (
-                            <>
-                                <Button type="link"
-                                    icon={<EditOutlined />}
-                                    onClick={() => {
-                                        return (
-                                            GetCompanyById(record.Id),
-                                            getCustomerProduct(record.Id),
-                                            form.setFieldsValue({
-                                                code: record.Code,
-                                                name: record.Name,
-                                                fullname_th: record.FullNameTH,
-                                                fullname_en: record.FullNameEN,
-                                                cost: record.CostManday,
-                                                is_cloud: record.IsCloudSite
+                    </Col>
+                </Row>
+                <Table
+                    dataSource={filterCompany === null ? listcompany : filterCompany}
+                    loading={loading}>
+                    <Column title="Code" width="10%" dataIndex="Code" />
+                    <Column title="CompanyName" width="20%" dataIndex="Name" />
+                    <Column title="FullName" width="60%" dataIndex="FullNameTH" />
+                    <Column title=""
+                        align="center"
+                        width="10%"
+                        render={(record) => {
+                            return (
+                                <>
+                                    <Button type="link"
+                                        icon={<EditOutlined />}
+                                        onClick={() => {
+                                            return (
+                                                GetCompanyById(record.Id),
+                                                getCustomerProduct(record.Id),
+                                                form.setFieldsValue({
+                                                    code: record.Code,
+                                                    name: record.Name,
+                                                    fullname_th: record.FullNameTH,
+                                                    fullname_en: record.FullNameEN,
+                                                    cost: record.CostManday,
+                                                    is_cloud: record.IsCloudSite
 
-                                            }),
-                                            setVisible(true)
-                                        )
-                                    }
-                                    }
-                                >
-                                    Edit
+                                                }),
+                                                setVisible(true)
+                                            )
+                                        }
+                                        }
+                                    >
+                                        Edit
                                     </Button>
-                            </>
-                        )
-                    }
-                    }
-                />
-            </Table>
-
+                                </>
+                            )
+                        }
+                        }
+                    />
+                </Table>
+            </div>
             {/* Add ข้อมูลบริษัท */}
             <Modal
                 visible={modalAdd}
@@ -504,82 +501,85 @@ export default function MasterCompany() {
             <Modal
                 title={`${selectcompany && selectcompany[0]?.FullNameTH}`}
                 visible={visible}
+                confirmLoading={loadingEdit}
                 width={800}
-                onOk={() => { form.submit() }}
+                onOk={() => { form.submit(); setLoadingEdit(true) }}
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okText="Save"
                 onCancel={() => { setVisible(false); form.resetFields(); setSelectcompany(null) }}
             >
-                <Form form={form}
-                    layout="horizontal"
-                    name="form-editcompany"
-                    onFinish={onFinish}
+                <Spin spinning={loadingEdit}>
+                    <Form form={form}
+                        layout="horizontal"
+                        name="form-editcompany"
+                        onFinish={onFinish}
 
-                >
-
-                    <Form.Item name="code" label="Code">
-                        <Input disabled={true} />
-                    </Form.Item>
-
-                    <Form.Item name="name" label="Name">
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="fullname_th" label="FullName TH">
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="fullname_en" label="FullName EN">
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="cost" label="Cost manday">
-                        <InputNumber
-                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                        />
-                    </Form.Item>
-                    <Form.Item name="is_cloud" label="ประเภท Site"
                     >
-                        <Radio.Group name="is_cloud" >
-                            <Radio value={true}>Cloud</Radio>
-                            <Radio value={false}>onPremise</Radio>
-                        </Radio.Group>
-                    </Form.Item>
-                </Form>
 
-                <Row>
-                    <Col span={24}>
-                        <Button type="primary" icon={<PlusOutlined />}
-                            style={{ backgroundColor: "#00CC00" }}
-                            onClick={() => { return (setModalProduct(true), getMasterProduct()) }}
-                        >
-                            Add Product
-                    </Button>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={24}>
-                        <Table dataSource={[...cusProduct]}>
-                            <Column title="No" width="10%" dataIndex="Row" />
-                            <Column title="Product Code" width="20%" dataIndex="Name" />
-                            <Column title="Product Name" width="60%" dataIndex="FullName" />
-                            <Column title=""
-                                align="center"
-                                width="10%"
-                                render={(record) => {
-                                    return (
-                                        <>
-                                            <Button type="link"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => deleteProduct(record)}
-                                            >
+                        <Form.Item name="code" label="Code">
+                            <Input disabled={true} />
+                        </Form.Item>
 
-                                            </Button>
-                                        </>
-                                    )
-                                }
-                                }
+                        <Form.Item name="name" label="Name">
+                            <Input />
+                        </Form.Item>
+                        <Form.Item name="fullname_th" label="FullName TH">
+                            <Input />
+                        </Form.Item>
+                        <Form.Item name="fullname_en" label="FullName EN">
+                            <Input />
+                        </Form.Item>
+                        <Form.Item name="cost" label="Cost manday">
+                            <InputNumber
+                                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                             />
-                        </Table>
-                    </Col>
-                </Row>
+                        </Form.Item>
+                        <Form.Item name="is_cloud" label="ประเภท Site"
+                        >
+                            <Radio.Group name="is_cloud" >
+                                <Radio value={true}>Cloud</Radio>
+                                <Radio value={false}>onPremise</Radio>
+                            </Radio.Group>
+                        </Form.Item>
+                    </Form>
+
+                    <Row>
+                        <Col span={24}>
+                            <Button type="primary" icon={<PlusOutlined />}
+                                style={{ backgroundColor: "#00CC00" }}
+                                onClick={() => { return (setModalProduct(true), getMasterProduct()) }}
+                            >
+                                Add Product
+                    </Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={24}>
+                            <Table dataSource={[...cusProduct]}>
+                                <Column title="No" width="10%" dataIndex="Row" />
+                                <Column title="Product Code" width="20%" dataIndex="Name" />
+                                <Column title="Product Name" width="60%" dataIndex="FullName" />
+                                <Column title=""
+                                    align="center"
+                                    width="10%"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => deleteProduct(record)}
+                                                >
+
+                                                </Button>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </Col>
+                    </Row>
+                </Spin>
             </Modal>
 
             {/* Add Product */}

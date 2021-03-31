@@ -30,11 +30,14 @@ export default function MasterPage({bgColor='#fff',...props}) {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
       });
-      dispatch({ type: 'Authen', payload: true });
-      dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+      if(result.status === 200){
+        dispatch({ type: 'Authen', payload: true });
+        dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+        CountStatus();
+      }
+      
     } catch (error) {
-         //alert(error.response);
-         //history.push("/login");
+      alert(error.response.data)
     }
   }
 
@@ -57,7 +60,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length })
 
     } catch (error) {
-
+      alert("กรุณา Login")
     }
   }
 
@@ -78,9 +81,10 @@ export default function MasterPage({bgColor='#fff',...props}) {
   useEffect(() => {
     if (!state.authen) {
       getuser()
+      
     }
-    getuser();
-    CountStatus();
+    CountStatus()
+   
   }, [])
 
   useEffect(() => {

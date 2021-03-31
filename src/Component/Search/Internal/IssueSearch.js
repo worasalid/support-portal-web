@@ -1,5 +1,5 @@
 import React, { useReducer, useContext, useState } from 'react'
-import { Row, Col, Input, Button, DatePicker, Select } from 'antd'
+import { Row, Col, Input, Button, DatePicker, Select, Checkbox, Tooltip } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import Axios from 'axios';
 import { useEffect } from 'react';
@@ -86,6 +86,9 @@ export default function Issuesearch({ Progress = "hide" }) {
         if (e.target.group === "keyword") {
             userdispatch({ type: "SELECT_KEYWORD", payload: e.target.value })
         }
+        if (e.target.group === "release_note") {
+            userdispatch({ type: "SELECT_ISRELEASENOTE", payload: e.target.value })
+        }
     }
     const getcompany = async () => {
         const company = await Axios({
@@ -161,7 +164,7 @@ export default function Issuesearch({ Progress = "hide" }) {
 
     return (
         <>
-            <Row style={{padding:"0px 0px 0px 24px", marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+            <Row style={{ padding: "0px 0px 0px 24px", marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
                 <Col span={4}>
                     <Select placeholder="Progress"
                         style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
@@ -174,7 +177,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                         }
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'progress' } })}
                         options={progressstatus.map((x) => ({ value: x.value, label: x.text }))}
-                        onClear={() => alert()}
+
                     />
                 </Col>
                 <Col span={4} >
@@ -247,7 +250,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                     </Button>
                 </Col>
             </Row>
-            <Row style={{padding:"0px 0px 0px 24px", marginBottom: 16 }} gutter={[16, 16]}>
+            <Row style={{ padding: "0px 0px 0px 24px", marginBottom: 16 }} gutter={[16, 16]}>
                 <Col span={4}>
                     <Select placeholder="Scene"
                         mode='multiple'
@@ -277,6 +280,20 @@ export default function Issuesearch({ Progress = "hide" }) {
                             }
                         }}
                     />
+                </Col>
+                <Col span={2}>
+
+                    <Tooltip title="ReleaseNote">
+                        <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note' } })}>
+                            <label style={{ fontSize: 10, display: "inline" }}>Release Note</label>
+
+                        </Checkbox>
+                        {/* <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note_N' } })}>
+                            <label style={{ fontSize: 10, display: "inline" }}>N</label>
+
+                        </Checkbox> */}
+                    </Tooltip>
+
                 </Col>
             </Row>
         </>

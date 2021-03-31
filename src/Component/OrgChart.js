@@ -22,7 +22,13 @@ export default class extends Component {
                 field_0: "name",
                 field_1: "title",
                 img_0: "img"
-            }
+            },
+            nodeMenu:{
+            	details: {text:"Details"},
+            	edit: {text:"Edit"},
+            	add: {text:"Add"},
+            	remove: {text:"Remove"}
+            },
         });
 
     }

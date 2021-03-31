@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import { Card, Avatar } from 'antd'
+import { Card, Avatar, message } from 'antd'
 import axios from 'axios'
 import { UserOutlined } from '@ant-design/icons'
 import AuthenContext from '../../../utility/authenContext';

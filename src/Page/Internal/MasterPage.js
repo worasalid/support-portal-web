@@ -383,7 +383,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
             <SubMenu  key="ricef"
               style={{
                 display: state.usersdata?.organize?.OrganizeCode === "consult" || 
-                state.usersdata?.organize?.OrganizeCode === "support" ||
+               // state.usersdata?.organize?.OrganizeCode === "support" ||
                   state.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
               }}
               icon={<AuditOutlined />} title="RICEF">
@@ -410,27 +410,47 @@ export default function MasterPage({bgColor='#fff',...props}) {
             <SubMenu key="setting" icon={<SettingOutlined />} title="Setting"
            // style={{display: state.usersdata?.users.code !== "I0017" ? "block" : "none"}}
             >
-              <Menu.Item key="11" onClick={() => {
+              <Menu.Item key="11" 
+                style={{display: state.usersdata?.organize.OrganizeCode === "support" || 
+                   state.usersdata?.organize.OrganizeCode === "cr_center" || 
+                   state.usersdata?.organize.OrganizeCode === "consult" || 
+                   state.usersdata?.users.code === "I0017" ? "block" : "none"}}
+                onClick={() => {
                 history.push('/internal/setting/mastercompany');
-                // setActivemenu('sub4');
-                // setActive_submenu('11')
               }}>
                 - ข้อมูลบริษัท
               </Menu.Item>
-              <Menu.Item key="12" onClick={() => {
-                history.push('/internal/setting/mapcompany');
-                // setActivemenu('sub4');
-                // setActive_submenu('12');
-              }}>
+              <Menu.Item key="12" 
+                  style={{
+                    display: state.usersdata?.organize.OrganizeCode === "support" ||  state.usersdata?.users.code === "I0017"  ? "block" : "none"
+                  }}
+                  onClick={() => {
+                  history.push('/internal/setting/mapcompany');
+              }}
+          
+              >
                 - Support Site
               </Menu.Item>
-              <Menu.Item key="13" onClick={() => history.push('/internal/setting/mapdeveloper')}>
+              <Menu.Item key="13" 
+               style={{
+                  display: state.usersdata?.organize.OrganizeCode === "dev"  ? "block" : "none"
+                }}
+                onClick={() => history.push('/internal/setting/mapdeveloper')}
+              >
                 - Developer Module
               </Menu.Item>
-              <Menu.Item key="14" onClick={() => history.push('/internal/setting/mapqa')}>
+              <Menu.Item key="14" onClick={() => history.push('/internal/setting/mapqa')}
+               style={{
+                display: state.usersdata?.organize.OrganizeCode === "qa" ||  state.usersdata?.users.code === "I0017"  ? "block" : "none"
+              }}
+              >
                 - QA Site
               </Menu.Item>
-              <Menu.Item key="15" onClick={() => history.push('/internal/setting/mapsa')}>
+              <Menu.Item key="15" onClick={() => history.push('/internal/setting/mapsa')}
+                style={{
+                display: state.usersdata?.organize.OrganizeCode === "sa" ||  state.usersdata?.users.code === "I0017"  ? "block" : "none"
+              }}
+              >
                 - SA Site
               </Menu.Item>
               <Menu.Item key="16" onClick={() => history.push('/internal/setting/system')}>

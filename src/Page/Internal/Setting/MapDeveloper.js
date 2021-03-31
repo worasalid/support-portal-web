@@ -122,7 +122,7 @@ export default function MapDeveloper() {
 
     return (
         <MasterPage>
-            <div >
+            <div style={{ padding: "24px 24px 24px 24px" }}>
                 <Tabs defaultActiveKey="1" type="card" onChange={(key) => setTabKey(key)}>
                     <TabPane tab="H.Developer" key="1">
                         <Row gutter={[16, 16]}>

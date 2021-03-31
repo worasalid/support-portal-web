@@ -1,4 +1,4 @@
-import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, LeftCircleOutlined } from '@ant-design/icons';
 import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
@@ -66,10 +66,11 @@ export default function ConfigQA() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    userid: match.params.id
+                    user_id: match.params.id
                 }
             });
             if (user.status === 200) {
+                console.log(user.data)
                 setUser(user.data.usersdata.users.display_name)
             }
         } catch (error) {
@@ -349,61 +350,64 @@ export default function ConfigQA() {
 
     return (
         <MasterPage>
-            <Spin spinning={loading} tip="Loading...">
-                {/* ชื่อ */}
-                <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-
-                    <Button type="primary" shape="circle" icon={<ArrowLeftOutlined />}
-                        onClick={() => history.goBack()}
-                    />
+            <div style={{ padding: "24px 24px 24px 24px" }}>
+                <Spin spinning={loading} tip="Loading...">
+                    {/* ชื่อ */}
+                    <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+                        <Col>
+                            <Button
+                                type="link"
+                                icon={<LeftCircleOutlined />}
+                                style={{ fontSize: 18, padding: 0 }}
+                                onClick={() => history.goBack()}
+                            >
+                                Back
+                               </Button>
+                        </Col>
                    &nbsp; &nbsp;
-                 <h1>{user}</h1>
-                </Row>
 
-                {/* Add */}
-                <Row>
-                    <Col span={10} style={{ textAlign: "right" }}>
-                        <Button type="primary" icon={<PlusOutlined />}
-                            style={{ backgroundColor: "#00CC00" }}
-                            onClick={() => {
-                                setModalProduct(true);
-                                setLoadingProduct(true);
-                                getProduct();
-                            }}
-                        >
-                            Add Product
+                    </Row>
+                    <Row>
+                        <Col>
+                            <h1>{user}</h1>
+                        </Col>
+                    </Row>
+
+                    {/* Add */}
+                    <Row>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Button type="primary" icon={<PlusOutlined />}
+                                style={{ backgroundColor: "#00CC00" }}
+                                onClick={() => {
+                                    setModalProduct(true);
+                                    setLoadingProduct(true);
+                                    getProduct();
+                                }}
+                            >
+                                Add Product
                     </Button>
-                    </Col>
-                </Row>
+                        </Col>
+                    </Row>
 
-                {/* table */}
-                <Row style={{ marginTop: 20 }}>
-                    <Col span={10}>
-                        <Table dataSource={productOwner} pagination={false}
-                        // onRow={(record, rowIndex) => {
-                        //     return {
-                        //         onClick: event => {
-                        //             setSelectProductRow(record);
-                        //             getModuleOwner(record.ProductId);
-                        //             setDivModule("block");
-                        //         }, // click row
-                        //     };
-                        // }}
-                        >
-                            <Column title="Product"
-                                width="10%"
-                                render={(record) => {
-                                    return (
-                                        <div style={{ cursor: "pointer" }}
-                                            onClick={() => {
-                                                setSelectProductRow(record);
-                                                getModuleOwner(record.ProductId);
-                                                setDivModule("block");
-                                                setLoadingModule(true);
-                                            }}
-                                        >
-                                            <label className="value-text"
-                                                style={{ cursor: "pointer" }}
+                    {/* table */}
+                    <Row style={{ marginTop: 20 }}>
+                        <Col span={10}>
+                            <Table dataSource={productOwner} pagination={false}
+                            // onRow={(record, rowIndex) => {
+                            //     return {
+                            //         onClick: event => {
+                            //             setSelectProductRow(record);
+                            //             getModuleOwner(record.ProductId);
+                            //             setDivModule("block");
+                            //         }, // click row
+                            //     };
+                            // }}
+                            >
+                                <Column title="Product"
+                                    width="10%"
+                                    render={(record) => {
+                                        return (
+                                            <div style={{ cursor: "pointer" }}
                                                 onClick={() => {
                                                     setSelectProductRow(record);
                                                     getModuleOwner(record.ProductId);
@@ -411,201 +415,211 @@ export default function ConfigQA() {
                                                     setLoadingModule(true);
                                                 }}
                                             >
-                                                {record.ProductName}
-                                            </label>
-                                        </div>
-                                    )
-                                }
-                                }
-                            />
-                            <Column title="FullName"
-                                width="80%"
-                                render={(record) => {
-                                    return (
-                                        <div style={{ cursor: "pointer" }}
-                                            onClick={() => {
-                                                setSelectProductRow(record);
-                                                getModuleOwner(record.ProductId);
-                                                setDivModule("block");
-                                                setLoadingModule(true);
-                                            }}
-                                        >
-                                            <label className="value-text"
-                                                style={{ cursor: "pointer" }}
+                                                <label className="value-text"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => {
+                                                        setSelectProductRow(record);
+                                                        getModuleOwner(record.ProductId);
+                                                        setDivModule("block");
+                                                        setLoadingModule(true);
+                                                    }}
+                                                >
+                                                    {record.ProductName}
+                                                </label>
+                                            </div>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="FullName"
+                                    width="80%"
+                                    render={(record) => {
+                                        return (
+                                            <div style={{ cursor: "pointer" }}
                                                 onClick={() => {
                                                     setSelectProductRow(record);
                                                     getModuleOwner(record.ProductId);
                                                     setDivModule("block");
+                                                    setLoadingModule(true);
                                                 }}
                                             >
-                                                {record.ProductFullName}
-                                            </label>
-                                        </div>
-                                    )
-                                }
-                                }
-                            />
-                            <Column title=""
-                                align="center"
-                                width="10%"
-                                render={(record) => {
-                                    return (
-                                        <>
-                                            <Button type="link"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => {
-                                                    return (
-
-                                                        setTimeout(() => {
-                                                            deleteProductOwner(record.ProductId)
-                                                        }, 1000)
-
-                                                    )
-                                                }
-                                                }
-                                            >
-                                            </Button>
-                                        </>
-                                    )
-                                }
-                                }
-                            />
-                        </Table>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={12} style={{ display: divModule }}>
-                        <Table dataSource={moduleOwner} bordered
-                            loading={loadingModule}
-                            pagination={{ pageSize: 5 }}
-                            //scroll={{ y: 500 }}
-                            title={() => {
-                                return (
-                                    <>
-                                        <Row>
-                                            <Col span={12}>
-                                                {selectProductRow.ProductFullName}
-                                            </Col>
-                                            <Col span={12} style={{ textAlign: "right" }}>
-                                                <Button type="primary" icon={<PlusOutlined />}
-                                                    style={{ backgroundColor: "#00CC00" }}
+                                                <label className="value-text"
+                                                    style={{ cursor: "pointer" }}
                                                     onClick={() => {
-                                                        getModule();
-                                                        setModalModule(true);
+                                                        setSelectProductRow(record);
+                                                        getModuleOwner(record.ProductId);
+                                                        setDivModule("block");
                                                     }}
                                                 >
-                                                    Add Module
-                                       </Button>
-                                            </Col>
-                                        </Row>
+                                                    {record.ProductFullName}
+                                                </label>
+                                            </div>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    align="center"
+                                    width="10%"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => {
+                                                        return (
 
-                                    </>
-                                )
-                            }}>
-                            <Column title="Module" dataIndex="ModuleName" />
-                            <Column title=""
-                                align="center"
-                                width="10%"
-                                render={(record) => {
+                                                            setTimeout(() => {
+                                                                deleteProductOwner(record.ProductId)
+                                                            }, 1000)
+
+                                                        )
+                                                    }
+                                                    }
+                                                >
+                                                </Button>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </Col>
+                        <Col span={2}></Col>
+                        <Col span={12} style={{ display: divModule }}>
+                            <Table dataSource={moduleOwner} bordered
+                                loading={loadingModule}
+                                pagination={{ pageSize: 5 }}
+                                //scroll={{ y: 500 }}
+                                title={() => {
                                     return (
                                         <>
-                                            <Button type="link"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => deleteModuleOwner(record)}
-                                            >
-                                            </Button>
+                                            <Row>
+                                                <Col span={12}>
+                                                    {selectProductRow.ProductFullName}
+                                                </Col>
+                                                <Col span={12} style={{ textAlign: "right" }}>
+                                                    <Button type="primary" icon={<PlusOutlined />}
+                                                        style={{ backgroundColor: "#00CC00" }}
+                                                        onClick={() => {
+                                                            getModule();
+                                                            setModalModule(true);
+                                                        }}
+                                                    >
+                                                        Add Module
+                                       </Button>
+                                                </Col>
+                                            </Row>
+
                                         </>
                                     )
-                                }
-                                }
-                            />
+                                }}>
+                                <Column title="Module" dataIndex="ModuleName" />
+                                <Column title=""
+                                    align="center"
+                                    width="10%"
+                                    render={(record) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => deleteModuleOwner(record)}
+                                                >
+                                                </Button>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </Col>
+                    </Row>
+
+                    {/* Modal Add Product */}
+                    <Modal
+                        title="Product"
+                        visible={modalProduct}
+                        width={800}
+                        onOk={() => {
+                            setModalProduct(false);
+                            addProductOwner();
+                            setSelectedRowKeys([]);
+
+                        }}
+                        okText="Add"
+                        onCancel={() => {
+                            setModalProduct(false)
+                            setSelectedRowKeys([]);
+                        }}
+                    >
+                        <Row style={{ marginBottom: 20 }}>
+                            <Col span={16}>
+                            </Col>
+                            <Col span={8}>
+                                <Input.Search placeholder="Code / Product" allowClear
+                                    enterButton
+                                    onSearch={searchProduct}
+                                />
+                            </Col>
+                        </Row>
+
+                        <Table
+                            dataSource={filterProduct === null ? masterProduct : filterProduct}
+                            loading={loadingProduct}
+                            pagination={{ pageSize: 5 }}
+                            rowSelection={{
+                                type: "checkbox",
+                                ...rowProductSelection,
+                            }}
+                        >
+                            <Column title="Product Code" dataIndex="Name" key="key"></Column>
+                            <Column title="Product Name" dataIndex="FullName" key="key"></Column>
                         </Table>
-                    </Col>
-                </Row>
+                    </Modal>
 
-                {/* Modal Add Product */}
-                <Modal
-                    title="Product"
-                    visible={modalProduct}
-                    width={800}
-                    onOk={() => {
-                        setModalProduct(false);
-                        addProductOwner();
-                        setSelectedRowKeys([]);
+                    {/* Modal Add Module */}
+                    <Modal
+                        title="Module"
+                        visible={modalModule}
+                        width={800}
+                        onOk={() => {
+                            setModalModule(false);
+                            addModuleOwner();
+                            setSelectedRowKeys([]);
 
-                    }}
-                    okText="Add"
-                    onCancel={() => {
-                        setModalProduct(false)
-                        setSelectedRowKeys([]);
-                    }}
-                >
-                    <Row style={{ marginBottom: 20 }}>
-                        <Col span={16}>
-                        </Col>
-                        <Col span={8}>
-                            <Input.Search placeholder="Code / Product" allowClear
-                                enterButton
-                                onSearch={searchProduct}
-                            />
-                        </Col>
-                    </Row>
-
-                    <Table
-                        dataSource={filterProduct === null ? masterProduct : filterProduct}
-                        loading={loadingProduct}
-                        pagination={{ pageSize: 5 }}
-                        rowSelection={{
-                            type: "checkbox",
-                            ...rowProductSelection,
+                        }}
+                        okText="Add"
+                        onCancel={() => {
+                            setModalModule(false)
+                            setSelectedRowKeys([]);
                         }}
                     >
-                        <Column title="Product Code" dataIndex="Name" key="key"></Column>
-                        <Column title="Product Name" dataIndex="FullName" key="key"></Column>
-                    </Table>
-                </Modal>
+                        <Row style={{ marginBottom: 20 }}>
+                            <Col span={16}>
+                            </Col>
+                            <Col span={8}>
+                                <Input.Search placeholder="Module" allowClear
+                                    enterButton
+                                    onSearch={searchModule}
+                                />
+                            </Col>
+                        </Row>
 
-                {/* Modal Add Module */}
-                <Modal
-                    title="Module"
-                    visible={modalModule}
-                    width={800}
-                    onOk={() => {
-                        setModalModule(false);
-                        addModuleOwner();
-                        setSelectedRowKeys([]);
+                        <Table
+                            dataSource={filterModule === null ? masterModule : filterModule}
+                            loading={loadingModule}
+                            pagination={{ pageSize: 6 }}
+                            rowSelection={{
+                                type: "checkbox",
+                                ...rowModuleSelection,
+                            }}
+                        >
+                            <Column title="Module Name" dataIndex="Name" key="Id" ></Column>
 
-                    }}
-                    okText="Add"
-                    onCancel={() => {
-                        setModalModule(false)
-                        setSelectedRowKeys([]);
-                    }}
-                >
-                    <Row style={{ marginBottom: 20 }}>
-                        <Col span={16}>
-                        </Col>
-                        <Col span={8}>
-                            <Input.Search placeholder="Module" allowClear
-                                enterButton
-                                onSearch={searchModule}
-                            />
-                        </Col>
-                    </Row>
-
-                    <Table
-                        dataSource={filterModule === null ? masterModule : filterModule}
-                        loading={loadingModule}
-                        pagination={{ pageSize: 6 }}
-                        rowSelection={{
-                            type: "checkbox",
-                            ...rowModuleSelection,
-                        }}
-                    >
-                        <Column title="Module Name" dataIndex="Name" key="Id" ></Column>
-
-                    </Table>
-                </Modal>
-            </Spin>
+                        </Table>
+                    </Modal>
+                </Spin>
+            </div>
         </MasterPage>
     )
 }

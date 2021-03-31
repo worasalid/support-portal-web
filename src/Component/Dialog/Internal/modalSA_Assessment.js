@@ -50,18 +50,24 @@ export default function ModalSA_Assessment({ visible = false, onOk, onCancel, de
                 <Col span={18}>
                     <label className="value-text"> {assessment?.UserName} </label>
                 </Col>
+            </Row>
+            <Row style={{marginTop: 12}}>
                 <Col span={6}>
                     <label className="header-text">วันที่ประเมิน</label>
                 </Col>
                 <Col span={18}>
                     <label className="value-text">{moment(assessment?.CreateDate).format("DD/MM/YYYY HH:mm")}</label>
                 </Col>
+            </Row>
+            <Row style={{marginTop: 12}}>
                 <Col span={6}>
                     <label className="header-text">STD Version</label>
                 </Col>
                 <Col span={18}>
                     <label className="value-text">{assessment?.STD === true ? "อยู่ใน Version " + assessment?.Version : "ไม่อยู่ใน STD Version"}</label>
                 </Col>
+            </Row>
+            <Row style={{marginTop: 12}}>
                 <Col span={6}>
                     <label className="header-text">ผลกระทบ</label>
                 </Col>

@@ -109,82 +109,84 @@ export default function MapQA() {
 
     return (
         <MasterPage>
-            <Tabs defaultActiveKey="1" type="card" onChange={(key) => setTabKey(key)}>
-                <TabPane tab="H.QA" key="1">
-                    <Row gutter={[16, 16]}>
-                        <Col span={16}>
-                        </Col>
-                        <Col span={8}>
-                            <Input.Search placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
-                                enterButton
-                                onSearch={searchHeadQA}
-                            />
-                        </Col>
-                    </Row>
-                    <Table
-                        dataSource={filterHeadQA === null ? headQAList : filterHeadQA}
-                        loading={loadingHeadQA}>
-                        <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
-                        <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
-                        <Column title="ชื่อเล่น" dataIndex="NickName" />
-                        <Column title="ตำแหน่ง" dataIndex="PositionName" />
+            <div style={{ padding: "24px 24px 24px 24px" }}>
+                <Tabs defaultActiveKey="1" type="card" onChange={(key) => setTabKey(key)}>
+                    <TabPane tab="H.QA" key="1">
+                        <Row gutter={[16, 16]}>
+                            <Col span={16}>
+                            </Col>
+                            <Col span={8}>
+                                <Input.Search placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
+                                    enterButton
+                                    onSearch={searchHeadQA}
+                                />
+                            </Col>
+                        </Row>
+                        <Table
+                            dataSource={filterHeadQA === null ? headQAList : filterHeadQA}
+                            loading={loadingHeadQA}>
+                            <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
+                            <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
+                            <Column title="ชื่อเล่น" dataIndex="NickName" />
+                            <Column title="ตำแหน่ง" dataIndex="PositionName" />
 
-                        <Column title="Site ที่รับผิดชอบ"
-                            align="center"
-                            width="15%"
-                            render={(record) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => history.push({ pathname: "/internal/setting/config_qa/userid-" + record.UserId })}
-                                        >
-                                            <EditOutlined />
-                                        </Button>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-
-                    </Table>
-                </TabPane>
-                <TabPane tab="QA" key="2">
-                    <Row gutter={[16, 16]}>
-                        <Col span={16}>
-                        </Col>
-                        <Col span={8}>
-                            <Input.Search placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
-                                enterButton
-                                onSearch={searchQA}
+                            <Column title="Site ที่รับผิดชอบ"
+                                align="center"
+                                width="15%"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <Button type="link"
+                                                onClick={() => history.push({ pathname: "/internal/setting/config_qa/userid-" + record.UserId })}
+                                            >
+                                                <EditOutlined />
+                                            </Button>
+                                        </>
+                                    )
+                                }
+                                }
                             />
-                        </Col>
-                    </Row>
-                    <Table
-                        dataSource={filterQA === null ? qalist : filterQA}
-                        loading={loadingQA}>
-                        <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
-                        <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
-                        <Column title="ชื่อเล่น" dataIndex="NickName" />
-                        <Column title="ตำแหน่ง" dataIndex="PositionName" />
-                        <Column title="Site ที่รับผิดชอบ"
-                            align="center"
-                            width="15%"
-                            render={(record) => {
-                                return (
-                                    <>
-                                        <Button type="link"
-                                            onClick={() => history.push({ pathname: "/internal/setting/config_qa/userid-" + record.UserId })}
-                                        >
-                                            <EditOutlined />
-                                        </Button>
-                                    </>
-                                )
-                            }
-                            }
-                        />
-                    </Table>
-                </TabPane>
-            </Tabs>
+
+                        </Table>
+                    </TabPane>
+                    <TabPane tab="QA" key="2">
+                        <Row gutter={[16, 16]}>
+                            <Col span={16}>
+                            </Col>
+                            <Col span={8}>
+                                <Input.Search placeholder="รหัส / ชื่อ-นามสกุล / ชื่อเล่น" allowClear
+                                    enterButton
+                                    onSearch={searchQA}
+                                />
+                            </Col>
+                        </Row>
+                        <Table
+                            dataSource={filterQA === null ? qalist : filterQA}
+                            loading={loadingQA}>
+                            <Column title="รหัสพนักงาน" width="10%" dataIndex="Code" />
+                            <Column title="ชื่อพนักงาน" width="40%" dataIndex="UserName" />
+                            <Column title="ชื่อเล่น" dataIndex="NickName" />
+                            <Column title="ตำแหน่ง" dataIndex="PositionName" />
+                            <Column title="Site ที่รับผิดชอบ"
+                                align="center"
+                                width="15%"
+                                render={(record) => {
+                                    return (
+                                        <>
+                                            <Button type="link"
+                                                onClick={() => history.push({ pathname: "/internal/setting/config_qa/userid-" + record.UserId })}
+                                            >
+                                                <EditOutlined />
+                                            </Button>
+                                        </>
+                                    )
+                                }
+                                }
+                            />
+                        </Table>
+                    </TabPane>
+                </Tabs>
+            </div>
         </MasterPage>
     )
 }

@@ -9,7 +9,7 @@ import InternalHistorylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
 import {
   ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, LeftCircleOutlined, UserOutlined,
-  UpCircleOutlined, DownCircleOutlined
+  UpCircleOutlined, DownCircleOutlined, InfoCircleOutlined
 } from "@ant-design/icons";
 import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
@@ -33,6 +33,7 @@ import ModalChangeDueDate from "../../../Component/Dialog/Internal/modalChangeDu
 import ModalSaveDueDate from "../../../Component/Dialog/Internal/Issue/modalSaveDueDate";
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
+import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 
 
 const { Option } = Select;
@@ -63,12 +64,12 @@ export default function Subject() {
   const [modalresolved_visible, setModalresolved_visible] = useState(false);
   const [modalsa_visible, setModalsa_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
-  const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalmanday_visible, setModalmanday_visible] = useState(false);
   const [modalmandaylog_visible, setModalmandaylog_visible] = useState(false);
   const [modalAssessment_visible, setModalAssessment_visible] = useState(false);
   const [modalQuotation_visible, setModalQuotation_visible] = useState(false);
   const [modalPreview, setModalPreview] = useState(false);
+  const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -532,7 +533,7 @@ export default function Subject() {
 
           <Row style={{ height: 'calc(100% - 32px)' }}>
             {/* Content */}
-            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "auto" }}>
+            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
 
               {/* Issue Description */}
               <Row style={{ marginRight: 24 }}>
@@ -546,6 +547,15 @@ export default function Subject() {
                         </Typography.Title>
                       </Col>
                       <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                        <Button title="file attach" type="link"
+                        style={{display: userstate?.issuedata?.details[0]?.cntFile === 0 ? "none" : "inline-block"}}
+                          icon={<img
+                            style={{ height: "20px", width: "20px" }}
+                            src={`${process.env.PUBLIC_URL}/icons-attach.png`}
+                            alt=""
+                          />}
+                          onClick={() => setModalfiledownload_visible(true)}
+                        />
                         <Button title="preview" type="link"
                           icon={<img
                             style={{ height: "20px", width: "20px" }}
@@ -665,38 +675,38 @@ export default function Subject() {
                     {activityIcon}
                   </span>
 
-                    <div style={{ display: activityCollapse }}>
-                      {
-                        userstate?.mailbox[0]?.NodeName === "support"
-                          ?
+                  <div style={{ display: activityCollapse }}>
+                    {
+                      userstate?.mailbox[0]?.NodeName === "support" 
+                        ?
 
-                          <Tabs defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
-                            <TabPane tab="Comment" key="1">
-                              <CommentBox />
-                            </TabPane>
-                            <TabPane tab="Comment (Internal)" key="2">
-                              {
-                                tabKey === "2" ? <InternalCommentBox /> : ""
-                              }
+                        <Tabs defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
+                          <TabPane tab="Comment" key="1">
+                            <CommentBox />
+                          </TabPane>
+                          <TabPane tab="Internal Note" key="2">
+                            {
+                              tabKey === "2" ? <InternalCommentBox /> : ""
+                            }
 
-                            </TabPane>
-                            <TabPane tab="History Log" key="3">
-                              <Historylog loading={history_loading} />
-                            </TabPane>
-                          </Tabs>
-                          :
-                          <Tabs defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
-                            <TabPane tab="Issue Note" key="1" >
-                              {
-                                tabKey === "1" ? <InternalCommentBox /> : ""
-                              }
-                            </TabPane>
-                            <TabPane tab="History Log" key="2">
-                              <Historylog loading={history_loading} />
-                            </TabPane>
-                          </Tabs>
-                      }
-                    </div>
+                          </TabPane>
+                          <TabPane tab="History Log" key="3">
+                            <InternalHistorylog  loading={history_loading} />
+                          </TabPane>
+                        </Tabs>
+                        :
+                        <Tabs defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
+                          <TabPane tab="Issue Note" key="1" >
+                            {
+                              tabKey === "1" ? <InternalCommentBox /> : ""
+                            }
+                          </TabPane>
+                          <TabPane tab="History Log" key="2">
+                            <InternalHistorylog loading={history_loading} />
+                          </TabPane>
+                        </Tabs>
+                    }
+                  </div>
                 </Col>
               </Row>
               {/* </div> */}
@@ -774,7 +784,6 @@ export default function Subject() {
                   }
                 </Col>
               </Row>
-
 
               <Row style={{
                 marginBottom: 20,
@@ -888,7 +897,6 @@ export default function Subject() {
                 </Col>
               </Row>
 
-
               {/* Change DueDate (Customer) */}
               <Row style={{ marginBottom: 20, display: userstate.issuedata.details[0]?.DueDate === null ? "none" : "block" }}>
                 <Col span={18}>
@@ -916,7 +924,6 @@ export default function Subject() {
                 </Col>
               </Row>
 
-
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Company</label>
@@ -924,6 +931,7 @@ export default function Subject() {
                   <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].CompanyName}</label>
                 </Col>
               </Row>
+              
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">IssueType</label>
@@ -950,6 +958,7 @@ export default function Subject() {
 
                 </Col>
               </Row>
+             
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Product</label>
@@ -978,7 +987,7 @@ export default function Subject() {
               }}>
                 <Col span={18}>
                   <label className="header-text">SA ประเมินผลกระทบ</label>
-                  <Button type="link" onClick={() => setModalAssessment_visible(true)}> รายละเอียด </Button>
+                  <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} /> 
                 </Col>
               </Row>
 
@@ -998,6 +1007,7 @@ export default function Subject() {
             {/* SideBar */}
           </Row>
         </div>
+
 
         {/* Modal */}
         <Modal
@@ -1132,7 +1142,8 @@ export default function Subject() {
           details={{
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
-            flowoutput: userstate.node.output_data
+            flowoutput: userstate.node.output_data,
+            product_code: userstate?.issuedata?.details[0]?.ProductName
           }}
         />
 
@@ -1218,6 +1229,23 @@ export default function Subject() {
           }}
           pathUrl={imgUrl}
         />
+
+        <ModalFileDownload
+          title="File Download"
+          visible={modalfiledownload_visible}
+          onCancel={() => { return (setModalfiledownload_visible(false)) }}
+          width={600}
+          onOk={() => {
+            setModalfiledownload_visible(false);
+
+          }}
+          details={{
+            refId: userstate?.issuedata?.details[0]?.Id,
+            reftype: "Master_Ticket",
+            grouptype: "attachment"
+          }}
+        />
+
       </Spin>
     </MasterPage >
   );

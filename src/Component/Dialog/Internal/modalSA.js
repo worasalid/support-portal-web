@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Spin, Radio } from 'antd';
+import { Modal, Form, Input, Spin, Radio, Select } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
 
 const radioStyle = {
-    display: 'block',
+    display: 'inline-block',
     height: '30px',
     lineHeight: '30px',
 };
@@ -21,12 +21,37 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     const [radiovalue2, setRadiovalue2] = useState(null);
     const [stdversion, setStdversion] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [version, setVersion] = useState([]);
 
     const editorRef = useRef(null)
 
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
+    }
+
+    const getVersion = async () => {
+        try {
+            const version = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/config-data",
+                method: "GET",
+                params: {
+                    groups: details.product_code + "_Version"
+                }
+            });
+
+            if (version.status === 200) {
+                setVersion(version.data)
+                // setVersion(version.data.map((x) => {
+                //     return {
+                //         value: x.value,
+                //         label: x.Name
+                //     }
+                // }))
+            }
+        } catch (error) {
+
+        }
     }
 
     const SaveComment = async () => {
@@ -53,6 +78,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
@@ -113,7 +139,6 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        setLoading(true);
         SendFlow(values);
     };
 
@@ -154,13 +179,24 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                             <Radio style={radioStyle} value={2}>ไม่ใช่ STD</Radio>
                             <Radio style={radioStyle} value={1}>
                                 STD
-                            <Input placeholder="Version" onChange={(e) => setStdversion(e.target.value)}
-                                    style={{ width: 300, marginLeft: 10, display: radiovalue === 1 ? "inline" : "none" }}
-                                />
+                                <Select placeholder="None"
+                                    style={{ marginLeft: 10, display: radiovalue === 1 ? "inline-block" : "none" }}
+
+                                    onClick={() => getVersion()}
+                                    onChange={(value, item) => setStdversion(item.label)}
+                                    options={version && version.map((x) => ({
+                                        value: x.Value,
+                                        label: x.Name
+                                    }))
+                                    }
+
+                                >
+                                </Select>
                             </Radio>
 
                         </Radio.Group>
                     </Form.Item>
+
                     <Form.Item
                         name="check_effect"
                         // valuePropName="checked"
@@ -205,6 +241,8 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                      AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
+
+
             </Spin>
         </Modal>
     )
