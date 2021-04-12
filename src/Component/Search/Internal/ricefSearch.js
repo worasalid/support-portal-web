@@ -133,7 +133,7 @@ export default function RicefSearch({ Company = "hide" }) {
 
     return (
         <>
-            <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+            <Row style={{ padding: "0px 0px 0px 24px", marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
                 <Col span={4} >
                     <Select placeholder="Company" mode="multiple" allowClear
                         filterOption={(input, option) =>
@@ -227,7 +227,7 @@ export default function RicefSearch({ Company = "hide" }) {
                 </Col>
             </Row>
 
-            <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
+            <Row style={{ padding: "0px 0px 0px 24px", marginBottom: 16}}  gutter={[16, 16]}>
                 <Col span={4}></Col>
                 <Col span={8} >
                     <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}

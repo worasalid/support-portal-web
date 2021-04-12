@@ -269,7 +269,16 @@ export default function Cancel() {
                 return (
                   <>
                     <label className="table-column-text">
-                      {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                      {
+                        record.AssignIconDate === null ?
+                          <label style={{ fontSize: 12, color: "red" }}>
+                            ยังไม่ได้ส่งเรื่องให้ ICON
+                          </label> :
+                          <label>
+                            {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
+                            {moment(record.AssignIconDate).format("HH:mm")}
+                          </label>
+                      }
                     </label>
 
                   </>

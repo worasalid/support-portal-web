@@ -57,6 +57,7 @@ export default function AllTask() {
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
           task: "alltask",
+          is_release_note: userstate.filter.isReleaseNote,
           pageCurrent: pageCurrent,
           pageSize: pageSize
         }
@@ -99,7 +100,7 @@ export default function AllTask() {
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
-        <Row style={{padding:"24px 24px 24px 24px", textAlign: "left" }}>
+        <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
           <Col span={24}>
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
@@ -151,6 +152,11 @@ export default function AllTask() {
                 render={(record) => {
                   return (
                     <>
+                      <Tag color="#87d068"
+                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
+                      >
+                        ReleaseNote
+                       </Tag>
                       <label className="table-column-text">
                         {record.Number}
                       </label>
@@ -330,7 +336,7 @@ export default function AllTask() {
                       <div>
                         <label className="table-column-text">
                           {record.InternalStatus}<br />
-                          {/* {record.FlowStatus} */}
+                          {record.FlowStatus === record.InternalStatus ? "" : record.FlowStatus}
                         </label>
                       </div>
                     </>

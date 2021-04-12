@@ -11,7 +11,8 @@ export const initState = {
     response: {
         status: null,
         message: ""
-    }
+    },
+    collapsed: false
 }
 
 export const reducer = createReducer(initState, {
@@ -20,7 +21,8 @@ export const reducer = createReducer(initState, {
     ERROR: (state, { payload }) => { state.error = payload },
     LOGIN: (state, { payload }) => { state.usersdata = payload},
     CLEAR: (state) => { state = initState },
-    SET_RESPONSE_STATUS: (state, { payload }) => { state.response.status = payload }
+    SET_RESPONSE_STATUS: (state, { payload }) => { state.response.status = payload },
+    MENUCOLLAPSED: (state, { payload }) => { state.collapsed = payload},
 });
 
 export default AuthenContext;

@@ -145,7 +145,6 @@ export default function ConfigVersion() {
     return (
         <MasterPage>
             <div style={{ padding: "24px 24px 24px 24px" }}>
-
                 <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
                     <Col>
                         <Button

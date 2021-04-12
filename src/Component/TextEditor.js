@@ -1,7 +1,7 @@
 import { Editor } from '@tinymce/tinymce-react';
 import React, { forwardRef, useRef, useState, useImperativeHandle } from 'react';
 
-export default forwardRef(function TextEditor(props, ref) {
+export default forwardRef(function TextEditor(props = null, ref) {
     const [value, setValue] = useState(null)
     const editorRef = useRef(null)
 
@@ -61,10 +61,10 @@ export default forwardRef(function TextEditor(props, ref) {
             <Editor
                 ref={editorRef}
                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                initialValue=""
+                value={props?.value === undefined ? "" : props?.value}
+                
                 init={{
-
-                    height: 300,
+                    height: (props?.init?.height === undefined ? 300 : props?.init?.height),
                     menubar: false,
                     plugins: [
                         'advlist autolink lists link image charmap print preview anchor',
@@ -74,8 +74,10 @@ export default forwardRef(function TextEditor(props, ref) {
                     block_unsupported_drop: false,
                     paste_data_images: true,
                     images_upload_handler: image_upload_handler,
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                    toolbar1: (props?.init?.toolbar1 === undefined ?
+                        'undo redo | bold italic underline forecolor fontsizeselect | link image' : props?.init?.toolbar1[0]),
+                    toolbar2: (props?.init?.toolbar2 === undefined ?
+                        'alignleft aligncenter alignright alignjustify bullist numlist preview' : props?.init?.toolbar2[0]),
                 }}
                 onEditorChange={(content, editor) => setValue(content)}
             // onEditorChange={(content, editor) => { return (console.log("onEditorChange", content), setValue(content)) }}

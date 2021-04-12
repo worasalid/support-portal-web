@@ -1,5 +1,5 @@
-import { PlusOutlined, SearchOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, Checkbox, message, Tabs, Row, Col, Select, Input } from 'antd';
+// import { PlusOutlined, SearchOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Table, Tabs, Row, Col, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router';
@@ -11,7 +11,6 @@ const { TabPane } = Tabs;
 
 export default function MapCompany() {
     const history = useHistory(null);
-    const [binding, setBinding] = useState(true)
     const [tabKey, setTabKey] = useState("1")
     const [loadingSupport, setLoaddingSupport] = useState(false)
     const [loadingConsult, setLoaddingConsult] = useState(false)

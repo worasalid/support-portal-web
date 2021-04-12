@@ -66,7 +66,7 @@ export default function MyTask() {
 
     return (
         <MasterPage>
-            <Row style={{ marginBottom: 16, textAlign: "left" }}>
+            <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
                 <Col span={24}>
                     <label style={{ fontSize: 20, verticalAlign: "top" }}>GAP Document</label>
                 </Col>
@@ -74,234 +74,212 @@ export default function MyTask() {
 
             <RicefSearch Company="show" />
 
+            <Row>
+                <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
+                    <Table dataSource={ricef} loading={ricefstate.loading}>
+                        <Column
+                            title="IssueNo"
+                            width="5%"
+                            render={(record) => {
+                                return (
+                                    <>
+                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                                            {record.IssueNumber}
+                                        </label>
+                                    </>
+                                )
+                            }
+                            }
+                        />
 
-            <Table dataSource={ricef} loading={ricefstate.loading}>
-                {/* <Column align="left" title="IssueNumber" width="20%" dataIndex=""
-                    render={(record) => {
-                        return (
-                            <div>
-                                <label className="table-column-text">
-                                    {record.IssueNumber}
-                                </label>
-
-                                <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                                    {
-                                        record.IssueType === 'ChangeRequest' ?
-                                            <Tooltip title="Issue Type"><Tag color="#108ee9">CR</Tag></Tooltip> :
-                                            <Tooltip title="Issue Type"><Tag color="#f50">{record.TypeName}</Tag></Tooltip>
-                                    }
-
-                                    <Tooltip title="Priority"><Tag color="#808080">{record.Priority}</Tag></Tooltip>
-
-         
-                                    <Tooltip title="Module"><Tag color="#808080">{record.ModuleName}</Tag></Tooltip>
-                                </div>
-                            </div>
-                        );
-                    }}
-                /> */}
-                <Column
-                    title="IssueNo"
-                    width="5%"
-                    render={(record) => {
-                        return (
-                            <>
-                                <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                                    {record.IssueNumber}
-                                </label>
-                            </>
-                        )
-                    }
-                    }
-                />
-
-                <Column
-                    title="Details"
-                    width="15%"
-                    render={(record) => {
-                        return (
-                            <div>
-                                <Row style={{ borderBottom: "1px dotted" }}>
-                                    <Col span={8}>
-                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080" }}>
-                                            Type :
+                        <Column
+                            title="Details"
+                            width="15%"
+                            render={(record) => {
+                                return (
+                                    <div>
+                                        <Row style={{ borderBottom: "1px dotted" }}>
+                                            <Col span={8}>
+                                                <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080" }}>
+                                                    Type :
                           </label>
-                                    </Col>
-                                    <Col span={14}>
-                                        <label
-                                            style={{ color: "#808080", fontSize: "10px" }}
+                                            </Col>
+                                            <Col span={14}>
+                                                <label
+                                                    style={{ color: "#808080", fontSize: "10px" }}
+                                                >
+                                                    {record.TypeName === 'ChangeRequest' ? "CR" : record.TypeName}
+                                                </label>
+                                            </Col>
+                                        </Row>
+                                        <Row style={{ borderBottom: "1px dotted" }}>
+                                            <Col span={8}>
+                                                <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                                    Priority :
+                          </label>
+                                            </Col>
+                                            <Col span={14} >
+                                                <label style={{ color: "#808080", fontSize: "10px" }}>
+                                                    {record.Priority}
+                                                </label>
+                                                {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                                            </Col>
+                                        </Row>
+                                        <Row style={{ borderBottom: "1px dotted" }}>
+                                            <Col span={8}>
+                                                <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                                    Product :
+                          </label>
+                                            </Col>
+                                            <Col span={14}>
+                                                <label style={{ color: "#808080", fontSize: "10px" }}>
+                                                    {record.ProductName}
+                                                </label>
+                                            </Col>
+                                        </Row>
+                                        <Row style={{ borderBottom: "1px dotted" }}>
+                                            <Col span={8}>
+                                                <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                                                    Module :
+                          </label>
+                                            </Col>
+                                            <Col span={14}>
+                                                <label style={{ color: "#808080", fontSize: "10px" }}>
+                                                    {record.ModuleName}
+                                                </label>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                );
+                            }}
+                        />
+
+                        <Column title="Subject"
+                            width="35%"
+                            render={(record) => {
+                                return (
+                                    <>
+                                        <div>
+                                            <label className="table-column-text">
+                                                {record.Title}
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label
+                                                onClick={() => {
+                                                    return (
+                                                        history.push({ pathname: "/internal/ricef/subject-" + record.RicefId })
+
+                                                    )
+                                                }
+                                                }
+                                                className="table-column-detail">
+                                                รายละเอียด
+                          </label>
+                                        </div>
+
+                                    </>
+                                )
+                            }
+                            }
+                        />
+                        <Column align="center"
+                            title={(state?.usersdata?.organize?.OrganizeCode === "dev" ? "Owner" : "Assignee")}
+                            width="20%"
+                            render={(record) => {
+                                return (
+                                    <>
+                                        <div
+                                            style={{ display: (state?.usersdata?.organize?.OrganizeCode === "dev") ? "block" : "none" }}
                                         >
-                                            {record.TypeName === 'ChangeRequest' ? "CR" : record.TypeName}
+                                            <label className="table-column-text">
+                                                {record.OwnerName}<br />
+                                            </label>
+                                            <label className="table-column-text">
+                                                {record.OwnerName2}<br />
+                                            </label>
+                                        </div>
+                                        <div
+                                            style={{ display: (state?.usersdata?.organize?.OrganizeCode === "consult") ? "block" : "none" }}
+                                        >
+                                            <label className="table-column-text">
+                                                {record.AssigneeName}<br />
+                                            </label>
+                                        </div>
+
+                                        <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
+                                    </>
+                                )
+                            }
+                            }
+                        />
+                        <Column align="center" title="Progress" width="5%"
+                            render={(record) => {
+                                return (
+                                    <>
+                                        <label className="table-column-text">
+                                            {record.Status}
                                         </label>
-                                    </Col>
-                                </Row>
-                                <Row style={{ borderBottom: "1px dotted" }}>
-                                    <Col span={8}>
-                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
-                                            Priority :
-                          </label>
-                                    </Col>
-                                    <Col span={14} >
-                                        <label style={{ color: "#808080", fontSize: "10px" }}>
-                                            {record.Priority}
-                                        </label>
-                                        {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+                                    </>
+                                )
+                            }}
 
-                                    </Col>
-                                </Row>
-                                <Row style={{ borderBottom: "1px dotted" }}>
-                                    <Col span={8}>
-                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
-                                            Product :
-                          </label>
-                                    </Col>
-                                    <Col span={14}>
-                                        <label style={{ color: "#808080", fontSize: "10px" }}>
-                                            {record.ProductName}
-                                        </label>
-                                    </Col>
-                                </Row>
-                                <Row style={{ borderBottom: "1px dotted" }}>
-                                    <Col span={8}>
-                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
-                                            Module :
-                          </label>
-                                    </Col>
-                                    <Col span={14}>
-                                        <label style={{ color: "#808080", fontSize: "10px" }}>
-                                            {record.ModuleName}
-                                        </label>
-                                    </Col>
-                                </Row>
-                            </div>
-                        );
-                    }}
-                />
+                        />
+                        <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
+                            width="20%"
+                            align="center"
+                            render={(record) => {
+                                return (
+                                    <>
+                                        <Row style={{ textAlign: "right" }}>
+                                            <Col span={12}>
+                                                <label className="value-text">Due Date</label>
+                                            </Col>
+                                            <Col span={12}>
+                                                <label className="value-text">{moment(record.DueDate).format("DD/MM/YYYY")}</label>
+                                            </Col>
+                                        </Row>
+                                        <Row style={{ textAlign: "right" }}>
+                                            <Col span={12}>
+                                                <label className="value-text">Assign Date</label>
+                                            </Col>
+                                            <Col span={12}>
+                                                <label className="value-text">
+                                                    {record.AssignDate === "" ? "-" : moment(record.AssignDate).format("DD/MM/YYYY")}
+                                                </label>
+                                            </Col>
+                                        </Row>
+                                        <Row style={{ textAlign: "right" }}>
+                                            <Col span={12}>
+                                                <label className="value-text">Resolved Date</label>
+                                            </Col>
+                                            <Col span={12}>
+                                                <label className="value-text">
+                                                    {record.ResolvedDate === "" ? "-" : moment(record.ResolvedDate).format("DD/MM/YYYY")}
+                                                </label>
 
-                <Column title="Subject"
-                    width="35%"
-                    render={(record) => {
-                        return (
-                            <>
-                                <div>
-                                    <label className="table-column-text">
-                                        {record.Title}
-                                    </label>
-                                </div>
-                                <div>
-                                    <label
-                                        onClick={() => {
-                                            return (
-                                                history.push({ pathname: "/internal/ricef/subject-" + record.RicefId })
+                                            </Col>
+                                        </Row>
+                                        <Row style={{ textAlign: "right" }}>
+                                            <Col span={12}>
+                                                <label className="value-text"> Complete Date</label>
+                                            </Col>
+                                            <Col span={12}>
+                                                <label className="value-text">
+                                                    {record.CompleteDate === "" ? "-" : moment(record.CompleteDate).format("DD/MM/YYYY")}
+                                                </label>
 
-                                            )
-                                        }
-                                        }
-                                        className="table-column-detail">
-                                        รายละเอียด
-                          </label>
-                                </div>
-
-                            </>
-                        )
-                    }
-                    }
-                />
-                <Column align="center"
-                    title={(state?.usersdata?.organize?.OrganizeCode === "dev" ? "Owner" : "Assignee")}
-                    width="20%"
-                    render={(record) => {
-                        return (
-                            <>
-                                <div
-                                    style={{ display: (state?.usersdata?.organize?.OrganizeCode === "dev") ? "block" : "none" }}
-                                >
-                                    <label className="table-column-text">
-                                        {record.OwnerName}<br />
-                                    </label>
-                                    <label className="table-column-text">
-                                        {record.OwnerName2}<br />
-                                    </label>
-                                </div>
-                                <div
-                                    style={{ display: (state?.usersdata?.organize?.OrganizeCode === "consult") ? "block" : "none" }}
-                                >
-                                    <label className="table-column-text">
-                                        {record.AssigneeName}<br />
-                                    </label>
-                                </div>
-
-                                <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
-                            </>
-                        )
-                    }
-                    }
-                />
-                <Column align="center" title="Progress" width="5%"
-                    render={(record) => {
-                        return (
-                            <>
-                                <label className="table-column-text">
-                                    {record.Status}
-                                </label>
-                            </>
-                        )
-                    }}
-
-                />
-                <Column title={<HistoryOutlined style={{ fontSize: 30 }} />}
-                    width="20%"
-                    align="center"
-                    render={(record) => {
-                        return (
-                            <>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text">Due Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">{moment(record.DueDate).format("DD/MM/YYYY")}</label>
-                                    </Col>
-                                </Row>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text">Assign Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">
-                                            {record.AssignDate === "" ? "-" : moment(record.AssignDate).format("DD/MM/YYYY")}
-                                        </label>
-                                    </Col>
-                                </Row>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text">Resolved Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">
-                                            {record.ResolvedDate === "" ? "-" : moment(record.ResolvedDate).format("DD/MM/YYYY")}
-                                        </label>
-
-                                    </Col>
-                                </Row>
-                                <Row style={{ textAlign: "right" }}>
-                                    <Col span={12}>
-                                        <label className="value-text"> Complete Date</label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="value-text">
-                                            {record.CompleteDate === "" ? "-" : moment(record.CompleteDate).format("DD/MM/YYYY")}
-                                        </label>
-
-                                    </Col>
-                                </Row>
-                            </>
-                        )
-                    }
-                    }
-                />
-            </Table>
-
+                                            </Col>
+                                        </Row>
+                                    </>
+                                )
+                            }
+                            }
+                        />
+                    </Table>
+                </Col>
+            </Row>
 
         </MasterPage>
     )

@@ -25,6 +25,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   };
 
   const FlowComplete = async (values) => {
+    setLoading(true);
     try {
       const completeflow = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/customer-complete",
@@ -50,12 +51,13 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
 
       if (completeflow.status === 200) {
         setLoading(false);
+        onOk();
 
         await Modal.success({
           title: 'บันทึกข้อมูลสำเร็จ',
           content: (
             <div>
-              {/* <p>บันทึกข้อมูลสำเร็จ</p> */}
+              <p>Completed Issue</p>
             </div>
           ),
           okText: "Close",
@@ -90,7 +92,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   }
 
   const onFinish = values => {
-    setLoading(true);
+    
     FlowComplete(values);
   };
 

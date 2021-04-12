@@ -51,6 +51,7 @@ export default function AllMyTask() {
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           progress: customerstate.filter.progress,
+          scene: customerstate.filter.scene,
           keyword: customerstate.filter.keyword,
           task: "allmytask",
           pageCurrent: pageCurrent,
@@ -113,14 +114,14 @@ export default function AllMyTask() {
 
   return (
     <MasterPage>
-      <Row style={{ marginBottom: 16, textAlign: "left" }}>
+      <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
         <Col span={24}>
           <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
         </Col>
       </Row>
       <IssueSearch Progress="show" />
       <Row>
-        <Col span={24}>
+        <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
           <Table dataSource={customerstate.issuedata.data} loading={customerstate.loading}
             footer={(x) => {
               return (
@@ -218,12 +219,12 @@ export default function AllMyTask() {
                     <Row style={{ borderBottom: "1px dotted" }}>
                       <Col span={8}>
                         <label style={{ color: "#808080", fontSize: "10px" }}>
-                          Module :
+                          Scene :
                           </label>
                       </Col>
                       <Col span={14}>
                         <label style={{ color: "#808080", fontSize: "10px" }}>
-                          {record.ModuleName}
+                          {record.Scene}
                         </label>
                       </Col>
                     </Row>
@@ -265,8 +266,16 @@ export default function AllMyTask() {
                 return (
                   <>
                     <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                      {moment(record.CreateDate).format("DD/MM/YYYY")}<br />
-                      {moment(record.CreateDate).format("HH:mm")}
+                    {
+                        record.AssignIconDate === null ?
+                          <label style={{fontSize:12, color:"red"}}>
+                            ยังไม่ได้ส่งเรื่องให้ ICON
+                          </label> :
+                          <label>
+                            {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
+                            {moment(record.AssignIconDate).format("HH:mm")}
+                          </label>
+                      }
                     </label>
 
                   </>

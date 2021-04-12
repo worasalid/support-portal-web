@@ -50,6 +50,7 @@ export default function InProgress() {
           startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
+          scene: customerstate.filter.scene,
           keyword: customerstate.filter.keyword,
           task: "InProgress",
           pageCurrent: pageCurrent,
@@ -246,8 +247,8 @@ export default function InProgress() {
                 return (
                   <>
                     <label className="table-column-text">
-                      {moment(record.CreateDate).format("DD/MM/YYYY")}<br />
-                      {moment(record.CreateDate).format("HH:mm")}
+                      {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
+                      {moment(record.AssignIconDate).format("HH:mm")}
                     </label>
 
                   </>

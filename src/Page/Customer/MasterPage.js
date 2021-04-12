@@ -1,5 +1,5 @@
-import { BarChartOutlined, NotificationOutlined,PieChartOutlined, FileOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, List } from "antd";
+import { NotificationOutlined,PieChartOutlined, FileOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip } from "antd";
 import React, { useState, useContext, useEffect } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AuthenContext from "../../utility/authenContext";
@@ -64,24 +64,29 @@ export default function MasterPage({bgColor='#fff',...props}) {
     }
   }
 
-  const GetNotifications = async () => {
+  const getNotification = async() => {
     try {
-      const notification = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/countstatus",
+      const countNoti = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         }
       });
-    } catch (error) {
 
+      if(countNoti.status === 200) {
+        masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
+        //setNotiCount(countNoti.data.total);
+      }
+    } catch (error) {
+      
     }
   }
 
   useEffect(() => {
     if (!state.authen) {
       getuser()
-      
+      getNotification();
     }
     CountStatus()
    
@@ -130,23 +135,30 @@ export default function MasterPage({bgColor='#fff',...props}) {
                       <Menu.Item key="1">
                         <div>
                           <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
-                          <div style={{ height: "50vh", overflowY: "scroll" }}>
+                          {/* <div style={{ height: "50vh", overflowY: "scroll" }}> */}
                             <Row style={{ padding: 16 }}>
                               <Col span={24}>
 
                                 <Notifications />
                               </Col>
                             </Row>
-                          </div>
+                          {/* </div> */}
                         </div>
                       </Menu.Item>
                     </Menu>
                   )} trigger="click">
 
-                  <Button type="text" style={{ marginRight: 15 }} size="middle"
-                    icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
-                  >
-                  </Button>
+                   <Button type="text" style={{ marginRight: 20,marginTop:10 }} size="middle"
+                  icon={
+                  <Badge 
+                   offset={[10,0]}
+                 // dot={show_notice} 
+                  count={masterstate?.toolbar?.top_menu?.notification}>
+                    <NotificationOutlined style={{ fontSize: 20 }} />
+                    </Badge>
+                    }
+                >
+                </Button>
                 </Dropdown>
               </Tooltip>
               {/* <Dropdown

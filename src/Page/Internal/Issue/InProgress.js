@@ -61,6 +61,7 @@ export default function InProgress() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
+          is_release_note : userstate.filter.isReleaseNote,
           task: "InProgress",
           pageCurrent: pageCurrent,
           pageSize: pageSize
@@ -165,10 +166,14 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <Tag color="#87d068"
+                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
+                      >
+                        ReleaseNote
+                       </Tag>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Number}
                       </label>
-
                     </>
 
                   )

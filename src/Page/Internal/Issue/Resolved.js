@@ -60,6 +60,7 @@ export default function Resolved() {
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
           task: "Resolved",
+          is_release_note: userstate.filter.isReleaseNote,
           pageCurrent: pageCurrent,
           pageSize: pageSize
         }
@@ -126,6 +127,11 @@ export default function Resolved() {
                 render={(record) => {
                   return (
                     <>
+                      <Tag color="#87d068"
+                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
+                      >
+                        ReleaseNote
+                       </Tag>
                       <label className="table-column-text">
                         {record.Number}
                       </label>
@@ -193,7 +199,7 @@ export default function Resolved() {
                       </Row> */}
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={10}>
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
                             Scene :
                           </label>
                         </Col>
@@ -278,10 +284,13 @@ export default function Resolved() {
                   return (
                     <>
                       <label className="table-column-text">
-                        {moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
+                        {moment(record.DueDate).format("DD/MM/YYYY")}
                       </label>
                       <br />
-
+                      <label className="table-column-text">
+                        {moment(record.DueDate).format("HH:mm")}
+                      </label>
+                      <br />
                       {record.cntDueDate >= 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {

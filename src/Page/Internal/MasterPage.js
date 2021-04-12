@@ -1,9 +1,9 @@
 import 'antd/dist/antd.css';
 import React, { Component, useState, useContext, useEffect } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, AutoComplete } from 'antd';
+import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Drawer } from 'antd';
 import { Badge, Avatar } from 'antd';
-import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BarChartOutlined } from '@ant-design/icons';
+import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BarChartOutlined, SnippetsOutlined, LeftOutlined } from '@ant-design/icons';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined
@@ -12,6 +12,7 @@ import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
 import MasterContext from "../../utility/masterContext";
 import Notifications from '../../Component/Notifications/Internal/Notification';
+import StickyNote from '../../Component/StickyNote/Internal/StickyNote';
 import axios from 'axios';
 
 const { SubMenu } = Menu;
@@ -49,7 +50,6 @@ export default function MasterPage({bgColor='#fff',...props}) {
   const { state, dispatch } = useContext(AuthenContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
 
-  const [collapsed, setCollapsed] = useState(false);
   const [show_notice, setshow_notice] = useState(true)
   const [activemenu, setActivemenu] = useState('')
   const [active_submenu, setActive_submenu] = useState('')
@@ -58,6 +58,9 @@ export default function MasterPage({bgColor='#fff',...props}) {
   //Menu
   const rootSubmenuKeys = ['sub0', 'sub1', 'sub2','sub3'];
   const [openKeys, setOpenKeys] = useState(['sub1']);
+
+  // Drawer
+  const [drawerCollapsed, setDrawerCollapsed ] = useState(false)
 
   const onOpenChange = keys => {
     const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
@@ -68,8 +71,6 @@ export default function MasterPage({bgColor='#fff',...props}) {
     }
   }
 
-
-  const toggle = () => setCollapsed(!collapsed);
 
   const getuser = async () => {
     try {
@@ -223,10 +224,29 @@ export default function MasterPage({bgColor='#fff',...props}) {
               style={{ height: "60px", width: "130px" }}
               src={`${process.env.PUBLIC_URL}/logo-space02.png`}
               alt=""
+              onClick={() =>  dispatch({ type: 'MENUCOLLAPSED', payload: !state.collapsed })}
+             
             />
           </Col>
           <Col span={12} style={{ textAlign: "right" }}>
 
+            <Button
+               style={{backgroundColor:"#BE1E2D", borderColor:"#BE1E2D"}}
+                icon={
+             <img
+             style={{ height: "30px", width: "30px" }}
+             
+             src={`${process.env.PUBLIC_URL}/icons-sticky-note.png`}
+             alt=""
+             //onClick={() => setCollapsed(!collapsed)}
+           />
+              } 
+               onClick={() => setDrawerCollapsed(true)} 
+            >
+             
+            </Button>
+           
+              
             <Tooltip title="Notifications">
               <Dropdown
                 placement="bottomCenter"
@@ -300,21 +320,22 @@ export default function MasterPage({bgColor='#fff',...props}) {
         </Row>
       </Menu>
       {/* </Header> */}
-      <Layout style={{ backgroundColor: "#edebec" }}>
+      
+      <Layout style={{ backgroundColor: "#" }}>
         <Sider theme="light"
           style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
-          width={200}
+          width={205}
+          collapsed={state.collapsed}
         >
+           
           <Menu theme="light"
-         // openKeys={openKeys} onOpenChange={onOpenChange}
             style={{ backgroundColor: "#edebec" }}
             mode="inline"
-           
              defaultOpenKeys={[match.path.split('/')[2]]}
              selectedKeys={[active_submenu]}
-        
           >
-            <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard">
+           
+            <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{marginTop:16}}>
               <Menu.Item key="20" onClick={() => history.push('/internal/dashboard')}>
                 - DashBoard
                 
@@ -333,11 +354,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
                 Other Issue
                
               </Menu.Item>
-              <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
+            <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
               {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
                 All Task
               </Menu.Item>
-              <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
+            <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
                 My Task
                 {
                   masterstate.toolbar.sider_menu.issue.mytask.count === 0
@@ -346,7 +367,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
+            <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
                 In progress
                 {
                   masterstate.toolbar.sider_menu.issue.inprogress.count === 0
@@ -355,8 +376,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
                 }
               </Menu.Item>
-
-              <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
+            <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
                 Resolved
                 {
                   masterstate.toolbar.sider_menu.issue.resolved.count === 0
@@ -365,7 +385,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
+            <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
                 Cancel
                 {
                   masterstate.toolbar.sider_menu.issue.cancel.count === 0
@@ -374,10 +394,9 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
                 }
               </Menu.Item>
-              <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
+            <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
                 <span >Complete</span>
-              </Menu.Item>
-
+            </Menu.Item>
             </SubMenu>
 
             <SubMenu  key="ricef"
@@ -458,14 +477,10 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Menu.Item>
             </SubMenu>
 
+         
           </Menu>
         </Sider>
 
-        {/* <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
-            </Breadcrumb> */}
         <Content
           className="site-layout-background"
           style={{
@@ -483,6 +498,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
           {props.children}
         </Content>
       </Layout>
+   
+      <StickyNote 
+        onClose={() => setDrawerCollapsed(false)}
+        visible={drawerCollapsed}
+      />
     </Layout>
   )
 }

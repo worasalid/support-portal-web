@@ -51,6 +51,7 @@ export default function MyTask() {
           startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
+          scene: customerstate.filter.scene,
           keyword: customerstate.filter.keyword,
           task: "mytask",
           pageCurrent: pageCurrent,
@@ -165,7 +166,7 @@ export default function MyTask() {
                   <div>
                     <Row style={{ borderBottom: "1px dotted" }}>
                       <Col span={8}>
-                        <label  style={{ color: "#808080",fontSize: "10px" }}>
+                        <label style={{ color: "#808080", fontSize: "10px" }}>
                           Type :
                           </label>
                       </Col>
@@ -266,8 +267,16 @@ export default function MyTask() {
                 return (
                   <>
                     <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                      {moment(record.CreateDate).format("DD/MM/YYYY")}<br />
-                      {moment(record.CreateDate).format("HH:mm")}
+                      {
+                        record.AssignIconDate === null ?
+                          <label style={{fontSize:12, color:"red"}}>
+                            ยังไม่ได้ส่งเรื่องให้ ICON
+                          </label> :
+                          <label>
+                            {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
+                            {moment(record.AssignIconDate).format("HH:mm")}
+                          </label>
+                      }
                     </label>
 
                   </>

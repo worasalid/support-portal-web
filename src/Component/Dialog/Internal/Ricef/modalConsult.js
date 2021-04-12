@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext } from 'react';
-import { Modal, Form, Row, Col, Select } from 'antd';
+import { Modal, Form, Row, Col, Select, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../../UploadFile'
@@ -15,6 +15,7 @@ export default function ModalConsult({ visible = false, onOk, onCancel, details,
     const uploadRef = useRef(null);
     const uploadRef_unittest = useRef(null);
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
 
     const [assignee, setAssignee] = useState(null);
     const [textValue, setTextValue] = useState("");
@@ -64,6 +65,7 @@ export default function ModalConsult({ visible = false, onOk, onCancel, details,
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/ricef/send-task",
@@ -83,14 +85,15 @@ export default function ModalConsult({ visible = false, onOk, onCancel, details,
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-
-                await Modal.info({
+                setLoading(false);
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>ส่งงานให้ Developer แก้ไข</p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         editorRef.current.editor.setContent("");
                         history.goBack();
@@ -99,13 +102,15 @@ export default function ModalConsult({ visible = false, onOk, onCancel, details,
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
                     onOk();
@@ -116,7 +121,6 @@ export default function ModalConsult({ visible = false, onOk, onCancel, details,
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
         SendFlow(values);
     };
 
@@ -128,105 +132,81 @@ export default function ModalConsult({ visible = false, onOk, onCancel, details,
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
+            confirmLoading={loading}
             onCancel={() => { return (form.resetFields(), onCancel(), editorRef.current.editor.setContent("")) }}
 
             {...props}
 
         >
 
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                layout="vertical"
-                name="normal_login"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-
-                <Form.Item
-                    style={{ display: details.status === "Open" ? "block" : "none" }}
-                    label="Assign Developer"
-                    name="assign"
-                    rules={[
-                        {
-                            required:  details.status === "Open" ? true : false,
-                            message: 'กรุณาระบุชื่อ Developer ',
-                        },
-                    ]}
+            <Spin spinning={loading}>
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    layout="vertical"
+                    name="normal_login"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <Select
-                        style={{ width: '50%' }}
-                        allowClear
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onClick={() => GetDeveloper()}
 
-                        options={ricefstate.assignee?.map((x) => ({ value: x.UserId, label: x.UserName, type: "module" }))}
-                        onChange={(value, item) => setAssignee(value)}
-                        defaultValue="None"
-                    />
-                </Form.Item>
-                <Form.Item
-                    label="Remark"
-                    name="remark"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'กรุณาระบุชื่อ Developer ',
-                        },
-                    ]}
-                >
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
+                    <Form.Item
+                        style={{ display: details.status === "Open" ? "block" : "none" }}
+                        label="Assign Developer"
+                        name="assign"
+                        rules={[
+                            {
+                                required: details.status === "Open" ? true : false,
+                                message: 'กรุณาระบุชื่อ Developer ',
+                            },
+                        ]}
+                    >
+                        <Select
+                            style={{ width: '50%' }}
+                            allowClear
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            onClick={() => GetDeveloper()}
+
+                            options={ricefstate.assignee?.map((x) => ({ value: x.UserId, label: x.UserName, type: "module" }))}
+                            onChange={(value, item) => setAssignee(value)}
+                            defaultValue="None"
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Remark"
+                        name="remark"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'กรุณาระบุชื่อ Developer ',
+                            },
+                        ]}
+                    >
+                        <Editor
+                            apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                            ref={editorRef}
+                            initialValue=""
+                            init={{
+                                height: 300,
+                                menubar: false,
+                                plugins: [
+                                    'advlist autolink lists link image charmap print preview anchor',
+                                    'searchreplace visualblocks code fullscreen',
+                                    'insertdatetime media table paste code help wordcount'
+                                ],
+                                toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                                toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                            }}
+                            onEditorChange={handleEditorChange}
+                        />
+                        <br />
                      AttachFile : <UploadFile ref={uploadRef} />
 
-                </Form.Item>
-            </Form>
-
-
-            {/* 
-            <Row style={{ marginTop: 30 }}>
-                <Col span={24}>
-                    Remark :
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
-                </Col>
-            </Row> */}
+                    </Form.Item>
+                </Form>
+            </Spin>
 
         </Modal>
     )

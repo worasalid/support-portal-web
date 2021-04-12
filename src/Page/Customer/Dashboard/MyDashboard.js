@@ -4,14 +4,60 @@ import MasterPage from '../MasterPage'
 import { Row, Col, Card, Spin, DatePicker, Tabs } from 'antd';
 import { FileOutlined } from '@ant-design/icons';
 import Axios from "axios";
+import moment from 'moment';
 
 const { Meta } = Card;
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
 
+
+const DashBoard = React.memo(({ data }) => {
+    const config = {
+        xField: 'Status',
+        yField: 'Value',
+        label: {
+            position: 'middle',
+            content: function content(item) {
+                return item.Value.toFixed(0);
+            },
+            style: { fill: '#fff' },
+        },
+        columnWidthRatio: 0.4,
+        legend: {
+            layout: 'horizontal',
+            position: 'bottom'
+        },
+        color: function color(x) {
+            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
+            if (x.Status === "InProgress") { return "#5B8FF9" }
+            if (x.Status === "Resolved") { return "#FF5500" }
+            if (x.Status === "Cancel") { return "#CD201F" }
+            if (x.Status === "ReOpen") { return "#CD201F" }
+            if (x.Status === "Complete") { return "#87D068" }
+
+        },
+    };
+
+    return (
+        <>
+            <Card title="Issue" bordered={true} style={{ width: "100%" }}>
+                <Column {...config}
+                    data={data.filter((x) => x.Status !== "Total")}
+                    height={200}
+                    //scrollbar="true"
+                    xAxis={{ position: "bottom" }}
+                />
+            </Card>
+        </>
+    )
+})
+
 export default function MyDashboard() {
-    const [loading, setLoading] = useState(true)
-    const [dashboard, setDashboard] = useState([])
+    const [loading, setLoading] = useState(true);
+    const [dashboard, setDashboard] = useState([]);
+    const [dashBoardWeekly, setDashBoardWeekly] = useState([]);
+    const [filterDate, setFilterDate] = useState([]);
+    const [dashboardType, setDashBoardType] = useState("Weekly");
 
     const weekdata = [
         {
@@ -124,17 +170,20 @@ export default function MyDashboard() {
 
     ]
 
-    const config = {
+
+
+    const configWeek = {
         xField: 'Status',
         yField: 'Value',
+        // seriesField: 'status',
+        // isStack: true,
         label: {
             position: 'middle',
-            content: function content(item) {
-                return item.Value.toFixed(0);
-            },
+            // content: function content(item) {
+            //     return item.Value.toFixed(0);
+            // },
             style: { fill: '#fff' },
         },
-        columnWidthRatio: 0.4,
         legend: {
             layout: 'horizontal',
             position: 'bottom'
@@ -145,32 +194,6 @@ export default function MyDashboard() {
             if (x.Status === "Resolved") { return "#FF5500" }
             if (x.Status === "Cancel") { return "#CD201F" }
             if (x.Status === "Complete") { return "#87D068" }
-
-        },
-    };
-
-    const configWeek = {
-        xField: 'day',
-        yField: 'value',
-        seriesField: 'status',
-        isStack: true,
-        // label: {
-        //     position: 'middle',
-        //     // content: function content(item) {
-        //     //     return item.Value.toFixed(0);
-        //     // },
-        //     style: { fill: '#fff' },
-        // },
-        legend: {
-            layout: 'horizontal',
-            position: 'bottom'
-        },
-        color: function color(x) {
-            if (x.status === "Open" || x.status === "Hold") { return "gray" }
-            if (x.status === "InProgress") { return "#5B8FF9" }
-            if (x.status === "Resolved") { return "#FF5500" }
-            if (x.status === "Cancel") { return "#CD201F" }
-            if (x.status === "Complete") { return "#87D068" }
 
         },
     };
@@ -202,21 +225,50 @@ export default function MyDashboard() {
         },
     };
 
-
-    const GetIssueStatus = async () => {
+    const GetIssueTotal = async (param) => {
         try {
             const issuestatus = await Axios({
                 url: process.env.REACT_APP_API_URL + "/dashboard/issue-status",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    dash_board_type: "total"  // Day, Weely, Month, Year
+                }
+
+            });
+            if (issuestatus.status === 200) {
+                setTimeout(() => {
+                    //setLoading(false)
+                    setDashboard(issuestatus.data.total)
+                }, 1000)
+            }
+
+        } catch (error) {
+            //setLoading(false)
+        }
+    }
+
+    const GetIssueStatus = async (param) => {
+        try {
+            const issuestatus = await Axios({
+                url: process.env.REACT_APP_API_URL + "/dashboard/issue-status",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    start_date: moment(param[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
+                    end_date: moment(param[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
+                    dash_board_type: dashboardType  // Day, Weely, Month, Year
                 }
 
             });
             if (issuestatus.status === 200) {
                 setTimeout(() => {
                     setLoading(false)
-                    setDashboard(issuestatus.data.total)
+                    setDashBoardWeekly(issuestatus.data.total)
                 }, 1000)
             }
 
@@ -225,10 +277,16 @@ export default function MyDashboard() {
         }
     }
 
-    useEffect(() => {
-        GetIssueStatus()
 
+
+
+    useEffect(() => {
+        GetIssueTotal();
+        GetIssueStatus();
     }, [])
+
+    useEffect(() => {
+    }, [dashboard])
 
     return (
         <MasterPage bgColor="#f0f2f5">
@@ -408,58 +466,37 @@ export default function MyDashboard() {
                                 </div>
                                 <div>
                                     <label className="dashboard-card-value">
-                                        {dashboard[6]?.Value}
+                                        {dashboard[7]?.Value}
                                     </label>
                                 </div>
                             </Card>
                         </Col>
                     </Row>
-                    <Row gutter={16} style={{ marginTop: "30px" }}>
-                        <Col span={18}>
-                        </Col>
-                        <Col span={6}>
-                            {/* <DatePicker /> */}
-                            <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
-                                onChange={(date, dateString) => console.log(dateString)}
-                            />
-                        </Col>
-                    </Row>
+
 
                     <Row gutter={16} style={{ marginTop: "30px" }}>
                         <Col span={12}>
-                            <Card title="Issue" bordered={true} style={{ width: "100%" }}>
+                            {/* <Card title="Issue" bordered={true} style={{ width: "100%" }}>
                                 <Column {...config}
                                     data={dashboard.filter((x) => x.Status !== "Total")}
                                     height={200}
                                     //scrollbar="true"
                                     xAxis={{ position: "bottom" }}
                                 />
-                            </Card>
+                            </Card> */}
+                            {<DashBoard data={dashboard} />}
                         </Col>
                         <Col span={12}>
                             <div className="card-container">
-                                <Tabs type="card" defaultActiveKey="1">
-                                    <TabPane tab="Day" key="1">
-                                        <Column {...configWeek}
-                                            style={{ height: 280 }}
-                                            data={weekdata.filter((x) => x.status !== "Total")}
-                                            //height={200}
-                                            //scrollbar="true"
-                                            xAxis={{ position: "bottom" }}
-                                    // legend={{
-                                        
-                                    // }}
-                                        />
-
-                                    </TabPane>
-                                    <TabPane tab="By Week" key="2">
+                                <Tabs type="card" defaultActiveKey="Day" onChange={(x) => setDashBoardType(x)}>
+                                    <TabPane tab="By Weekly" key="weekly">
                                         <Row style={{ marginBottom: 24 }}>
                                             <Col span={12}>
 
                                             </Col>
                                             <Col span={12}>
                                                 <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
-                                                    onChange={(date, dateString) => console.log(dateString)}
+                                                    onChange={(date, dateString) => GetIssueStatus(dateString)}
                                                 />
                                             </Col>
                                         </Row>
@@ -467,20 +504,20 @@ export default function MyDashboard() {
                                             // groupField="type"
                                             // tooltip="xxx"
                                             style={{ height: 280 }}
-                                            data={weekdata.filter((x) => x.status !== "Total")}
+                                            data={dashBoardWeekly.filter((x) => x.status !== "Total")}
                                             //scrollbar="true"
                                             xAxis={{ position: "bottom" }}
                                         />
 
                                     </TabPane>
-                                    <TabPane tab="By Month" key="3">
+                                    <TabPane tab="By Monthly" key="monthly">
                                         <Row style={{ marginBottom: 24 }}>
                                             <Col span={12}>
 
                                             </Col>
                                             <Col span={12}>
                                                 <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
-                                                    onChange={(date, dateString) => console.log(dateString)}
+                                                    onChange={(date, dateString) => setFilterDate(dateString)}
                                                 />
                                             </Col>
                                         </Row>
@@ -490,7 +527,7 @@ export default function MyDashboard() {
                                             //scrollbar="true"
                                             xAxis={{ position: "bottom" }}
                                         />
-
+                                      
                                     </TabPane>
                                 </Tabs>
                             </div>

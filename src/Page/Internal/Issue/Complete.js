@@ -59,6 +59,7 @@ export default function Complete() {
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
+          is_release_note: userstate.filter.isReleaseNote,
           task: "Complete",
           pageCurrent: pageCurrent,
           pageSize: pageSize
@@ -171,6 +172,11 @@ export default function Complete() {
                 render={(record) => {
                   return (
                     <>
+                      <Tag color="#87d068"
+                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
+                      >
+                        ReleaseNote
+                       </Tag>
                       <label className="table-column-text">
                         {record.Number}
                       </label>
@@ -237,8 +243,8 @@ export default function Complete() {
                         </Col>
                       </Row> */}
                       <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={10}>
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
                             Scene :
                           </label>
                         </Col>
@@ -324,7 +330,11 @@ export default function Complete() {
                   return (
                     <>
                       <label className="table-column-text">
-                        {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}
+                      </label>
+                      <br />
+                      <label className="table-column-text">
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                       </label>
                       <br />
                       {record.cntDueDate >= 1 ?

@@ -1,6 +1,5 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Alert, Spin } from "antd";
-import Modal from "antd/lib/modal/Modal";
+import { Button, Form, Input, Alert, Spin, Modal } from "antd";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from "react-router-dom";
@@ -27,7 +26,7 @@ export default function NormalLoginForm() {
       });
 
       if (result.status === 200) {
-        console.log("result",result.data,result.data.usersdata)
+        console.log("result", result.data, result.data.usersdata)
         setLoading(false);
         localStorage.setItem("sp-ssid", result.data.ssid);
         dispatch({ type: 'Authen', payload: true });
@@ -38,8 +37,20 @@ export default function NormalLoginForm() {
 
 
     } catch (error) {
-    
-      alert("ข้อมููลไม่ถูกต้อง");
+      await Modal.error({
+        title: 'Login ไม่สำเร็จ',
+        content: (
+          <div>
+            <p>{error.response.data}</p>
+            <p>กรุณาติดต่อ ผู้ดูแลระบบ</p>
+          </div>
+        ),
+        okText: "Close",
+        onOk() {
+
+        },
+      });
+
       setLoading(false);
     }
   };
@@ -122,7 +133,7 @@ export default function NormalLoginForm() {
                 htmlType="submit"
                 shape="round"
                 style={{ width: 200, textAlign: "center" }}
-             //   onClick={() => setLoading(true)}
+              //   onClick={() => setLoading(true)}
               //className="login-form-button"
               >
                 Log in

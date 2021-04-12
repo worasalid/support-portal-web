@@ -17,7 +17,7 @@ export default class extends Component {
     componentDidMount() {
         this.chart = new OrgChart(this.divRef.current, {
             nodes: this.props.nodes,
-
+            mouseScrool: OrgChart.action.edit,
             nodeBinding: {
                 field_0: "name",
                 field_1: "title",
@@ -27,10 +27,22 @@ export default class extends Component {
             	details: {text:"Details"},
             	edit: {text:"Edit"},
             	add: {text:"Add"},
-            	remove: {text:"Remove"}
+            	remove: {text:"Remove"},
             },
+            toolbar: {
+                fullScreen: true,
+                zoom: true,
+                fit: true,
+                expandAll: true
+            },
+            
         });
-
+       
+        this.chart.on("added", function (sender, id,node) {
+            sender.editUI.show(id);
+            console.log(sender.editUI.node.parent.id)
+            console.log(sender.editUI.node.parent.pid)
+        });
     }
 
     render() {

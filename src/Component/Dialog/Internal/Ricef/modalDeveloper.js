@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Modal, Form } from 'antd';
+import { Modal, Form, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
-import { useHistory,useRouteMatch } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
@@ -14,6 +14,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null)
+    const [loading, setLoading] = useState(false);
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -57,6 +58,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/ricef/send-task",
@@ -74,14 +76,16 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
                 SaveComment();
                 SaveUnitTest(values);
                 onOk();
+                setLoading(false);
 
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>แก้ไขงานเสร็จ ส่งงานให้ Consult ตรวจสอบ</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.editor.setContent("");
                         history.goBack();
@@ -89,13 +93,15 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
                     onOk();
@@ -106,9 +112,8 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
         SendFlow(values);
-    
+
     };
 
     return (
@@ -118,66 +123,70 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
+            confirmLoading={loading}
             onCancel={() => { return (form.resetFields(), onCancel()) }}
 
             {...props}
 
         >
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="normal_login"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    label="URL"
-                    name="urltest"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'กรุณาใส่ Url ที่ใช้ test ',
-                        },
-                    ]}
+            <Spin spinning={loading}>
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    name="normal_login"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <TextArea rows="2" style={{ width: "100%" }} />
-                </Form.Item>
+                    <Form.Item
+                        label="URL"
+                        name="urltest"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'กรุณาใส่ Url ที่ใช้ test ',
+                            },
+                        ]}
+                    >
+                        <TextArea rows="2" style={{ width: "100%" }} />
+                    </Form.Item>
 
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Unit Test"
-                    name="unittest"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_unittest} />
-                </Form.Item>
+                    <Form.Item
+                        style={{ minWidth: 300, maxWidth: 300 }}
+                        label="Unit Test"
+                        name="unittest"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={uploadRef_unittest} />
+                    </Form.Item>
 
-            </Form>
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
-            <br />
+                </Form>
+                <Editor
+                    apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                    ref={editorRef}
+                    initialValue=""
+                    init={{
+                        height: 300,
+                        menubar: false,
+                        plugins: [
+                            'advlist autolink lists link image charmap print preview anchor',
+                            'searchreplace visualblocks code fullscreen',
+                            'insertdatetime media table paste code help wordcount'
+                        ],
+                        toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                        toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                    }}
+                    onEditorChange={handleEditorChange}
+                />
+                <br />
                      AttachFile : <UploadFile ref={uploadRef} />
+
+            </Spin>
         </Modal>
     )
 }

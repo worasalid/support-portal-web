@@ -230,7 +230,7 @@ export default function SubTask() {
 
     }
     // Flow CR
-    if (userstate?.taskdata?.data[0]?.IssueType === "ChangeRequest") {
+    if (userstate?.taskdata?.data[0]?.IssueType === "ChangeRequest" || userstate?.taskdata?.data[0]?.IssueType === "Memo") {
       if (item.data.NodeName === "support") {
         if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR") { setModalsendtask_visible(true) }
       }
@@ -372,7 +372,7 @@ export default function SubTask() {
     <MasterPage>
       <Spin spinning={pageLoading} tip="Loading...">
         <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
-          <Row style={{ padding: "0px 0px 0px 24px" }}>
+          {/* <Row style={{ padding: "0px 0px 0px 24px" }}>
             <Col>
               <Button
                 type="link"
@@ -383,12 +383,28 @@ export default function SubTask() {
                 Back
                 </Button>
             </Col>
-          </Row>
+          </Row> */}
 
-          <Row style={{ height: 'calc(100% - 32px)' }}>
+          <Row style={{ height: 'calc(100% - 0px)' }}>
             {/* Content */}
-            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
-              {/* <div style={{ height: "80vh", overflowY: "scroll" }}> */}
+            <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+
+              <Row style={{ textAlign: "left" }}>
+                <Col span={24} style={{ textAlign: "left" }}>
+                  <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
+                    <Button
+                      type="link"
+                      icon={<LeftCircleOutlined />}
+                      // style={{zIndex:99}}
+                      style={{ fontSize: 18, padding: 0, backgroundColor: "white", width: "100%", textAlign: "left" }}
+                      onClick={() => history.goBack()}
+                    >
+                      Back
+                        </Button>
+                  </div>
+                </Col>
+              </Row>
+
               {/* Issue Description */}
               <Row style={{ marginRight: 24 }}>
                 <Col span={24}>
@@ -480,7 +496,7 @@ export default function SubTask() {
 
             {/* SideBar */}
             <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
-              <Row style={{ marginBottom: 20 }}>
+              <Row style={{ marginBottom: 20, marginTop:24 }}>
                 <Col span={18}>
                   <label className="header-text">Progress Status</label>
                 </Col>

@@ -80,7 +80,10 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
                             </Row>
                             <Row>
                                 <Col>
-                                    <p>{item.description}</p></Col>
+                                    <label className="value-text">
+                                       {item.description}
+                                    </label>
+                                </Col>
                             </Row>
                         </Timeline.Item>
                     )

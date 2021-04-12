@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Modal, Form, Spin, Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
-const { TabPane } = Tabs;
+//const { TabPane } = Tabs;
 
 
 export default function ModalQuotation({ visible = false, onOk, onCancel, datarow, details, ...props }) {
@@ -23,7 +23,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
         setTextValue(content);
     }
     const SaveQuotation = async (values) => {
-        const quotation = await Axios({
+        await Axios({
             url: process.env.REACT_APP_API_URL + "/tickets/save-document",
             method: "POST",
             headers: {
@@ -36,13 +36,13 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                 reftype: "Master_Ticket",
                 grouptype: "quotation"
             }
-        })
+        });
     }
 
     const SaveComment = async () => {
         try {
             if (textValue !== "") {
-                const comment = await Axios({
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {

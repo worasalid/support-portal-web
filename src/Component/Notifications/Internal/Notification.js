@@ -6,8 +6,6 @@ import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
 
-
-
 export default function Notifications(props) {
     const history = useHistory()
     const [pageStart, setPageStart] = useState(1)

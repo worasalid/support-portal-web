@@ -130,7 +130,7 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
             confirmLoading={loading}
             visible={visible}
             okText="Send"
-            onOk={() => { return (SaveComment(), SendFlow(), onOk()) }}
+            onOk={() => SendFlow() }
             onCancel={() => { return (editorRef.current.editor.setContent(""), onCancel()) }}
             {...props}
         >

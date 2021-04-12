@@ -48,6 +48,7 @@ export default function Pass() {
           startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
+          scene: customerstate.filter.scene,
           keyword: customerstate.filter.keyword,
           task: "Pass",
           pageCurrent: pageCurrent,
@@ -242,7 +243,7 @@ export default function Pass() {
                   <>
                     {/* <label className={record.MailStatus === "Read" ? "table-column-text" : "table-column-text-unread"}> */}
                     <label>
-                      {moment(record.CreateDate).format("DD/MM/YYYY HH:mm")}
+                      {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                     </label>
 
                   </>

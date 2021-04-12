@@ -1,13 +1,12 @@
-import React, { useReducer, useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { Row, Col, Input, Button, DatePicker, Select, Tag, Spin } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import Axios from 'axios';
-import { productReducer, moduleReducer, issueTypeReducer, keywordReducer, initState } from '../../../utility/reducer';
 import { useEffect } from 'react';
 import AuthenContext from '../../../utility/authenContext';
 import IssueContext from '../../../utility/issueContext';
 
-export default function Issuesearch({Progress = "hide"}) {
+export default function Issuesearch({ Progress = "hide" }) {
     const { RangePicker } = DatePicker;
     const { Option } = Select;
     const { state, dispatch } = useContext(AuthenContext);
@@ -25,6 +24,29 @@ export default function Issuesearch({Progress = "hide"}) {
         {
             value: "Complete",
             text: "Complete"
+        },
+    ]
+
+    const sceneData = [
+        {
+            value: "None",
+            text: "None"
+        },
+        {
+            value: "Application",
+            text: "Application"
+        },
+        {
+            value: "Report",
+            text: "Report"
+        },
+        {
+            value: "Printform",
+            text: "Printform"
+        },
+        {
+            value: "Data",
+            text: "Data"
         },
     ]
 
@@ -47,7 +69,10 @@ export default function Issuesearch({Progress = "hide"}) {
         if (e.target.name === "progress") {
             customerdispatch({ type: "SELECT_PROGRESS", payload: e.target.value })
         }
-       
+        if (e.target.name === "scene") {
+            customerdispatch({ type: "SELECT_SCENE", payload: e.target.value })
+        }
+
         if (e.target.name === "date") {
             customerdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })
         }
@@ -156,7 +181,7 @@ export default function Issuesearch({Progress = "hide"}) {
                 </Col>
                 <Col span={4}>
                     <Select placeholder="Module" style={{ width: "100%" }}
-                    mode="multiple"
+                        mode="multiple"
                         showSearch
                         allowClear
                         maxTagCount={1}
@@ -174,7 +199,7 @@ export default function Issuesearch({Progress = "hide"}) {
                     />
                 </Col>
                 <Col span={2}>
-                    <Button type="primary"  shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                    <Button type="primary" shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
                         onClick={() => customerdispatch({ type: "SEARCH", payload: true })}
                     >
                         Search
@@ -182,12 +207,12 @@ export default function Issuesearch({Progress = "hide"}) {
                 </Col>
             </Row>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={6}>
+                <Col span={2}>
                 </Col>
                 <Col span={4}>
-                <Select placeholder="Progress" 
-                style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
-                    mode="multiple"
+                    <Select placeholder="Progress"
+                        style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
+                        mode="multiple"
                         showSearch
                         allowClear
                         maxTagCount={1}
@@ -196,11 +221,33 @@ export default function Issuesearch({Progress = "hide"}) {
                         }
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'progress' } })}
                         options={progressstatus.map((x) => ({ value: x.value, label: x.text }))}
-                        onClear={() => alert()}
+                    />
+                </Col>
+                <Col span={4}>
+                    <Select placeholder="Scene"
+                        style={{ width: "100%"}}
+                        mode="multiple"
+                        showSearch
+                        allowClear
+                        maxTagCount={1}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'scene' } })}
+                        options={sceneData.map((x) => ({ value: x.value, label: x.text }))}
                     />
                 </Col>
                 <Col span={10}>
-                    <Input placeholder="Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", name: 'keyword' } })}></Input>
+                    <Input placeholder="IssueNo / Subject" name="subject" prefix="" suffix={<SearchOutlined />}
+                        onChange={(value) => handleChange({ target: { value: value.target.value || "", name: 'keyword' } })}
+                        onKeyDown={(x) => {
+                            if (x.keyCode === 13) {
+                                customerdispatch({ type: "SEARCH", payload: true })
+                            }
+                        }}
+
+                    />
+
                 </Col>
             </Row>
         </>

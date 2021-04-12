@@ -1,4 +1,4 @@
-import { Col, Tag, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Popconfirm, Spin } from "antd";
+import { Col, Tag, Row, Select, Divider, Typography, Button, Avatar, Tabs, Modal, Menu, Spin, Dropdown, Affix } from "antd";
 import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -9,7 +9,7 @@ import InternalHistorylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
 import {
   ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, LeftCircleOutlined, UserOutlined,
-  UpCircleOutlined, DownCircleOutlined, InfoCircleOutlined
+  UpCircleOutlined, DownCircleOutlined, InfoCircleOutlined, SmallDashOutlined
 } from "@ant-design/icons";
 import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
@@ -37,6 +37,7 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 
 
 const { Option } = Select;
+const { SubMenu } = Menu;
 const { TabPane } = Tabs;
 
 
@@ -331,7 +332,7 @@ export default function Subject() {
       }
     }
     //CR FLOW
-    if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest") {
+    if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") {
       if (userstate?.mailbox[0]?.NodeName === "support") {
         if (item.data.value === "SendCR_Center") {
           setModalsendissue_visible(true)
@@ -517,8 +518,8 @@ export default function Subject() {
     <MasterPage>
       <Spin spinning={loadingPage} tip="Loading..." style={{ height: "100%" }}>
         <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
-          <Row style={{ padding: "0px 0px 0px 24px" }}>
-            <Col>
+          {/* <Row style={{ padding: "0px 0px 0px 24px" }}>
+            <Col span={16}>
               <Button
                 type="link"
                 icon={<LeftCircleOutlined />}
@@ -527,16 +528,47 @@ export default function Subject() {
               >
                 Back
                 </Button>
+            </Col >
+            <Col span={8} style={{ textAlign: "right" }}>
+              <Dropdown
+
+                placement="bottomCenter"
+                overlayStyle={{ width: 200, boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px" }}
+                overlay={(
+                  <Menu mode="inline" theme="light" onMouseOver="">
+                    <Button type="link" onClick={() => history.push("/Login")}>Log Out</Button> <br />
+                  </Menu>
+                )} trigger="click">
+
+                <Button type="text" icon={<SmallDashOutlined style={{fontSize: 24}} />} />
+
+              </Dropdown>
             </Col>
-          </Row>
+          </Row> */}
           {/* </Affix> */}
 
-          <Row style={{ height: 'calc(100% - 32px)' }}>
+          <Row style={{ height: 'calc(100% - 0px)' }}>
             {/* Content */}
-            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+
+            <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+              <Row style={{textAlign:"left"}}>
+                <Col span={24} style={{textAlign:"left"}}>
+                  <div offsetTop={10} style={{zIndex:100,overflow: "hidden",position: "fixed",width:"400px"}}>
+                    <Button
+                      type="link"
+                      icon={<LeftCircleOutlined />}
+                      // style={{zIndex:99}}
+                      style={{ fontSize: 18, padding: 0, backgroundColor: "white",width:"100%",textAlign:"left" }}
+                      onClick={() => history.goBack()}
+                    >
+                      Back
+                        </Button>
+                  </div>
+                </Col>
+              </Row>
 
               {/* Issue Description */}
-              <Row style={{ marginRight: 24 }}>
+              <Row style={{ marginRight: 24, overflow: "hidden" }}>
                 <Col span={24}>
                   <label className="topic-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Number}</label>
                   <div className="issue-detail-box">
@@ -548,7 +580,7 @@ export default function Subject() {
                       </Col>
                       <Col span={8} style={{ display: "inline", textAlign: "right" }}>
                         <Button title="file attach" type="link"
-                        style={{display: userstate?.issuedata?.details[0]?.cntFile === 0 ? "none" : "inline-block"}}
+                          style={{ display: userstate?.issuedata?.details[0]?.cntFile === 0 ? "none" : "inline-block" }}
                           icon={<img
                             style={{ height: "20px", width: "20px" }}
                             src={`${process.env.PUBLIC_URL}/icons-attach.png`}
@@ -613,7 +645,7 @@ export default function Subject() {
                 {/* ปุ่ม Create CR */}
                 <Col span={24}
                   style={{
-                    display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
+                    display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
                       userstate?.mailbox[0]?.NodeName === "cr_center" &&
                       userstate.issuedata.details[0]?.Manday === null ? "block" : "none"
                   }} >
@@ -677,7 +709,7 @@ export default function Subject() {
 
                   <div style={{ display: activityCollapse }}>
                     {
-                      userstate?.mailbox[0]?.NodeName === "support" 
+                      userstate?.mailbox[0]?.NodeName === "support"
                         ?
 
                         <Tabs defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
@@ -691,7 +723,7 @@ export default function Subject() {
 
                           </TabPane>
                           <TabPane tab="History Log" key="3">
-                            <InternalHistorylog  loading={history_loading} />
+                            <InternalHistorylog loading={history_loading} />
                           </TabPane>
                         </Tabs>
                         :
@@ -711,11 +743,12 @@ export default function Subject() {
               </Row>
               {/* </div> */}
             </Col>
+
             {/* Content */}
 
             {/* SideBar */}
             <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
-              <Row style={{ marginBottom: 20 }}>
+              <Row style={{ marginBottom: 20, marginTop:24 }}>
                 <Col span={18}>
                   <label className="header-text">Progress Status</label>
                 </Col>
@@ -820,16 +853,6 @@ export default function Subject() {
                 </Col>
               </Row>
 
-              {/* <Row style={{ marginBottom: 20 }}>
-                <Col span={24} style={{ marginTop: "10px" }}>
-                  <ClockTimer
-                    ref={clockRef2}
-                    duedate={userstate?.issuedata?.details[0]?.SLA_DueDate}
-                    type="SLA"
-                  />
-                </Col>
-              </Row> */}
-
               {/*  DueDate (Internal) เคส CR , Memo*/}
               <Row style={{
                 marginBottom: 20,
@@ -838,10 +861,10 @@ export default function Subject() {
                 <Col span={18}>
                   <label className="header-text">DueDate (ICON)</label>
 
-                  <ClockCircleOutlined
-                    style={{ fontSize: 18, marginLeft: 12 }}
-                  // onClick={() => setHistoryduedate_visible(true)}
+                  <Button type="link" icon={<ClockCircleOutlined
+                    style={{ fontSize: 18, marginLeft: 12 }} />}
                   />
+
                   <br />
                   {
                     userstate?.mailbox[0]?.NodeName === "cr_center"
@@ -874,7 +897,11 @@ export default function Subject() {
                 <Col span={18}>
                   <label className="header-text">DueDate (Customer)</label>
 
-                  <ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} onClick={() => setHistoryduedate_visible(true)} />
+                  <Button type="link"
+                    icon={<ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} />}
+                    onClick={() => setHistoryduedate_visible(true)}
+                  />
+                  {/* <ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} onClick={() => setHistoryduedate_visible(true)} /> */}
                   <br />
                   {
                     userstate?.mailbox[0]?.NodeName === "support"
@@ -889,11 +916,7 @@ export default function Subject() {
                         {(userstate?.issuedata.details[0]?.DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
                       </label>
                   }
-                  {/* {userstate?.issuedata.details[0]?.cntDueDate >= 1 ?
-                    <Tag color="warning">
-                      DueDate ถูกเลื่อน
-                   </Tag> : ""
-                  } */}
+
                 </Col>
               </Row>
 
@@ -902,7 +925,11 @@ export default function Subject() {
                 <Col span={18}>
                   <label className="header-text">DueDate (Customer)</label>
 
-                  <ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} onClick={() => setHistoryduedate_visible(true)} />
+                  <Button type="link"
+                    icon={<ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} />}
+                    onClick={() => setHistoryduedate_visible(true)}
+                  />
+
                   <br />
                   {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
                   {
@@ -931,7 +958,7 @@ export default function Subject() {
                   <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].CompanyName}</label>
                 </Col>
               </Row>
-              
+
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">IssueType</label>
@@ -958,7 +985,7 @@ export default function Subject() {
 
                 </Col>
               </Row>
-             
+
               <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Product</label>
@@ -983,17 +1010,18 @@ export default function Subject() {
 
               <Row style={{
                 marginBottom: 20,
-                display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" && userstate.issuedata.details[0]?.IsAssessment === 1 ? "block" : "none"
+                display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
+                  userstate.issuedata.details[0]?.IsAssessment === 1 ? "block" : "none"
               }}>
                 <Col span={18}>
-                  <label className="header-text">SA ประเมินผลกระทบ</label>
-                  <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} /> 
+                  <label className="header-text">ผลประเมินผลของ SA</label>
+                  <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} />
                 </Col>
               </Row>
 
               <Row style={{
                 marginBottom: 20,
-                display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
+                display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
                   userstate.issuedata.details[0]?.Manday ? "block" : "none"
               }}>
                 <Col span={18}>
@@ -1102,6 +1130,7 @@ export default function Subject() {
           }}
           details={{
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            duedate: userstate?.issuedata?.details[0]?.DueDate
           }}
         />
 

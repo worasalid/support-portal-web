@@ -170,9 +170,10 @@ export default function Subject() {
     }
 
     // CR FLOW
-    if (customerstate.issuedata.details[0].IssueType === "ChangeRequest") {
+    if (customerstate.issuedata.details[0].IssueType === "ChangeRequest" || customerstate.issuedata.details[0].IssueType === "Memo") {
 
-      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" || item.data.value === "Continue") {
+      if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" ||
+        item.data.value === "Continue" || item.data.value === "SendToDeploy") {
         modalSendissue_visible(true)
       }
       if (item.data.NodeName === "customer" && item.data.value === "Hold") {
@@ -228,13 +229,7 @@ export default function Subject() {
   }
 
   useEffect(() => {
-   
     getdetail();
-
-    var now  = "2021-03-27 15:00";
-    var then = "2021-03-27 17:20";
-    var result =   moment(then,"YYYY-MM-DD HH:mm").diff(moment(now,"YYYY-MM-DD HH:mm"),'minute')
-  console.log(result)
   }, [])
 
   useEffect(() => {
