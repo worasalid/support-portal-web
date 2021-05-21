@@ -13,7 +13,7 @@ export default function Notifications(props) {
     const [notification, setNotification] = useState([]);
     const [hasMore, setHasMore] = useState(true)
 
-    const GetNotification = async (page) => {
+    const getNotiDetails = async (page) => {
         try {
             setLoading(true)
             const noti = await Axios({
@@ -72,7 +72,7 @@ export default function Notifications(props) {
     }
 
     useEffect(() => {
-        GetNotification(pageStart);
+        getNotiDetails(pageStart);
     }, [])
 
 
@@ -89,7 +89,7 @@ export default function Notifications(props) {
             <InfiniteScroll
                 initialLoad={false}
                 pageStart={1}
-                loadMore={(page) => page > 6 ? "" : GetNotification(page)}
+                loadMore={(page) => page > 6 ? "" : getNotiDetails(page)}
                 //loader={(x) => console.log("loader", x)}
                 hasMore={!loading && hasMore}
                 useWindow={false}
@@ -106,7 +106,7 @@ export default function Notifications(props) {
                                         <label className="text-link"
                                             onClick={() => {
                                                 history.push({ pathname: "/internal/issue/subject/" + item.ticketid });
-                                                window.location.reload("false");
+                                                window.location.reload(true);
                                                 updateCountNoti(item.id);
                                             }}
 

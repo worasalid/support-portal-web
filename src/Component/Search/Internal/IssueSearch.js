@@ -1,4 +1,4 @@
-import React, {useContext } from 'react'
+import React, { useContext } from 'react'
 import { Row, Col, Input, Button, DatePicker, Select, Checkbox, Tooltip } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import Axios from 'axios';
@@ -9,7 +9,7 @@ import IssueContext, { userState } from '../../../utility/issueContext';
 
 export default function Issuesearch({ Progress = "hide" }) {
     const { RangePicker } = DatePicker;
-    //const { Option } = Select;
+    const { Option,OptGroup  } = Select;
     const { state, dispatch } = useContext(AuthenContext);
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
@@ -74,6 +74,9 @@ export default function Issuesearch({ Progress = "hide" }) {
         if (e.target.group === "module") {
             userdispatch({ type: "SELECT_MODULE", payload: e.target.value })
         }
+        if (e.target.group === "version") {
+            userdispatch({ type: "SELECT_VERSION", payload: e.target.value })
+        }
         if (e.target.group === "progress") {
             userdispatch({ type: "SELECT_PROGRESS", payload: e.target.value })
         }
@@ -90,6 +93,7 @@ export default function Issuesearch({ Progress = "hide" }) {
             userdispatch({ type: "SELECT_ISRELEASENOTE", payload: e.target.value })
         }
     }
+
     const getcompany = async () => {
         const company = await Axios({
             url: process.env.REACT_APP_API_URL + "/master/company",
@@ -110,6 +114,24 @@ export default function Issuesearch({ Progress = "hide" }) {
             }
         });
         userdispatch({ type: "LOAD_PRODUCT", payload: products.data });
+    }
+
+    const getVersion = async () => {
+        try {
+            const version = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/version",
+                method: "GET",
+                params: {
+                    productId: userstate.filter.productState
+                }
+            });
+
+            if (version.status === 200) {
+                userdispatch({ type: "LOAD_VERSION", payload: version.data });
+            }
+        } catch (error) {
+
+        }
     }
 
     const getmodule = async () => {
@@ -141,26 +163,34 @@ export default function Issuesearch({ Progress = "hide" }) {
 
     const getMasterdata = async () => {
         try {
-            // getcompany();
-            // getproducts();
-            // getmodule();
-            // getissue_type();
+            getcompany();
+            getproducts();
+            getissue_type();
+            
         } catch (error) {
 
         }
     }
     useEffect(() => {
-        if (state.authen) {
+        // if (state.authen) {
+        //     getMasterdata();
+        // }
+        if (state.authen === false) {
+
+        } else {
             getMasterdata();
+            setInterval(() => {
+                userdispatch({ type: "SEARCH", payload: true })
+            }, 100000)
         }
     }, [state.authen]);
 
     useEffect(() => {
         if (userstate.filter.productState.length !== 0) {
             getmodule();
+            getVersion();
         }
     }, [userstate.filter.productState]);
-
 
     return (
         <>
@@ -189,7 +219,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                         maxTagCount={1}
                         // onKeyUp={(e) => {console.log(e.target)}}
                         onChange={(value, option) => handleChange({ target: { value: value || "", group: "company" } })}
-                        onClick={() => getcompany()}
+                        // onClick={() => getcompany()}
                         options={userstate.masterdata && userstate.masterdata.companyState.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
                     >
 
@@ -203,8 +233,8 @@ export default function Issuesearch({ Progress = "hide" }) {
                         maxTagCount={2}
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", group: "issuetype" } })}
-                        onClick={() => getissue_type()}
-                        options={userstate.masterdata && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        //onClick={() => getissue_type()}
+                        options={userstate.masterdata && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name === "ChangeRequest" ? "CR" : x.Name }))}
                     >
 
                     </Select>
@@ -219,13 +249,13 @@ export default function Issuesearch({ Progress = "hide" }) {
                         }
                         //maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
-                        onClick={() => getproducts()}
+                        // onClick={() => getproducts()}
                         options={userstate.masterdata && userstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name}` }))}
 
                     />
                 </Col>
                 <Col span={4}>
-                    <Select placeholder="Module"
+                    {/* <Select placeholder="Module"
                         mode='multiple'
                         disabled={userstate?.filter?.productState?.length === 0 ? true : false}
                         style={{ width: "100%" }}
@@ -236,9 +266,20 @@ export default function Issuesearch({ Progress = "hide" }) {
                         allowClear
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'module' } })}
                         options={userstate.masterdata && userstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
-
+                    /> */}
+                    <Select placeholder="version"
+                        mode='multiple'
+                        disabled={userstate?.filter?.productState?.length === 0 ? true : false}
+                        style={{ width: "100%" }}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount={1}
+                        allowClear
+                        onChange={(value) => handleChange({ target: { value: value || "", group: 'version' } })}
+                     
+                        options={userstate.masterdata && userstate.masterdata.versionState.map((x) => ({ value: x.Name, label: x.Name }))}
                     />
-
                 </Col>
 
                 <Col span={2}>

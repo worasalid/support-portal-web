@@ -54,7 +54,10 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
         data: {
           ticketid: details.ticketid,
           mailboxid: details.mailboxid,
-          flowoutputid: details.flowoutputid
+          flowoutputid: details.flowoutputid,
+          value: {
+            comment_text: editorRef.current.getValue()
+          }
         }
       });
 
@@ -74,9 +77,9 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             ),
             okText: "Close",
             onOk() {
-              editorRef.current.setvalue()
-              onOk();
-              history.push({ pathname: "/customer/issue/inprogress" })
+              editorRef.current.setvalue();
+              history.push({ pathname: "/customer/issue/inprogress" });
+              window.location.reload(true);
             },
           });
         }
@@ -114,7 +117,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             },
           });
         }
-        if (details.flowoutput.value === "Pass") {
+        if (details.flowoutput.value === "Pass" || details.flowoutput.value ===  "SendToDeploy") {
           await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -127,6 +130,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             onOk() {
               editorRef.current.setvalue()
               onOk();
+              window.location.reload(true);
               history.push({ pathname: "/customer/issue/pass" })
 
             },
@@ -169,7 +173,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
       okText="Send"
       onOk={() => {
         setLoading(true);
-         SendFlow();
+        SendFlow();
       }}
       onCancel={() => { return (editorRef.current.setvalue(), onCancel()) }}
       {...props}

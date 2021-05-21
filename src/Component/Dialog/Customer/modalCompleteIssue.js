@@ -64,7 +64,8 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           onOk() {
             form.resetFields();
             onOk();
-            history.push({ pathname: "/customer/issue/complete" })
+            history.push({ pathname: "/customer/issue/complete" });
+            window.location.reload(true);
           },
         });
       }

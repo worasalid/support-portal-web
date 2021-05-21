@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import { Modal, Form, Spin, Tabs } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+// import { Editor } from '@tinymce/tinymce-react';
+import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
@@ -13,15 +14,11 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
     const uploadRef = useRef(null);
     const upload_quotation = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
     const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
     //data
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
     const SaveQuotation = async (values) => {
         await Axios({
             url: process.env.REACT_APP_API_URL + "/tickets/save-document",
@@ -41,7 +38,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -51,8 +48,8 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
-                        comment_type: "internal",
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -63,6 +60,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
@@ -75,7 +73,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                     mailboxid: details && details.mailboxid,
                     flowoutputid: details.flowoutput.FlowOutputId,
                     value: {
-                        comment_text: textValue
+                        comment_text: editorRef.current.getValue(),
                     }
                 }
             });
@@ -95,7 +93,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                     ),
                     okText: "Close",
                     onOk() {
-                        editorRef.current.editor.setContent("");
+                        editorRef.current.setvalue("");
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -111,7 +109,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                 ),
                 okText: "Close",
                 onOk() {
-                    editorRef.current.editor.setContent("");
+                    editorRef.current.setvalue("");
                     onOk();
                 },
             });
@@ -119,21 +117,18 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
     }
 
     const onFinish = (values) => {
-        setLoading(true);
         SendFlow(values);
-
     };
-
 
     return (
         <Modal
             visible={visible}
             confirmLoading={loading}
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit()}
             okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -143,6 +138,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                     initialValues={{
                         remember: true,
                     }}
+                    layout="vertical"
                     onFinish={onFinish}
                 >
 
@@ -160,27 +156,17 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                     >
                         <UploadFile ref={upload_quotation} />
                     </Form.Item>
-                </Form>
-                 Remark :
-            <Editor
-                    apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                    ref={editorRef}
-                    initialValue=""
-                    init={{
-                        height: 300,
-                        menubar: false,
-                        plugins: [
-                            'advlist autolink lists link image charmap print preview anchor',
-                            'searchreplace visualblocks code fullscreen',
-                            'insertdatetime media table paste code help wordcount'
-                        ],
-                        toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                        toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                    }}
-                    onEditorChange={handleEditorChange}
-                />
-                <br />
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="remark"
+                        label="Remark :"
+
+                    >
+                        <TextEditor ref={editorRef} />
+                        <br />
                      AttachFile : <UploadFile ref={uploadRef} />
+                    </Form.Item>
+                </Form>
             </Spin>
         </Modal>
     )

@@ -49,7 +49,8 @@ export const userState = {
         productState: [],
         moduleState: [],
         issueTypeState: [],
-        priorityState: []
+        priorityState: [],
+        versionState: []
     },
     filter: {
         companyState: [],
@@ -58,6 +59,7 @@ export const userState = {
         scene: [],
         TypeState: [],
         priorityState: [],
+        versionState: [],
         progress: [],
         isReleaseNote: "",
         date: {
@@ -99,13 +101,13 @@ export const customerReducer = createReducer(customerState, {
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
     CLEAR_FILTER: (state, { payload }) => { state.filter = payload },
     SEARCH: (state, { payload }) => { state.search = payload },
-    //LOADING: (state, { payload }) => { state.loading = payload },
-    LOADING: (state, { payload }) => {
-        state.loading = payload;
-        if (payload) {
-            state.issuedata.data = [];
-        }
-    },
+    LOADING: (state, { payload }) => { state.loading = payload },
+    // LOADING: (state, { payload }) => {
+    //     state.loading = payload;
+    //     if (payload) {
+    //         state.issuedata.data = [];
+    //     }
+    // },
     SELECT_DATAROW: (state, { payload }) => { state.issuedata.datarow = payload },
     SELECT_NODE_OUTPUT: (state, { payload }) => { state.node.output_data = payload },
 
@@ -126,6 +128,7 @@ export const userReducer = createReducer(userState, {
     SELECT_MODULE: (state, { payload }) => { state.filter.moduleState = payload },
     SELECT_TYPE: (state, { payload }) => { state.filter.TypeState = payload },
     SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
+    SELECT_VERSION: (state, { payload }) => { state.filter.versionState = payload },
     SELECT_PROGRESS: (state, { payload }) => { state.filter.progress = payload },
     SELECT_SCENE: (state, { payload }) => { state.filter.scene = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
@@ -144,6 +147,7 @@ export const userReducer = createReducer(userState, {
     LOAD_COMPANY: (state, { payload }) => { state.masterdata.companyState = payload },
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
+    LOAD_VERSION: (state, { payload }) => { state.masterdata.versionState = payload },
     LOAD_TYPE: (state, { payload }) => { state.masterdata.issueTypeState = payload },
     LOAD_PRIORITY: (state, { payload }) => { state.masterdata.priorityState = payload },
     LOAD_ACTION_FLOW: (state, { payload }) => { state.actionflow = payload },

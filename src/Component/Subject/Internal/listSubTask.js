@@ -47,7 +47,8 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     flowstatus: value.FlowStatus,
                     description: value.Description,
                     releasenote: value.IsReleaseNote,
-                    manday: value.Manday
+                    manday: value.Manday,
+                    cntFile: value.cntFile
                 }
             }))
         } catch (error) {
@@ -178,7 +179,18 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                                 {item.title}
                                                             </label>
                                                                &nbsp;&nbsp;
-                                                              <Tag color="#f50">{item.module}
+                                                            <label className="value-text">
+                                                                {
+                                                                    item.cntFile !== 0 ?
+                                                                        <img
+                                                                            style={{ height: "20px", width: "20px" }}
+                                                                            src={`${process.env.PUBLIC_URL}/icons-attach.png`}
+                                                                            alt=""
+                                                                        /> : ""
+                                                                }
+                                                            </label>
+                                                               &nbsp;&nbsp;
+                                                              <Tag color="#17A2B8">{item.module}
                                                             </Tag>
                                                             &nbsp;&nbsp;
                                                             <Tag color="#87d068"
@@ -186,9 +198,9 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                             >
                                                                 ReleaseNote
                                                             </Tag>
-                                                            <label 
-                                                                style={{ 
-                                                                    display: item.manday !== 0 ? "inline-block" : "none" ,
+                                                            <label
+                                                                style={{
+                                                                    display: item.manday !== 0 ? "inline-block" : "none",
                                                                     fontSize: 12
                                                                 }}
                                                             >

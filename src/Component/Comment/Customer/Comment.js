@@ -33,6 +33,7 @@ export default function CommentBox() {
     const [modalPreview, setModalPreview] = useState(false);
 
     const loadComment = async () => {
+        setLoading(true);
         try {
             const commment_list = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/loadcomment",
@@ -64,7 +65,7 @@ export default function CommentBox() {
 
             }
         } catch (error) {
-
+            setLoading(false);
         }
     }
     const onFinish = async (values) => {

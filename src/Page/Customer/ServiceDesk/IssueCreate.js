@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext, useReducer } from 'react'
-import { Button, Form, Input, Select, Card, Dropdown, Menu, Row, Col, Modal, List } from "antd";
+import { Button, Form, Input, Select, Card, Dropdown, Menu, Row, Col, Modal, Spin } from "antd";
 import { PhoneOutlined, DatabaseOutlined, FileOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
 import { useHistory, useRouteMatch } from "react-router-dom";
 import MasterPage from "./MasterPage"
@@ -36,7 +36,8 @@ export default function IssueCreate() {
 
     const [form] = Form.useForm();
     const uploadRef = useRef(null);
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     const image_upload_handler = (blobInfo, success, failure, progress) => {
         var xhr, formData;
@@ -181,6 +182,7 @@ export default function IssueCreate() {
     }
 
     const onFinish = async (values) => {
+        setLoading(true);
         try {
             let createTicket = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create",
@@ -203,6 +205,7 @@ export default function IssueCreate() {
             });
 
             if (createTicket.status === 200) {
+                setLoading(false);
                 Modal.success({
                     title: 'แจ้งปัญหาเรียบร้อยแล้ว',
                     content: (
@@ -211,14 +214,27 @@ export default function IssueCreate() {
 
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         history.push("/customer/issue/mytask");
+                        window.location.reload(true);
                     },
                 });
             }
 
         } catch (error) {
-            alert(error);
+            await Modal.error({
+                title: 'แจ้งปัญหาไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
+
+                },
+            });
         }
     };
 
@@ -271,187 +287,188 @@ export default function IssueCreate() {
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>
-                <div className="sd-page-header">
-                    <Row>
-                        <Col span={18}>
-                            <h3>แจ้งปัญหาการใช้งาน</h3>
-                        </Col>
-                        <Col span={6} style={{ textAlign: "right" }}>
-                            <Button
-                                type="link"
-                                onClick={() => history.push({ pathname: "/customer/servicedesk" })}
-                            >
-                                <HomeOutlined style={{ fontSize: 20 }} /> กลับสู่เมนูหลัก
-                            </Button>
-                        </Col>
-                    </Row>
-
-                </div>
-
-                <Form
-                    form={form}
-                    hidden={hiddenForm}
-                    {...layout}
-
-                    name="issue"
-                    initialValues={{
-                        // product: "REM",
-                        // module: 2,
-                        priority: 4
-                    }}
-                    layout="vertical"
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
-
-                >
-                    <Form.Item
-                        label="IssueType"
-                        name="type"
-                    >
-                        <Dropdown
-                            placement="topCenter"
-                            style={{ height: 80 }}
-                            overlayStyle={{
-                                width: 200,
-                                boxShadow:
-                                    "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                            }}
-                            overlay={
-                                // <List
-                                //     itemLayout="horizontal"
-                                //     dataSource={issueType}
-                                //     renderItem={item => (
-                                //         <>
-                                //             <Menu mode="inline" theme="light" onMouseOver=""  >
-                                //                 <Menu.Item key={item.id} style={{height:100}}>
-                                //                     <Card className="issue-active" hoverable style={{width:"100%", padding:0,margin:0}}>
-                                //                         <Meta
-                                //                             avatar={
-                                //                                 <BugOutlined style={{ fontSize: 30 }} />
-                                //                             }
-                                //                             title={<label className="card-title-menu">{item.name}</label>}
-                                //                             description={item.description}
-                                //                         />
-                                //                     </Card>
-                                //                 </Menu.Item>
-                                //             </Menu>
-
-                                //         </>
-                                //     )}
-                                // />
-                                <Menu mode="inline" theme="light" onMouseOver=""
+                <Spin spinning={loading}>
+                    <div className="sd-page-header">
+                        <Row>
+                            <Col span={18}>
+                                <h3>แจ้งปัญหาการใช้งาน</h3>
+                            </Col>
+                            <Col span={6} style={{ textAlign: "right" }}>
+                                <Button
+                                    type="link"
+                                    onClick={() => history.push({ pathname: "/customer/servicedesk" })}
                                 >
-                                    <Menu.Item key="1" onClick={
-                                        () => { return (setTitle("Bug"), history.push("/customer/servicedesk/issuecreate/1")) }}>
-                                        <Card className="issue-active" hoverable>
-                                            <Meta
-                                                avatar={
-                                                    <BugOutlined style={{ fontSize: 30 }} />
-                                                }
-                                                title={<label className="card-title-menu">{issueType[0]?.name}</label>}
-                                                description={issueType[0]?.description}
-                                            />
-                                        </Card>
-                                    </Menu.Item>
-                                    <Menu.Item key="2" onClick={
-                                        () => { return (setTitle("CR"), history.push("/customer/servicedesk/issuecreate/2")) }}>
-                                        <Card className="issue-active" hoverable >
-                                            <Meta
-                                                avatar={
-                                                    <FileOutlined style={{ fontSize: 30 }} />
-                                                }
-                                                title={<label className="card-title-menu">{issueType[1]?.name}</label>}
-                                                description={issueType[1]?.description}
-                                            />
-                                        </Card>
-                                    </Menu.Item>
-                                    <Menu.Item key="3" onClick={
-                                        () => { return (setTitle("Memo"), history.push("/customer/servicedesk/issuecreate/3")) }}>
-                                        <Card className="issue-active" hoverable>
-                                            <Meta
-                                                avatar={
-                                                    <DatabaseOutlined style={{ fontSize: 30 }} />
-                                                }
-                                                title={<label className="card-title-menu">{issueType[2]?.name}</label>}
-                                                description={issueType[2]?.description}
-                                            />
-                                        </Card>
-                                    </Menu.Item>
-                                    <Menu.Item key="4" onClick={
-                                        () => { return (setTitle("Use"), history.push("/customer/servicedesk/issuecreate/4")) }}>
-                                        <Card className="issue-active" hoverable style={{ width: "100%", marginTop: 16 }} >
-                                            <Meta
-                                                avatar={
-                                                    <PhoneOutlined style={{ fontSize: 30 }} />
-                                                }
-                                                title={<label style={{ color: "rgb(0, 116, 224)" }}>{issueType[3]?.name}</label>}
-                                                description={issueType[3]?.description}
-                                            />
-                                        </Card>
-                                    </Menu.Item>
-                                </Menu>
+                                    <HomeOutlined style={{ fontSize: 20 }} /> กลับสู่เมนูหลัก
+                            </Button>
+                            </Col>
+                        </Row>
 
-                            }
+                    </div>
 
-                            trigger="click"
+                    <Form
+                        form={form}
+                        hidden={hiddenForm}
+                        {...layout}
 
-                        >
-                            <Card className="card-box issue-active" hoverable>
-                                <Meta
-                                    avatar={
-                                        `${title}` === "Bug" ? <BugOutlined style={{ fontSize: 30 }} /> :
-                                            `${title}` === "CR" ? <FileOutlined style={{ fontSize: 30 }} /> :
-                                                `${title}` === "Memo" ? <DatabaseOutlined style={{ fontSize: 30 }} /> :
-                                                    <PhoneOutlined style={{ fontSize: 30 }} />
-                                    }
-                                    title={
-                                        <label className="card-title-menu">
-                                            {title}
-                                        </label>
-                                    }
-                                    description={typeDes}
-                                />
-                            </Card>
+                        name="issue"
+                        initialValues={{
+                            // product: "REM",
+                            // module: 2,
+                            priority: 4
+                        }}
+                        layout="vertical"
+                        onFinish={onFinish}
+                        onFinishFailed={onFinishFailed}
 
-                        </Dropdown>
-                    </Form.Item>
-                    <Form.Item
-                        label="Product"
-                        name="product"
-                        style={{ width: "100%" }}
-                        rules={[
-                            {
-                                required: true,
-                                message: "กรุณาระบุ Product!",
-                            },
-                        ]}
                     >
-                        <Select
-                            placeholder="Product"
-                            onChange={(value) => customerdispatch({ type: "SELECT_PRODUCT", payload: value })}
-                            options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: `${x.Name} - (${x.FullName})` }))}
-                        />
-                    </Form.Item>
-
-
-                    <Form.Item label="Scene" name="scene">
-                        <Select
-                            placeholder="Scene"
-                            //mode="multiple"
-                            // defaultValue="None"
-                            showSearch
-                            allowClear
-                            filterOption={(input, option) =>
-                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            // options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.Id, label: x.Name }))}
-                            options={cusScene.map(x => ({ value: x.value, label: x.name }))}
+                        <Form.Item
+                            label="IssueType"
+                            name="type"
                         >
+                            <Dropdown
+                                placement="topCenter"
+                                style={{ height: 80 }}
+                                overlayStyle={{
+                                    width: 200,
+                                    boxShadow:
+                                        "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
+                                }}
+                                overlay={
+                                    // <List
+                                    //     itemLayout="horizontal"
+                                    //     dataSource={issueType}
+                                    //     renderItem={item => (
+                                    //         <>
+                                    //             <Menu mode="inline" theme="light" onMouseOver=""  >
+                                    //                 <Menu.Item key={item.id} style={{height:100}}>
+                                    //                     <Card className="issue-active" hoverable style={{width:"100%", padding:0,margin:0}}>
+                                    //                         <Meta
+                                    //                             avatar={
+                                    //                                 <BugOutlined style={{ fontSize: 30 }} />
+                                    //                             }
+                                    //                             title={<label className="card-title-menu">{item.name}</label>}
+                                    //                             description={item.description}
+                                    //                         />
+                                    //                     </Card>
+                                    //                 </Menu.Item>
+                                    //             </Menu>
 
-                        </Select>
-                    </Form.Item>
+                                    //         </>
+                                    //     )}
+                                    // />
+                                    <Menu mode="inline" theme="light" onMouseOver=""
+                                    >
+                                        <Menu.Item key="1" onClick={
+                                            () => { return (setTitle("Bug"), history.push("/customer/servicedesk/issuecreate/1")) }}>
+                                            <Card className="issue-active" hoverable>
+                                                <Meta
+                                                    avatar={
+                                                        <BugOutlined style={{ fontSize: 30 }} />
+                                                    }
+                                                    title={<label className="card-title-menu">{issueType[0]?.name}</label>}
+                                                    description={issueType[0]?.description}
+                                                />
+                                            </Card>
+                                        </Menu.Item>
+                                        <Menu.Item key="2" onClick={
+                                            () => { return (setTitle("CR"), history.push("/customer/servicedesk/issuecreate/2")) }}>
+                                            <Card className="issue-active" hoverable >
+                                                <Meta
+                                                    avatar={
+                                                        <FileOutlined style={{ fontSize: 30 }} />
+                                                    }
+                                                    title={<label className="card-title-menu">{issueType[1]?.name}</label>}
+                                                    description={issueType[1]?.description}
+                                                />
+                                            </Card>
+                                        </Menu.Item>
+                                        <Menu.Item key="3" onClick={
+                                            () => { return (setTitle("Memo"), history.push("/customer/servicedesk/issuecreate/3")) }}>
+                                            <Card className="issue-active" hoverable>
+                                                <Meta
+                                                    avatar={
+                                                        <DatabaseOutlined style={{ fontSize: 30 }} />
+                                                    }
+                                                    title={<label className="card-title-menu">{issueType[2]?.name}</label>}
+                                                    description={issueType[2]?.description}
+                                                />
+                                            </Card>
+                                        </Menu.Item>
+                                        <Menu.Item key="4" onClick={
+                                            () => { return (setTitle("Use"), history.push("/customer/servicedesk/issuecreate/4")) }}>
+                                            <Card className="issue-active" hoverable style={{ width: "100%", marginTop: 16 }} >
+                                                <Meta
+                                                    avatar={
+                                                        <PhoneOutlined style={{ fontSize: 30 }} />
+                                                    }
+                                                    title={<label style={{ color: "rgb(0, 116, 224)" }}>{issueType[3]?.name}</label>}
+                                                    description={issueType[3]?.description}
+                                                />
+                                            </Card>
+                                        </Menu.Item>
+                                    </Menu>
 
-                    {/* <Form.Item label="Module" name="module">
+                                }
+
+                                trigger="click"
+
+                            >
+                                <Card className="card-box issue-active" hoverable>
+                                    <Meta
+                                        avatar={
+                                            `${title}` === "Bug" ? <BugOutlined style={{ fontSize: 30 }} /> :
+                                                `${title}` === "CR" ? <FileOutlined style={{ fontSize: 30 }} /> :
+                                                    `${title}` === "Memo" ? <DatabaseOutlined style={{ fontSize: 30 }} /> :
+                                                        <PhoneOutlined style={{ fontSize: 30 }} />
+                                        }
+                                        title={
+                                            <label className="card-title-menu">
+                                                {title}
+                                            </label>
+                                        }
+                                        description={typeDes}
+                                    />
+                                </Card>
+
+                            </Dropdown>
+                        </Form.Item>
+                        <Form.Item
+                            label="Product"
+                            name="product"
+                            style={{ width: "100%" }}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "กรุณาระบุ Product!",
+                                },
+                            ]}
+                        >
+                            <Select
+                                placeholder="Product"
+                                onChange={(value) => customerdispatch({ type: "SELECT_PRODUCT", payload: value })}
+                                options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: `${x.Name} - (${x.FullName})` }))}
+                            />
+                        </Form.Item>
+
+
+                        <Form.Item label="Scene" name="scene">
+                            <Select
+                                placeholder="Scene"
+                                //mode="multiple"
+                                // defaultValue="None"
+                                showSearch
+                                allowClear
+                                filterOption={(input, option) =>
+                                    option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                }
+                                // options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.Id, label: x.Name }))}
+                                options={cusScene.map(x => ({ value: x.value, label: x.name }))}
+                            >
+
+                            </Select>
+                        </Form.Item>
+
+                        {/* <Form.Item label="Module" name="module">
                         <Select
                             placeholder="Module"
                             mode="multiple"
@@ -467,74 +484,76 @@ export default function IssueCreate() {
                         </Select>
                     </Form.Item> */}
 
-                    <Form.Item label="Priority" name="priority">
-                        <Select
-                            defaultValue={4}
-                            placeholder="Priority"
-                            options={customerstate && customerstate.masterdata.priorityState.map(x => ({ value: x.Id, label: x.Name }))}>
+                        <Form.Item label="Priority" name="priority">
+                            <Select
+                                defaultValue={4}
+                                placeholder="Priority"
+                                options={customerstate && customerstate.masterdata.priorityState.map(x => ({ value: x.Id, label: x.Name }))}>
 
-                        </Select>
-                    </Form.Item>
+                            </Select>
+                        </Form.Item>
 
-                    <Form.Item
-                        label="หัวข้อ"
-                        name="subject"
-                        rules={[
-                            {
-                                required: true,
-                                message: "กรุณาระบุ หัวข้อ!",
-                            },
-                        ]}
-                    >
-                        <Input placeholder="หัวข้อ" />
-                    </Form.Item>
-                    <Form.Item
-                        label="รายละเอียด"
-                        name="description"
-
-                        rules={[
-                            {
-                                required: true,
-                                message: "กรุณาระบุ รายละเอียด!",
-                            },
-                        ]}
-                    >
-                        <Editor
-                            ref={editorRef}
-                            apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                            initialValue=""
-                            init={{
-
-                                height: 300,
-                                menubar: false,
-                                plugins: [
-                                    'advlist autolink lists link image charmap print preview anchor',
-                                    'searchreplace visualblocks code fullscreen',
-                                    'insertdatetime media table paste code help wordcount'
-                                ],
-                                block_unsupported_drop: false,
-                                paste_data_images: true,
-                                images_upload_handler: image_upload_handler,
-                                toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                                toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                            }}
-                            onEditorChange={(content, editor) => setDescription(content)}
-                        />
-                    </Form.Item>
-                    <Form.Item label="ไฟล์แนบ" name="attach">
-                        <UploadFile ref={uploadRef} />
-                    </Form.Item>
-                    <Form.Item {...tailLayout}>
-                        <Button
-                            style={{ width: 100 }}
-                            type="primary"
-                            htmlType="submit"
-                            size="middle"
+                        <Form.Item
+                            label="หัวข้อ"
+                            name="subject"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "กรุณาระบุ หัวข้อ!",
+                                },
+                            ]}
                         >
-                            บันทึก
+                            <Input placeholder="หัวข้อ" />
+                        </Form.Item>
+                        <Form.Item
+                            label="รายละเอียด"
+                            name="description"
+
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "กรุณาระบุ รายละเอียด!",
+                                },
+                            ]}
+                        >
+                            <Editor
+                                ref={editorRef}
+                                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                                initialValue=""
+                                init={{
+
+                                    height: 300,
+                                    menubar: false,
+                                    plugins: [
+                                        'advlist autolink lists link image charmap print preview anchor',
+                                        'searchreplace visualblocks code fullscreen',
+                                        'insertdatetime media table paste code help wordcount'
+                                    ],
+                                    block_unsupported_drop: false,
+                                    paste_data_images: true,
+                                    images_upload_handler: image_upload_handler,
+                                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                                }}
+                                onEditorChange={(content, editor) => setDescription(content)}
+                            />
+                        </Form.Item>
+                        <Form.Item label="ไฟล์แนบ" name="attach">
+                            <UploadFile ref={uploadRef} />
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
+                            <Button
+                                loading={loading}
+                                style={{ width: 100 }}
+                                type="primary"
+                                htmlType="submit"
+                                size="middle"
+                            >
+                                บันทึก
                             </Button>
-                    </Form.Item>
-                </Form>
+                        </Form.Item>
+                    </Form>
+                </Spin>
             </div>
 
 

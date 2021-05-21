@@ -42,8 +42,9 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
                     okText: "Close",
                     onOk() {
                         onOk();
-                        history.push({ pathname: "/customer/issue/cancel" })
+                        history.push({ pathname: "/customer/issue/cancel" });
                         form.resetFields();
+                        window.location.reload(true);
 
                     },
                 });

@@ -78,14 +78,15 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                             <p>ประเมิน DueDate เรียบร้อยแล้ว</p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         editorRef.current.editor.setContent("");
                         window.location.reload(false)
-                        // history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
         } catch (error) {
+            setLoading(false);
             await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
@@ -93,9 +94,9 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
-                    onOk();
                     history.push({ pathname: "/internal/issue/inprogress" })
                 },
             });
@@ -134,6 +135,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         editorRef.current.editor.setContent("")
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -141,6 +143,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                 });
             }
         } catch (error) {
+            setLoading(false);
             await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
@@ -148,9 +151,9 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
-                    onOk();
                     history.push({ pathname: "/internal/issue/inprogress" })
                 },
             });

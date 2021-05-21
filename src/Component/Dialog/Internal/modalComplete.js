@@ -19,6 +19,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
     }
 
     const CompleteFlow = async (values) => {
+        setLoading(true);
         try {
             const completeflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -45,7 +46,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>Deploy PRD เรียบร้อยแล้ว</p>
                         </div>
                     ),
                     okText: "Close",
@@ -73,7 +74,7 @@ export default function ModalComplete({ visible = false, onOk, onCancel, datarow
     }
 
     const onFinish = (values) => {
-        setLoading(true);
+       
         CompleteFlow(values);
         // SaveUnitTest(values);
         // SaveFileDeploy();

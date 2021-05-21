@@ -43,7 +43,7 @@ const DashBoard = React.memo(({ data }) => {
             <Card title="Issue" bordered={true} style={{ width: "100%" }}>
                 <Column {...config}
                     data={data.filter((x) => x.Status !== "Total")}
-                    height={200}
+                    height={280}
                     //scrollbar="true"
                     xAxis={{ position: "bottom" }}
                 />
@@ -56,121 +56,42 @@ export default function MyDashboard() {
     const [loading, setLoading] = useState(true);
     const [dashboard, setDashboard] = useState([]);
     const [dashBoardWeekly, setDashBoardWeekly] = useState([]);
+    const [dashBoardMonthly, setDashBoardMonthly] = useState([]);
     const [filterDate, setFilterDate] = useState([]);
-    const [dashboardType, setDashBoardType] = useState("Weekly");
+    const [dashboardType, setDashBoardType] = useState("total");
 
-    const weekdata = [
-        {
-            day: "Monday",
-            status: "Open",
-            value: 3
+    const [dates, setDates] = useState([]);
+
+    const config = {
+        xField: 'Status',
+        yField: 'Value',
+        seriesField: 'Status',
+        label: {
+            position: 'middle',
+            content: function content(item) {
+                return item.Value.toFixed(0);
+            },
+            style: { fill: '#fff' },
         },
-        {
-            day: "Monday",
-            status: "InProgress",
-            value: 5
+        meta: {
+            Status: { alias: '类别' },
+            Value: { alias: '销售额' },
         },
-        {
-            day: "Monday",
-            status: "Resolved",
-            value: 5
+        columnWidthRatio: 0.4,
+        legend: {
+            layout: 'horizontal',
+            position: 'bottom'
         },
-        {
-            day: "Tuesday",
-            status: "InProgress",
-            value: 3
-        },
-        {
-            day: "Wednesday",
-            status: "InProgress",
-            value: 40
-        },
-        {
-            day: "Thursday",
-            status: "InProgress",
-            value: 4
-        },
-        {
-            day: "Friday",
-            status: "InProgress",
-            value: 4
-        },
-        {
-            day: "Friday",
-            status: "Open",
-            value: 2
+        color: function color(x) {
+            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
+            if (x.Status === "InProgress") { return "#5B8FF9" }
+            if (x.Status === "Resolved") { return "#FF5500" }
+            if (x.Status === "Cancel") { return "#CD201F" }
+            if (x.Status === "ReOpen") { return "#CD201F" }
+            if (x.Status === "Complete") { return "#87D068" }
+
         }
-    ]
-    const monthdata = [
-        {
-            month: "Jan",
-            status: "Open",
-            value: 3
-        },
-        {
-            month: "Feb",
-            status: "Complete",
-            value: 3
-        },
-        {
-            month: "Feb",
-            status: "Open",
-            value: 4
-        },
-        {
-            month: "Mar",
-            status: "InProgress",
-            value: 3
-        },
-        {
-            month: "Apr",
-            status: "InProgress",
-            value: 10
-        },
-        {
-            month: "May	",
-            status: "InProgress",
-            value: 4
-        },
-        {
-            month: "Jun",
-            status: "InProgress",
-            value: 4
-        },
-        {
-            month: "Jul",
-            status: "Open",
-            value: 2
-        },
-        {
-            month: "Aug",
-            status: "Open",
-            value: 2
-        },
-        {
-            month: "Sep",
-            status: "Open",
-            value: 2
-        },
-        {
-            month: "Oct",
-            status: "Open",
-            value: 2
-        },
-        {
-            month: "Nov",
-            status: "Open",
-            value: 2
-        },
-        {
-            month: "Dec",
-            status: "Open",
-            value: 2
-        }
-
-    ]
-
-
+    }
 
     const configWeek = {
         xField: 'Status',
@@ -199,28 +120,28 @@ export default function MyDashboard() {
     };
 
     const configMonth = {
-        xField: 'month',
-        yField: 'value',
-        seriesField: 'status',
+        xField: 'Status',
+        yField: 'Value',
+        seriesField: 'Status',
         isStack: true,
-        // label: {
-        //     position: 'middle',
-        //     content: function content(item) {
-        //         return item.Value.toFixed(0);
-        //     },
-        //     style: { fill: '#fff' },
-        // },
+        label: {
+            position: 'middle',
+            content: function content(item) {
+                return item.Value.toFixed(0);
+            },
+            style: { fill: '#fff' },
+        },
         columnWidthRatio: 0.8,
         legend: {
             layout: 'horizontal',
             position: 'bottom'
         },
         color: function color(x) {
-            if (x.status === "Open" || x.status === "Hold") { return "gray" }
-            if (x.status === "InProgress") { return "#5B8FF9" }
-            if (x.status === "Resolved") { return "#FF5500" }
-            if (x.status === "Cancel") { return "#CD201F" }
-            if (x.status === "Complete") { return "#87D068" }
+            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
+            if (x.Status === "InProgress") { return "#5B8FF9" }
+            if (x.Status === "Resolved") { return "#FF5500" }
+            if (x.Status === "Cancel") { return "#CD201F" }
+            if (x.Status === "Complete") { return "#87D068" }
 
         },
     };
@@ -234,15 +155,13 @@ export default function MyDashboard() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    dash_board_type: "total"  // Day, Weely, Month, Year
+                    dash_board_type: dashboardType
                 }
 
             });
             if (issuestatus.status === 200) {
-                setTimeout(() => {
-                    //setLoading(false)
-                    setDashboard(issuestatus.data.total)
-                }, 1000)
+                setLoading(false);
+                setDashboard(issuestatus.data.total)
             }
 
         } catch (error) {
@@ -250,7 +169,8 @@ export default function MyDashboard() {
         }
     }
 
-    const GetIssueStatus = async (param) => {
+    const getIssueByWeek = async (param) => {
+        setLoading(true);
         try {
             const issuestatus = await Axios({
                 url: process.env.REACT_APP_API_URL + "/dashboard/issue-status",
@@ -261,15 +181,13 @@ export default function MyDashboard() {
                 params: {
                     start_date: moment(param[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
                     end_date: moment(param[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
-                    dash_board_type: dashboardType  // Day, Weely, Month, Year
+                    dash_board_type: dashboardType
                 }
 
             });
             if (issuestatus.status === 200) {
-                setTimeout(() => {
-                    setLoading(false)
-                    setDashBoardWeekly(issuestatus.data.total)
-                }, 1000)
+                setLoading(false);
+                setDashBoardWeekly(issuestatus.data.total);
             }
 
         } catch (error) {
@@ -277,16 +195,45 @@ export default function MyDashboard() {
         }
     }
 
+    const getIssueByMonth = async (param) => {
+        setLoading(true);
+        try {
+            const issuestatus = await Axios({
+                url: process.env.REACT_APP_API_URL + "/dashboard/issue-status",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    start_date: moment(param, "MM/YYYY").format("YYYY-MM"),
+                    dash_board_type: dashboardType
+                }
 
+            });
+            if (issuestatus.status === 200) {
+                setLoading(false);
+                setDashBoardMonthly(issuestatus.data.total);
+            }
 
+        } catch (error) {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
         GetIssueTotal();
-        GetIssueStatus();
     }, [])
 
     useEffect(() => {
-    }, [dashboard])
+        if (dashboardType === "weekly") {
+            getIssueByWeek([moment(moment().add(-7, 'day').format("DD/MM/YYYY"), "DD/MM/YYYY"), moment(moment().format("DD/MM/YYYY"), "DD/MM/YYYY")]);
+        }
+        if (dashboardType === "monthly") {
+            getIssueByMonth(moment(moment().format("MM/YYYY"), "MM/YYYY"));
+        }
+
+    }, [dashboardType])
+
 
     return (
         <MasterPage bgColor="#f0f2f5">
@@ -475,34 +422,56 @@ export default function MyDashboard() {
 
 
                     <Row gutter={16} style={{ marginTop: "30px" }}>
-                        <Col span={12}>
-                            {/* <Card title="Issue" bordered={true} style={{ width: "100%" }}>
-                                <Column {...config}
-                                    data={dashboard.filter((x) => x.Status !== "Total")}
-                                    height={200}
-                                    //scrollbar="true"
-                                    xAxis={{ position: "bottom" }}
-                                />
-                            </Card> */}
+                        {/* <Col span={12}>
                             {<DashBoard data={dashboard} />}
-                        </Col>
-                        <Col span={12}>
+                        </Col> */}
+                        <Col span={24}>
                             <div className="card-container">
                                 <Tabs type="card" defaultActiveKey="Day" onChange={(x) => setDashBoardType(x)}>
-                                    <TabPane tab="By Weekly" key="weekly">
-                                        <Row style={{ marginBottom: 24 }}>
-                                            <Col span={12}>
+                                    <TabPane tab="Total" key="total">
+                                        <Row>
+                                            <Col span={24}>
 
                                             </Col>
-                                            <Col span={12}>
+                                        </Row>
+                                        <Column {...config}
+                                            tooltip="xxx"
+                                            style={{ height: 350 }}
+                                            data={dashboard.filter((x) => x.Status !== "Total")}
+                                            xAxis={{
+                                                position: "bottom",
+                                            }}
+                                        />
+
+                                    </TabPane>
+                                    <TabPane tab="By Weekly" key="weekly">
+                                        <Row style={{ marginBottom: 24 }}>
+                                            <Col span={16}>
+
+                                            </Col>
+                                            <Col span={8}>
                                                 <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
-                                                    onChange={(date, dateString) => GetIssueStatus(dateString)}
+                                                    defaultValue={
+                                                        [
+                                                            moment(moment().add(-7, 'day').format("DD/MM/YYYY"), "DD/MM/YYYY"),
+                                                            moment(moment().format("DD/MM/YYYY"), "DD/MM/YYYY")
+                                                        ]
+                                                    }
+                                                    disabledDate={(current) => {
+                                                        if (!dates || dates.length === 0) {
+                                                            return false;
+                                                        }
+                                                        const tooLate = dates[0] && current.diff(dates[0], 'days') >= 7;
+                                                        const tooEarly = dates[1] && dates[1].diff(current, 'days') >= 7;
+                                                        return tooEarly || tooLate;
+                                                    }}
+                                                    onOpenChange={() => setDates([])}
+                                                    onChange={(date, dateString) => { getIssueByWeek(dateString) }}
+                                                    onCalendarChange={val => setDates(val)}
                                                 />
                                             </Col>
                                         </Row>
                                         <Column {...configWeek}
-                                            // groupField="type"
-                                            // tooltip="xxx"
                                             style={{ height: 280 }}
                                             data={dashBoardWeekly.filter((x) => x.status !== "Total")}
                                             //scrollbar="true"
@@ -512,22 +481,22 @@ export default function MyDashboard() {
                                     </TabPane>
                                     <TabPane tab="By Monthly" key="monthly">
                                         <Row style={{ marginBottom: 24 }}>
-                                            <Col span={12}>
+                                            <Col span={16}>
 
                                             </Col>
-                                            <Col span={12}>
-                                                <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
-                                                    onChange={(date, dateString) => setFilterDate(dateString)}
+                                            <Col span={8}>
+                                                <DatePicker  picker="month" format="MM/YYYY"  style={{ width: "100%" }}
+                                                    defaultValue={moment(moment().format("MM/YYYY"), "MM/YYYY")}
+                                                    onChange={(date, dateString) => { getIssueByMonth(dateString) }}
                                                 />
                                             </Col>
                                         </Row>
                                         <Column {...configMonth}
                                             style={{ height: 280 }}
-                                            data={monthdata.filter((x) => x.status !== "Total")}
+                                            data={dashBoardMonthly.filter((x) => x.status !== "Total")}
                                             //scrollbar="true"
                                             xAxis={{ position: "bottom" }}
                                         />
-                                      
                                     </TabPane>
                                 </Tabs>
                             </div>
@@ -538,6 +507,6 @@ export default function MyDashboard() {
 
                 </div>
             </Spin>
-        </MasterPage>
+        </MasterPage >
     )
 }

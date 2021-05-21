@@ -1,4 +1,4 @@
-import React, { useState,useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import { Spin, Modal, Form, Tabs } from 'antd';
 // import { Editor } from '@tinymce/tinymce-react';
@@ -12,7 +12,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
     const SaveComment = async () => {
@@ -72,11 +72,17 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
+
                         if (details.flowoutput.value === "SendTask" || details.flowoutput.value === "ResolvedTask" || details.flowoutput.value === "SendToDev") {
+                            window.location.reload(true);
                             history.goBack();
+                        }
+                        else if (details.flowoutput.value === "SendToDeploy") {
+                            history.push({ pathname: "/internal/issue/resolved" });
                         }
                         else {
                             history.push({ pathname: "/internal/issue/inprogress" });
+                            window.location.reload(true);
                         }
                     },
                 });
@@ -96,7 +102,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                 okCancel() {
 
                     editorRef.current.setvalue();
-                    window.location.reload();
+                    window.location.reload(true);
                 },
             });
         }
@@ -107,22 +113,16 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
         SendFlow();
     };
 
-    useEffect(() => {
-        if (visible) {
-           
-        }
-
-    }, [visible])
 
     return (
         <Modal
             visible={visible}
             confirmLoading={loading}
             okText="Send"
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit()}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">

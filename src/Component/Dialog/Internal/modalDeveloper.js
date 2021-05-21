@@ -62,7 +62,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             data: {
                 ticketid: details && details.ticketid,
                 taskid: details.taskid,
-                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                //files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
                 unit_test_url: values.unit_test_url,
                 grouptype: "unittest"
             }
@@ -79,14 +79,15 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             data: {
                 ticketid: details && details.ticketid,
                 taskid: details.taskid,
-                files: uploadRef_document.current.getFiles().map((n) => n.response.id),
-                url: values.urltest,
-                grouptype: "document_deploy"
+                //files: uploadRef_document.current.getFiles().map((n) => n.response.id),
+                url: values.document_url,
+                grouptype: "deploy_document"
             }
         })
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -124,9 +125,10 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         editorRef.current.setvalue();
                         if (state?.usersdata?.organize?.PositionLevel === 0) {
                             // ถ้า H.Dev แก้ไขงานเอง ให้ refresh หน้าจอ แล้วทำงานต่อ ไม่ต้องเปลียน page
-                            window.location.reload();
+                            window.location.reload(true);
                         } else {
-                            history.push({ pathname: "/internal/issue/inprogress" })
+                            history.push({ pathname: "/internal/issue/inprogress" });
+                            window.location.reload(true);
                         }
 
                     },
@@ -141,7 +143,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         <p>{error.response.data}</p>
                     </div>
                 ),
-                okText:"Close",
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -152,7 +154,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     }
 
     const onFinish = (values) => {
-        setLoading(true);
+        console.log(values);
         SendFlow(values);
     };
 
@@ -162,11 +164,11 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
         <Modal
             visible={visible}
             confirmLoading={loading}
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit()}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { form.resetFields(); onCancel() }}
 
             {...props}
 
@@ -181,12 +183,13 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     onFinish={onFinish}
                 >
                     <Form.Item
+                        wrapperCol={6}
                         label="UnitTest (URL)"
                         name="unit_test_url"
                         rules={[
                             {
-                                required: false,
-                                message: 'กรุณาใส่ Url ที่ใช้ test ',
+                                required: true,
+                                message: 'กรุณาใส่ Url ที่ใช้ test',
                             },
                         ]}
                     >
@@ -194,7 +197,22 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     </Form.Item>
 
                     <Form.Item
-                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        labelCol={6}
+                        label="Document (URL)"
+                        name="document_url"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'กรุณาใส่ Url Deploy Document!',
+                            },
+                        ]}
+                    >
+                        <TextArea rows="2" style={{ width: "100%" }} />
+                    </Form.Item>
+
+
+                    {/* <Form.Item
+                         style={{ minWidth: 300, maxWidth: 300 }}
                         label="Unit Test"
                         name="unittest"
                         rules={[
@@ -205,10 +223,10 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         ]}
                     >
                         <UploadFile ref={uploadRef_unittest} />
-                    </Form.Item>
+                    </Form.Item> */}
 
-                    <Form.Item
-                        // style={{ minWidth: 300, maxWidth: 300 }}
+                    {/* <Form.Item
+                         style={{ minWidth: 300, maxWidth: 300 }}
                         label="Deploy Document"
                         name="document"
                         rules={[
@@ -219,7 +237,9 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         ]}
                     >
                         <UploadFile ref={uploadRef_document} />
-                    </Form.Item>
+                    </Form.Item> */}
+
+
                 </Form>
                 <TextEditor ref={editorRef} />
                 <br />

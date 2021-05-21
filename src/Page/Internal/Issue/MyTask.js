@@ -1,4 +1,4 @@
-import { Button, Col, Row, Table, Tag, Tooltip, Divider } from "antd";
+import { Button, Col, Row, Table, Tag, Tooltip, Modal } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -42,7 +42,7 @@ export default function Mytask() {
 
 
   const loadIssue = async (value) => {
-    // setLoadding(true);
+    setLoadding(true);
     try {
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
@@ -55,11 +55,12 @@ export default function Mytask() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
           scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          is_release_note : userstate.filter.isReleaseNote,
+          is_release_note: userstate.filter.isReleaseNote,
           task: "mytask",
           pageCurrent: pageCurrent,
           pageSize: pageSize
@@ -67,12 +68,26 @@ export default function Mytask() {
       });
 
       if (results.status === 200) {
-
+        setLoadding(false);
         setPageTotal(results.data.total)
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
-    } catch (error) {
 
+    } catch (error) {
+      if (error.response.status === 401) {
+        Modal.warning({
+          title: `Error ${error.response.status}`,
+          content: (
+            <div>
+              <p>{error.response.data}</p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+            history.push("/Login")
+          },
+        });
+      }
     }
   };
 
@@ -89,6 +104,28 @@ export default function Mytask() {
     });
   }
 
+  const updateCountNoti = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticket_id: param
+        }
+      });
+
+      if (result.status === 200) {
+
+      }
+    } catch (error) {
+
+    }
+  }
+
+
   function HandleChange(items) {
     console.log("Menu", items.item.props.node)
     if (items.item.props.node === "support") { setVisible(true) }
@@ -97,16 +134,21 @@ export default function Mytask() {
   }
 
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
-    setTimeout(() => {
-      loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
-    }, 1000)
+    if (userstate.search === true) {
+      if (pageCurrent !== 1) {
+        setPageCurrent(1);
+        setPageSize(10);
+      } else {
+        loadIssue();
+      }
+    }
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, pageCurrent]);
+  }, [userstate.search]);
 
-
+  useEffect(() => {
+    loadIssue();
+  }, [pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -119,25 +161,26 @@ export default function Mytask() {
         <IssueSearch />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
+            <Table dataSource={userstate?.issuedata?.data} loading={loading}
               // scroll={{y:350}}
+              //bordered
               style={{ padding: "5px 5px" }}
               footer={(x) => {
                 return (
                   <>
                     <div style={{ textAlign: "right" }}>
                       <label>จำนวนเคส : </label>
-                      <label>{x.length}</label>
-                      <label> จากทั้งหมด : </label>
                       <label>{pageTotal}</label>
+                      {/* <label> จากทั้งหมด : </label>
+                      <label>{pageTotal}</label> */}
 
                     </div>
                   </>
                 )
               }}
-              pagination={{ pageSize: pageSize, total: pageTotal }}
+              pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
 
-              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
               onRow={(record, rowIndex) => {
                 return {
                   onClick: event => { }, // click row
@@ -155,34 +198,31 @@ export default function Mytask() {
               }
             >
 
-              <Column
-                title="IssueNo"
-                width="5%"
+              <Column title="IssueNo" width="5%"
                 render={(record) => {
                   return (
                     <>
-                      <Tag color="#87d068"
-                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize:10 }}
-                      >
-                        ReleaseNote
-                       </Tag>
+                      <Tooltip title="ReleaseNote">
+                        <TrademarkOutlined
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 12, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      <br />
                       <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Number}
                       </label>
+
                     </>
                   )
-                }
-                }
+                }}
               />
 
-              <Column
-                title="Details"
-                width="14%"
+              <Column title="Details" width="20%"
                 render={(record) => {
                   return (
                     <div>
                       <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={10}>
+                        <Col span={8}>
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
                             Type :
                           </label>
@@ -196,7 +236,7 @@ export default function Mytask() {
                         </Col>
                       </Row>
                       <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={10}>
+                        <Col span={8}>
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
                             Priority :
                           </label>
@@ -210,7 +250,7 @@ export default function Mytask() {
                         </Col>
                       </Row>
                       <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={10}>
+                        <Col span={8}>
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
                             Product :
                           </label>
@@ -221,20 +261,8 @@ export default function Mytask() {
                           </label>
                         </Col>
                       </Row>
-                      {/* <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={10}>
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
-                            Module :
-                          </label>
-                        </Col>
-                        <Col span={14}>
-                          <label style={{ color: "#808080", fontSize: "10px" }}>
-                            {record.ModuleName}
-                          </label>
-                        </Col>
-                      </Row> */}
                       <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={10}>
+                        <Col span={8}>
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
                             Scene :
                           </label>
@@ -245,13 +273,25 @@ export default function Mytask() {
                           </label>
                         </Col>
                       </Row>
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
+                          </label>
+                        </Col>
+                      </Row>
                     </div>
                   );
                 }}
               />
 
-              <Column title="Subject"
-                width="35%"
+              <Column title="Subject" width="40%"
                 render={(record) => {
                   return (
                     <>
@@ -260,6 +300,7 @@ export default function Mytask() {
                         <Col span={24}>
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                             {record.Title}
+                            {record.IsReOpen === true ? " (ReOpen)" : ""}
                           </label>
                           <Tag color="#00CC00"
                             style={{
@@ -274,39 +315,26 @@ export default function Mytask() {
                       </Row>
                       <Row>
                         <Col span={24}>
-
                           <label
                             onClick={() => {
-                              return (
-                                history.push({ pathname: "/internal/issue/subject/" + record.Id }),
-                                (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                              )
-                            }
-                            }
+                              history.push({ pathname: "/internal/issue/subject/" + record.Id });
+                              UpdateStatusMailbox(record.MailBoxId);
+                              updateCountNoti(record.Id);
+                              window.location.reload(true);
+                            }}
                             className="table-column-detail">
                             รายละเอียด
                           </label>
 
                         </Col>
                       </Row>
-
-
-                      {/* 
-                      </div>
-                      <div>
-
-
-                      </div> */}
-
-
                     </>
                   )
                 }
                 }
               />
-              <Column title="Issue By"
+              <Column title="Issue By" width="10%"
                 align="center"
-                width="15%"
                 render={(record) => {
                   return (
                     <>
@@ -336,8 +364,7 @@ export default function Mytask() {
 
                 }
               />
-              <Column title="Due Date"
-                width="10%"
+              <Column title="Due Date" width="8%"
                 align="center"
                 render={(record) => {
                   return (
@@ -350,8 +377,8 @@ export default function Mytask() {
                         {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
                       </label>
                       <br />
-                      {record.cntDueDate >= 1 ?
-                        <Tag color="warning"
+                      <div style={{ display: record.cntDueDate >= 1 ? "block" : "none" }}>
+                        <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
                             setHistoryduedate_visible(true)
@@ -359,12 +386,10 @@ export default function Mytask() {
                           }
                         >
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                            เลื่อน Due Date
+                            เลื่อน Due
                             </label>
-
-                        </Tag> : ""
-                      }
-
+                        </Tag>
+                      </div>
                     </>
                   )
                 }
@@ -372,13 +397,11 @@ export default function Mytask() {
               />
 
               <Column
-                title="ProgressStatus"
-                width="10%"
+                title="ProgressStatus" width="10%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
-
                       <div>
                         <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.FlowStatus}
@@ -391,9 +414,8 @@ export default function Mytask() {
               />
 
               <Column
-                title="Time Tracking"
+                title="Time Tracking" width="5%"
                 align="center"
-                width="10%"
                 render={(record) => {
                   return (
                     <>
@@ -411,8 +433,7 @@ export default function Mytask() {
                 }
               />
 
-              <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-                width="10%"
+              <Column title={<DownloadOutlined style={{ fontSize: 30 }} />} width="5%"
                 align="center"
                 render={(record) => {
                   return (

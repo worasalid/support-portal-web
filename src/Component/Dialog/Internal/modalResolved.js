@@ -4,6 +4,7 @@ import { Modal, Form, Select, Spin } from 'antd';
 import UploadFile from '../../UploadFile';
 import Axios from 'axios';
 import TextEditor from '../../TextEditor';
+import TextArea from 'antd/lib/input/TextArea';
 
 const { Option } = Select;
 
@@ -41,7 +42,6 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         }
     ]
 
-
     const SaveComment = async () => {
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
@@ -64,7 +64,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         }
     }
 
-    const SaveTestResult = async () => {
+    const SaveTestResult = async (values) => {
         try {
             const comment = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/save-document",
@@ -74,8 +74,9 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 },
                 data: {
                     ticketid: details && details.ticketid,
-                    files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
+                    //files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
                     reftype: "Master_Ticket",
+                    url: values.test_result_url,
                     grouptype: "testResult"
                 }
             });
@@ -85,6 +86,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
     }
 
     const SendFlow = async (item) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
@@ -103,7 +105,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
             });
 
             if (sendflow.status === 200) {
-                SaveTestResult();
+                SaveTestResult(item);
                 SaveComment();
                 onOk();
                 setLoading(false);
@@ -111,13 +113,14 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>Resolved Issue</p>
                         </div>
                     ),
                     okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
-                        history.push({ pathname: "/internal/issue/resolved" })
+                        history.push({ pathname: "/internal/issue/resolved" });
+                        window.location.reload(true);
                     },
                 });
             }
@@ -141,7 +144,6 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
     }
 
     const onFinish = (values) => {
-        setLoading(true);
         SendFlow(values);
     };
 
@@ -156,11 +158,11 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
         <Modal
             visible={visible}
             confirmLoading={loading}
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit()}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), editorRef.current.setvalue(), onCancel()) }}
+            onCancel={() => { form.resetFields(); editorRef.current.setvalue(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -202,15 +204,16 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                             : <Form.Item
                                 style={{ minWidth: 300, maxWidth: 800 }}
                                 label="Test Result (ใบส่งมอบงาน)"
-                                name="uploadresult"
+                                name="test_result_url"
                                 rules={[
                                     {
-                                        required: false,
+                                        required: true,
                                         message: 'กรุณาแนบ (ใบส่งมอบงาน)'
                                     },
                                 ]}
                             >
-                                <UploadFile ref={uploadRef_testresult} />
+                                {/* <UploadFile ref={uploadRef_testresult} /> */}
+                                <TextArea rows="2" style={{ width: "100%" }} />
                             </Form.Item>
                     }
 

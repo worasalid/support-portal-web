@@ -24,7 +24,9 @@ export const masterState = {
                 },
                 complete: {
                     count: 0
-                }
+                },
+                sla_duedate_noti: 0,
+                duedate_noti: 0
             },
             report: {
                 visible: true
@@ -48,7 +50,10 @@ export const masterReducer = createReducer(masterState, {
     COUNT_PASS: (state, {payload}) => {state.toolbar.sider_menu.issue.pass.count = payload},
     COUNT_CANCEL: (state, {payload}) => {state.toolbar.sider_menu.issue.cancel.count = payload},
     COUNT_COMPLETE: (state, {payload}) => {state.toolbar.sider_menu.issue.complete.count = payload},
-    COUNT_NOTI : (state, {payload}) => {state.toolbar.top_menu.notification= payload}
+    COUNT_NOTI : (state, {payload}) => {state.toolbar.top_menu.notification= payload},
+    COUNT_DUEDATE_NOTI : (state, {payload}) => {state.toolbar.sider_menu.issue.duedate_noti= payload},
+    COUNT_SLA_DUEDATE_NOTI : (state, {payload}) => {state.toolbar.sider_menu.issue.sla_duedate_noti= payload}
+
 })
 
 export default MasterContext;

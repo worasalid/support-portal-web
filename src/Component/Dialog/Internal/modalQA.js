@@ -38,7 +38,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             data: {
                 ticketId: details && details.ticketid,
                 taskid: details.taskid,
-                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                //files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
                 unit_test_url: values.unit_test_url,
                 grouptype: "test_result_QA"
             }
@@ -47,7 +47,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -69,6 +69,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -125,8 +126,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        setLoading(true);
-        SendFlow(values);
+       SendFlow(values);
     };
 
 
@@ -134,11 +134,11 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
         <Modal
             visible={visible}
             confirmLoading={loading}
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit()}
             okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => {form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -153,18 +153,18 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                     <Form.Item
                         // style={{ minWidth: 300, maxWidth: 300 }}
                         name="unit_test_url"
-                        label="URL"
+                        label="Test Result URL"
                         rules={[
                             {
-                                required: false,
-                                message: 'Please input your UnitTest!',
+                                required: true,
+                                message: 'กรุณาแนบ url ผลทดสอบ!',
                             },
                         ]}
                     >
                         <TextArea rows="2" style={{ width: "100%" }} />
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         style={{ minWidth: 300, maxWidth: 300 }}
                         label="Unit Test"
                         name="unittest"
@@ -176,7 +176,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         ]}
                     >
                         <UploadFile ref={uploadRef_unittest} />
-                    </Form.Item>
+                    </Form.Item> */}
                 </Form>
                  Remark :
             <TextEditor ref={editorRef} />

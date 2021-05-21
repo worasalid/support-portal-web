@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -42,7 +42,7 @@ export default function Complete() {
 
 
   const loadIssue = async (value) => {
-    // setLoadding(true);
+    setLoadding(true);
     try {
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
@@ -55,6 +55,7 @@ export default function Complete() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
           scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
@@ -67,7 +68,7 @@ export default function Complete() {
       });
 
       if (results.status === 200) {
-
+        setLoadding(false);
         setPageTotal(results.data.total)
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
@@ -76,18 +77,25 @@ export default function Complete() {
     }
   };
 
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
+  const updateCountNoti = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticket_id: param
+        }
+      });
+
+      if (result.status === 200) {
+
       }
-    });
-    userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+    } catch (error) {
+
+    }
   }
 
   const UpdateStatusMailbox = async (value) => {
@@ -113,14 +121,20 @@ export default function Complete() {
   }
 
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
-    setTimeout(() => {
-      loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
-    }, 1000)
-
+    if (userstate.search === true) {
+      if (pageCurrent !== 1) {
+        setPageCurrent(1);
+        setPageSize(10);
+      } else {
+        loadIssue();
+      }
+    }
     userdispatch({ type: "SEARCH", payload: false })
   }, [userstate.search, pageCurrent]);
+
+  useEffect(() => {
+    loadIssue();
+  }, [pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -133,17 +147,17 @@ export default function Complete() {
         <IssueSearch />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
+            <Table dataSource={userstate.issuedata.data} loading={loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
-              pagination={{ pageSize: pageSize, total: pageTotal }}
-              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
+              onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
               footer={(x) => {
                 return (
                   <>
                     <div style={{ textAlign: "right" }}>
                       <label>จำนวนเคส : </label>
-                      <label>{x.length}</label>
+                      <label>{pageTotal}</label>
                     </div>
                   </>
                 )
@@ -172,11 +186,12 @@ export default function Complete() {
                 render={(record) => {
                   return (
                     <>
-                      <Tag color="#87d068"
-                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
-                      >
-                        ReleaseNote
-                       </Tag>
+                      <Tooltip title="ReleaseNote">
+                        <TrademarkOutlined
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 12, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      <br />
                       <label className="table-column-text">
                         {record.Number}
                       </label>
@@ -188,7 +203,7 @@ export default function Complete() {
 
               <Column
                 title="Details"
-                width="15%"
+                width="20%"
                 render={(record) => {
                   return (
                     <div>
@@ -260,7 +275,7 @@ export default function Complete() {
               />
 
               <Column title="Subject"
-                width="35%"
+                width="40%"
                 render={(record) => {
                   return (
                     <>
@@ -279,10 +294,10 @@ export default function Complete() {
                       <div>
                         <label
                           onClick={() => {
-                            return (
-                              history.push({ pathname: "/internal/issue/subject/" + record.Id })
-                              // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
+                            history.push({ pathname: "/internal/issue/subject/" + record.Id });
+                            updateCountNoti(record.Id)
+                            // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
+
                           }
                           }
                           className="table-column-detail">
@@ -324,7 +339,7 @@ export default function Complete() {
               />
 
               <Column title="Due Date"
-                width="10%"
+                width="8%"
                 align="center"
                 render={(record) => {
                   return (
@@ -345,7 +360,7 @@ export default function Complete() {
                           }
                           }
                         >
-                          DueDate ถูกเลื่อน
+                          เลื่อน Due
                        </Tag> : ""
                       }
 
@@ -381,23 +396,25 @@ export default function Complete() {
               <Column
                 title="Time Tracking"
                 align="center"
-                width="10%"
+                width="5%"
                 render={(record) => {
                   return (
                     <>
-                      <ClockSLA
-                        start={moment(record.AssignIconDate)}
-                        due={moment(record.DueDate)}
-                        end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-
-                      />
+                      <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
+                        <ClockSLA
+                          start={moment(record.AssignIconDate)}
+                          due={moment(record.DueDate)}
+                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
+                        />
+                      </div>
                     </>
                   )
                 }
                 }
               />
+
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-                width="10%"
+                width="5%"
                 align="center"
                 render={(record) => {
                   return (

@@ -6,17 +6,18 @@ import { useHistory } from "react-router-dom";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
+import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
 export default function AllTask() {
   const history = useHistory();
-
+  const [loading, setLoadding] = useState(false);
   //modal
   const [visible, setVisible] = useState(false);
   const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
@@ -38,7 +39,7 @@ export default function AllTask() {
 
 
   const loadIssue = async (value) => {
-    // setLoadding(true);
+    setLoadding(true);
     try {
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
@@ -51,6 +52,7 @@ export default function AllTask() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
           progress: userstate.filter.progress,
           scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
@@ -64,6 +66,7 @@ export default function AllTask() {
       });
 
       if (results.status === 200) {
+        setLoadding(false);
         setPageTotal(results.data.total);
         setIssueAllStatus(results.data.issue_status);
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data });
@@ -87,15 +90,21 @@ export default function AllTask() {
   }
 
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
-    setTimeout(() => {
-      loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
-    }, 1000)
+    if (userstate.search === true) {
+      if (pageCurrent !== 1) {
+        setPageCurrent(1);
+        setPageSize(10);
+      } else {
+        loadIssue();
+      }
+    }
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, pageCurrent]);
+  }, [userstate.search]);
 
+  useEffect(() => {
+    loadIssue();
+  }, [pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -111,8 +120,8 @@ export default function AllTask() {
 
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
-              pagination={{ pageSize: pageSize, total: pageTotal }}
+            <Table dataSource={userstate.issuedata.data} loading={loading}
+              pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
               //scroll={{y:250}}
               style={{ padding: "5px 5px" }}
               onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
@@ -121,9 +130,9 @@ export default function AllTask() {
                   <>
                     <div style={{ textAlign: "right" }}>
                       <label>จำนวนเคส : </label>
-                      <label>{x.length}</label>
-                      <label> จากทั้งหมด : </label>
                       <label>{pageTotal}</label>
+                      {/* <label> จากทั้งหมด : </label>
+                      <label>{pageTotal}</label> */}
 
                     </div>
                   </>
@@ -152,11 +161,12 @@ export default function AllTask() {
                 render={(record) => {
                   return (
                     <>
-                      <Tag color="#87d068"
-                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
-                      >
-                        ReleaseNote
-                       </Tag>
+                      <Tooltip title="ReleaseNote">
+                        <TrademarkOutlined
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 12, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      <br />
                       <label className="table-column-text">
                         {record.Number}
                       </label>
@@ -168,7 +178,7 @@ export default function AllTask() {
 
               <Column
                 title="Details"
-                width="15%"
+                width="20%"
                 render={(record) => {
                   return (
                     <div>
@@ -213,12 +223,25 @@ export default function AllTask() {
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            Module :
+                            Scene :
                           </label>
                         </Col>
                         <Col span={14}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            {record.ModuleName}
+                            {record.Scene}
+                          </label>
+                        </Col>
+                      </Row>
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
                           </label>
                         </Col>
                       </Row>
@@ -227,8 +250,7 @@ export default function AllTask() {
                 }}
               />
 
-              <Column title="Subject"
-                width="35%"
+              <Column title="Subject" width="40%"
                 render={(record) => {
                   return (
                     <>
@@ -264,9 +286,9 @@ export default function AllTask() {
                 }
                 }
               />
-              <Column title="Issue By"
+
+              <Column title="Issue By" width="10%"
                 align="center"
-                width="15%"
                 render={(record) => {
                   return (
                     <>
@@ -296,18 +318,34 @@ export default function AllTask() {
 
                 }
               />
-              <Column title="Due Date"
-                width="10%"
+
+              <Column title="Due Date" width="8%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "support" &&
+                          record.Is_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาแจ้ง DueDate ลูกค้า
+                        </label>
+                      </div>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "cr_center" &&
+                          record.Is_SLA_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาระบุ DueDate
+                        </label>
+                      </div>
                       <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')} <br />
                         {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
                       </label>
                       <br />
-                      {record.cntDueDate > 1 ?
+                      {record.cntDueDate >= 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -315,7 +353,7 @@ export default function AllTask() {
                           }
                           }
                         >
-                          เลื่อน Due
+                          เลื่อน DueDate
                        </Tag> : ""
                       }
 
@@ -325,9 +363,7 @@ export default function AllTask() {
                 }
               />
 
-              <Column
-                title="ProgressStatus"
-                width="10%"
+              <Column title="ProgressStatus" width="10%"
                 align="center"
                 render={(record) => {
                   return (
@@ -335,8 +371,9 @@ export default function AllTask() {
 
                       <div>
                         <label className="table-column-text">
-                          {record.InternalStatus}<br />
-                          {record.FlowStatus === record.InternalStatus ? "" : record.FlowStatus}
+                          {/* {record.InternalStatus}
+                          <br /> */}
+                          {record.FlowStatus}
                         </label>
                       </div>
                     </>
@@ -345,10 +382,8 @@ export default function AllTask() {
                 }}
               />
 
-              <Column
-                title="Time Tracking"
+              <Column  title="Time Tracking" width="5%"
                 align="center"
-                width="10%"
                 render={(record) => {
                   return (
 
@@ -375,7 +410,7 @@ export default function AllTask() {
               />
 
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-                width="10%"
+                width="5%"
                 align="center"
                 render={(record) => {
                   return (
@@ -401,6 +436,16 @@ export default function AllTask() {
           </Col>
         </Row>
 
+        {/* Modal */}
+        <DuedateLog
+          title="ประวัติ DueDate"
+          visible={historyduedate_visible}
+          onCancel={() => setHistoryduedate_visible(false)}
+          details={{
+            ticketId: userstate.issuedata.datarow.Id
+          }}
+        >
+        </DuedateLog>
 
         <ModalFileDownload
           title="File Download"
@@ -416,10 +461,8 @@ export default function AllTask() {
             reftype: "Master_Ticket",
             grouptype: "attachment"
           }}
-
-
-
         />
+
         <ModalTimetracking
           title="Time Tracking"
           width={600}

@@ -153,7 +153,7 @@ export default function Historylog({ type = "Issue", subtype = "ticket" }) {
 
                                         {(item.value2 === "" || item.value2 === null) ? "" :
                                             <>
-                                                < SwapRightOutlined /> <label> {item.value2}</label>
+                                                < SwapRightOutlined /> <label className="value-text"> {item.value2}</label>
 
                                             </>
                                         }

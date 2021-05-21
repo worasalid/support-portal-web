@@ -51,6 +51,7 @@ export default function AllIssue() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
           progress: userstate.filter.progress,
           scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
@@ -309,6 +310,23 @@ export default function AllIssue() {
                 render={(record) => {
                   return (
                     <>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "support" &&
+                          record.Is_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาแจ้ง DueDate ลูกค้า
+                        </label>
+                      </div>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "cr_center" &&
+                          record.Is_SLA_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาระบุ DueDate
+                        </label>
+                      </div>
+
                       <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}
                       </label>
@@ -317,7 +335,7 @@ export default function AllIssue() {
                         {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
                       </label>
                       <br />
-                      {record.cntDueDate > 1 ?
+                      {record.cntDueDate >= 1 ?
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -345,7 +363,7 @@ export default function AllIssue() {
 
                       <div>
                         <label className="table-column-text">
-                          {record.InternalStatus}<br />
+                        {/* {record.InternalStatus}<br /> */}
                           {record.FlowStatus}
                         </label>
                       </div>

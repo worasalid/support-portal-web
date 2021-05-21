@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Select, Table, Button, Tabs } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import React, { useState, useRef } from 'react';
+import { useHistory } from "react-router-dom";
+import { Modal, Form, Tabs, Spin } from 'antd';
+import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 
@@ -14,14 +14,9 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
     const uploadRef = useRef(null);
     const upload_PO = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
-    //data
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
     const SavePO = async (values) => {
         const documentPO = await Axios({
             url: process.env.REACT_APP_API_URL + "/tickets/save-document",
@@ -41,7 +36,7 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -49,10 +44,10 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                     },
                     data: {
-                      ticketid: details && details.ticketid,
+                        ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
-                        comment_type: "internal",
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -63,6 +58,7 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
@@ -75,7 +71,7 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
                     mailboxid: details && details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
-                        comment_text: textValue
+                        comment_text: editorRef.current.getValue()
                     }
                 }
             });
@@ -83,99 +79,89 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
             if (sendflow.status === 200) {
                 SaveComment();
                 SavePO();
-                onOk();
+                setLoading(false);
+                onCancel();
 
-                await Modal.info({
+                Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>ส่งใบ PO</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
-                        editorRef.current.editor.setContent("");
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        editorRef.current.setvalue();
+                        history.push({ pathname: "/internal/issue/inprogress" });
+                        window.location.reload(true);
                     },
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
+                        <p>{error.message}</p>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
-                    editorRef.current.editor.setContent("");
-                    onOk();
+                    editorRef.current.setvalue();
+                    window.location.reload(true);
                 },
             });
         }
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
-       SendFlow(values);
-        
+        SendFlow(values);
     };
 
-  
+
     return (
         <Modal
             visible={visible}
-            onOk={() => { return (form.submit()) }}
+            confirmLoading={loading}
+            onOk={() => form.submit()}
             okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
 
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" ,marginTop: 0 }}
-                name="form-po"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-            
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="เอกสาร PO"
-                    name="po"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'กรุณาแนบเอกสาร PO',
-                        },
-                    ]}
+            <Spin spinning={loading}>
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white", marginTop: 0 }}
+                    name="form-po"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <UploadFile ref={upload_PO} />
-                </Form.Item>
-            </Form>
-                 Remark :
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
 
+                    <Form.Item
+                        style={{ minWidth: 300, maxWidth: 300 }}
+                        label="เอกสาร PO"
+                        name="po"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'กรุณาแนบเอกสาร PO',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={upload_PO} />
+                    </Form.Item>
+                </Form>
+                 Remark :
+                 <TextEditor ref={editorRef} />
+                <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
+            </Spin>
         </Modal>
     )
 }

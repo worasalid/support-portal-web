@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Modal, Form, Select, Spin } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+//import { Editor } from '@tinymce/tinymce-react';
+import TextEditor from '../../TextEditor';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -17,10 +18,6 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
 
     const [assignlist, setAssignlist] = useState([]);
     const [loading, setLoading] = useState(false);
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
 
     const GetAssign = async () => {
         try {
@@ -44,7 +41,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -54,7 +51,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -66,6 +63,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
     }
 
     const SendFlow = async (param) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -98,11 +96,12 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     ),
                     okText:"Close",
                     onOk() {
-                        editorRef.current.editor.setContent("");
+                        editorRef.current.setvalue();
                         if (param === state?.usersdata?.users?.id) {
-                            window.location.reload()
+                            window.location.reload(true);
                         } else {
-                            history.push({ pathname: "/internal/issue/inprogress" })
+                            history.push({ pathname: "/internal/issue/inprogress" });
+                            window.location.reload(true);
                         }
 
                     },
@@ -119,7 +118,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                 ),
                 okText:"Close",
                 onOk() {
-                    editorRef.current.editor.setContent("");
+                    editorRef.current.setvalue();
                     onOk();
 
                 },
@@ -128,7 +127,6 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
     }
 
     const onFinish = (values, item) => {
-        setLoading(true);
         SendFlow(values.assignto);
     };
 
@@ -143,11 +141,11 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
         <Modal
             visible={visible}
             confirmLoading={loading}
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit() }
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => {form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -199,23 +197,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         ]}
                     >
                         {/* Remark : */}
-                        <Editor
-                            apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                            ref={editorRef}
-                            initialValue=""
-                            init={{
-                                height: 300,
-                                menubar: false,
-                                plugins: [
-                                    'advlist autolink lists link image charmap print preview anchor',
-                                    'searchreplace visualblocks code fullscreen',
-                                    'insertdatetime media table paste code help wordcount'
-                                ],
-                                toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                                toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                            }}
-                            onEditorChange={handleEditorChange}
-                        />
+                        <TextEditor ref={editorRef} />
                         <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>

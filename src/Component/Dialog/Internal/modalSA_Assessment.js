@@ -11,7 +11,6 @@ export default function ModalSA_Assessment({ visible = false, onOk, onCancel, de
     const history = useHistory();
     const [assessment, setAssessment] = useState([]);
 
-
     const LoadAssessment = async () => {
         const result = await Axios({
             url: process.env.REACT_APP_API_URL + "/tickets/load-issue-assessment",

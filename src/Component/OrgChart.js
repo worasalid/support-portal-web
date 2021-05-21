@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import OrgChart from '@balkangraph/orgchart.js';
 
 
-
 export default class extends Component {
 
     constructor(props) {
@@ -43,6 +42,34 @@ export default class extends Component {
             console.log(sender.editUI.node.parent.id)
             console.log(sender.editUI.node.parent.pid)
         });
+
+        this.chart.editUI.on('field', function(sender, args){
+            console.log("xxx",sender.editUI)
+            if (args.type == 'edit' && args.name == 'title'){
+
+                var txt = args.field.querySelector('input');
+                var txtVal = txt.value;
+                if (txt){
+                    txt.style.color = "red";  
+                    
+                    var select = document.createElement('select');
+                    select.innerHTML = '<option value="CEO">CEO</option>' 
+                    + '<option value="IT Manager">IT Manager</option>'
+                    + '<option value="HR Manager">HR Manager</option>';
+                    
+                    select.style.width = '100%';                    
+                    select.setAttribute('val', '');
+                    select.style.fontSize = '16px';
+                    select.style.color = 'red';
+                    select.style.paddingTop = '7px';
+                    select.style.paddingBottom = '7px';
+                    select.value = txtVal;
+                    
+                    txt.parentNode.appendChild(select);
+                    txt.parentNode.removeChild(txt);
+                }
+            }
+	    });
     }
 
     render() {

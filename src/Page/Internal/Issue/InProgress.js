@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -44,7 +44,7 @@ export default function InProgress() {
 
 
   const loadIssue = async (value) => {
-    // setLoadding(true);
+    setLoadding(true);
     try {
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
@@ -57,11 +57,12 @@ export default function InProgress() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
           scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
-          is_release_note : userstate.filter.isReleaseNote,
+          is_release_note: userstate.filter.isReleaseNote,
           task: "InProgress",
           pageCurrent: pageCurrent,
           pageSize: pageSize
@@ -69,7 +70,7 @@ export default function InProgress() {
       });
 
       if (results.status === 200) {
-
+        setLoadding(false);
         setPageTotal(results.data.total)
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
@@ -78,23 +79,29 @@ export default function InProgress() {
     }
   };
 
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
+  const updateCountNoti = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticket_id: param
+        }
+      });
+
+      if (result.status === 200) {
+
       }
-    });
-    userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
+    } catch (error) {
+
+    }
   }
 
-
   function HandleChange(items) {
-    console.log("Menu", items.item.props.node)
+
     if (items.item.props.node === "support") { setVisible(true) }
     if (items.item.props.node === "developer_1") { setModaldeveloper_visible(true) }
     if (items.item.props.node === "qa" || items.item.props.node === "developer_2") { setModalQA_visible(true) }
@@ -102,14 +109,21 @@ export default function InProgress() {
   }
 
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
-    setTimeout(() => {
-      loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
-    }, 1000)
+    if (userstate.search === true) {
+      if (pageCurrent !== 1) {
+        setPageCurrent(1);
+        setPageSize(10);
+      } else {
+        loadIssue();
+      }
+    }
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, visible, pageCurrent]);
+  }, [userstate.search, visible]);
+
+  useEffect(() => {
+    loadIssue();
+  }, [pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -122,10 +136,11 @@ export default function InProgress() {
         <IssueSearch />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
+
+            <Table dataSource={userstate.issuedata.data} loading={loading}
               style={{ padding: "5px 5px" }}
-              pagination={{ pageSize: 10, total: 10 }}
-              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
+              onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
               // expandable={{
               //   expandedRowRender: record => <p style={{ margin: 0 }}>{record.Number}</p>,
 
@@ -161,17 +176,17 @@ export default function InProgress() {
 
 
               <Column
-                title="IssueNo"
-                width="5%"
+                title="IssueNo" width="5%"
                 render={(record) => {
                   return (
                     <>
-                      <Tag color="#87d068"
-                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
-                      >
-                        ReleaseNote
-                       </Tag>
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                      <Tooltip title="ReleaseNote">
+                        <TrademarkOutlined
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 12, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      <br />
+                      <label className="table-column-text">
                         {record.Number}
                       </label>
                     </>
@@ -182,8 +197,7 @@ export default function InProgress() {
               />
 
               <Column
-                title="Details"
-                width="15%"
+                title="Details" width="20%"
                 render={(record) => {
                   return (
                     <div>
@@ -226,18 +240,7 @@ export default function InProgress() {
                           </label>
                         </Col>
                       </Row>
-                      {/* <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={8}>
-                          <label style={{ color: "#808080", fontSize: "10px" }}>
-                            Module :
-                          </label>
-                        </Col>
-                        <Col span={14}>
-                          <label style={{ color: "#808080", fontSize: "10px" }}>
-                            {record.ModuleName}
-                          </label>
-                        </Col>
-                      </Row> */}
+
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
@@ -250,13 +253,25 @@ export default function InProgress() {
                           </label>
                         </Col>
                       </Row>
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
+                          </label>
+                        </Col>
+                      </Row>
                     </div>
                   );
                 }}
               />
 
-              <Column title="Subject"
-                width="35%"
+              <Column title="Subject" width="40%"
                 render={(record) => {
                   return (
                     <>
@@ -275,12 +290,10 @@ export default function InProgress() {
                       <div>
                         <label
                           onClick={() => {
-                            return (
-                              history.push({ pathname: "/internal/issue/subject/" + record.Id })
-                              // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
-                          }
-                          }
+                            updateCountNoti(record.Id);
+                            history.push({ pathname: "/internal/issue/subject/" + record.Id });
+                            window.location.reload(true);
+                          }}
                           className="table-column-detail">
                           รายละเอียด
                           </label>
@@ -291,9 +304,8 @@ export default function InProgress() {
                 }
                 }
               />
-              <Column title="Issue By"
+              <Column title="Issue By" width="10%"
                 align="center"
-                width="10%"
                 render={(record) => {
                   return (
                     <>
@@ -318,37 +330,49 @@ export default function InProgress() {
                 }
               />
 
-              <Column title="Due Date"
-                width="10%"
+              <Column title="Due Date" width="8%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "support" &&
+                          record.Is_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาแจ้ง DueDate ลูกค้า
+                        </label>
+                      </div>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "cr_center" &&
+                          record.Is_SLA_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาระบุ DueDate
+                        </label>
+                      </div>
+
                       <label className="table-column-text">
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}<br />
                         {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
                       </label>
                       <br />
-                      {record.cntDueDate >= 1 ?
+                      <div style={{ display: record.cntDueDate >= 1 ? "block" : "none" }}>
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
                             setHistoryduedate_visible(true)
-                          }
-                          }
+                          }}
                         >
-                          DueDate ถูกเลื่อน
-                       </Tag> : ""
-                      }
-
+                          เลื่อน Due
+                       </Tag>
+                      </div>
                     </>
                   )
-                }
-                }
+                }}
               />
               <Column
-                title="ProgressStatus"
-                width="10%"
+                title="ProgressStatus" width="10%"
                 align="center"
                 render={(record) => {
                   return (
@@ -357,19 +381,19 @@ export default function InProgress() {
                         <label className="table-column-text">
                           {record.FlowStatus}
                         </label>
+                        <label
+                          style={{ display: record.IsReOpen === true ? "block" : "none" }}
+                          className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                          (ReOpen)
+                        </label>
                       </div>
-                      {/* <div>
-                        {record.FlowDate === null ? "" : new Date(record.FlowDate).toLocaleDateString('en-GB')}
-                      </div> */}
-
                     </>
                   );
                 }}
               />
               <Column
-                title="Time Tracking"
+                title="Time Tracking" width="5%"
                 align="center"
-                width="10%"
                 render={(record) => {
                   return (
                     <>
@@ -387,8 +411,7 @@ export default function InProgress() {
                 }
               />
 
-              <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-                width="10%"
+              <Column title={<DownloadOutlined style={{ fontSize: 30 }} />} width="5%"
                 align="center"
                 render={(record) => {
                   return (

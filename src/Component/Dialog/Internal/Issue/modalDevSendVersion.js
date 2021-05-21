@@ -1,44 +1,41 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Select, Spin } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
 import { useHistory } from "react-router-dom";
+import { Modal, Form, Spin, Select, DatePicker } from 'antd';
 import UploadFile from '../../../UploadFile'
-import TextEditor from '../../../TextEditor';
 import Axios from 'axios';
+import TextEditor from '../../../TextEditor';
+// const { TabPane } = Tabs;
 
-export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, details, ...props }) {
+export default function ModalDevSendVersion({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
-    const editorRef = useRef(null)
-
-    const [assignlist, setAssignlist] = useState([]);
+    const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
+    const [version, setVersion] = useState([])
 
-    const GetAssign = async () => {
+    const getVersion = async () => {
         try {
-            const assign = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/assign-developer",
+            const version = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/config-data",
                 method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
                 params: {
-                    taskid: details.taskid
+                    groups: details.product_code + "_Version"
                 }
             });
-            setAssignlist(assign.data)
 
+            if (version.status === 200) {
+                setVersion(version.data)
+            }
         } catch (error) {
 
         }
-
     }
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "") {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -58,7 +55,7 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
         }
     }
 
-    const SendFlow = async (value) => {
+    const SendFlow = async (param) => {
         setLoading(true);
         try {
             const sendflow = await Axios({
@@ -72,27 +69,28 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
-                        assigneeid: value,
+                        version: param.version,
+                        patch_update: param.patch_update.format('DD/MM/YYYY'),
                         comment_text: editorRef.current.getValue()
                     }
-
                 }
             });
 
             if (sendflow.status === 200) {
                 SaveComment();
+                onOk();
                 setLoading(false);
-                onCancel();
-                Modal.success({
+
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>สอบถามข้อมูลกับทาง Developer</p>
+                            <p>ระบุ Version ให้ทีม Support</p>
                         </div>
                     ),
                     okText: "Close",
                     onOk() {
-                        editorRef.current.setvalue("");
+                        editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
@@ -106,45 +104,42 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
-                    editorRef.current.setvalue("");
+                    editorRef.current.setvalue();
                     onOk();
-
                 },
             });
         }
     }
 
-    const onFinish = (values, item) => {
-        SendFlow(values.assignto);
+    const onFinish = (param) => {
+        SendFlow(param);
     };
 
     useEffect(() => {
         if (visible) {
-            GetAssign();
-
+            getVersion()
         }
 
     }, [visible])
-
-
 
     return (
         <>
             <Modal
                 visible={visible}
                 confirmLoading={loading}
-                onOk={() => { return (form.submit()) }}
-                okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okText="Send"
+                onOk={() => form.submit()}
+                okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okType="dashed"
-                onCancel={() => { return (form.resetFields(), onCancel()) }}
+                onCancel={() => {form.resetFields(); onCancel()}}
                 {...props}
             >
                 <Spin spinning={loading} size="large" tip="Loading...">
                     <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                        name="qa-test"
                         layout="vertical"
-                        name="assigndev"
                         className="login-form"
                         initialValues={{
                             remember: true,
@@ -153,38 +148,53 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                     >
                         <Form.Item
                             style={{ minWidth: 300, maxWidth: 300 }}
-                            label="AssignTo"
-                            name="assignto"
+                            label="Version"
+                            name="version"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'กรุณาเลือก Developer',
+                                    message: 'Please Select Version',
                                 },
                             ]}
                         >
-                            {/* <label>Assign To </label> */}
                             <Select style={{ width: '100%' }} placeholder="None"
                                 showSearch
                                 filterOption={(input, option) =>
                                     option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                 }
-                                onClick={(value, item) => assignlist.length === 0 ? alert("ไม่มีผู้ดูแล Module") : ""}
-                                options={
-                                    assignlist && assignlist.map((item) => ({
-                                        value: item.UserId,
-                                        label: item.UserName
-                                    }))
+                                //onChange={(value, item) => setSelect_assign(item.label)}
+                                options={version && version.map((x) => ({
+                                    value: x.Name,
+                                    label: x.Name
+                                }))
                                 }
                             >
                             </Select>
                         </Form.Item>
+                        <Form.Item
+                            style={{ minWidth: 300, maxWidth: 300 }}
+                            label="วันที่ Update Patch"
+                            name="patch_update"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please Select Date',
+                                },
+                            ]}
+                        >
+                            <DatePicker format="DD/MM/YYYY" />
+                        </Form.Item>
+                        <Form.Item
+                            // style={{ minWidth: 300, maxWidth: 300 }}
+                            name="remark"
+                            label="Remark :"
 
+                        >
+                            <TextEditor ref={editorRef} />
+                            <br />
+                            AttachFile : <UploadFile ref={uploadRef} />
+                        </Form.Item>
                     </Form>
-
-                    {/* Remark : */}
-                    <TextEditor ref={editorRef} />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
                 </Spin>
             </Modal>
         </>

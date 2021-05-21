@@ -10,7 +10,6 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [form2] = Form.useForm();
-    const [hidden_form, setHidden_form] = useState(true)
     const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
@@ -20,7 +19,6 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     let [totalcost, setTotalcost] = useState(0)
     const [crCenterManday, setCrCenterManday] = useState(0)
     const [totalmanday, setTotalmanday] = useState(0)
-    const [textValue, setTextValue] = useState("");
     const [listdata, setListdata] = useState([]);
 
     const radioStyle = {
@@ -73,13 +71,9 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
-
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null) {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
@@ -89,7 +83,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
@@ -101,6 +95,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }
 
     const SendFlowTask = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -114,7 +109,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     flowoutputid: details.flowoutput.FlowOutputId,
                     value: {
                         manday: values.manday,
-                        comment_text: textValue
+                        comment_text: editorRef.current.getValue(),
                     }
 
                 }
@@ -158,6 +153,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }
 
     const SendFlowIssue = async (values) => {
+        setLoading(true);
         try {
             const SendFlowIssue = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
@@ -172,7 +168,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     value: {
                         totalmanday: totalmanday,
                         cost: totalcost,
-                        comment_text: textValue
+                        comment_text: editorRef.current.getValue(),
                     }
 
                 }
@@ -216,15 +212,14 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-
     const onFinish = (values) => {
-        setLoading(true);
         details.flowoutput.Type === "Task" ? SendFlowTask(values) : SendFlowIssue(values)
     };
 
     useEffect(() => {
         if (visible) {
             GetTask();
+            console.log("detail",details)
         }
     }, [visible])
 
@@ -236,7 +231,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }, 0);
 
     useEffect(() => {
-        setTotalmanday(manday + parseFloat(crCenterManday))
+        setTotalmanday(details.totalcost === 0 ? manday + parseFloat(crCenterManday) : details.totalcost)
     }, [])
 
     useEffect(() => {
@@ -244,6 +239,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         setTotalcost((manday + crCenterManday) * costmanday)
     }, [crCenterManday, costmanday, manday])
 
+    
 
     return (
         <Modal
@@ -302,7 +298,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                     <Row>
                                         <Col span={24}>
                                             <Radio.Group onChange={(e) => e.target.value}>
-                                                <Radio style={radioStyle} value={1} onChange={(x) => setCostmanday(0)}>
+                                                <Radio style={radioStyle} value={1} onChange={(x) => {setCostmanday(0); setTotalcost(0)}}>
                                                     ไม่มีค่าใช้จ่าย (ฟรี)
                                 </Radio>
                                                 <Radio style={radioStyle} value={2} onChange={(x) => setCostmanday(details.costmanday)}>
@@ -362,6 +358,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                 </Col>
                                 <Col span={10} style={{ textAlign: "right" }}>
                                     <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalmanday}</label>
+
                                 </Col>
                                 <Col span={4} style={{ textAlign: "right" }}>
                                     <label style={{ fontSize: 12 }}>Manday</label>
@@ -372,7 +369,12 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                     <label style={{ fontSize: 12, marginRight: 14 }}>Total Cost</label>
                                 </Col>
                                 <Col span={10} style={{ textAlign: "right", borderBottom: "1px solid" }}>
-                                    <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label>
+                                    {/* <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label> */}
+                                    <InputNumber min={0} value={totalcost} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
+                                        onChange={(value) => {
+                                            setTotalcost(value)
+                                        }
+                                        } />
                                     <u></u>
                                 </Col>
                                 <Col span={4} style={{ textAlign: "right" }}>

@@ -28,6 +28,8 @@ import ModalSendTask from "../../../Component/Dialog/Internal/modalSendTask";
 import ModalManday from "../../../Component/Dialog/Internal/modalManday";
 import ModalRequestInfoDev from "../../../Component/Dialog/Internal/Issue/modalRequestInfoDev";
 import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
+import ModalDevSendVersion from "../../../Component/Dialog/Internal/Issue/modalDevSendVersion";
+import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -54,7 +56,6 @@ export default function SubTask() {
   const [modalleaderqc_visible, setModalleaderqc_visible] = useState(false);
   const [modalQAassign_visible, setModalQAassign_visible] = useState(false);
   const [modalQA_visible, setModalQA_visible] = useState(false);
-  const [modalresolved_visible, setModalresolved_visible] = useState(false);
   const [modalmanday_visible, setModalmanday_visible] = useState(false);
 
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
@@ -62,6 +63,8 @@ export default function SubTask() {
   const [modalreject_visible, setModalreject_visible] = useState(false);
   const [modalRequestInfoDev, setModalRequestInfoDev] = useState(false);
   const [modalPreview, setModalPreview] = useState(false);
+  const [modalDevSendVersion, setModalDevSendVersion] = useState(false);
+  const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -78,6 +81,27 @@ export default function SubTask() {
   const [createddate, setCreateddate] = useState(null);
   const [resolveddate, setResolveddate] = useState(null);
 
+  // Load ข้อมูล Detail ของ Issue และ ข้อมูล mailbox ล่าสุด
+  const getMailBox = async () => {
+    try {
+      const mailbox = await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/load-mailbox",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticketid: match.params.id
+        }
+      });
+
+      if (mailbox.status === 200) {
+        userdispatch({ type: "LOAD_MAILBOX", payload: mailbox.data })
+      }
+    } catch (error) {
+
+    }
+  }
 
   const getflow_output = async (trans_id) => {
     try {
@@ -93,21 +117,41 @@ export default function SubTask() {
       });
 
       if (flow_output.status === 200) {
+
         if ((flow_output.data.filter((x) => x.Type === "Task").length) > 0) {
           setDivProgress("show")
         }
-        // console.log("LOAD_ACTION_FLOW", flow_output.data.filter((x) => x.Type === "Task").length)
 
-        if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName === "qa" && userstate.taskdata.data[0].QARecheck) {
+        if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === true) {
           userdispatch({
             type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value !== "QApass")
+            payload: flow_output.data.filter((x) => x.value === "SendQALeader" || x.value === "QAReject")
           });
         }
 
-        if (userstate.taskdata.data[0] && userstate.taskdata.data[0].NodeName !== "qa") {
-          userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
+        if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === false) {
+          userdispatch({
+            type: "LOAD_ACTION_FLOW",
+            payload: flow_output.data.filter((x) => x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
+          });
+        }
 
+        if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "AssignTask") {
+          userdispatch({
+            type: "LOAD_ACTION_FLOW",
+            payload: flow_output.data.filter((x) => x.value === "QAassign" || x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
+          });
+        }
+
+        if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "CheckResult") {
+          userdispatch({
+            type: "LOAD_ACTION_FLOW",
+            payload: flow_output.data.filter((x) => x.value === "RecheckPass" || x.value === "RequestVersion" || x.value === "RejectRecheck")
+          });
+        }
+
+        if (userstate?.mailbox[0]?.NodeName !== "qa" && userstate?.mailbox[0]?.NodeName !== "qa_leader") {
+          userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
         }
       }
     } catch (error) {
@@ -116,26 +160,19 @@ export default function SubTask() {
 
   }
 
-  const getdetail = async () => {
+  const loadModule = async () => {
     try {
-      const ticket_detail = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/loaddetail",
+      const module = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/modules",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         params: {
-          ticketId: match.params.id
+          productId: userstate?.taskdata?.data[0]?.ProductId
         }
       });
-
-      if (ticket_detail.status === 200) {
-        userdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
-        setSLA(ticket_detail.data.SLA);
-        setCreateddate(ticket_detail.data.CreateDate);
-        setResolveddate(ticket_detail.data.ResolvedDate)
-        // getflow_output(ticket_detail.data[0].TransId)
-      }
+      userdispatch({ type: "LOAD_MODULE", payload: module.data })
     } catch (error) {
 
     }
@@ -165,30 +202,6 @@ export default function SubTask() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-    // if (item.data.NodeName === "support") {
-    //   // if (item.data.value === "ResolvedTask") {
-    //   //   setVisible(true)
-    //   // }
-    //   if (item.data.value === "Resolved") { setModalresolved_visible(true) }
-
-
-    // }
-    // if (item.data.NodeName === "developer_2") {
-    //   if (item.data.value === "LeaderQC") { setModalleaderqc_visible(true) }
-    //   if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
-    //   if (item.data.value === "LeaderReject") { setModalsendtask_visible(true) }
-    // }
-    // if (item.data.NodeName === "developer_1") {
-    //   if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-    //   if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
-    // }
-    // if (item.data.NodeName === "qa_leader") {
-
-    // }
-    // if (item.data.NodeName === "qa") {
-    //   if (item.data.value === "QAReject") { setModalsendtask_visible(true) }
-    //   setModalQA_visible(true)
-    // }
 
     // Flow Bug
     if (userstate?.taskdata?.data[0]?.IssueType === "Bug") {
@@ -199,10 +212,17 @@ export default function SubTask() {
         if (item.data.value === "SendToDeploy") { setModalsendtask_visible(true) }
       }
       if (item.data.NodeName === "developer_2") {
-        if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
-        if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
+        if (item.data.value === "LeaderAssign") {
+          setModalleaderassign_visible(true)
+        }
+        if (item.data.value === "SendUnitTest") {
+          setModaldeveloper_visible(true)
+        }
         if (item.data.value === "LeaderQC" || item.data.value === "LeaderReject") {
           setModalsendtask_visible(true)
+        }
+        if (item.data.value === "SendVersion") {
+          setModalDevSendVersion(true)
         }
         if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
         if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
@@ -213,14 +233,18 @@ export default function SubTask() {
       }
       if (item.data.NodeName === "qa_leader") {
         if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
-        if (item.data.value === "QApass") { setModalQA_visible(true) }
-        if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
-        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") {
+        if (item.data.value === "QApass" || item.data.value === "RequestVersion") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject" || item.data.value === "RecheckPass") {
           setModalsendtask_visible(true)
         }
       }
       if (item.data.NodeName === "qa") {
         if (item.data.value === "SendQALeader") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "QApass" || item.data.value === "RequestVersion") {
           setModalQA_visible(true)
         }
         if (item.data.value === "QAReject") {
@@ -237,7 +261,7 @@ export default function SubTask() {
       if (item.data.NodeName === "cr_center") {
         if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }
         if (item.data.value === "CheckManday" || item.data.value === "RejectManday") { setModalmanday_visible(true) }
-        if (item.data.value === "SendTask") { setModalsendtask_visible(true) }
+        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
         if (item.data.value === "RejectTask") { setModalsendtask_visible(true) }
       }
       if (item.data.NodeName === "developer_2") {
@@ -254,8 +278,12 @@ export default function SubTask() {
         if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
       }
       if (item.data.NodeName === "qa_leader") {
-        if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
-        if (item.data.value === "QApass") { setModalQA_visible(true) }
+        if (item.data.value === "QAassign") {
+          setModalQAassign_visible(true)
+        }
+        if (item.data.value === "QApass") {
+          setModalQA_visible(true)
+        }
         if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
         if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
       }
@@ -279,8 +307,6 @@ export default function SubTask() {
         if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
       }
     }
-
-
   }
 
   function renderColorPriority(param) {
@@ -296,6 +322,30 @@ export default function SubTask() {
 
     }
   }
+
+  function onChange(value, item) {
+
+    if (item.type === "module") {
+      Modal.info({
+        title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
+        content: (
+          <div>
+            <p></p>
+          </div>
+        ),
+        okCancel() {
+
+        },
+        onOk() {
+          updateModule(value, item)
+        },
+      });
+    }
+    if (item.type === "progress") {
+      alert()
+    }
+  }
+
 
   //////////////////////////////////////////////// NEW ทำ subtask /////////////////////
   const GetTaskDetail = async () => {
@@ -348,13 +398,33 @@ export default function SubTask() {
     }
   }
 
+  const updateModule = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/module",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          task_id: match.params.task,
+          module_id: param
+        }
+      });
+
+      if (result.status === 200) {
+        window.location.reload(true);
+      }
+
+    } catch (error) {
+
+    }
+  }
+
   useEffect(() => {
     GetTaskDetail();
+    getMailBox();
   }, [])
-
-  // useEffect(() => {
-  //   getdetail();
-  // }, [SLA])
 
   useEffect(() => {
     if (historyduedate_visible) {
@@ -368,22 +438,11 @@ export default function SubTask() {
     }
   }, [userstate?.taskdata?.data[0]?.TransId])
 
+
   return (
     <MasterPage>
       <Spin spinning={pageLoading} tip="Loading...">
         <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
-          {/* <Row style={{ padding: "0px 0px 0px 24px" }}>
-            <Col>
-              <Button
-                type="link"
-                icon={<LeftCircleOutlined />}
-                style={{ fontSize: 18, padding: 0 }}
-                onClick={() => history.goBack()}
-              >
-                Back
-                </Button>
-            </Col>
-          </Row> */}
 
           <Row style={{ height: 'calc(100% - 0px)' }}>
             {/* Content */}
@@ -404,12 +463,18 @@ export default function SubTask() {
                   </div>
                 </Col>
               </Row>
+              <Row style={{ marginTop: 30 }}>
+                <Col span={24}>
+                  <label className="topic-text">
+                    {userstate?.taskdata?.data[0]?.TicketNumber}
+                    {userstate?.taskdata?.data[0]?.IsReOpen === true ? " (ReOpen)" : ""}
+                  </label>
+                </Col>
+              </Row>
 
               {/* Issue Description */}
               <Row style={{ marginRight: 24 }}>
                 <Col span={24}>
-
-                  <label className="topic-text">{userstate?.taskdata?.data[0]?.TicketNumber}</label>
                   <div className="issue-detail-box">
                     <Row>
                       <Col span={16} style={{ display: "inline" }}>
@@ -419,6 +484,15 @@ export default function SubTask() {
                         </Typography.Title>
                       </Col>
                       <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                        <Button title="file attach" type="link"
+                          style={{ display: userstate?.taskdata?.data[0]?.cntFile === 0 ? "none" : "inline-block" }}
+                          icon={<img
+                            style={{ height: "20px", width: "20px" }}
+                            src={`${process.env.PUBLIC_URL}/icons-attach.png`}
+                            alt=""
+                          />}
+                          onClick={() => setModalfiledownload_visible(true)}
+                        />
                         <Button title="preview" type="link"
                           icon={<img
                             style={{ height: "20px", width: "20px" }}
@@ -464,7 +538,7 @@ export default function SubTask() {
                 <Col span={24}>
                   <TabsDocument
                     details={{
-                      refId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+                      refId: userstate?.taskdata?.data[0]?.TaskId,
                       reftype: "Ticket_Task",
                     }}
                   />
@@ -496,7 +570,7 @@ export default function SubTask() {
 
             {/* SideBar */}
             <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
-              <Row style={{ marginBottom: 20, marginTop:24 }}>
+              <Row style={{ marginBottom: 20, marginTop: 24 }}>
                 <Col span={18}>
                   <label className="header-text">Progress Status</label>
                 </Col>
@@ -509,7 +583,6 @@ export default function SubTask() {
                   <Select ref={selectRef}
                     value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
                     style={{ width: '100%' }} placeholder="None"
-                    // onClick={() => getflow_output(userstate?.taskdata?.data[0]?.TransId)}
                     onChange={(value, item) => HandleChange(value, item)}
                     options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                   />
@@ -517,8 +590,14 @@ export default function SubTask() {
                 <Col span={18}
                   style={{
                     display:
+                      userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
+                  }}>
+                  <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
+                </Col>
+                <Col span={18}
+                  style={{
+                    display:
                       userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
-                    //userstate?.actionflow?.length === 0 ? "block" : "none"
                   }}>
                   <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
                 </Col>
@@ -544,27 +623,12 @@ export default function SubTask() {
                 <Col span={24} >
                   <label className="header-text">Time Tracking</label>
                   {
-
                     userstate.taskdata.data[0] &&
-
-                    // <Clock
-                    //   showseconds={false}
-                    //   deadline={userstate.taskdata.data[0] && userstate.taskdata.data[0].DueDate}
-                    //   createdate={userstate.taskdata.data[0].AssignIconDate === null ? undefined : userstate.taskdata.data[0].AssignIconDate}
-                    //   resolvedDate={userstate.taskdata.data[0].ResolvedDate === null ? undefined : userstate.taskdata.data[0].ResolvedDate}
-                    //   onClick={() => { setModaltimetracking_visible(true) }}
-                    // />
 
                     <Button type="link"
                       icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
                       onClick={() => { setModaltimetracking_visible(true) }}
                     />
-                    // <ClockSLA
-                    //   start={moment(userstate?.taskdata?.data[0]?.AssignIconDate)}
-                    //   due={moment(userstate?.taskdata?.data[0]?.SLA_DueDate)}
-                    //   end={userstate?.taskdata?.data[0]?.ResolvedDate === null ? moment() : moment(userstate?.taskdata?.data[0]?.ResolvedDate)}
-                    //   onClick={() => { setModaltimetracking_visible(true) }}
-                    // />
                   }
 
                 </Col>
@@ -624,7 +688,24 @@ export default function SubTask() {
                 <Col span={18}>
                   <label className="header-text">Module</label>
                   <br />
-                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].ModuleName}</label>
+                  {
+                    (userstate?.mailbox[0]?.NodeName === "support" && userstate?.taskdata?.data[0]?.Status === "Waiting Progress")
+                      ? <Select
+                        style={{ width: '100%' }}
+                        allowClear
+                        showSearch
+
+                        filterOption={(input, option) =>
+                          option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onClick={() => loadModule()}
+                        options={userstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name, type: "module" }))}
+                        onChange={(value, item) => onChange(value, item)}
+                        value={userstate?.taskdata?.data[0]?.ModuleName}
+                      />
+
+                      : <label className="value-text">{userstate?.taskdata?.data[0]?.ModuleName}</label>
+                  }
                 </Col>
               </Row>
 
@@ -640,19 +721,42 @@ export default function SubTask() {
 
               </Row>
 
-              <Row style={{
-                marginBottom: 20,
-
-              }}>
+              <Row style={{ marginBottom: 20, }}>
                 <Col span={18}>
                   <label className="header-text">Release Note</label>&nbsp;&nbsp;
                   <Checkbox
                     checked={userstate.taskdata.data[0]?.IsReleaseNote}
                     onChange={(x) => updateReleaseNote(x.target.checked)} />
                 </Col>
-
               </Row>
 
+              <Row
+                style={{
+                  marginBottom: 20,
+                  display: userstate?.taskdata?.data[0]?.IssueType === "Bug" && userstate.taskdata.data[0]?.PatchUpdate !== null ? "block" : "none"
+                }}>
+                <Col span={18}>
+                  <label className="header-text">Version</label>
+                  <br />
+                  <label className="value-text">
+                    {userstate.taskdata.data[0]?.Version}
+                  </label>
+                </Col>
+              </Row>
+
+              <Row
+                style={{
+                  marginBottom: 20,
+                  display: userstate?.taskdata?.data[0]?.IssueType === "Bug" && userstate.taskdata.data[0]?.PatchUpdate !== null ? "block" : "none"
+                }}>
+                <Col span={18}>
+                  <label className="header-text">วันที่ Update Patch</label>
+                  <br />
+                  <label className="value-text">
+                    {moment(userstate.taskdata.data[0]?.PatchUpdate).format("DD/MM/YYYY HH:mm")}
+                  </label>
+                </Col>
+              </Row>
 
             </Col>
             {/* SideBar */}
@@ -866,7 +970,7 @@ export default function SubTask() {
           }}
           onCancel={() => {
             setModalRequestInfoDev(false);
-            // window.location.reload("false");
+
           }}
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
@@ -935,6 +1039,39 @@ export default function SubTask() {
             setImgUrl(null);
           }}
           pathUrl={imgUrl}
+        />
+
+        <ModalDevSendVersion
+          title="ระบุ Version"
+          width={800}
+          visible={modalDevSendVersion}
+          onCancel={() => { return (setModalDevSendVersion(false)) }}
+          onOk={() => {
+            setModalDevSendVersion(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            product_code: userstate?.taskdata?.data[0]?.ProductName
+          }}
+        />
+
+        <ModalFileDownload
+          title="File Download"
+          visible={modalfiledownload_visible}
+          onCancel={() => { return (setModalfiledownload_visible(false)) }}
+          width={600}
+          onOk={() => {
+            setModalfiledownload_visible(false);
+
+          }}
+          details={{
+            refId: userstate?.taskdata.data[0]?.TaskId,
+            reftype: "Ticket_Task",
+            grouptype: "attachment"
+          }}
         />
 
       </Spin>

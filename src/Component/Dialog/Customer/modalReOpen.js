@@ -21,7 +21,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     const configData = async () => {
         try {
             const configData = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/load-config-data",
+                url: process.env.REACT_APP_API_URL + "/master/config-data",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -66,6 +66,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     }
 
     const FlowReOpen = async (param) => {
+        setLoading(true);
         try {
             const completeflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/customer-send",
@@ -87,6 +88,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
             if (completeflow.status === 200) {
                 SaveComment();
                 setLoading(false);
+                onCancel();
 
                 await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
@@ -99,7 +101,8 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                     onOk() {
                         form.resetFields();
                         onOk();
-                        history.push({ pathname: "/customer/issue/inprogress" })
+                        history.push({ pathname: "/customer/issue/inprogress" });
+                        window.location.reload(true);
                     },
                 });
             }
@@ -144,6 +147,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
             visible={visible}
             confirmLoading={loading}
             onOk={() => form.submit()}
+            okText="Send"
             okButtonProps={""}
             onCancel={() => { return onCancel(), form.resetFields() }}
             {...props}
@@ -160,7 +164,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                         label="เหตุผลการ ReOpen"
                         name="reason"
                     >
-                        <Select placeholder="Priority" style={{ width: "100%" }}
+                        <Select placeholder="เหตุผลการ ReOpen" style={{ width: "100%" }}
                             allowClear
                             maxTagCount={1}
                             onChange={(value) => configData()}

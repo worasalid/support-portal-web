@@ -32,7 +32,7 @@ export default function ModalSaveDueDate({ visible = false, onOk, onCancel, deta
                     data: {
                         ticketid: details && details.ticketid,
                         comment_text: textValue,
-                        comment_type: "customer",
+                        comment_type: details.node_name === "cr_center" ? "internal" : "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -66,11 +66,11 @@ export default function ModalSaveDueDate({ visible = false, onOk, onCancel, deta
                         <div>
                             <p>กำหนด Due Date วันที่ {duedate} </p>
                         </div>
-                    ), 
+                    ),
                     okText: "Close",
                     onOk() {
                         form.resetFields();
-                         window.location.reload(false)
+                        window.location.reload(false)
 
                     },
                 });
@@ -106,8 +106,10 @@ export default function ModalSaveDueDate({ visible = false, onOk, onCancel, deta
     };
 
     useEffect(() => {
-
-    }, [])
+        if (visible) {
+            console.log(details.node_name)
+        }
+    }, [visible])
 
     useEffect(() => {
 

@@ -26,7 +26,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: details.flowoutput.Type === "Issue" ? "internal" : "customer",
+                        comment_type: details.flowoutput.Type === null ? "customer" : "internal",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -69,14 +69,33 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                     okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
-                        if (details.flowoutput.value === "ApproveCR") {
-                            window.location.reload(false)
+                        switch (details.flowoutput.value) {
+                            case "ApproveCR":
+                                window.location.reload(true);
+                                break;
+                            case "ConfirmPayment":
+                                window.location.reload(true);
+                                break;
+                            case "Resolved":
+                                history.push({ pathname: "/internal/issue/resolved" });
+                                window.location.reload(true);
+                                break;
+
+                            default:
+                                history.push({ pathname: "/internal/issue/inprogress" });
+                                window.location.reload(true);
+                                break;
                         }
-                        if (details.flowoutput.value === "Resolved") {
-                            history.push({ pathname: "/internal/issue/resolved" })
-                        } else {
-                            history.push({ pathname: "/internal/issue/inprogress" })
-                        }
+                        // if (details.flowoutput.value === "ApproveCR" || details.flowoutput.value === "ConfirmPayment") {
+                        //     window.location.reload(true);
+                        // }
+                        // if (details.flowoutput.value === "Resolved") {
+                        //     history.push({ pathname: "/internal/issue/resolved" });
+                        //     window.location.reload(true);
+                        // } else {
+                        //     history.push({ pathname: "/internal/issue/inprogress" });
+                        //     window.location.reload(true);
+                        // }
 
                     },
                 });

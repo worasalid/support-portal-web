@@ -100,7 +100,7 @@ export default function CommentBox({ loadingComment = false }) {
     const onFinish = async (values) => {
         try {
 
-            if (editorRef.current.getValue() === "" || editorRef.current.getValue() === null) {
+            if (editorRef.current.getValue() === "" && editorRef.current.getValue() === null && editorRef.current.getValue() === undefined) {
                 throw ("กรุณาระบุ Comment!")
             }
 
@@ -112,7 +112,7 @@ export default function CommentBox({ loadingComment = false }) {
                 },
                 data: {
                     ticketid: match.params.id,
-                    taskid: match.params.task,
+                    //taskid: match.params.task,
                     comment_text: editorRef.current.getValue(),
                     comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
@@ -313,7 +313,7 @@ export default function CommentBox({ loadingComment = false }) {
             />
 
             < Tabs defaultActiveKey="1" >
-                <TabPane tab="Issue Note" key="1">
+                <TabPane tab="Internal Note" key="1">
                     <Form
                         name="Internal"
                         initialValues={{

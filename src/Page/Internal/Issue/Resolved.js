@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -42,7 +42,7 @@ export default function Resolved() {
 
 
   const loadIssue = async (value) => {
-    // setLoadding(true);
+    setLoadding(true);
     try {
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
@@ -55,6 +55,7 @@ export default function Resolved() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
           scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
@@ -67,7 +68,7 @@ export default function Resolved() {
       });
 
       if (results.status === 200) {
-
+        setLoadding(false);
         setPageTotal(results.data.total)
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
@@ -78,14 +79,21 @@ export default function Resolved() {
 
 
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
-    setTimeout(() => {
-      loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
-    }, 1000)
+    if (userstate.search === true) {
+      if (pageCurrent !== 1) {
+        setPageCurrent(1);
+        setPageSize(10);
+      } else {
+        loadIssue();
+      }
+    }
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, pageCurrent]);
+  }, [userstate.search, visible]);
+
+  useEffect(() => {
+    loadIssue();
+  }, [pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -101,8 +109,8 @@ export default function Resolved() {
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
-              pagination={{ pageSize: pageSize, total: pageTotal }}
-              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
+              onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
               onRow={(record, rowIndex) => {
                 // console.log(record, rowIndex)
                 return {
@@ -127,11 +135,12 @@ export default function Resolved() {
                 render={(record) => {
                   return (
                     <>
-                      <Tag color="#87d068"
-                        style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 10 }}
-                      >
-                        ReleaseNote
-                       </Tag>
+                      <Tooltip title="ReleaseNote">
+                        <TrademarkOutlined
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 12, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      <br />
                       <label className="table-column-text">
                         {record.Number}
                       </label>
@@ -222,7 +231,9 @@ export default function Resolved() {
                       <div>
                         <label className="table-column-text">
                           {record.Title}
+                          {record.IsReOpen === true ? " (ReOpen)" : ""}
                         </label>
+
                         <Tag color="#00CC00"
                           style={{
                             borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
@@ -284,14 +295,14 @@ export default function Resolved() {
                   return (
                     <>
                       <label className="table-column-text">
-                        {moment(record.DueDate).format("DD/MM/YYYY")}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}
                       </label>
                       <br />
                       <label className="table-column-text">
-                        {moment(record.DueDate).format("HH:mm")}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                       </label>
                       <br />
-                      {record.cntDueDate >= 1 ?
+                      <div style={{ display: record.cntDueDate >= 1 ? "block" : "none" }}>
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -301,8 +312,7 @@ export default function Resolved() {
                         >
                           เลื่อน Due
                        </Tag>
-                        : ""
-                      }
+                      </div>
                     </>
                   )
                 }
@@ -326,7 +336,6 @@ export default function Resolved() {
                           {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY")}<br />
                           {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("HH:mm")}
                         </label>
-
                       </div>
                     </>
                   );

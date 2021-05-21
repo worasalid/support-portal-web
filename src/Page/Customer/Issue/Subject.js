@@ -169,7 +169,7 @@ export default function Subject() {
       if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
 
-    // CR FLOW
+    // CR/Memo FLOW
     if (customerstate.issuedata.details[0].IssueType === "ChangeRequest" || customerstate.issuedata.details[0].IssueType === "Memo") {
 
       if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo" ||
@@ -179,13 +179,15 @@ export default function Subject() {
       if (item.data.NodeName === "customer" && item.data.value === "Hold") {
         modalSendissue_visible(true)
       }
-      if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday") {
+      if (item.data.NodeName === "customer" && item.data.value === "ConfirmManday" || item.data.value === "RejectManday") {
         setModalconfirmManday_visible(true)
       }
-      if (item.data.NodeName === "customer" && item.data.value === "Reject") {
+      if (item.data.NodeName === "customer" && item.data.value === "Reject" || item.data.value === "RejectPO") {
         modalSendissue_visible(true)
       }
-      if (item.data.NodeName === "customer" && item.data.value === "SendPO") { return (setModalPO_visible(true)) }
+      if (item.data.NodeName === "customer" && item.data.value === "SendPO") {
+        setModalPO_visible(true)
+      }
       if (item.data.NodeName === "customer" && item.data.value === "RejectDueDate") {
         setModalDueDate_visible(true)
       }
@@ -203,6 +205,7 @@ export default function Subject() {
       }
     }
 
+    // Use Flow
     if (customerstate.issuedata.details[0].IssueType === "Use") {
       if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
         return (modalSendissue_visible(true))
@@ -507,6 +510,7 @@ export default function Subject() {
           ticketid: customerstate.issuedata.details[0]?.Id,
           mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
           flowoutputid: customerstate.node.output_data?.FlowOutputId,
+          flowoutput: customerstate.node.output_data,
           manday: customerstate.issuedata.details[0]?.Manday,
           cost: customerstate.issuedata.details[0]?.Cost
         }}

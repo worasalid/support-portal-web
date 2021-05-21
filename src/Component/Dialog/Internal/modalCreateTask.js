@@ -13,6 +13,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
     const editorRef = useRef(null);
+    const uploadRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
     const LoadModule = async () => {
@@ -34,6 +35,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     }
 
     const CreateTask = async (values) => {
+        setLoading(true);
         try {
             const createtask = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create-task",
@@ -46,11 +48,13 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     title: values.title,
                     description: editorRef.current.getValue(),
                     moduleid: values.module,
-                    mailboxid: details.mailboxid
+                    mailboxid: details.mailboxid,
+                    files: uploadRef.current.getFiles().map((n) => n.response.id),
                 }
             });
             if (createtask.status === 200) {
                 setLoading(false);
+                onCancel();
                 await Modal.success({
                     title: 'สร้าง Task งานสำเร็จ',
                     content: (
@@ -85,7 +89,6 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     }
 
     const onFinish = (values) => {
-        setLoading(true);
         CreateTask(values);
     };
 
@@ -101,7 +104,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
         <Modal
             visible={visible}
             confirmLoading={loading}
-            onOk={() => { form.submit(); onCancel() }}
+            onOk={() => { form.submit() }}
             okText="Create"
             okButtonProps={{ type: "primary", htmlType: "submit", color: "#00CC00" }}
             onCancel={() => {
@@ -167,6 +170,8 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                         </Select>
                     </Form.Item>
                 </Form>
+                <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
         </Modal>
     )

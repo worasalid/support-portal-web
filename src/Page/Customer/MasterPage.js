@@ -54,8 +54,8 @@ export default function MasterPage({bgColor='#fff',...props}) {
         }
       });
       masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length });
-      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
-      masterdispatch({ type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Pass").length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Open" || x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Waiting Deploy PRD").length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length });
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length })
 
@@ -76,7 +76,6 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
       if(countNoti.status === 200) {
         masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
-        //setNotiCount(countNoti.data.total);
       }
     } catch (error) {
       
@@ -84,13 +83,20 @@ export default function MasterPage({bgColor='#fff',...props}) {
   }
 
   useEffect(() => {
-    if (!state.authen) {
-      getuser()
+    if (state.authen === false) {
+      getuser();
       getNotification();
+      CountStatus();
+    }else{
+      getuser();
+      setInterval(() => {
+        getNotification();
+        CountStatus();
+      }, 500000)
+      console.log("state",state?.usersdata?.users)
     }
-    CountStatus()
-   
-  }, [])
+
+  }, [state.authen])
 
   useEffect(() => {
     if (match.url.search("alltask") > 0) {
@@ -112,6 +118,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
       setActivemenu(activemenu.push("7"))
     }
   }, [])
+
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -161,43 +168,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
                 </Button>
                 </Dropdown>
               </Tooltip>
-              {/* <Dropdown
-                placement="topCenter"
-                overlayStyle={{
-                  width: 200,
-                  boxShadow:
-                    "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                }}
-                overlay={
-                  <Menu mode="inline" theme="light" onMouseOver="">
-                    <Menu.Item key="1" onClick={() => alert("Profile")}>
-                      Profile
-                    </Menu.Item>
-                    <Menu.Item key="2" onClick={() => alert("Setting")}>
-                      Setting
-                    </Menu.Item>
-                     {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
-                    <Divider style={{ margin: 4 }} />
-                    <Menu.Item key="2" onClick={() => history.push("/Login")}>
-                      Log Out
-                    </Menu.Item>
-                  </Menu>
-                }
-                trigger="click"
-              >
-                <Button type="link" >
-                  <div style={{ display: "inline-block", alignItems: "center" }}>
-                    <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
-
-                    </Avatar>
-                  </div>
-                  <div style={{ display: "inline-block", marginLeft: 8 }}>
-                    <label className="user-login">
-                      {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
-                    </label>
-                  </div>
-                </Button>
-              </Dropdown> */}
+     
               <div style={{ display: "inline-block", alignItems: "center" }}>
                     <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
@@ -304,11 +275,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Menu.Item>
               <Menu.Item
                 key="6"
-                onClick={() =>
-                  {
-                    return ( history.push({ pathname: "/customer/issue/cancel" }), window.location.reload(true)) 
-                  }
-                }
+                onClick={() => history.push({ pathname: "/customer/issue/cancel" })}
               >
                 Cancel
                 {

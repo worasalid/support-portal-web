@@ -34,6 +34,7 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
         }
     }, [visible])
 
+
     return (
         <Modal
             visible={visible}
@@ -50,7 +51,7 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
                         </label>
                         <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em", marginLeft: 20 }} />
                         <label className="value-text" style={{ marginLeft: 5 }} >
-                            {moment(history[0]?.due_date).format("DD/MM/YYYY HH:mm")}
+                            {history[0]?.due_date === undefined ? "None" : moment(history[0]?.due_date).format("DD/MM/YYYY HH:mm")}
                         </label>
                     </Col>
                 </Row>

@@ -26,7 +26,7 @@ export default function NormalLoginForm() {
       });
 
       if (result.status === 200) {
-        console.log("result", result.data, result.data.usersdata)
+        // console.log("result", result.data, result.data.usersdata)
         setLoading(false);
         localStorage.setItem("sp-ssid", result.data.ssid);
         dispatch({ type: 'Authen', payload: true });

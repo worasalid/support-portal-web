@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -52,6 +52,7 @@ export default function Cancel() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,

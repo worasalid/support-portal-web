@@ -50,7 +50,6 @@ export default function Issuesearch({ Progress = "hide" }) {
         },
     ]
 
-
     const handleChange = (e) => {
         //console.log(e.target.name,e.target.value)
         if (e.target.name === "issuetype") {
@@ -58,12 +57,14 @@ export default function Issuesearch({ Progress = "hide" }) {
             //console.log(e.target.value)
         }
         if (e.target.name === "product") {
+            console.log(e.target.value)
             customerdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
         }
         if (e.target.name === "module") {
             customerdispatch({ type: "SELECT_MODULE", payload: e.target.value })
         }
         if (e.target.name === "priority") {
+            console.log(e.target.value)
             customerdispatch({ type: "SELECT_PRIORITY", payload: e.target.value })
         }
         if (e.target.name === "progress") {
@@ -80,12 +81,16 @@ export default function Issuesearch({ Progress = "hide" }) {
             customerdispatch({ type: "SELECT_KEYWORD", payload: e.target.value })
         }
     }
-    const getproducts = async () => {
+
+    const getProducts = async () => {
         const products = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/products",
-            method: "get",
+            url: process.env.REACT_APP_API_URL + "/master/customer-products",
+            method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                company_id: state?.usersdata?.users?.company_id
             }
         });
         customerdispatch({ type: "LOAD_PRODUCT", payload: products.data });
@@ -130,27 +135,24 @@ export default function Issuesearch({ Progress = "hide" }) {
     }
 
     const getMasterdata = async () => {
-        try {
-            getproducts();
-            getmodule();
-            getissue_type();
-            getpriority();
-        } catch (error) {
-
-        }
+        getProducts();
+        getissue_type();
+        getpriority();
     }
+
     useEffect(() => {
-        if (state.authen) {
-            getMasterdata();
+        if (state.authen === false) {
+
+        } else {
+            setInterval(() => {
+                customerdispatch({ type: "SEARCH", payload: true })
+            }, 500000)
+            getMasterdata()
+
         }
     }, [state.authen]);
 
-    useEffect(() => {
-        if (state.authen) {
-            getmodule();
 
-        }
-    }, [customerstate.filter.productState]);
     return (
         <>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
@@ -165,6 +167,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", name: "issuetype" } })}
                         options={customerstate.masterdata && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name.replace("ChangeRequest", "CR") }))}
+                    //onClick={() => getissue_type()}
                     >
 
                     </Select>
@@ -176,22 +179,18 @@ export default function Issuesearch({ Progress = "hide" }) {
                         maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
                         options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onClear={() => alert()}
+                    //onClick={() => getpriority()}
                     />
                 </Col>
                 <Col span={4}>
-                    <Select placeholder="Module" style={{ width: "100%" }}
+                    <Select placeholder="Product" style={{ width: "100%" }}
                         mode="multiple"
-                        showSearch
                         allowClear
                         maxTagCount={1}
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={(value) => handleChange({ target: { value: value || "", name: 'module' } })}
-                        options={customerstate.masterdata && customerstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onClear={() => alert()}
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'product' } })}
+                        options={customerstate.masterdata && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: x.Name }))}
                     />
+                   
                 </Col>
                 <Col span={6} >
                     <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder={["IssueDate (Start)", "IssueDate (End)"]}
@@ -225,7 +224,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                 </Col>
                 <Col span={4}>
                     <Select placeholder="Scene"
-                        style={{ width: "100%"}}
+                        style={{ width: "100%" }}
                         mode="multiple"
                         showSearch
                         allowClear

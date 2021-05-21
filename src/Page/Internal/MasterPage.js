@@ -1,9 +1,9 @@
 import 'antd/dist/antd.css';
 import React, { Component, useState, useContext, useEffect } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Drawer } from 'antd';
+import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
-import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BarChartOutlined, SnippetsOutlined, LeftOutlined } from '@ant-design/icons';
+import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined } from '@ant-design/icons';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined
@@ -42,8 +42,8 @@ export class Menucollapsed extends Component {
   }
 }
 
-export default function MasterPage({bgColor='#fff',...props}) {
-  axios.defaults.headers = { "Authorization": "Bearer " + localStorage.getItem("sp-ssid")}
+export default function MasterPage({ bgColor = '#fff', ...props }) {
+  axios.defaults.headers = { "Authorization": "Bearer " + localStorage.getItem("sp-ssid") }
 
   const history = useHistory();
   const match = useRouteMatch();
@@ -53,14 +53,14 @@ export default function MasterPage({bgColor='#fff',...props}) {
   const [show_notice, setshow_notice] = useState(true)
   const [activemenu, setActivemenu] = useState('')
   const [active_submenu, setActive_submenu] = useState('')
-  //const [notiCount, setNotiCount] = useState(0);
+  const [notiCRDueDate, setNotiCRDueDate] = useState(0);
 
   //Menu
-  const rootSubmenuKeys = ['sub0', 'sub1', 'sub2','sub3'];
+  const rootSubmenuKeys = ['sub0', 'sub1', 'sub2', 'sub3'];
   const [openKeys, setOpenKeys] = useState(['sub1']);
 
   // Drawer
-  const [drawerCollapsed, setDrawerCollapsed ] = useState(false)
+  const [drawerCollapsed, setDrawerCollapsed] = useState(false)
 
   const onOpenChange = keys => {
     const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
@@ -81,15 +81,26 @@ export default function MasterPage({bgColor='#fff',...props}) {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
       });
-      if(result.status === 200){
+      if (result.status === 200) {
         dispatch({ type: 'Authen', payload: true });
         dispatch({ type: 'LOGIN', payload: result.data.usersdata });
       }
-     
+
     } catch (error) {
-      console.log("message",error.response.data)
-      alert(error.response.data)
-         history.push("/login");
+      if (error.response.status === 401) {
+        Modal.warning({
+          title: `Error ${error.response.status}`,
+          content: (
+            <div>
+              <p>{error.response.data}</p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+            history.push("/Login")
+          },
+        });
+      }
     }
   }
 
@@ -105,6 +116,8 @@ export default function MasterPage({bgColor='#fff',...props}) {
           type: "user"
         }
       });
+      masterdispatch({ type: "COUNT_SLA_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_SLA_DueDate === 0).length });
+      masterdispatch({ type: "COUNT_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_DueDate === 0).length });
       masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in").length });
       masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "Hold" || x.GroupStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Resolved" || x.GroupStatus === "Pass" || x.GroupStatus === "Deploy")).length });
@@ -116,7 +129,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
     }
   }
 
-  const getNotification = async() => {
+  const getNotification = async () => {
     try {
       const countNoti = await Axios({
         url: process.env.REACT_APP_API_URL + "/master/notification",
@@ -126,12 +139,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
         }
       });
 
-      if(countNoti.status === 200) {
+      if (countNoti.status === 200) {
         masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
-        //setNotiCount(countNoti.data.total);
       }
     } catch (error) {
-      
+
     }
   }
 
@@ -140,79 +152,83 @@ export default function MasterPage({bgColor='#fff',...props}) {
       getuser();
       getNotification();
       CountStatus();
+    } else {
+      setInterval(() => {
+        getNotification();
+        CountStatus();
+      }, 100000)
     }
-
   }, [state.authen])
 
-  useEffect(() =>{
+
+  useEffect(() => {
 
     // Issue
-    if(match.url.search("issue") > 0) {
+    if (match.url.search("issue") > 0) {
 
-      if(match.url.search("other") > 0){
+      if (match.url.search("other") > 0) {
         setActive_submenu('0')
       }
-      if(match.url.search("alltask") > 0){
-      setActive_submenu('1')
+      if (match.url.search("alltask") > 0) {
+        setActive_submenu('1')
       }
-      if(match.url.search("mytask") > 0){
+      if (match.url.search("mytask") > 0) {
         setActive_submenu('2');
-        }
-      if(match.url.search("inprogress") > 0){
-          setActive_submenu('3');
-        }
-        if(match.url.search("resolved") > 0) {
-          setActive_submenu('4');
-        }
-        if(match.url.search("cancel") > 0) {
-          setActive_submenu('5');
-        }
-        if(match.url.search("complete") > 0) {
-          setActive_submenu('6');
-        }
+      }
+      if (match.url.search("inprogress") > 0) {
+        setActive_submenu('3');
+      }
+      if (match.url.search("resolved") > 0) {
+        setActive_submenu('4');
+      }
+      if (match.url.search("cancel") > 0) {
+        setActive_submenu('5');
+      }
+      if (match.url.search("complete") > 0) {
+        setActive_submenu('6');
+      }
     }
-        //Setting
-    if(match.url.search("ricef") > 0) {
-        if(match.url.search("all") > 0){
-            setActive_submenu('7')
-        }
-        if(match.url.search("mytask") > 0){
-          setActive_submenu('8')
-        }
-        if(match.url.search("inprogress") > 0){
+    //Setting
+    if (match.url.search("ricef") > 0) {
+      if (match.url.search("all") > 0) {
+        setActive_submenu('7')
+      }
+      if (match.url.search("mytask") > 0) {
+        setActive_submenu('8')
+      }
+      if (match.url.search("inprogress") > 0) {
         setActive_submenu('9')
-        }
+      }
 
     }
     //Setting
-    if(match.url.search("setting") > 0) {
-      if(match.url.search("mastercompany") > 0){
+    if (match.url.search("setting") > 0) {
+      if (match.url.search("mastercompany") > 0) {
         setActive_submenu('11')
       }
-      if(match.url.search("mapcompany") > 0){
-      setActive_submenu('12')
+      if (match.url.search("mapcompany") > 0) {
+        setActive_submenu('12')
       }
-      if(match.url.search("mapdeveloper") > 0){
+      if (match.url.search("mapdeveloper") > 0) {
         setActive_submenu('13');
-        }
-      if(match.url.search("mapqa") > 0){
-          setActive_submenu('14');
-        }
-        if(match.url.search("mapsa") > 0) {
-          setActive_submenu('15');
-        }
-        if(match.url.search("system") > 0) {
-          setActive_submenu('16');
-        }
+      }
+      if (match.url.search("mapqa") > 0) {
+        setActive_submenu('14');
+      }
+      if (match.url.search("mapsa") > 0) {
+        setActive_submenu('15');
+      }
+      if (match.url.search("system") > 0) {
+        setActive_submenu('16');
+      }
     }
-  },[match.url])
-
+  }, [match.url])
 
   return (
     <Layout style={{ height: "100vh" }}>
       {/* <Header style={{ backgroundColor: "#be1e2d" }}> */}
       {/* <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']} style={{ backgroundColor: "#0099FF" }}> */}
-      <Menu theme="light" mode="horizontal" 
+      <Menu theme="light" mode="horizontal"
         style={{
           backgroundColor: "#be1e2d",
           height: "60px",
@@ -224,29 +240,26 @@ export default function MasterPage({bgColor='#fff',...props}) {
               style={{ height: "60px", width: "130px" }}
               src={`${process.env.PUBLIC_URL}/logo-space02.png`}
               alt=""
-              onClick={() =>  dispatch({ type: 'MENUCOLLAPSED', payload: !state.collapsed })}
-             
+              onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: !state.collapsed })}
+
             />
           </Col>
           <Col span={12} style={{ textAlign: "right" }}>
-
-            <Button
-               style={{backgroundColor:"#BE1E2D", borderColor:"#BE1E2D"}}
+            <Tooltip title="Sticky Note">
+              <Button
+                style={{ backgroundColor: "#BE1E2D", borderColor: "#BE1E2D" }}
                 icon={
-             <img
-             style={{ height: "30px", width: "30px" }}
-             
-             src={`${process.env.PUBLIC_URL}/icons-sticky-note.png`}
-             alt=""
-             //onClick={() => setCollapsed(!collapsed)}
-           />
-              } 
-               onClick={() => setDrawerCollapsed(true)} 
-            >
-             
-            </Button>
-           
-              
+                  <img
+                    style={{ height: "30px", width: "30px" }}
+
+                    src={`${process.env.PUBLIC_URL}/icons-sticky-note.png`}
+                  />
+                }
+                onClick={() => setDrawerCollapsed(true)}
+              >
+              </Button>
+            </Tooltip>
+
             <Tooltip title="Notifications">
               <Dropdown
                 placement="bottomCenter"
@@ -255,29 +268,29 @@ export default function MasterPage({bgColor='#fff',...props}) {
                   <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
                     <Menu.Item key="1">
                       <div>
-                      <label style={{ fontSize: 24, fontWeight: "bold" }}><NotificationOutlined /> &nbsp; Notifications</label><br />
-                      {/* <div style={{ height: "50vh", overflowY: "scroll" }}> */}
+                        <label style={{ fontSize: 24, fontWeight: "bold" }}><NotificationOutlined /> &nbsp; Notifications</label><br />
+                        {/* <div style={{ height: "50vh", overflowY: "scroll" }}> */}
                         <Row style={{ padding: 16 }}>
                           <Col span={24}>
-                           
-                               <Notifications />
+
+                            <Notifications />
                           </Col>
                         </Row>
-                      {/* </div> */}
+                        {/* </div> */}
                       </div>
                     </Menu.Item>
                   </Menu>
                 )} trigger="click">
 
-                <Button type="text" style={{ marginRight: 20,marginTop:10 }} size="middle"
+                <Button type="text" style={{ marginRight: 20, marginTop: 10 }} size="middle"
                   icon={
-                  <Badge 
-                   offset={[10,0]}
-                 // dot={show_notice} 
-                  count={masterstate?.toolbar?.top_menu?.notification}>
-                    <NotificationOutlined style={{ fontSize: 20 }} />
+                    <Badge
+                      offset={[10, 0]}
+                      // dot={show_notice} 
+                      count={masterstate?.toolbar?.top_menu?.notification}>
+                      <NotificationOutlined style={{ fontSize: 20 }} />
                     </Badge>
-                    }
+                  }
                 >
                 </Button>
               </Dropdown>
@@ -296,7 +309,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
                       Profile
                       </Menu.Item>
                     <hr />
-                    <Button type="link" onClick={() => history.push("/Login")}>Log Out</Button> <br />
+                    <Button type="link"
+                      onClick={() => {localStorage.removeItem("sp-ssid"); history.push("/Login")}}
+                    >
+                      Log Out
+                      </Button> <br />
                   </Menu>
                 )} trigger="click">
 
@@ -320,45 +337,45 @@ export default function MasterPage({bgColor='#fff',...props}) {
         </Row>
       </Menu>
       {/* </Header> */}
-      
+
       <Layout style={{ backgroundColor: "#" }}>
         <Sider theme="light"
           style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
           width={205}
           collapsed={state.collapsed}
         >
-           
+
           <Menu theme="light"
             style={{ backgroundColor: "#edebec" }}
             mode="inline"
-             defaultOpenKeys={[match.path.split('/')[2]]}
-             selectedKeys={[active_submenu]}
+            defaultOpenKeys={[match.path.split('/')[2]]}
+            selectedKeys={[active_submenu]}
           >
-           
-            <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{marginTop:16}}>
+
+            <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{ marginTop: 16 }}>
               <Menu.Item key="20" onClick={() => history.push('/internal/dashboard')}>
                 - DashBoard
-                
+
               </Menu.Item>
             </SubMenu>
             <SubMenu key="issue" icon={<FileOutlined />} title="Issue" >
-            <Menu.Item key="0" onClick={() => {
-              history.push({ pathname: '/internal/issue/other' });
-              // setActivemenu('sub0');
-              // setActive_submenu('0')
-            }}
-               style={{
-                display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
+              <Menu.Item key="0" onClick={() => {
+                history.push({ pathname: '/internal/issue/other' });
+                // setActivemenu('sub0');
+                // setActive_submenu('0')
               }}
+                style={{
+                  display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
+                }}
               >
                 Other Issue
-               
+
               </Menu.Item>
-            <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
-              {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
+              <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
+                {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
                 All Task
               </Menu.Item>
-            <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
+              <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
                 My Task
                 {
                   masterstate.toolbar.sider_menu.issue.mytask.count === 0
@@ -367,16 +384,24 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
                 }
               </Menu.Item>
-            <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
-                In progress
+              <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
+                <Badge dot
+                  count={
+                    (state.usersdata?.organize.OrganizeCode === "support" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? 1 : 0) ||
+                    (state.usersdata?.organize.OrganizeCode === "cr_center" && masterstate.toolbar.sider_menu.issue.sla_duedate_noti > 0 ? 1 : 0) ||
+                    (state.usersdata?.organize.OrganizeCode === "consult" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? 1 : 0)
+                  }
+                >
+                  In progress
                 {
-                  masterstate.toolbar.sider_menu.issue.inprogress.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+                    masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                      ? ""
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
 
-                }
+                  }
+                </Badge>
               </Menu.Item>
-            <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
+              <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
                 Resolved
                 {
                   masterstate.toolbar.sider_menu.issue.resolved.count === 0
@@ -385,7 +410,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
                 }
               </Menu.Item>
-            <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
+              <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
                 Cancel
                 {
                   masterstate.toolbar.sider_menu.issue.cancel.count === 0
@@ -394,81 +419,83 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
                 }
               </Menu.Item>
-            <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
+              <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
                 <span >Complete</span>
-            </Menu.Item>
+              </Menu.Item>
             </SubMenu>
 
-            <SubMenu  key="ricef"
+            <SubMenu key="ricef"
               style={{
-                display: state.usersdata?.organize?.OrganizeCode === "consult" || 
-               // state.usersdata?.organize?.OrganizeCode === "support" ||
+                display: state.usersdata?.organize?.OrganizeCode === "consult" ||
+                  // state.usersdata?.organize?.OrganizeCode === "support" ||
                   state.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
               }}
               icon={<AuditOutlined />} title="RICEF">
               <Menu.Item key="7" onClick={() => history.push('/internal/ricef/all')}>
                 - All Task
                   {/* <Badge count={1}> */}
-                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
               <Menu.Item key="8" onClick={() => history.push('/internal/ricef/mytask')}>
                 - My Task
                   {/* <Badge count={1}> */}
-                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
               <Menu.Item key="9" onClick={() => history.push('/internal/ricef/inprogress')}>
                 - InProgress
                   {/* <Badge count={1}> */}
-                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
             </SubMenu>
 
             <SubMenu key="setting" icon={<SettingOutlined />} title="Setting"
-           // style={{display: state.usersdata?.users.code !== "I0017" ? "block" : "none"}}
+            // style={{display: state.usersdata?.users.code !== "I0017" ? "block" : "none"}}
             >
-              <Menu.Item key="11" 
-                style={{display: state.usersdata?.organize.OrganizeCode === "support" || 
-                   state.usersdata?.organize.OrganizeCode === "cr_center" || 
-                   state.usersdata?.organize.OrganizeCode === "consult" || 
-                   state.usersdata?.users.code === "I0017" ? "block" : "none"}}
+              <Menu.Item key="11"
+                style={{
+                  display: state.usersdata?.organize.OrganizeCode === "support" ||
+                    state.usersdata?.organize.OrganizeCode === "cr_center" ||
+                    state.usersdata?.organize.OrganizeCode === "consult" ||
+                    state.usersdata?.users.code === "I0017" ? "block" : "none"
+                }}
                 onClick={() => {
-                history.push('/internal/setting/mastercompany');
-              }}>
+                  history.push('/internal/setting/mastercompany');
+                }}>
                 - ข้อมูลบริษัท
               </Menu.Item>
-              <Menu.Item key="12" 
-                  style={{
-                    display: state.usersdata?.organize.OrganizeCode === "support" ||  state.usersdata?.users.code === "I0017"  ? "block" : "none"
-                  }}
-                  onClick={() => {
+              <Menu.Item key="12"
+                style={{
+                  display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" || state.usersdata?.users.code === "I0017" ? "block" : "none"
+                }}
+                onClick={() => {
                   history.push('/internal/setting/mapcompany');
-              }}
-          
+                }}
+
               >
                 - Support Site
               </Menu.Item>
-              <Menu.Item key="13" 
-               style={{
-                  display: state.usersdata?.organize.OrganizeCode === "dev"  ? "block" : "none"
+              <Menu.Item key="13"
+                style={{
+                  display: state.usersdata?.organize.OrganizeCode === "dev" ? "block" : "none"
                 }}
                 onClick={() => history.push('/internal/setting/mapdeveloper')}
               >
                 - Developer Module
               </Menu.Item>
               <Menu.Item key="14" onClick={() => history.push('/internal/setting/mapqa')}
-               style={{
-                display: state.usersdata?.organize.OrganizeCode === "qa" ||  state.usersdata?.users.code === "I0017"  ? "block" : "none"
-              }}
+                style={{
+                  display: state.usersdata?.organize.OrganizeCode === "qa" || state.usersdata?.users.code === "I0017" ? "block" : "none"
+                }}
               >
                 - QA Site
               </Menu.Item>
               <Menu.Item key="15" onClick={() => history.push('/internal/setting/mapsa')}
                 style={{
-                display: state.usersdata?.organize.OrganizeCode === "sa" ||  state.usersdata?.users.code === "I0017"  ? "block" : "none"
-              }}
+                  display: state.usersdata?.organize.OrganizeCode === "sa" || state.usersdata?.users.code === "I0017" ? "block" : "none"
+                }}
               >
                 - SA Site
               </Menu.Item>
@@ -477,7 +504,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Menu.Item>
             </SubMenu>
 
-         
+
           </Menu>
         </Sider>
 
@@ -498,11 +525,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
           {props.children}
         </Content>
       </Layout>
-   
-      <StickyNote 
+
+      <StickyNote
         onClose={() => setDrawerCollapsed(false)}
         visible={drawerCollapsed}
       />
-    </Layout>
+    </Layout >
   )
 }

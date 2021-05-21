@@ -42,12 +42,6 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
 
             if (version.status === 200) {
                 setVersion(version.data)
-                // setVersion(version.data.map((x) => {
-                //     return {
-                //         value: x.value,
-                //         label: x.Name
-                //     }
-                // }))
             }
         } catch (error) {
 

@@ -189,7 +189,7 @@ export default function SLATime({ start, end, due }) {
       due_minute,
       work_minute,
     });
-  }, []);
+  }, [start, end, due]);
 
 
   return (

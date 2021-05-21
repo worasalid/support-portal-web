@@ -109,7 +109,7 @@ export default function TaskComment({ loadingComment = false }) {
                     ticketid: match.params.id,
                     taskid: match.params.task,
                     comment_text: editorRef.current.getValue(),
-                    comment_type: "internal",
+                    comment_type: "task",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
                     userid: values.sendto
                 }
