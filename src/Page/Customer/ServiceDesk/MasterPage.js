@@ -12,7 +12,7 @@ export default function MasterPage(props) {
     const getuser = async () => {
         try {
             const result = await axios({
-                url: process.env.REACT_APP_API_URL + "/auth/customer/me",
+                url: process.env.REACT_APP_API_URL + "/auth/login/customer/me",
                 method: "get",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")

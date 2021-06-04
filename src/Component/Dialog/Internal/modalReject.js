@@ -32,7 +32,7 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: textValue,
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });

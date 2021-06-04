@@ -187,18 +187,7 @@ export default function Pass() {
                           </label>
                         </Col>
                       </Row>
-                      {/* <Row style={{ borderBottom: "1px dotted" }}>
-                      <Col span={8}>
-                        <label style={{ color: "#808080", fontSize: "10px" }}>
-                          Module :
-                          </label>
-                      </Col>
-                      <Col span={14}>
-                        <label style={{ color: "#808080", fontSize: "10px" }}>
-                          {record.ModuleName}
-                        </label>
-                      </Col>
-                    </Row> */}
+
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
@@ -208,6 +197,20 @@ export default function Pass() {
                         <Col span={14}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
                             {record.Scene}
+                          </label>
+                        </Col>
+                      </Row>
+
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
                           </label>
                         </Col>
                       </Row>
@@ -267,8 +270,8 @@ export default function Pass() {
                   return (
                     <>
                       <label className="table-column-text">
-                        {record.DueDate === null ? "" : moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
-                        {record.DueDate === null ? "" : moment(record.AssignIconDate).format("HH:mm")}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                       </label>
                       <br />
                       {record.cntDueDate >= 1 ?

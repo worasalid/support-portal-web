@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { Spin, Modal, Form, Tabs } from 'antd';
 // import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
@@ -10,6 +10,7 @@ const { TabPane } = Tabs;
 
 export default function ModalSendTask({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
+    const match = useRouteMatch();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const editorRef = useRef(null);
@@ -28,7 +29,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -74,11 +75,13 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                         editorRef.current.setvalue();
 
                         if (details.flowoutput.value === "SendTask" || details.flowoutput.value === "ResolvedTask" || details.flowoutput.value === "SendToDev") {
-                            window.location.reload(true);
-                            history.goBack();
+                            history.push({ pathname: "/internal/issue/subject/" + match.params.id });
+                            window.location.reload(true); 
                         }
                         else if (details.flowoutput.value === "SendToDeploy") {
                             history.push({ pathname: "/internal/issue/resolved" });
+                            window.location.reload(true);
+                           
                         }
                         else {
                             history.push({ pathname: "/internal/issue/inprogress" });
@@ -112,6 +115,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
         setLoading(true);
         SendFlow();
     };
+
 
 
     return (

@@ -3,7 +3,7 @@ import React, { Component, useState, useContext, useEffect } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
-import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined } from '@ant-design/icons';
+import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BellOutlined } from '@ant-design/icons';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined
@@ -188,7 +188,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
         setActive_submenu('6');
       }
     }
-    //Setting
+    //ricef
     if (match.url.search("ricef") > 0) {
       if (match.url.search("all") > 0) {
         setActive_submenu('7')
@@ -222,6 +222,11 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
         setActive_submenu('16');
       }
     }
+    // Migration
+    if (match.url.search("migration") > 0) {
+      setActive_submenu('99')
+    }
+
   }, [match.url])
 
   return (
@@ -310,7 +315,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                       </Menu.Item>
                     <hr />
                     <Button type="link"
-                      onClick={() => {localStorage.removeItem("sp-ssid"); history.push("/Login")}}
+                      onClick={() => { localStorage.removeItem("sp-ssid"); history.push("/Login") }}
                     >
                       Log Out
                       </Button> <br />
@@ -355,7 +360,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{ marginTop: 16 }}>
               <Menu.Item key="20" onClick={() => history.push('/internal/dashboard')}>
                 - DashBoard
-
               </Menu.Item>
             </SubMenu>
             <SubMenu key="issue" icon={<FileOutlined />} title="Issue" >
@@ -375,53 +379,70 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
                 All Task
               </Menu.Item>
-              <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
-                My Task
+              <Menu.ItemGroup key="g2" title="In Box">
+                <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
+                  My Task
                 {
-                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
-
-                }
-              </Menu.Item>
-              <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
-                <Badge dot
-                  count={
-                    (state.usersdata?.organize.OrganizeCode === "support" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? 1 : 0) ||
-                    (state.usersdata?.organize.OrganizeCode === "cr_center" && masterstate.toolbar.sider_menu.issue.sla_duedate_noti > 0 ? 1 : 0) ||
-                    (state.usersdata?.organize.OrganizeCode === "consult" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? 1 : 0)
-                  }
-                >
-                  In progress
-                {
-                    masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                    masterstate.toolbar.sider_menu.issue.mytask.count === 0
                       ? ""
-                      : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
 
                   }
-                </Badge>
-              </Menu.Item>
-              <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
-                Resolved
-                {
-                  masterstate.toolbar.sider_menu.issue.resolved.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.resolved.count})`}</span>
+                </Menu.Item>
+              </Menu.ItemGroup>
+              <Menu.ItemGroup key="g2" title="Out Box">
+                <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
 
-                }
-              </Menu.Item>
-              <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
-                Cancel
+                  <Badge
+                    //dot
+                    style={{ color: "red" }}
+                    offset={[20, 0]}
+                    count={
+                      (state.usersdata?.organize.OrganizeCode === "support" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? <BellOutlined /> : 0) ||
+                      (state.usersdata?.organize.OrganizeCode === "cr_center" && masterstate.toolbar.sider_menu.issue.sla_duedate_noti > 0 ? <BellOutlined /> : 0) ||
+                      (state.usersdata?.organize.OrganizeCode === "consult" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? <BellOutlined /> : 0)
+                    }
+                  >
+                    In progress
                 {
-                  masterstate.toolbar.sider_menu.issue.cancel.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+                      masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                        ? ""
+                        : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
 
-                }
-              </Menu.Item>
-              <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
-                <span >Complete</span>
-              </Menu.Item>
+                    }
+
+                  </Badge>
+                  {/* <BellOutlined style={{
+                  color: "red",
+                  display: (state.usersdata?.organize.OrganizeCode === "support" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? "inline-block" : "block") ||
+                    (state.usersdata?.organize.OrganizeCode === "cr_center" && masterstate.toolbar.sider_menu.issue.sla_duedate_noti > 0 ? "inline-block" : "none") ||
+                    (state.usersdata?.organize.OrganizeCode === "consult" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? "inline-block" : "none")
+                }} /> */}
+
+                </Menu.Item>
+
+                <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
+                  Resolved
+                {
+                    masterstate.toolbar.sider_menu.issue.resolved.count === 0
+                      ? ""
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.resolved.count})`}</span>
+
+                  }
+                </Menu.Item>
+                <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
+                  Cancel
+                {
+                    masterstate.toolbar.sider_menu.issue.cancel.count === 0
+                      ? ""
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+
+                  }
+                </Menu.Item>
+                <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
+                  <span >Complete</span>
+                </Menu.Item>
+              </Menu.ItemGroup>
             </SubMenu>
 
             <SubMenu key="ricef"
@@ -503,6 +524,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 - ตั้งค่าข้อมูลระบบ
               </Menu.Item>
             </SubMenu>
+
+
+            <Menu.Item key="99" icon={<SettingOutlined />} onClick={() => history.push('/internal/migration')}
+              hidden={state?.usersdata?.users?.code === "I0017" ? false : true}
+            >
+              Migration
+              </Menu.Item>
 
 
           </Menu>

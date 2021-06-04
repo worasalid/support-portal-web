@@ -92,7 +92,7 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
                     okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
-                        history.push({ pathname: "/internal/issue/inprogress" });
+                        history.push({ pathname: "/customer/issue/inprogress" });
                         window.location.reload(true);
                     },
                 });

@@ -207,7 +207,7 @@ export default function Resolved() {
                         </Col>
                       </Row> */}
                       <Row style={{ borderBottom: "1px dotted" }}>
-                        <Col span={10}>
+                        <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
                             Scene :
                           </label>
@@ -218,6 +218,21 @@ export default function Resolved() {
                           </label>
                         </Col>
                       </Row>
+
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
+                          </label>
+                        </Col>
+                      </Row>
+
                     </div>
                   );
                 }}

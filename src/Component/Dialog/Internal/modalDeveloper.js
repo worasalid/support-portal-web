@@ -42,7 +42,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -154,7 +154,6 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     }
 
     const onFinish = (values) => {
-        console.log(values);
         SendFlow(values);
     };
 

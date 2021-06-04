@@ -212,6 +212,19 @@ export default function InProgress() {
                           </label>
                         </Col>
                       </Row>
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
+                          </label>
+                        </Col>
+                      </Row>
                     </div>
                   );
                 }}

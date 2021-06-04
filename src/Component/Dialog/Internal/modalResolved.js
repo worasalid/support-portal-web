@@ -22,8 +22,16 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
             label: "Waiting Customer Update Patch"
         },
         {
+            name: "Waiting Customer Test",
+            label: "Waiting Customer Test"
+        },
+        {
             name: "Waiting Customer Deploy PRD",
             label: "Waiting Customer Deploy PRD"
+        },
+        {
+            name: "Deploy PRD Completed",
+            label: "Deploy PRD Completed"
         }
     ]
 
@@ -74,7 +82,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 },
                 data: {
                     ticketid: details && details.ticketid,
-                    //files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
+                    files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
                     reftype: "Master_Ticket",
                     url: values.test_result_url,
                     grouptype: "testResult"
@@ -212,8 +220,8 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                                     },
                                 ]}
                             >
-                                {/* <UploadFile ref={uploadRef_testresult} /> */}
-                                <TextArea rows="2" style={{ width: "100%" }} />
+                                <UploadFile ref={uploadRef_testresult} />
+                                {/* <TextArea rows="2" style={{ width: "100%" }} /> */}
                             </Form.Item>
                     }
 

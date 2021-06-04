@@ -89,6 +89,27 @@ export default function AllTask() {
     });
   }
 
+  const updateCountNoti = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticket_id: param
+        }
+      });
+
+      if (result.status === 200) {
+
+      }
+    } catch (error) {
+
+    }
+  }
+
   useEffect(() => {
     if (userstate.search === true) {
       if (pageCurrent !== 1) {
@@ -105,6 +126,8 @@ export default function AllTask() {
   useEffect(() => {
     loadIssue();
   }, [pageCurrent]);
+
+
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -270,12 +293,12 @@ export default function AllTask() {
                       <div>
                         <label
                           onClick={() => {
-                            return (
-                              history.push({ pathname: "/internal/issue/subject/" + record.Id }),
-                              (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
-                          }
-                          }
+                            history.push({ pathname: "/internal/issue/subject/" + record.Id });
+                            UpdateStatusMailbox(record.MailBoxId);
+                            updateCountNoti(record.Id);
+                            window.location.reload(true);
+                          }}
+
                           className="table-column-detail">
                           รายละเอียด
                           </label>
@@ -382,7 +405,7 @@ export default function AllTask() {
                 }}
               />
 
-              <Column  title="Time Tracking" width="5%"
+              <Column title="Time Tracking" width="5%"
                 align="center"
                 render={(record) => {
                   return (

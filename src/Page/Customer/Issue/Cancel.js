@@ -67,32 +67,26 @@ export default function Cancel() {
     }
   };
 
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value
-      }
-    });
-    customerdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data })
-  }
+  const updateCountNoti = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticket_id: param
+        }
+      });
 
-  // const UpdateStatusMailbox = async (value) => {
-  //   const mailbox = await Axios({
-  //     url: process.env.REACT_APP_API_URL + "/tickets/read",
-  //     method: "PATCH",
-  //     headers: {
-  //       "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-  //     },
-  //     params: {
-  //       mailbox_id: value
-  //     }
-  //   });
-  // }
+      if (result.status === 200) {
+
+      }
+    } catch (error) {
+
+    }
+  }
 
   useEffect(() => {
     if (customerstate.search === true) {
@@ -216,18 +210,7 @@ export default function Cancel() {
                           </label>
                         </Col>
                       </Row>
-                      {/* <Row style={{ borderBottom: "1px dotted" }}>
-                      <Col span={8}>
-                        <label style={{ color: "#808080", fontSize: "10px" }}>
-                          Module :
-                          </label>
-                      </Col>
-                      <Col span={14}>
-                        <label style={{ color: "#808080", fontSize: "10px" }}>
-                          {record.ModuleName}
-                        </label>
-                      </Col>
-                    </Row> */}
+
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
@@ -237,6 +220,20 @@ export default function Cancel() {
                         <Col span={14}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
                             {record.Scene}
+                          </label>
+                        </Col>
+                      </Row>
+
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
                           </label>
                         </Col>
                       </Row>
@@ -257,13 +254,12 @@ export default function Cancel() {
                       <div>
                         <label
                           onClick={() => {
-                            return (
-                              customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                              history.push({ pathname: "/Customer/Issue/Subject/" + record.Id })
-                              // ,(record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
-                          }
-                          }
+                            customerdispatch({ type: "SELECT_DATAROW", payload: record });
+                            history.push({ pathname: "/Customer/Issue/Subject/" + record.Id });
+                            updateCountNoti(record.Id);
+                            window.location.reload(true);
+                          }}
+
                           className="table-column-detail">รายละเอียด</label>
                       </div>
 

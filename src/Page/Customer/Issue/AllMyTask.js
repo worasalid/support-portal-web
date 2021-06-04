@@ -84,6 +84,27 @@ export default function AllMyTask() {
     });
   }
 
+  const updateCountNoti = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticket_id: param
+        }
+      });
+
+      if (result.status === 200) {
+
+      }
+    } catch (error) {
+
+    }
+  }
+
   useEffect(() => {
     if (customerstate.search === true) {
       if (pageCurrent !== 1) {
@@ -101,6 +122,7 @@ export default function AllMyTask() {
     loadIssue();
   }, [pageCurrent]);
 
+  console.log("progress", customerstate?.filter?.progress)
 
   return (
     <IssueContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
@@ -219,6 +241,20 @@ export default function AllMyTask() {
                           </label>
                         </Col>
                       </Row>
+
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
+                          </label>
+                        </Col>
+                      </Row>
                     </div>
                   );
                 }}
@@ -235,13 +271,13 @@ export default function AllMyTask() {
                       <div>
                         <label
                           onClick={() => {
-                            return (
-                              customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                              history.push({ pathname: "/customer/issue/subject/" + record.Id }),
-                              (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
-                          }
-                          }
+                            customerdispatch({ type: "SELECT_DATAROW", payload: record });
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id });
+                            UpdateStatusMailbox(record.MailBoxId);
+                            updateCountNoti(record.Id);
+                            window.location.reload(true);
+                          }}
+
                           className="table-column-detail">รายละเอียด</label>
                       </div>
 

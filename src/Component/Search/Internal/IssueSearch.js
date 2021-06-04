@@ -9,7 +9,7 @@ import IssueContext, { userState } from '../../../utility/issueContext';
 
 export default function Issuesearch({ Progress = "hide" }) {
     const { RangePicker } = DatePicker;
-    const { Option,OptGroup  } = Select;
+    const { Option, OptGroup } = Select;
     const { state, dispatch } = useContext(AuthenContext);
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
@@ -29,6 +29,10 @@ export default function Issuesearch({ Progress = "hide" }) {
         {
             value: "ReOpen",
             text: "ReOpen"
+        },
+        {
+            value: "Cancel",
+            text: "Cancel"
         },
         {
             value: "Complete",
@@ -121,6 +125,9 @@ export default function Issuesearch({ Progress = "hide" }) {
             const version = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/version",
                 method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
                 params: {
                     productId: userstate.filter.productState
                 }
@@ -166,7 +173,7 @@ export default function Issuesearch({ Progress = "hide" }) {
             getcompany();
             getproducts();
             getissue_type();
-            
+
         } catch (error) {
 
         }
@@ -277,7 +284,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                         maxTagCount={1}
                         allowClear
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'version' } })}
-                     
+
                         options={userstate.masterdata && userstate.masterdata.versionState.map((x) => ({ value: x.Name, label: x.Name }))}
                     />
                 </Col>

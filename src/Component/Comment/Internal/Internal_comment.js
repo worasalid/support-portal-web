@@ -32,7 +32,7 @@ export default function CommentBox({ loadingComment = false }) {
     const [commentid, setCommentid] = useState(null);
     const [listmailbox, setListmailbox] = useState([]);
     const [listmailto, setListmailto] = useState([]);
-    const mailto = []
+
     const [imgUrl, setImgUrl] = useState(null);
 
     const [divcollapse, setDivcollapse] = useState([])
@@ -97,7 +97,9 @@ export default function CommentBox({ loadingComment = false }) {
         }
     }
 
-    const onFinish = async (values) => {
+    const saveComment = async (values) => {
+        setModalLoading(true);
+        setbuttonLoading(true);
         try {
 
             if (editorRef.current.getValue() === "" && editorRef.current.getValue() === null && editorRef.current.getValue() === undefined) {
@@ -116,7 +118,7 @@ export default function CommentBox({ loadingComment = false }) {
                     comment_text: editorRef.current.getValue(),
                     comment_type: "internal",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
-                    userid: values.sendto
+                    userid: values.send_to === undefined ? values.send_all : values.send_to
                 }
             });
 
@@ -143,7 +145,6 @@ export default function CommentBox({ loadingComment = false }) {
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
 
                 okText: "Close",
-                // okCancel:true,
                 content: (
                     <div>
                         <p>{error.response?.data ? error.response?.data : error.message || error}</p>
@@ -157,6 +158,10 @@ export default function CommentBox({ loadingComment = false }) {
 
             });
         }
+    }
+
+    const onFinish = async (values) => {
+        saveComment(values)
     }
 
     useEffect(() => {
@@ -223,7 +228,7 @@ export default function CommentBox({ loadingComment = false }) {
                                             }}
                                         >
                                             {/* <EllipsisOutlined style={{ fontSize: 20,color:"#C7C7C7" }} /> */}
-                                     
+
                                         </label>
                                     )
                                 }
@@ -274,7 +279,7 @@ export default function CommentBox({ loadingComment = false }) {
                                             <Row>
                                                 <Col span={24}>
                                                     <label
-                                                        onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
+                                                        onClick={() => { setCommentid(item.id); setModalfiledownload_visible(true) }}
                                                         className="text-link value-text">
                                                         <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
                                                 </label>
@@ -389,31 +394,36 @@ export default function CommentBox({ loadingComment = false }) {
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
                 onOk={() => {
                     form.submit();
-                    setbuttonLoading(true);
-                    setModalLoading(true);
+                    //setbuttonLoading(true);
+                    //setModalLoading(true);
                 }}
 
             >
                 <Spin spinning={modalLoading}>
                     <Form
                         form={form}
-                        name="email_send"
+                        name="send_email"
                         initialValues={{
 
                         }}
                         layout="horizontal"
                         onFinish={onFinish}
                     >
-                        <Form.Item name="email_All" label="ส่งทุกคน" valuePropName="checked">
+                        <Form.Item name="send_all" label="ส่งทุกคน"
+                        // valuePropName="checked"
+                        >
                             <Checkbox onChange={(e) => {
-                                return (
-                                    setDisabled(e.target.checked)
-                                )
-
-
-                            }} />
+                                setDisabled(e.target.checked)
+                                if (e.target.checked === true) {
+                                    form.setFieldsValue({ send_all: listmailbox && listmailbox.map((x) => x.UserId )})
+                                    form.setFieldsValue({ send_to: undefined})
+                                }else{
+                                    form.setFieldsValue({ send_all: undefined})
+                                }
+                            }}
+                            />
                         </Form.Item>
-                        <Form.Item name="sendto" label="To" >
+                        <Form.Item name="send_to" label="To" >
                             <Select style={{ width: '100%' }} placeholder="None"
                                 // showSearch
                                 mode="multiple"
@@ -422,8 +432,6 @@ export default function CommentBox({ loadingComment = false }) {
                                 filterOption={(input, option) =>
                                     option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                 }
-
-                                // onChange={(value, item) => setListmailbox(item.value)}
                                 options={
                                     listmailbox && listmailbox.map((item) => ({
                                         value: item.UserId,

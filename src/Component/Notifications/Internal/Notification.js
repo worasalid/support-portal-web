@@ -103,26 +103,32 @@ export default function Notifications(props) {
                             <List.Item.Meta
                                 title={
                                     <>
-                                        <label className="text-link"
+                                        {/* <label
                                             onClick={() => {
                                                 history.push({ pathname: "/internal/issue/subject/" + item.ticketid });
                                                 window.location.reload(true);
                                                 updateCountNoti(item.id);
                                             }}
 
+                                        > */}
+                                        <Badge dot={true}
+                                            offset={[-5]}
+                                            style={{ display: item?.readdate === null ? "inline-block" : "none" }}
                                         >
-                                            <Badge dot={true}
-                                                 offset={[-5]}
-                                                style={{ display: item?.readdate === null ? "inline-block" : "none" }}
-                                            >
-                                                {/* {item.title} */}
-                                            </Badge>
+                                            {/* {item.title} */}
+                                        </Badge>
 
-                                            <label>
-                                                {item.title}
-                                            </label>
-
+                                        <label className="text-link"
+                                            onClick={() => {
+                                                history.push({ pathname: "/internal/issue/subject/" + item.ticketid });
+                                                window.location.reload(true);
+                                                updateCountNoti(item.id);
+                                            }}
+                                        >
+                                            {item.title}
                                         </label>
+
+                                        {/* </label> */}
                                         <label
                                             style={{ marginLeft: 20 }}
                                             className={item?.readdate === null ? "noti-text-unread" : "noti-text"}

@@ -91,7 +91,8 @@ export default function SubTask() {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         params: {
-          ticketid: match.params.id
+          ticketid: match.params.id,
+          taskid: match.params.task
         }
       });
 
@@ -577,7 +578,8 @@ export default function SubTask() {
                 <Col span={18}
                   style={{
                     marginTop: 10,
-                    display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
+                    //display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
+                    display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
                   }}
                 >
                   <Select ref={selectRef}
@@ -589,15 +591,15 @@ export default function SubTask() {
                 </Col>
                 <Col span={18}
                   style={{
-                    display:
-                      userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
+                    // display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
+                    display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
                   }}>
                   <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
                 </Col>
                 <Col span={18}
                   style={{
-                    display:
-                      userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
+                    //display: userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
+                    display: userstate?.mailbox[0]?.MailType === "out" ? "block" : "none"
                   }}>
                   <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
                 </Col>
@@ -689,7 +691,9 @@ export default function SubTask() {
                   <label className="header-text">Module</label>
                   <br />
                   {
-                    (userstate?.mailbox[0]?.NodeName === "support" && userstate?.taskdata?.data[0]?.Status === "Waiting Progress")
+                    (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center") &&
+                      userstate.taskdata.data[0]?.MailType === "in" &&
+                      userstate?.taskdata?.data[0]?.Status === "Waiting Progress"
                       ? <Select
                         style={{ width: '100%' }}
                         allowClear

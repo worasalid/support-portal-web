@@ -204,7 +204,7 @@ export default function InProgress() {
 
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label className="table-column-text" style={{ color: "#808080" }}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
                             Type :
                           </label>
                         </Col>
@@ -253,11 +253,12 @@ export default function InProgress() {
                           </label>
                         </Col>
                       </Row>
-                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            Version :
+                           {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ?  "Version :" : "Patch :"}
                           </label>
                         </Col>
                         <Col span={14}>
@@ -266,6 +267,7 @@ export default function InProgress() {
                           </label>
                         </Col>
                       </Row>
+
                     </div>
                   );
                 }}
@@ -330,7 +332,7 @@ export default function InProgress() {
                 }
               />
 
-              <Column title="Due Date" width="8%"
+              <Column title="Due Date" width="10%"
                 align="center"
                 render={(record) => {
                   return (
@@ -371,6 +373,7 @@ export default function InProgress() {
                   )
                 }}
               />
+
               <Column
                 title="ProgressStatus" width="10%"
                 align="center"
@@ -383,7 +386,7 @@ export default function InProgress() {
                         </label>
                         <label
                           style={{ display: record.IsReOpen === true ? "block" : "none" }}
-                          className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                          className="table-column-text">
                           (ReOpen)
                         </label>
                       </div>
@@ -391,6 +394,7 @@ export default function InProgress() {
                   );
                 }}
               />
+              
               <Column
                 title="Time Tracking" width="5%"
                 align="center"

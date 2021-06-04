@@ -85,6 +85,7 @@ export default function TaskComment({ loadingComment = false }) {
                 },
                 params: {
                     ticketId: match.params.id,
+                    taskId: match.params.task
                 }
             });
             setListmailbox(mailbox.data);
@@ -93,7 +94,9 @@ export default function TaskComment({ loadingComment = false }) {
         }
     }
 
-    const onFinish = async (values) => {
+    const saveComment = async (values) => {
+        setModalLoading(true);
+        setbuttonLoading(true);
         try {
             if (editorRef.current.getValue() === "" || editorRef.current.getValue() === null) {
                 throw ("กรุณาระบุ Comment!")
@@ -111,7 +114,7 @@ export default function TaskComment({ loadingComment = false }) {
                     comment_text: editorRef.current.getValue(),
                     comment_type: "task",
                     files: uploadRef.current.getFiles().map((n) => n.response.id),
-                    userid: values.sendto
+                    userid: values.send_to === undefined ? values.send_all : values.send_to
                 }
             });
 
@@ -152,10 +155,13 @@ export default function TaskComment({ loadingComment = false }) {
         }
     }
 
+    const onFinish = async (values) => {
+        saveComment(values)
+    }
+
     useEffect(() => {
         loadInternalComment()
     }, [])
-
 
     return (
         <>
@@ -358,31 +364,35 @@ export default function TaskComment({ loadingComment = false }) {
                 // cancelButtonProps={{ disabled: true }}
                 onOk={() => {
                     form.submit();
-                    setbuttonLoading(true);
-                    setModalLoading(true);
+                    //setbuttonLoading(true);
+                    //setModalLoading(true);
                 }}
 
             >
                 <Spin spinning={modalLoading}>
                     <Form
                         form={form}
-                        name="email_send"
+                        name="send_email"
                         initialValues={{
 
                         }}
                         layout="horizontal"
                         onFinish={onFinish}
                     >
-                        <Form.Item name="email_All" label="ส่งทุกคน" valuePropName="checked">
+                        <Form.Item name="send_all" label="ส่งทุกคน"
+                        // valuePropName="checked"
+                        >
                             <Checkbox onChange={(e) => {
-                                return (
-                                    setDisabled(e.target.checked)
-                                )
-
-
-                            }} />
+                                if (e.target.checked === true) {
+                                    form.setFieldsValue({ send_all: listmailbox && listmailbox.map((x) => x.UserId) })
+                                    form.setFieldsValue({ send_to: undefined })
+                                } else {
+                                    form.setFieldsValue({ send_all: undefined })
+                                }
+                            }}
+                            />
                         </Form.Item>
-                        <Form.Item name="sendto" label="To" >
+                        <Form.Item name="send_to" label="To" >
                             <Select style={{ width: '100%' }} placeholder="None"
                                 // showSearch
                                 mode="multiple"

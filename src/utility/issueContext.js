@@ -9,7 +9,8 @@ export const customerState = {
         productState: [],
         moduleState: [],
         issueTypeState: [],
-        priorityState: []
+        priorityState: [],
+        versionState: []
     },
     filter: {
         productState: [],
@@ -17,6 +18,7 @@ export const customerState = {
         scene: [],
         TypeState: [],
         priorityState: [],
+        versionState: [],
         progress: [],
         date: {
             startdate: "",
@@ -95,6 +97,7 @@ export const customerReducer = createReducer(customerState, {
     SELECT_MODULE: (state, { payload }) => { state.filter.moduleState = payload },
     SELECT_TYPE: (state, { payload }) => { state.filter.TypeState = payload },
     SELECT_PRIORITY: (state, { payload }) => { state.filter.priorityState = payload },
+    SELECT_VERSION: (state, { payload }) => { state.filter.versionState = payload },
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
     SELECT_PROGRESS: (state, { payload }) => { state.filter.progress = payload },
     SELECT_SCENE: (state, { payload }) => { state.filter.scene = payload },
@@ -117,6 +120,7 @@ export const customerReducer = createReducer(customerState, {
     LOAD_TASKDATA: (state, { payload }) => { state.taskdata.data = payload },
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
+    LOAD_VERSION: (state, { payload }) => { state.masterdata.versionState = payload },
     LOAD_TYPE: (state, { payload }) => { state.masterdata.issueTypeState = payload },
     LOAD_PRIORITY: (state, { payload }) => { state.masterdata.priorityState = payload },
     LOAD_ACTION_FLOW: (state, { payload }) => { state.actionflow = payload }

@@ -5,7 +5,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import { Tabs } from 'antd';
 import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, UserOutlined } from '@ant-design/icons';
 import ModalFileDownload from '../../Dialog/Customer/modalFileDownload';
 import TextEditor from '../../TextEditor';
 import _ from 'lodash'
@@ -214,8 +214,8 @@ export default function CommentBox() {
                                         }
                                         setDivcollapse(newKeys)
                                     }}
-                                    src={item.avatar}
-                                    icon={item.email.substring(0, 1).toLocaleUpperCase()}
+                                    src={item.avatar === null ? <UserOutlined /> : item.avatar}
+                                    icon={item.email === null ? <UserOutlined /> : item.email.substring(0, 1).toLocaleUpperCase()}
                                 />
                             </>
                         }

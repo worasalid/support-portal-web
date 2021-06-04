@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Profile from './Page/Internal/Profile';
 
 import CustomerDashboard from './Page/Customer/Dashboard/MyDashboard';
+import CustomerDashboardAll from './Page/Customer/Dashboard/IssueAll';
+import CustomerAllIssue from './Page/Customer/Issue/All';
 import CustomerAllMytask from './Page/Customer/Issue/AllMyTask';
 import CustomerMytask from './Page/Customer/Issue/MyTask';
 import CustomerComplete from './Page/Customer/Issue/Complete';
@@ -53,6 +55,9 @@ import ConfigVersion from './Page/Internal/Setting/System/ConfigVersion';
 import ConfigReOpenEmail from './Page/Internal/Setting/System/ConfigReOpenEmail';
 import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
 import ConfigReasonReject from './Page/Internal/Setting/System/ConfigReasonReject';
+
+import Migration from './Page/Internal/Migration/Migration';
+import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
 
 
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
@@ -128,12 +133,17 @@ export default function Routes() {
                                     <Route path="/internal/ricef/inprogress" exact component={RicefInProgress} />
                                     <Route path="/internal/ricef/subject-:ricefid?" exact component={RicefSubject} />
 
+                                    {/* Migration */}
+                                    <Route path="/internal/migration" exact component={Migration}/>
+                                    <Route path="/internal/migration/sqlscript/comid-:id?" exact component={ScriptSQL}/>
 
                                     <Route path="/customer/login" exact component={Customerlogin} />
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />
                                     <Route path="/customer/servicedesk/issuemenu" exact component={IssueMenu} />
                                     <Route path="/customer/servicedesk/issuecreate/:id?" exact component={IssueCreate} />
+                                    <Route path="/customer/dashboard/all" exact component={CustomerDashboardAll} />
                                     <Route path="/customer/dashboard" exact component={CustomerDashboard} />
+                                    <Route path="/customer/issue/all-issue" exact component={CustomerAllIssue} />
                                     <Route path="/customer/issue/alltask" exact component={CustomerAllMytask} />
                                     <Route path="/customer/issue/mytask" exact component={CustomerMytask} />
                                     <Route path="/customer/issue/inprogress" exact component={CustomerInProgress} />

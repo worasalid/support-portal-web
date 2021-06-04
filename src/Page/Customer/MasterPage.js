@@ -24,7 +24,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
   const getuser = async () => {
     try {
       const result = await Axios({
-        url: process.env.REACT_APP_API_URL + "/auth/customer/me",
+        url: process.env.REACT_APP_API_URL + "/auth/login/customer/me",
         method: "get",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -93,7 +93,6 @@ export default function MasterPage({bgColor='#fff',...props}) {
         getNotification();
         CountStatus();
       }, 500000)
-      console.log("state",state?.usersdata?.users)
     }
 
   }, [state.authen])
@@ -101,6 +100,9 @@ export default function MasterPage({bgColor='#fff',...props}) {
   useEffect(() => {
     if (match.url.search("alltask") > 0) {
       setActivemenu(activemenu.push("2"))
+    }
+    if (match.url.search("all-issue") > 0) {
+      setActivemenu(activemenu.push("1"))
     }
     if (match.url.search("mytask") > 0) {
       setActivemenu(activemenu.push("3"))
@@ -206,12 +208,27 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Button>
             </div>
             <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
+            <Menu.Item key="01" onClick={() => history.push('/customer/dashboard/all')}>
+                - All Issue
+                
+              </Menu.Item>
               <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
                 - DashBoard
                 
               </Menu.Item>
             </SubMenu>
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issues">
+            <Menu.Item
+                key="1"
+                onClick={() =>  history.push('/customer/issue/all-issue')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/allmytask" }), window.location.reload(true)) 
+                  // }
+                  
+                }
+              >
+                All Issue
+              </Menu.Item>
               <Menu.Item
                 key="2"
                 onClick={() =>  history.push('/customer/issue/alltask')
@@ -222,8 +239,6 @@ export default function MasterPage({bgColor='#fff',...props}) {
                 }
               >
                 All Task
-               
-
               </Menu.Item>
               <Menu.Item
                 key="3"
@@ -265,7 +280,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
                   // }
                 }
               >
-                Resolved
+                Waiting Deploy
                 {
                   masterstate.toolbar.sider_menu.issue.pass.count === 0
                     ? ""

@@ -111,7 +111,6 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             okText: "Close",
             onOk() {
               editorRef.current.setvalue()
-              onOk();
               history.push({ pathname: "/customer/issue/mytask" })
 
             },
@@ -129,15 +128,12 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             okText: "Close",
             onOk() {
               editorRef.current.setvalue()
-              onOk();
-              window.location.reload(true);
-              history.push({ pathname: "/customer/issue/pass" })
+              history.push({ pathname: "/customer/issue/pass"});
 
+              window.location.reload(true);
             },
           });
         }
-
-
       }
 
     } catch (error) {

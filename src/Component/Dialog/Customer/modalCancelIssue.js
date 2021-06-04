@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Modal, Form, Input, Spin } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Modal, Form, Input, Spin, Select } from 'antd';
 import Axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
@@ -10,9 +10,34 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
     const history = useHistory();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const [cancelData, setCancelData] = useState(null);
+    const [formHidden, setFormHidden] = useState(true);
 
+    const configData = async () => {
+        try {
+            const configData = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/config-data",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    groups: "ResonCancel"
+                }
+
+            });
+
+            if (configData.status === 200) {
+                setCancelData(configData.data)
+            }
+
+        } catch (error) {
+
+        }
+    }
 
     const FlowCancel = async (values) => {
+        setLoading(true);
         try {
             const cancelflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/customer-cancel",
@@ -24,7 +49,8 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
                     ticketid: details.ticketid,
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
-                    description: values.description
+                    cancel_reason: values.reason,
+                    cancel_description: values.description
                 }
             });
 
@@ -72,14 +98,23 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
         }
     }
 
+    const onChange = (value, item) => {
+        if (item.label === "อื่นๆ โปรดระบุ") {
+            setFormHidden(false);
+           
+        }else{
+            setFormHidden(true);
+            form.setFieldsValue({description: undefined})
+        }
+    }
+
     const onFinish = values => {
-        setLoading(true);
         FlowCancel(values);
     };
 
     useEffect(() => {
         if (visible) {
-
+            configData();
         }
     }, [visible])
 
@@ -104,9 +139,25 @@ export default function ModalCancelIssue({ visible = false, onOk, onCancel, data
                 >
                     <Form.Item
                         label="เหตุผลในการยกเลิก"
-                        name="description"
+                        name="reason"
                         rules={[{ required: true, message: 'กรุณาระบุเหตุผลในการยกเลิก' }]}
                     >
+                        <Select placeholder="เหตุผลการ ยกเลิก" style={{ width: "100%" }}
+                            allowClear
+                            maxTagCount={1}
+                            onChange={(value, item) => onChange(value, item)}
+                            options={cancelData && cancelData.map((x) => ({ value: x.Id, label: x.Name }))}
+
+                        />
+
+                    </Form.Item>
+                    <Form.Item
+                        hidden={formHidden}
+                        label="รายละเอียด"
+                        name="description"
+                        rules={[{ required: false, message: 'กรุณาระบุ รายละเอียด' }]}
+                    >
+
                         <TextArea rows={5} style={{ width: "100%" }} />
                     </Form.Item>
                 </Form >

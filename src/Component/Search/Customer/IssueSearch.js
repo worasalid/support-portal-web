@@ -22,8 +22,20 @@ export default function Issuesearch({ Progress = "hide" }) {
             text: "Resolved"
         },
         {
+            value: "Waiting Deploy PRD",
+            text: "Waiting Deploy PRD"
+        },
+        {
             value: "Complete",
             text: "Complete"
+        },
+        {
+            value: "Cancel",
+            text: "Cancel"
+        },
+        {
+            value: "ReOpen",
+            text: "ReOpen"
         },
     ]
 
@@ -50,21 +62,20 @@ export default function Issuesearch({ Progress = "hide" }) {
         },
     ]
 
+    const proGress = []
+
     const handleChange = (e) => {
-        //console.log(e.target.name,e.target.value)
         if (e.target.name === "issuetype") {
             customerdispatch({ type: "SELECT_TYPE", payload: e.target.value })
             //console.log(e.target.value)
         }
         if (e.target.name === "product") {
-            console.log(e.target.value)
             customerdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
         }
         if (e.target.name === "module") {
             customerdispatch({ type: "SELECT_MODULE", payload: e.target.value })
         }
         if (e.target.name === "priority") {
-            console.log(e.target.value)
             customerdispatch({ type: "SELECT_PRIORITY", payload: e.target.value })
         }
         if (e.target.name === "progress") {
@@ -190,7 +201,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'product' } })}
                         options={customerstate.masterdata && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: x.Name }))}
                     />
-                   
+
                 </Col>
                 <Col span={6} >
                     <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder={["IssueDate (Start)", "IssueDate (End)"]}

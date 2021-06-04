@@ -19,6 +19,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
 
     useImperativeHandle(ref, () => ({
         GetTask: () => GetTask(),
+        getData: () => listdata,
         CountData: () => countdata
     }));
 
@@ -115,6 +116,11 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                 return <>
                     <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
                     <label style={{ color: "#52c41a" }}>{param}</label>
+                </>
+            case 'Cancel':
+                return <>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#cd201f" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#cd201f" }}>{param}</label>
                 </>
 
         }

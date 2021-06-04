@@ -35,7 +35,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: textValue,
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -204,13 +204,14 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                                 name="duedate"
                                 rules={[
                                     {
-                                        required: false,
+                                        required: true,
                                         message: 'กรุณาระบุ DueDate',
                                     },
                                 ]}
                             >
                                 <DatePicker
-                                    format="DD/MM/YYYY"
+                                    format="DD/MM/YYYY HH:mm"
+                                    showTime
                                     defaultValue={details.duedate === null ? "" : moment(details?.duedate, "DD/MM/YYYY")}
                                     onChange={(date, datestring) => { form.setFieldsValue({ duedate: datestring }); setDuedate(datestring) }} /><br />
                             </Form.Item>

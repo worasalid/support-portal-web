@@ -1,4 +1,4 @@
-import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Tag, Modal } from "antd";
+import { Col, Row, Select, Typography, Spin, Button, Avatar, Tabs, Tag, Modal, Skeleton } from "antd";
 import React, { useContext, useState, useEffect, useMemo } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -6,6 +6,7 @@ import CommentBox from "../../../Component/Comment/Customer/Comment";
 import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import Historylog from "../../../Component/History/Customer/Historylog";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
+import AuthenContext from "../../../utility/authenContext";
 import MasterPage from "../MasterPage";
 import { ArrowDownOutlined, ArrowUpOutlined, LeftCircleOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
@@ -27,7 +28,9 @@ const { TabPane } = Tabs;
 export default function Subject() {
   const match = useRouteMatch();
   const history = useHistory();
+  const { state, dispatch } = useContext(AuthenContext);
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+  const [loadingPage, setLoadingPage] = useState(true);
 
   // div
   const [container, setContainer] = useState(null);
@@ -49,32 +52,9 @@ export default function Subject() {
   // data
   const [ticketdata, setTicketdata] = useState([]);
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
+  const [mailbox, setMailbox] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [imgUrl, setImgUrl] = useState(null);
-
-
-  const getflow_output = async (value) => {
-    const flow_output = await Axios({
-      url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-      },
-      params: {
-        trans_id: value.TransId
-      }
-    });
-    if (flow_output.status === 200) {
-      customerdispatch({
-        type: "LOAD_ACTION_FLOW",
-        payload: flow_output.data.filter((x) => x.Type === null || x.Type === "Issue"
-          || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
-        )
-      })
-
-    }
-
-  }
 
   const getdetail = async () => {
     try {
@@ -90,45 +70,65 @@ export default function Subject() {
       });
 
       if (ticket_detail.status === 200) {
+        setLoadingPage(false);
         customerdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
-        // getflow_output(ticket_detail.data[0].TransId)
-        getflow_output(ticket_detail.data[0])
+        getMailbox(ticket_detail.data[0]);
+        // getflow_output(ticket_detail.data[0])
       }
     } catch (error) {
 
     }
   }
 
-  const UndoIssue = async (value) => {
+  const getMailbox = async (value) => {
     try {
-      const result = await Axios({
-        url: process.env.REACT_APP_API_URL + "/workflow/issue-undo",
-        method: "POST",
+      const mailbox = await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/mailbox-customer",
+        method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
-        data: {
-          mailboxid: value
+        params: {
+          ticket_id: value.Id
         }
       });
 
-      if (result.status === 200) {
-        await Modal.info({
-          title: 'บันทึกข้อมูลสำเร็จ',
-          content: (
-            <div>
-              <p>ยกเลิกการส่ง Issue เลขที่ : {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</p>
-            </div>
-          ),
-          onOk() {
-            history.push({ pathname: "/customer/issue/mytask" })
-          },
-        });
-
+      if (mailbox.status === 200) {
+        setMailbox(mailbox.data[0]);
+        getflow_output(value, mailbox.data[0].TransId);
       }
     } catch (error) {
 
     }
+  }
+
+  const getflow_output = async (value, trans_id) => {
+    try {
+      const flow_output = await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          trans_id: trans_id
+        }
+      });
+
+      if (flow_output.status === 200) {
+        customerdispatch({
+          type: "LOAD_ACTION_FLOW",
+          payload: flow_output.data.filter((x) => x.Type === null || x.Type === "Issue"
+            || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
+          )
+        })
+      }
+
+    } catch (error) {
+
+    }
+
+
   }
 
   const getDueDateHistory = async () => {
@@ -231,8 +231,10 @@ export default function Subject() {
     }
   }
 
+
   useEffect(() => {
     getdetail();
+
   }, [])
 
   useEffect(() => {
@@ -247,167 +249,180 @@ export default function Subject() {
     }
   }, [customerstate?.issuedata?.details[0]?.Id])
 
+
+
+  // if(customerstate?.issuedata?.details[0]?.CreateId !== state?.userdata?.users?.id){
+  //    console.log("true")
+  // }
   return (
     <MasterPage>
-      <div style={{ height: "100%" }} >
-        <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
-          <Row style={{ padding: "0px 0px 0px 24px" }}>
-            <Col>
-              <Button
-                type="link"
-                icon={<LeftCircleOutlined />}
-                style={{ fontSize: 18, padding: 0 }}
-                onClick={() => history.goBack()}
-              >
-                Back
+      <Spin spinning={loadingPage} tip="Loading..." style={{ height: "100%" }}>
+        <Skeleton loading={loadingPage}>
+          <div style={{ height: "100%" }} >
+            <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
+              <Row style={{ padding: "0px 0px 0px 24px" }}>
+                <Col>
+                  <Button
+                    type="link"
+                    icon={<LeftCircleOutlined />}
+                    style={{ fontSize: 18, padding: 0 }}
+                    onClick={() => history.goBack()}
+                  >
+                    Back
                 </Button>
-            </Col>
-          </Row>
+                </Col>
+              </Row>
 
-          <Row style={{ height: 'calc(100% - 32px)' }}>
-            {/* Content */}
-            <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+              <Row style={{ height: 'calc(100% - 32px)' }}>
+                {/* Content */}
+                <Col span={16} style={{ padding: "24px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
 
-              {/* Issue Description */}
-              <Row style={{ marginRight: 24 }}>
-                <Col span={24}>
-                  {/* <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label> */}
-                  <label className="topic-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</label>
-                  <div className="issue-detail-box">
-                    <Row>
-                      <Col span={16} style={{ display: "inline" }}>
-                        <Typography.Title level={4}>
-                          <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Title}
-                        </Typography.Title>
-                      </Col>
-                      <Col span={8} style={{ display: "inline", textAlign: "right" }}>
-                        <Button type="link"
-                          onClick={
-                            () => {
-                              return (
-                                setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
-                              )
-                            }
-                          }
-                        >{collapsetext}
-                        </Button>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <div style={{ display: divcollapse }}>
-                        <div className="issue-description"
-                          dangerouslySetInnerHTML={{ __html: customerstate?.issuedata?.details[0]?.Description }}
-                          onClick={e => {
-                            if (e.target.tagName == "IMG") {
-                              setImgUrl(e.target.src);
-                              setModalPreview(true);
-                            }
-                          }}>
+                  {/* Issue Description */}
+                  <Row style={{ marginRight: 24 }}>
+                    <Col span={24}>
+                      {/* <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label> */}
+                      <label className="topic-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</label>
+                      &nbsp; &nbsp;
+                      <label style={{ fontSize: 30, color: "red" }}
+                        hidden={customerstate?.issuedata?.details[0]?.GroupStatus === "Cancel" ? false : true}
+                      >
+                        ยกเลิก
+                    </label>
+                      <div className="issue-detail-box">
+                        <Row>
+                          <Col span={16} style={{ display: "inline" }}>
+                            <Typography.Title level={4}>
+                              <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Title}
+                            </Typography.Title>
+                          </Col>
+                          <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                            <Button type="link"
+                              onClick={
+                                () => {
+                                  return (
+                                    setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                    setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
+                                  )
+                                }
+                              }
+                            >{collapsetext}
+                            </Button>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <div style={{ display: divcollapse }}>
+                            <div className="issue-description"
+                              dangerouslySetInnerHTML={{ __html: customerstate?.issuedata?.details[0]?.Description }}
+                              onClick={e => {
+                                if (e.target.tagName == "IMG") {
+                                  setImgUrl(e.target.src);
+                                  setModalPreview(true);
+                                }
+                              }}>
 
-                        </div>
+                            </div>
+                          </div>
+                        </Row>
                       </div>
-                    </Row>
-                  </div>
+                    </Col>
+                  </Row>
+
+                  {/* TAB Document */}
+                  <Row style={{ marginTop: 36, marginRight: 24 }}>
+                    <Col span={24}>
+
+                      <TabsDocument
+                        details={tabDocDetail}
+                      />
+                    </Col>
+                  </Row>
+
+                  {/* TAB Activity */}
+                  <Row style={{ marginTop: 36, marginRight: 24 }}>
+                    <Col span={24}>
+                      <label className="header-text">Activity</label>
+                      <Tabs defaultActiveKey="1">
+                        <TabPane tab="Comment" key="1">
+                          <CommentBox />
+                        </TabPane>
+
+                        <TabPane tab="History Log" key="2">
+                          <Historylog />
+                        </TabPane>
+                      </Tabs>
+                    </Col>
+                  </Row>
+
                 </Col>
-              </Row>
+                {/* Content */}
 
-              {/* TAB Document */}
-              <Row style={{ marginTop: 36, marginRight: 24 }}>
-                <Col span={24}>
+                {/* SideBar */}
+                <Col
+                  span={8}
+                  style={{ backgroundColor: "#fafafa", padding: 24, border: "1px" }}
+                >
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={16}>
+                      <label className="header-text">Progress Status</label>
+                      <br />
+                      <Select
+                        style={{ width: "100%", marginTop: 8 }}
 
-                  <TabsDocument
-                    details={tabDocDetail}
-                  />
-                </Col>
-              </Row>
-
-              {/* TAB Activity */}
-              <Row style={{ marginTop: 36, marginRight: 24 }}>
-                <Col span={24}>
-                  <label className="header-text">Activity</label>
-                  <Tabs defaultActiveKey="1">
-                    <TabPane tab="Comment" key="1">
-                      <CommentBox />
-                    </TabPane>
-
-                    <TabPane tab="History Log" key="2">
-                      <Historylog />
-                    </TabPane>
-                  </Tabs>
-                </Col>
-              </Row>
-
-            </Col>
-            {/* Content */}
-
-            {/* SideBar */}
-            <Col
-              span={8}
-              style={{ backgroundColor: "#fafafa", padding: 24, border: "1px" }}
-            >
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={16}>
-                  <label className="header-text">Progress Status</label>
-                  <br />
-                  <Select
-                    style={{ width: "100%", marginTop: 8 }}
-                    placeholder="None"
-                    onChange={(value, item) => HandleChange(value, item)}
-                    value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
-                    options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
-                    disabled={
-                      customerstate.issuedata.details[0] &&
-                        customerstate.issuedata.details[0].MailType === "out" ? true : false
-                    }
-                  >
-                  </Select>
-                </Col>
-                <Col span={8}>
-
-                  <Button type="primary" icon={<UndoOutlined />} color="green"
-                    style={{
-                      marginLeft: 20,
-                      width: 100,
-                      marginTop: 35,
-                      display: customerstate.issuedata.details[0]?.IsUndo === true &&
-                        customerstate.issuedata.details[0].MailType === "out" &&
-                        customerstate.issuedata.details[0].NodeActionText === "Create" ? "block" : "none"
-                    }}
-                    onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
-                  >
-                    Undo
+                        placeholder="None"
+                        onChange={(value, item) => HandleChange(value, item)}
+                        value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
+                        options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
+                        disabled={
+                          // customerstate?.issuedata?.details[0]?.MailType === "out" ? true : false
+                          mailbox?.MailType === "in" ? false : true
+                        }
+                      >
+                      </Select>
+                    </Col>
+                    {/* <Col span={8}>
+                      <Button type="primary" icon={<UndoOutlined />} color="green"
+                        style={{
+                          marginLeft: 20,
+                          width: 100,
+                          marginTop: 35,
+                          display: customerstate.issuedata.details[0]?.IsUndo === true &&
+                            customerstate.issuedata.details[0].MailType === "out" &&
+                            customerstate.issuedata.details[0].NodeActionText === "Create" ? "block" : "none"
+                        }}
+                        onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
+                      >
+                        Undo
                     </Button>
-                </Col>
+                    </Col> */}
 
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">IssueType</label>
-                  <br />
-                  <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].IssueType}</label>
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Priority</label>
-                  <br />
-                  <label className="value-text">
-                    {renderColorPriority(customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority)}&nbsp;&nbsp;
+                  </Row>
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={18}>
+                      <label className="header-text">IssueType</label>
+                      <br />
+                      <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].IssueType}</label>
+                    </Col>
+                  </Row>
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={18}>
+                      <label className="header-text">Priority</label>
+                      <br />
+                      <label className="value-text">
+                        {renderColorPriority(customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority)}&nbsp;&nbsp;
 
                     {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority}
-                  </label>
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Product</label>
-                  <br />
-                  <label className="value-text">{customerstate.issuedata.details[0] && `${customerstate.issuedata.details[0].ProductName} (${customerstate.issuedata.details[0].ProductFullName})`}</label>
-                </Col>
-              </Row>
+                      </label>
+                    </Col>
+                  </Row>
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={18}>
+                      <label className="header-text">Product</label>
+                      <br />
+                      <label className="value-text">{customerstate.issuedata.details[0] && `${customerstate.issuedata.details[0].ProductName} (${customerstate.issuedata.details[0].ProductFullName})`}</label>
+                    </Col>
+                  </Row>
 
-              {/* <Row style={{ marginBottom: 20 }}>
+                  {/* <Row style={{ marginBottom: 20 }}>
                 <Col span={18}>
                   <label className="header-text">Module</label>
                   <br />
@@ -415,189 +430,183 @@ export default function Subject() {
                 </Col>
               </Row> */}
 
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Scene</label>
-                  <br />
-                  <label className="value-text">{customerstate?.issuedata.details[0]?.Scene}</label>
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={18}>
+                      <label className="header-text">Scene</label>
+                      <br />
+                      <label className="value-text">{customerstate?.issuedata.details[0]?.Scene}</label>
+                    </Col>
+                  </Row>
+
+                  <Row style={{
+                    marginBottom: 20,
+                    display: customerstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
+                      customerstate.issuedata.details[0]?.Manday !== null ? "block" : "none"
+                  }}>
+                    <Col span={18}>
+                      <label className="header-text">Manday</label>
+                      <label style={{ marginLeft: 10 }} className="value-text">{customerstate?.issuedata?.details[0]?.Manday}</label>
+                    </Col>
+                  </Row>
+
+                  <Row style={{ marginBottom: 20 }}>
+                    <Col span={18}>
+                      <label className="header-text">DueDate</label>
+                      <br />
+
+                      <label className="value-text">
+                        {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
+                      </label>
+
+                      {customerstate?.issuedata?.details[0]?.cntDueDate >= 1 ?
+                        <Tag style={{ marginLeft: 16, cursor: "pointer" }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
+                          <label style={{ cursor: "pointer" }}> DueDate ถูกเลื่อน</label>
+
+                        </Tag> : ""
+                      }
+                    </Col>
+                  </Row>
+
+                  <Row style={{ marginBottom: 20 }} hidden={customerstate?.issuedata.details[0]?.Version !== null ? false : true}>
+                    <Col span={18}>
+                      <label className="header-text">Version</label>
+                      <br />
+                      <label className="value-text">{customerstate?.issuedata?.details[0]?.Version}</label>
+                    </Col>
+                  </Row>
+
                 </Col>
               </Row>
+            </div>
+          </div>
+        </Skeleton>
 
-              <Row style={{
-                marginBottom: 20,
-                display: customerstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
-                  customerstate.issuedata.details[0]?.Manday !== null ? "block" : "none"
-              }}>
-                <Col span={18}>
-                  <label className="header-text">Manday</label>
-                  <label style={{ marginLeft: 10 }} className="value-text">{customerstate.issuedata.details[0]?.Manday}</label>
-                </Col>
-              </Row>
+        <DuedateLog
+          title="ประวัติ DueDate"
+          visible={historyduedate_visible}
+          onCancel={() => setHistoryduedate_visible(false)}
+          details={{
+            ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id
+          }}
+        >
+        </DuedateLog>
 
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">DueDate</label>
-                  <br />
+        <ModalSendIssue
+          title={ProgressStatus}
+          visible={modalsendissue_visible}
+          width={700}
+          onCancel={() => modalSendissue_visible(false)}
+          onOk={() => {
+            modalSendissue_visible(false);
+          }}
+          details={{
+            ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+            flowoutput: customerstate?.node.output_data
+          }}
+        />
 
-                  <label className="value-text">
-                    {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
-                  </label>
+        <ModalConfirmManday
+          title={ProgressStatus}
+          visible={modalconfirmManday_visible}
+          width={700}
+          onCancel={() => setModalconfirmManday_visible(false)}
+          onOk={() => {
+            setModalconfirmManday_visible(false);
+          }}
+          details={{
+            ticketid: customerstate.issuedata.details[0]?.Id,
+            mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+            flowoutputid: customerstate.node.output_data?.FlowOutputId,
+            flowoutput: customerstate.node.output_data,
+            manday: customerstate.issuedata.details[0]?.Manday,
+            cost: customerstate.issuedata.details[0]?.Cost
+          }}
+        />
 
-                  {customerstate?.issuedata?.details[0]?.cntDueDate >= 1 ?
-                    <Tag style={{ marginLeft: 16, cursor: "pointer" }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
-                      <label style={{ cursor: "pointer" }}> DueDate ถูกเลื่อน</label>
+        <ModalDueDate
+          title={ProgressStatus}
+          visible={modalDueDate_visible}
+          width={700}
+          onCancel={() => setModalDueDate_visible(false)}
+          onOk={() => {
+            setModalDueDate_visible(false);
+          }}
+          details={{
+            ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+            duedate: moment(customerstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
+          }}
+        />
 
-                    </Tag> : ""
-                  }
+        <ModalPO
+          title={ProgressStatus}
+          visible={modalPO_visible}
+          width={700}
+          onCancel={() => setModalPO_visible(false)}
+          onOk={() => {
+            setModalPO_visible(false);
+          }}
+          details={{
+            ticketid: customerstate.issuedata.details[0]?.Id,
+            mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+            flowoutputid: customerstate.node.output_data?.FlowOutputId
+          }}
+        />
 
+        <ModalCompleteIssue
+          title={ProgressStatus}
+          visible={modalcomplete_visible}
+          onCancel={() => setModalcomplete_visible(false)}
+          width={700}
+          onOk={() => setModalcomplete_visible(false)}
+          details={{
+            ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
+          }}
+        />
 
-                  {/* <Button type="text"
-                    style={{ padding: 0 }}
-                    icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
-                    className="value-text"
-                  >
-                    {(customerstate?.issuedata?.details[0]?.DueDate === null ? "None" : moment(customerstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
-                  </Button>
+        <ModalCancelIssue
+          title={ProgressStatus}
+          visible={modalcancel_visible}
+          onCancel={() => setModalcancel_visible(false)}
+          width={700}
+          onOk={() => setModalcancel_visible(false)}
+          details={{
+            ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
+          }}
+        />
 
-                  {history_duedate_data.length >= 1 ?
-                    <Tag style={{ marginLeft: 16 }} color="warning" onClick={() => setHistoryduedate_visible(true)}>
-                      DueDate ถูกเลื่อน
-                   </Tag> : ""
-                  } */}
-                </Col>
-              </Row>
+        <ModalReOpen
+          title={ProgressStatus}
+          visible={modalreopen_visible}
+          onCancel={() => setModalreopen_visible(false)}
+          width={700}
+          onOk={() => setModalreopen_visible(false)}
+          details={{
+            ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
+            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
+          }}
+        />
 
-            </Col>
-          </Row>
-        </div>
-      </div>
-
-      <DuedateLog
-        title="ประวัติ DueDate"
-        visible={historyduedate_visible}
-        onCancel={() => setHistoryduedate_visible(false)}
-        details={{
-          ticketId: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id
-        }}
-      >
-      </DuedateLog>
-
-      <ModalSendIssue
-        title={ProgressStatus}
-        visible={modalsendissue_visible}
-        width={700}
-        onCancel={() => modalSendissue_visible(false)}
-        onOk={() => {
-          modalSendissue_visible(false);
-        }}
-        details={{
-          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
-          flowoutput: customerstate?.node.output_data
-        }}
-      />
-
-      <ModalConfirmManday
-        title={ProgressStatus}
-        visible={modalconfirmManday_visible}
-        width={700}
-        onCancel={() => setModalconfirmManday_visible(false)}
-        onOk={() => {
-          setModalconfirmManday_visible(false);
-        }}
-        details={{
-          ticketid: customerstate.issuedata.details[0]?.Id,
-          mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
-          flowoutputid: customerstate.node.output_data?.FlowOutputId,
-          flowoutput: customerstate.node.output_data,
-          manday: customerstate.issuedata.details[0]?.Manday,
-          cost: customerstate.issuedata.details[0]?.Cost
-        }}
-      />
-
-      <ModalDueDate
-        title={ProgressStatus}
-        visible={modalDueDate_visible}
-        width={700}
-        onCancel={() => setModalDueDate_visible(false)}
-        onOk={() => {
-          setModalDueDate_visible(false);
-        }}
-        details={{
-          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
-          duedate: moment(customerstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
-        }}
-      />
-
-      <ModalPO
-        title={ProgressStatus}
-        visible={modalPO_visible}
-        width={700}
-        onCancel={() => setModalPO_visible(false)}
-        onOk={() => {
-          setModalPO_visible(false);
-        }}
-        details={{
-          ticketid: customerstate.issuedata.details[0]?.Id,
-          mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
-          flowoutputid: customerstate.node.output_data?.FlowOutputId
-        }}
-      />
-
-      <ModalCompleteIssue
-        title={ProgressStatus}
-        visible={modalcomplete_visible}
-        onCancel={() => setModalcomplete_visible(false)}
-        width={700}
-        onOk={() => setModalcomplete_visible(false)}
-        details={{
-          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
-        }}
-      />
-
-      <ModalCancelIssue
-        title={ProgressStatus}
-        visible={modalcancel_visible}
-        onCancel={() => setModalcancel_visible(false)}
-        width={700}
-        onOk={() => setModalcancel_visible(false)}
-        details={{
-          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
-        }}
-      />
-
-      <ModalReOpen
-        title={ProgressStatus}
-        visible={modalreopen_visible}
-        onCancel={() => setModalreopen_visible(false)}
-        width={700}
-        onOk={() => setModalreopen_visible(false)}
-        details={{
-          ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-          mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
-          flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
-        }}
-      />
-
-      <PreviewImg
-        title="Preview"
-        visible={modalPreview}
-        width={800}
-        footer={null}
-        onCancel={() => {
-          setModalPreview(false);
-          setImgUrl(null);
-        }}
-        pathUrl={imgUrl}
-      />
-
+        <PreviewImg
+          title="Preview"
+          visible={modalPreview}
+          width={800}
+          footer={null}
+          onCancel={() => {
+            setModalPreview(false);
+            setImgUrl(null);
+          }}
+          pathUrl={imgUrl}
+        />
+      </Spin>
     </MasterPage>
   );
 }

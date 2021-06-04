@@ -84,6 +84,27 @@ export default function MyTask() {
     });
   }
 
+  const updateCountNoti = async (param) => {
+    try {
+      const result = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticket_id: param
+        }
+      });
+
+      if (result.status === 200) {
+
+      }
+    } catch (error) {
+
+    }
+  }
+
 
   useEffect(() => {
     if (customerstate.search === true) {
@@ -223,6 +244,19 @@ export default function MyTask() {
                           </label>
                         </Col>
                       </Row>
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
+                          </label>
+                        </Col>
+                      </Row>
                     </div>
                   );
                 }}
@@ -242,13 +276,15 @@ export default function MyTask() {
                       <div>
                         <label
                           onClick={() => {
-                            return (
-                              customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                              history.push({ pathname: "/customer/issue/subject/" + record.Id }),
-                              (record.MailStatus !== "Read" ? UpdateStatusMailbox(record.MailBoxId) : "")
-                            )
-                          }
-                          }
+
+                            customerdispatch({ type: "SELECT_DATAROW", payload: record });
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id });
+                            UpdateStatusMailbox(record.MailBoxId)
+                            updateCountNoti(record.Id);
+                            window.location.reload(true);
+
+                          }}
+
                           className="table-column-detail">รายละเอียด</label>
                       </div>
 
@@ -291,8 +327,8 @@ export default function MyTask() {
                     <>
                       {record.GroupStatus === "Wait For Progress" ? "" :
                         <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                          {record.SLA === null ? "" : moment(record.SLA).format("DD/MM/YYYY")}<br />
-                          {record.SLA === null ? "" : moment(record.SLA).format("HH:mm")}
+                          {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
+                          {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                         </label>
                       }
                       <br />

@@ -11,7 +11,7 @@ export default function Login() {
     const onFinish = async (value) => {
         try {
             const result = await axios({
-                url: process.env.REACT_APP_API_URL + "/auth/customer",
+                url: process.env.REACT_APP_API_URL + "/auth/login/customer",
                 method: "get",
                 params: value
             });

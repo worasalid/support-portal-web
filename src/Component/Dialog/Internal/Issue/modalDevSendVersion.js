@@ -34,7 +34,7 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",

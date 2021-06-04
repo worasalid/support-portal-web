@@ -540,7 +540,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title="ไฟล์ Unit Test" width="25%"
+                                <Column title="ไฟล์ Unit Test" width="55%"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -552,31 +552,9 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="URL" width="70%"
-                                    render={(value, record, index) => {
-                                        return (
-                                            <>
-                                                <div className="text-link value-text"
-                                                    style={{
-                                                        whiteSpace: "nowrap",
-                                                        textOverflow: "ellipsis",
-                                                        overflow: "hidden",
-                                                        width: 500
-                                                    }}
-                                                >
-                                                    <label className="text-link value-text"
-                                                        onClick={() => window.open(record.Url, "_blank")}
-                                                    >
-                                                        {record.Url}
-                                                    </label>
-                                                </div>
-                                            </>
-                                        )
-                                    }
-                                    }
                                 />
-                                {/* <Column title="FileSize" width="15%" dataIndex="FileSize"
+
+                                <Column title="FileSize" width="10%" dataIndex="FileSize"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -587,9 +565,8 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="OwnerName"
-                                    width="25%"
+                                />
+                                <Column title="OwnerName" width="25%"
                                     align="center"
                                     render={(value, record, index) => {
                                         return (
@@ -605,7 +582,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title=""
+                                <Column title=""
                                     width="3%"
                                     render={(value, record, index) => {
                                         return (
@@ -621,9 +598,10 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
+                                />
                             </Table>
                         </TabPane>
+
                         <TabPane tab="Document Deploy" key="4" >
                             <Table dataSource={listfile.filter((x) => x.GroupType === "deploy_document")} style={{ width: "100%" }} pagination={false}>
                                 <Column title="No"
@@ -814,8 +792,8 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                 />
                             </Table>
                         </TabPane>
-                        <TabPane tab="เอกสาร PO" key="2">
-                            <Table dataSource={listfile.filter((x) => x.GroupType === "PO_Document")} style={{ width: "100%" }} pagination={false}>
+                        <TabPane tab="Test Result" key="2">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
                                 <Column title="No"
                                     width="5%"
                                     render={(value, record, index) => {
@@ -828,18 +806,21 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                <Column title="ชื่อเอกสาร" dataIndex="FileName" width="45%"
+                                <Column title="ไฟล์ Unit Test" width="55%"
                                     render={(value, record, index) => {
                                         return (
                                             <>
                                                 <label className="value-text">
-                                                    {record.FileName}
+                                                    {record.FileName}<br />
                                                 </label>
+
                                             </>
                                         )
-                                    }}
+                                    }
+                                    }
                                 />
-                                <Column title="FileSize" width="15%"
+
+                                <Column title="FileSize" width="10%" dataIndex="FileSize"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -848,26 +829,18 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                                 </label>
                                             </>
                                         )
-                                    }}
+                                    }
+                                    }
                                 />
-                                <Column title="OwnerName" width="20%"
-                                    render={(value, record, index) => {
-                                        return (
-                                            <>
-                                                <label className="value-text">
-                                                    {record.OwnerName}
-                                                </label>
-                                            </>
-                                        )
-                                    }}
-                                />
-                                <Column title="วันที่"
+                                <Column title="OwnerName" width="25%"
                                     align="center"
-                                    width="10%"
                                     render={(value, record, index) => {
                                         return (
                                             <>
                                                 <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label style={{ fontSize: 10, color: "#CCCCCC" }}>
                                                     {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
                                                 </label>
                                             </>
@@ -876,14 +849,14 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                 />
                                 <Column title=""
-                                    width="5%"
+                                    width="3%"
                                     render={(value, record, index) => {
                                         return (
                                             <>
                                                 <Button type="link"
                                                     onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
                                                 >
-                                                    {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+                                                    {record.FileName === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
                                                 </Button>
 
@@ -894,6 +867,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                 />
                             </Table>
                         </TabPane>
+
                         <TabPane tab="Test Result" key="3">
                             <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
                                 <Column title="No"
@@ -1147,7 +1121,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
 
                             </Table>
                         </TabPane>
-                   
+
                     </Tabs>
                 </div>
 
@@ -1208,6 +1182,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                 />
                             </Table>
                         </TabPane>
+                        
                         <TabPane tab="Test Result" key="2">
                             <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
                                 <Column title="No"
@@ -1222,7 +1197,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title="ไฟล์ Unit Test" width="25%"
+                                <Column title="ไฟล์ Unit Test" width="55%"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -1234,31 +1209,9 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="URL" width="70%"
-                                    render={(value, record, index) => {
-                                        return (
-                                            <>
-                                                <div className="text-link value-text"
-                                                    style={{
-                                                        whiteSpace: "nowrap",
-                                                        textOverflow: "ellipsis",
-                                                        overflow: "hidden",
-                                                        width: 500
-                                                    }}
-                                                >
-                                                    <label className="text-link value-text"
-                                                        onClick={() => window.open(record.Url, "_blank")}
-                                                    >
-                                                        {record.Url}
-                                                    </label>
-                                                </div>
-                                            </>
-                                        )
-                                    }
-                                    }
                                 />
-                                {/* <Column title="FileSize" width="15%" dataIndex="FileSize"
+
+                                <Column title="FileSize" width="10%" dataIndex="FileSize"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -1269,9 +1222,8 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="OwnerName"
-                                    width="25%"
+                                />
+                                <Column title="OwnerName" width="25%"
                                     align="center"
                                     render={(value, record, index) => {
                                         return (
@@ -1287,7 +1239,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title=""
+                                <Column title=""
                                     width="3%"
                                     render={(value, record, index) => {
                                         return (
@@ -1303,7 +1255,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
+                                />
                             </Table>
                         </TabPane>
 
@@ -1480,7 +1432,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title="ไฟล์ Unit Test" width="25%"
+                                <Column title="ไฟล์ Unit Test" width="55%"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -1492,31 +1444,9 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="URL" width="70%"
-                                    render={(value, record, index) => {
-                                        return (
-                                            <>
-                                                <div className="text-link value-text"
-                                                    style={{
-                                                        whiteSpace: "nowrap",
-                                                        textOverflow: "ellipsis",
-                                                        overflow: "hidden",
-                                                        width: 500
-                                                    }}
-                                                >
-                                                    <label className="text-link value-text"
-                                                        onClick={() => window.open(record.Url, "_blank")}
-                                                    >
-                                                        {record.Url}
-                                                    </label>
-                                                </div>
-                                            </>
-                                        )
-                                    }
-                                    }
                                 />
-                                {/* <Column title="FileSize" width="15%" dataIndex="FileSize"
+
+                                <Column title="FileSize" width="10%" dataIndex="FileSize"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -1527,9 +1457,8 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="OwnerName"
-                                    width="25%"
+                                />
+                                <Column title="OwnerName" width="25%"
                                     align="center"
                                     render={(value, record, index) => {
                                         return (
@@ -1545,7 +1474,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title=""
+                                <Column title=""
                                     width="3%"
                                     render={(value, record, index) => {
                                         return (
@@ -1561,7 +1490,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
+                                />
                             </Table>
                         </TabPane>
 
@@ -1667,7 +1596,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                     </Tabs>
                 </div>
 
-                {/*testResult, VDO Upload */}
+                {/*testResult, Document Deploy, VDO Upload */}
                 <div
                     style={{
                         // display : "block"
@@ -1692,7 +1621,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title="ไฟล์ Unit Test" width="25%"
+                                <Column title="ไฟล์ Unit Test" width="55%"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -1704,31 +1633,9 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="URL" width="70%"
-                                    render={(value, record, index) => {
-                                        return (
-                                            <>
-                                                <div className="text-link value-text"
-                                                    style={{
-                                                        whiteSpace: "nowrap",
-                                                        textOverflow: "ellipsis",
-                                                        overflow: "hidden",
-                                                        width: 500
-                                                    }}
-                                                >
-                                                    <label className="text-link value-text"
-                                                        onClick={() => window.open(record.Url, "_blank")}
-                                                    >
-                                                        {record.Url}
-                                                    </label>
-                                                </div>
-                                            </>
-                                        )
-                                    }
-                                    }
                                 />
-                                {/* <Column title="FileSize" width="15%" dataIndex="FileSize"
+
+                                <Column title="FileSize" width="10%" dataIndex="FileSize"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -1739,9 +1646,8 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
-                                <Column title="OwnerName"
-                                    width="25%"
+                                />
+                                <Column title="OwnerName" width="25%"
                                     align="center"
                                     render={(value, record, index) => {
                                         return (
@@ -1757,7 +1663,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                     }
                                     }
                                 />
-                                {/* <Column title=""
+                                <Column title=""
                                     width="3%"
                                     render={(value, record, index) => {
                                         return (
@@ -1773,7 +1679,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                         )
                                     }
                                     }
-                                /> */}
+                                />
                             </Table>
                         </TabPane>
 
@@ -1933,7 +1839,7 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
 
                             </Table>
                         </TabPane>
-                   
+
                     </Tabs>
                 </div>
 

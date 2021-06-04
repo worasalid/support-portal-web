@@ -273,11 +273,12 @@ export default function Mytask() {
                           </label>
                         </Col>
                       </Row>
-                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            Version :
+                            {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
                           </label>
                         </Col>
                         <Col span={14}>
@@ -364,11 +365,28 @@ export default function Mytask() {
 
                 }
               />
-              <Column title="Due Date" width="8%"
+              <Column title="Due Date" width="10%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "support" &&
+                          record.Is_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาแจ้ง DueDate ลูกค้า
+                        </label>
+                      </div>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "cr_center" &&
+                          record.Is_SLA_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาระบุ DueDate
+                        </label>
+                      </div>
+
                       <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}
                       </label>
@@ -405,6 +423,11 @@ export default function Mytask() {
                       <div>
                         <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.FlowStatus}
+                        </label>
+                        <label
+                          style={{ display: record.IsReOpen === true ? "block" : "none" }}
+                          className="table-column-text">
+                          (ReOpen)
                         </label>
                       </div>
                     </>
