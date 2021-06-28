@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Row, Col, Input, Button, DatePicker, Select, Checkbox, Tooltip } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
+import { SearchOutlined, TrademarkOutlined } from '@ant-design/icons'
 import Axios from 'axios';
 import { useEffect } from 'react';
 import AuthenContext from '../../../utility/authenContext';
@@ -333,7 +333,10 @@ export default function Issuesearch({ Progress = "hide" }) {
 
                     <Tooltip title="ReleaseNote">
                         <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note' } })}>
-                            <label style={{ fontSize: 10, display: "inline" }}>Release Note</label>
+                            <TrademarkOutlined
+                                style={{fontSize: 14, color: "#17A2B8" }}
+                            />
+                          
 
                         </Checkbox>
                         {/* <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note_N' } })}>

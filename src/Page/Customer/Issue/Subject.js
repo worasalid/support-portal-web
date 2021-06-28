@@ -501,7 +501,7 @@ export default function Subject() {
           }}
           details={{
             ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            mailboxid: mailbox?.MailBoxId,
             flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
             flowoutput: customerstate?.node.output_data
           }}
@@ -517,7 +517,7 @@ export default function Subject() {
           }}
           details={{
             ticketid: customerstate.issuedata.details[0]?.Id,
-            mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+            mailboxid: mailbox?.MailBoxId,
             flowoutputid: customerstate.node.output_data?.FlowOutputId,
             flowoutput: customerstate.node.output_data,
             manday: customerstate.issuedata.details[0]?.Manday,
@@ -535,7 +535,7 @@ export default function Subject() {
           }}
           details={{
             ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            mailboxid: mailbox?.MailBoxId,
             flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
             duedate: moment(customerstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
           }}
@@ -551,7 +551,7 @@ export default function Subject() {
           }}
           details={{
             ticketid: customerstate.issuedata.details[0]?.Id,
-            mailboxid: customerstate.issuedata.details[0]?.MailBoxId,
+            mailboxid: mailbox?.MailBoxId,
             flowoutputid: customerstate.node.output_data?.FlowOutputId
           }}
         />
@@ -564,7 +564,7 @@ export default function Subject() {
           onOk={() => setModalcomplete_visible(false)}
           details={{
             ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            mailboxid: mailbox?.MailBoxId,
             flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId,
           }}
         />
@@ -577,7 +577,7 @@ export default function Subject() {
           onOk={() => setModalcancel_visible(false)}
           details={{
             ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            mailboxid: mailbox?.MailBoxId,
             flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
           }}
         />
@@ -590,7 +590,7 @@ export default function Subject() {
           onOk={() => setModalreopen_visible(false)}
           details={{
             ticketid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Id,
-            mailboxid: customerstate.issuedata.details[0] && customerstate.issuedata.details[0].MailBoxId,
+            mailboxid: mailbox?.MailBoxId,
             flowoutputid: customerstate.node.output_data && customerstate.node.output_data.FlowOutputId
           }}
         />

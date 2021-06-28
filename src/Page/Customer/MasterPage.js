@@ -130,7 +130,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
             <Col span={12}>
               <img
                 style={{ height: "35px" }}
-                src={`${process.env.PUBLIC_URL}/logo-space.png`}
+                src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
                 alt=""
               />
             </Col>

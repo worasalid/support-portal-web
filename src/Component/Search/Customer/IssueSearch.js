@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import AuthenContext from '../../../utility/authenContext';
 import IssueContext from '../../../utility/issueContext';
 
-export default function Issuesearch({ Progress = "hide" }) {
+export default function Issuesearch({ Progress = "hide", Version = "hide" }) {
     const { RangePicker } = DatePicker;
     const { Option } = Select;
     const { state, dispatch } = useContext(AuthenContext);
@@ -101,24 +101,21 @@ export default function Issuesearch({ Progress = "hide" }) {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
-                company_id: state?.usersdata?.users?.company_id
+                company_id: state.usersdata?.users?.company_id
             }
         });
         customerdispatch({ type: "LOAD_PRODUCT", payload: products.data });
     }
 
-    const getmodule = async () => {
-        const module = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/modules",
+    const getPatch = async () => {
+        const patch = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/ticket-patch",
             method: "get",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
-            params: {
-                productId: customerstate.filter.productState
-            }
         });
-        customerdispatch({ type: "LOAD_MODULE", payload: module.data });
+        customerdispatch({ type: "LOAD_PATCH", payload: patch.data });
 
     }
 
@@ -149,19 +146,17 @@ export default function Issuesearch({ Progress = "hide" }) {
         getProducts();
         getissue_type();
         getpriority();
+        getPatch();
     }
 
     useEffect(() => {
-        if (state.authen === false) {
-
-        } else {
+        if (state.usersdata !== null) {
             setInterval(() => {
                 customerdispatch({ type: "SEARCH", payload: true })
             }, 500000)
             getMasterdata()
-
         }
-    }, [state.authen]);
+    }, [state.usersdata])
 
 
     return (
@@ -216,10 +211,11 @@ export default function Issuesearch({ Progress = "hide" }) {
                     </Button>
                 </Col>
             </Row>
+
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
                 <Col span={2}>
                 </Col>
-                <Col span={4}>
+                <Col span={4} hidden={Progress === "hide"}>
                     <Select placeholder="Progress"
                         style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
                         mode="multiple"
@@ -231,6 +227,20 @@ export default function Issuesearch({ Progress = "hide" }) {
                         }
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'progress' } })}
                         options={progressstatus.map((x) => ({ value: x.value, label: x.text }))}
+                    />
+                </Col>
+                <Col span={4} hidden={Version === "hide"}>
+                    <Select placeholder="Patch Version"
+                        style={{ width: "100%", display: Version === "show" ? "block" : "none" }}
+                        mode="multiple"
+                        showSearch
+                        allowClear
+                        maxTagCount={1}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'version' } })}
+                        options={customerstate.masterdata && customerstate.masterdata.patchState.map((x) => ({ value: x.Version, label: x.Version }))}
                     />
                 </Col>
                 <Col span={4}>

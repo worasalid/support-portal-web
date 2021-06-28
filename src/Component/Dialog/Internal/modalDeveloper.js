@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Modal, Form, Spin } from 'antd';
+import { Modal, Form, Spin, Checkbox } from 'antd';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -13,7 +13,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     const history = useHistory();
     const uploadRef = useRef(null);
     const uploadRef_unittest = useRef(null);
-    // const uploadRef_filedeploy = useRef(null);
+    const uploadRef_filedeploy = useRef(null);
     const uploadRef_document = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
@@ -33,7 +33,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -86,6 +86,22 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
         })
     }
 
+    const saveFile_Deploy = async (values) => {
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/save_filedeploy",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticket_id: details && details.ticketid,
+                task_id: details.taskid,
+                files: uploadRef_filedeploy.current.getFiles().map((n) => n.response.id),
+                grouptype: "file_deploy"
+            }
+        })
+    }
+
     const SendFlow = async (values) => {
         setLoading(true);
         try {
@@ -100,6 +116,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
+                        sql_script: values.sql_script,
                         comment_text: textValue
                     }
                 }
@@ -110,6 +127,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 SaveComment();
                 SaveUnitTest(values);
                 SaveDocumentDeploy(values);
+                saveFile_Deploy(values);
                 onOk();
                 setLoading(false);
 
@@ -197,12 +215,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
 
                     <Form.Item
                         labelCol={6}
-                        label="Document (URL)"
+                        label="Excel Deploy"
                         name="document_url"
                         rules={[
                             {
                                 required: true,
-                                message: 'กรุณาใส่ Url Deploy Document!',
+                                message: 'กรุณาใส่ Url Excel Deploy!',
                             },
                         ]}
                     >
@@ -238,6 +256,33 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         <UploadFile ref={uploadRef_document} />
                     </Form.Item> */}
 
+                    <Form.Item
+                        wrapperCol={6}
+                        label="File Deploy"
+                        name="file_deploy"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input File Deploy!',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={uploadRef_filedeploy} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="SQL Script"
+                        name="sql_script"
+                        valuePropName="checked"
+                        rules={[
+                            {
+                                required: false,
+                                message: '!!!',
+                            },
+                        ]}
+                    >
+                        <Checkbox />
+                    </Form.Item>
 
                 </Form>
                 <TextEditor ref={editorRef} />

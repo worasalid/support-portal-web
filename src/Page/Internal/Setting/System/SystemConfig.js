@@ -138,7 +138,7 @@ export default function SystemConfig() {
                     <Col span={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
-                            onClick={() => history.push("/internal/setting/system/reopen_email")}
+                            onClick={() => history.push("/internal/setting/system/email_config")}
                         >
                             <Meta
                                 avatar={
@@ -148,10 +148,10 @@ export default function SystemConfig() {
                                         alt=""
                                     />
                                 }
-                                title={<label className="card-title-menu">ตั้งค่า Email ReOpen</label>}
+                                title={<label className="card-title-menu">ตั้งค่า Email </label>}
                                 description={
                                     <label className="value-text">
-                                        ตั้งค่าการส่ง Email กรณี มีการ ReOpen
+                                        ตั้งค่าการส่ง Email
                                 </label>
 
                                 }

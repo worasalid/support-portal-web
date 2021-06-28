@@ -119,8 +119,10 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
     }
 
     useEffect(() => {
+        if (visible) {
 
-    }, [])
+        }
+    }, [visible])
 
     return (
         <Modal

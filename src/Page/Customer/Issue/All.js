@@ -219,7 +219,7 @@ export default function All() {
                           </label>
                         </Col>
                       </Row>
-                      
+
                       <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
@@ -271,7 +271,7 @@ export default function All() {
                   return (
                     <>
                       <label className="table-column-text">
-                          {record.CreateBy}
+                        {record.CreateBy}
                       </label>
                       <br />
                       <label className="table-column-text">
@@ -333,7 +333,30 @@ export default function All() {
                 align="center"
                 render={(record) => {
                   return (
-                    <label className="table-column-text">{record.ProgressStatus}</label>
+                    <>
+                      <div hidden={record.GroupStatus === "Resolved" ? false : true}>
+                        <label className="table-column-text">{record.GroupStatus}</label>
+                        <br/>
+                        <label className="table-column-text">
+                          {moment(record.ResolvedDate).format("DD/MM/YYYY")}
+                        </label>
+                      </div>
+
+                      <div hidden={record.GroupStatus === "Completed" ? false : true}>
+                        <label className="table-column-text">
+                          {record.GroupStatus} <br />
+                          {moment(record.CompleteDate).format("DD/MM/YYYY")}
+                        </label>
+                      </div>
+
+                      <div hidden={record.GroupStatus !== "Completed" && record.GroupStatus !== "Resolved" ? false : true}>
+                        <label className="table-column-text">{record.GroupStatus}</label>
+                        <br/>
+                        <label className="table-column-text">
+                          {record.ProgressStatus === null || record.ProgressStatus === record.GroupStatus ? "" : `(${record.ProgressStatus})`}
+                        </label>
+                      </div>
+                    </>
                   );
                 }}
               />
@@ -349,10 +372,19 @@ export default function All() {
                             customerdispatch({ type: "SELECT_DATAROW", payload: record }),
                             setModalfiledownload_visible(true)
                           )
-                        }
-                        }
+                        }}
                       >
                         {record.cntFile === 0 ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                      </Button>
+
+                      {/* FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา*/}
+                      <Button type="link"
+                        hidden={record.FileUrl === "" ? true : false}
+                        icon={<DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                        onClick={() => {
+                          window.open(record.FileUrl)
+                        }}
+                      >
                       </Button>
                     </>
                   )

@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -27,6 +27,7 @@ export default function AllIssue() {
 
   // data
   const [userstate, userdispatch] = useReducer(userReducer, userState);
+  const [loading, setLoadding] = useState(false);
   const [pageCurrent, setPageCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [pageTotal, setPageTotal] = useState(0);
@@ -38,7 +39,7 @@ export default function AllIssue() {
 
 
   const loadIssue = async (value) => {
-    // setLoadding(true);
+    setLoadding(true);
     try {
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
@@ -58,16 +59,17 @@ export default function AllIssue() {
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
           task: "allissue",
+          is_release_note: userstate.filter.isReleaseNote,
           pageCurrent: pageCurrent,
           pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
-        console.log("allissue", results.data.data)
         setPageTotal(results.data.total);
         setIssueAllStatus(results.data.issue_status);
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data });
+        setLoadding(false);
       }
     } catch (error) {
 
@@ -88,14 +90,21 @@ export default function AllIssue() {
   }
 
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
-    setTimeout(() => {
-      loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
-    }, 1000)
+    if (userstate.search === true) {
+      if (pageCurrent !== 1) {
+        setPageCurrent(1);
+        setPageSize(10);
+      } else {
+        loadIssue();
+      }
+    }
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, pageCurrent]);
+  }, [userstate.search]);
+
+  useEffect(() => {
+    loadIssue();
+  }, [pageCurrent]);
 
 
   return (
@@ -131,11 +140,11 @@ export default function AllIssue() {
 
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
-              pagination={{ pageSize: pageSize, total: pageTotal }}
+            <Table dataSource={userstate.issuedata.data} loading={loading}
+              pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
               //scroll={{y:250}}
               style={{ padding: "5px 5px" }}
-              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
               footer={(x) => {
                 return (
                   <>
@@ -162,8 +171,7 @@ export default function AllIssue() {
                 return (
                   (index === recHover ? "table-hover" : "")
                 )
-              }
-              }
+              }}
             >
               <Column
                 title="IssueNo"
@@ -171,18 +179,29 @@ export default function AllIssue() {
                 render={(record) => {
                   return (
                     <>
+                      <Tooltip title="ReleaseNote">
+                        <TrademarkOutlined
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 16, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      &nbsp;
+                      <Tooltip title="SQL Script">
+                        <ConsoleSqlOutlined
+                          style={{ display: record.SQL_Script === 1 ? "inline-block" : "none", fontSize: 16, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      <br />
                       <label className="table-column-text">
                         {record.Number}
                       </label>
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column
                 title="Details"
-                width="15%"
+                width="20%"
                 render={(record) => {
                   return (
                     <div>
@@ -227,12 +246,25 @@ export default function AllIssue() {
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            Module :
+                            Scene :
                           </label>
                         </Col>
                         <Col span={14}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            {record.ModuleName}
+                            {record.Scene}
+                          </label>
+                        </Col>
+                      </Row>
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Version :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
                           </label>
                         </Col>
                       </Row>
@@ -242,7 +274,7 @@ export default function AllIssue() {
               />
 
               <Column title="Subject"
-                width="25%"
+                width="40%"
                 render={(record) => {
                   return (
                     <>
@@ -280,7 +312,7 @@ export default function AllIssue() {
               />
               <Column title="Issue By"
                 align="center"
-                width="15%"
+                width="10%"
                 render={(record) => {
                   return (
                     <>
@@ -363,9 +395,10 @@ export default function AllIssue() {
 
                       <div>
                         <label className="table-column-text">
-                        {/* {record.InternalStatus}<br /> */}
-                          {record.FlowStatus}
+                          {record.GroupStatus}<br />
+                          {record.FlowStatus === null || record.GroupStatus === record.FlowStatus ? "" : `(${record.FlowStatus})`}
                         </label>
+
                       </div>
                     </>
                   );
@@ -376,7 +409,7 @@ export default function AllIssue() {
               <Column
                 title="Time Tracking"
                 align="center"
-                width="10%"
+                width="5%"
                 render={(record) => {
                   return (
                     <>
@@ -394,22 +427,28 @@ export default function AllIssue() {
               />
 
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-                width="10%"
+                width="5%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
                       <Button type="link"
-                        // onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
                         onClick={() => {
-                          return (
-                            userdispatch({ type: "SELECT_DATAROW", payload: record }),
-                            setModalfiledownload_visible(true)
-                          )
-                        }
-                        }
-                      >
+                          userdispatch({ type: "SELECT_DATAROW", payload: record });
+                          setModalfiledownload_visible(true);
+                        }}>
                         {record.cntFile === 0 ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                      </Button>
+
+
+                      {/* FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา*/}
+                      <Button type="link"
+                        hidden={record.FileUrl === "" ? true : false}
+                        icon={<DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                        onClick={() => {
+                          window.open(record.FileUrl)
+                        }}
+                      >
                       </Button>
                     </>
                   )

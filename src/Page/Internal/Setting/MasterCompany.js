@@ -120,10 +120,7 @@ export default function MasterCompany() {
             });
 
             if (cusproduct.status === 200) {
-                // console.log("product.data",product.data)
                 setCusProduct([...cusproduct.data])
-
-
             }
         } catch (error) {
 
@@ -140,7 +137,7 @@ export default function MasterCompany() {
                 }
             });
             if (product.status === 200) {
-                setListProduct(product.data.map((x) => {
+                setListProduct(product.data.filter((n) => !cusProduct.find((item) => item.ProductId === n.Id )).map((x) => {
                     return {
                         key: x.Id,
                         Name: x.Name,

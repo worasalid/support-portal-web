@@ -64,7 +64,8 @@ export default function Notifications(props) {
             });
 
             if (result.status === 200) {
-                console.log("Success")
+                console.log("Success");
+                window.location.reload(true);
             }
         } catch (error) {
 
@@ -103,14 +104,6 @@ export default function Notifications(props) {
                             <List.Item.Meta
                                 title={
                                     <>
-                                        {/* <label
-                                            onClick={() => {
-                                                history.push({ pathname: "/internal/issue/subject/" + item.ticketid });
-                                                window.location.reload(true);
-                                                updateCountNoti(item.id);
-                                            }}
-
-                                        > */}
                                         <Badge dot={true}
                                             offset={[-5]}
                                             style={{ display: item?.readdate === null ? "inline-block" : "none" }}
@@ -120,9 +113,11 @@ export default function Notifications(props) {
 
                                         <label className="text-link"
                                             onClick={() => {
+                                             
                                                 history.push({ pathname: "/internal/issue/subject/" + item.ticketid });
-                                                window.location.reload(true);
                                                 updateCountNoti(item.id);
+                                               
+
                                             }}
                                         >
                                             {item.title}

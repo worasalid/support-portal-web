@@ -162,7 +162,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
 
   useEffect(() => {
-
     // Issue
     if (match.url.search("issue") > 0) {
 
@@ -187,6 +186,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       if (match.url.search("complete") > 0) {
         setActive_submenu('6');
       }
+
     }
     //ricef
     if (match.url.search("ricef") > 0) {
@@ -222,12 +222,23 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
         setActive_submenu('16');
       }
     }
+    // patch
+    if (match.url.search("patch") > 0) {
+      if (match.url.search("cut_of_patch") > 0) {
+        setActive_submenu('17')
+      }
+    }
     // Migration
     if (match.url.search("migration") > 0) {
       setActive_submenu('99')
     }
 
   }, [match.url])
+
+  useEffect(() => {
+    localStorage.setItem("menu-collapsed", state.collapsed)
+  }, [state.collapsed])
+
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -245,7 +256,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               style={{ height: "60px", width: "130px" }}
               src={`${process.env.PUBLIC_URL}/logo-space02.png`}
               alt=""
-              onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: !state.collapsed })}
+              onClick={() => {
+                dispatch({ type: 'MENUCOLLAPSED', payload: !state.collapsed });
+                localStorage.setItem("menu-collapsed", !state.collapsed)
+              }}
 
             />
           </Col>
@@ -312,13 +326,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     <hr />
                     <Menu.Item key="1" onClick={() => history.push({ pathname: "/internal/user/profile" })}>
                       Profile
-                      </Menu.Item>
+                    </Menu.Item>
                     <hr />
                     <Button type="link"
                       onClick={() => { localStorage.removeItem("sp-ssid"); history.push("/Login") }}
                     >
                       Log Out
-                      </Button> <br />
+                    </Button> <br />
                   </Menu>
                 )} trigger="click">
 
@@ -348,12 +362,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
           style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
           width={205}
           collapsed={state.collapsed}
+
         >
 
           <Menu theme="light"
             style={{ backgroundColor: "#edebec" }}
             mode="inline"
-            defaultOpenKeys={[match.path.split('/')[2]]}
+            defaultOpenKeys={state.collapsed ? [] : [match.path.split('/')[2]]}
             selectedKeys={[active_submenu]}
           >
 
@@ -369,10 +384,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 // setActive_submenu('0')
               }}
                 style={{
-                  display: state.usersdata?.organize.OrganizeCode === "support" ? "block" : "none"
+                  display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" ? "block" : "none"
                 }}
               >
-                Other Issue
+                All Issue
 
               </Menu.Item>
               <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
@@ -382,7 +397,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               <Menu.ItemGroup key="g2" title="In Box">
                 <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
                   My Task
-                {
+                  {
                     masterstate.toolbar.sider_menu.issue.mytask.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
@@ -404,7 +419,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     }
                   >
                     In progress
-                {
+                    {
                       masterstate.toolbar.sider_menu.issue.inprogress.count === 0
                         ? ""
                         : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
@@ -423,7 +438,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
                 <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
                   Resolved
-                {
+                  {
                     masterstate.toolbar.sider_menu.issue.resolved.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.resolved.count})`}</span>
@@ -432,7 +447,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 </Menu.Item>
                 <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
                   Cancel
-                {
+                  {
                     masterstate.toolbar.sider_menu.issue.cancel.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
@@ -445,6 +460,24 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.ItemGroup>
             </SubMenu>
 
+            <SubMenu key="patch"
+              style={{
+                display: state.usersdata?.organize?.ComCode !== "ERP" ? "block" : "none"
+              }}
+              icon={<AuditOutlined />}
+              title="Version Patch"
+            >
+              <Menu.Item key="17"
+                hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
+                onClick={() => history.push('/internal/patch/cut_of_patch')}>
+                  Cut Off Patch
+              </Menu.Item>
+              <Menu.Item key="18" onClick={() => history.push('/internal/patch/header')}>
+                Patch Detail
+                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+              </Menu.Item>
+            </SubMenu>
+
             <SubMenu key="ricef"
               style={{
                 display: state.usersdata?.organize?.OrganizeCode === "consult" ||
@@ -454,19 +487,19 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               icon={<AuditOutlined />} title="RICEF">
               <Menu.Item key="7" onClick={() => history.push('/internal/ricef/all')}>
                 - All Task
-                  {/* <Badge count={1}> */}
+                {/* <Badge count={1}> */}
                 <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
               <Menu.Item key="8" onClick={() => history.push('/internal/ricef/mytask')}>
                 - My Task
-                  {/* <Badge count={1}> */}
+                {/* <Badge count={1}> */}
                 <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
               <Menu.Item key="9" onClick={() => history.push('/internal/ricef/inprogress')}>
                 - InProgress
-                  {/* <Badge count={1}> */}
+                {/* <Badge count={1}> */}
                 <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 {/* </Badge> */}
               </Menu.Item>
@@ -480,6 +513,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                   display: state.usersdata?.organize.OrganizeCode === "support" ||
                     state.usersdata?.organize.OrganizeCode === "cr_center" ||
                     state.usersdata?.organize.OrganizeCode === "consult" ||
+                    state.usersdata?.organize?.ComCode === "ERP" ||
                     state.usersdata?.users.code === "I0017" ? "block" : "none"
                 }}
                 onClick={() => {
@@ -500,7 +534,9 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.Item>
               <Menu.Item key="13"
                 style={{
-                  display: state.usersdata?.organize.OrganizeCode === "dev" ? "block" : "none"
+                  display: state.usersdata?.organize.OrganizeCode === "dev" ||
+                    state.usersdata?.organize?.ComCode === "ERP" ? "block" : "none"
+
                 }}
                 onClick={() => history.push('/internal/setting/mapdeveloper')}
               >
@@ -508,14 +544,18 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.Item>
               <Menu.Item key="14" onClick={() => history.push('/internal/setting/mapqa')}
                 style={{
-                  display: state.usersdata?.organize.OrganizeCode === "qa" || state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  display: state.usersdata?.organize.OrganizeCode === "qa" ||
+                    state.usersdata?.organize?.ComCode === "ERP" ||
+                    state.usersdata?.users.code === "I0017" ? "block" : "none"
                 }}
               >
                 - QA Site
               </Menu.Item>
               <Menu.Item key="15" onClick={() => history.push('/internal/setting/mapsa')}
                 style={{
-                  display: state.usersdata?.organize.OrganizeCode === "sa" || state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  display: state.usersdata?.organize.OrganizeCode === "sa" ||
+                    state.usersdata?.organize?.ComCode === "ERP" ||
+                    state.usersdata?.users.code === "I0017" ? "block" : "none"
                 }}
               >
                 - SA Site
@@ -526,11 +566,11 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             </SubMenu>
 
 
-            <Menu.Item key="99" icon={<SettingOutlined />} onClick={() => history.push('/internal/migration')}
+            <Menu.Item key="migrate" icon={<SettingOutlined />} onClick={() => history.push('/internal/migration')}
               hidden={state?.usersdata?.users?.code === "I0017" ? false : true}
             >
               Migration
-              </Menu.Item>
+            </Menu.Item>
 
 
           </Menu>

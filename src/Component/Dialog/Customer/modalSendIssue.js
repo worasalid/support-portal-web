@@ -62,7 +62,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
       });
 
       if (sendflow.status === 200) {
-        SaveComment();
+        //SaveComment();
         onOk();
         setLoading(false);
 

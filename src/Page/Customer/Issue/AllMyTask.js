@@ -122,7 +122,6 @@ export default function AllMyTask() {
     loadIssue();
   }, [pageCurrent]);
 
-  console.log("progress", customerstate?.filter?.progress)
 
   return (
     <IssueContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
@@ -132,7 +131,7 @@ export default function AllMyTask() {
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
-        <IssueSearch Progress="show" />
+        <IssueSearch Progress="show"  />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={customerstate.issuedata.data} loading={loading}
@@ -351,7 +350,22 @@ export default function AllMyTask() {
                 align="center"
                 render={(record) => {
                   return (
-                    <label className="table-column-text">{record.ProgressStatus}</label>
+                    <>
+                      <div hidden={record.GroupStatus === "Resolved" ? false : true}>
+                        <label className="table-column-text">{record.GroupStatus}</label>
+                        <br />
+                        <label className="table-column-text">
+                          {moment(record.ResolvedDate).format("DD/MM/YYYY")}
+                        </label>
+                      </div>
+
+                      <div hidden={record.GroupStatus === "Completed" ? false : true}>
+                        <label className="table-column-text">
+                          {record.GroupStatus} <br />
+                          {moment(record.CompleteDate).format("DD/MM/YYYY")}
+                        </label>
+                      </div>
+                    </>
                   );
                 }}
               />

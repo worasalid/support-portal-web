@@ -43,6 +43,7 @@ export default function ConfigQA() {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectProduct(selectedRowKeys);
             setSelectedRowKeys(selectedRowKeys);
+            console.log("sss",selectedRowKeys)
 
         },
     };
@@ -70,7 +71,6 @@ export default function ConfigQA() {
                 }
             });
             if (user.status === 200) {
-                console.log(user.data)
                 setUser(user.data.usersdata.users.display_name)
             }
         } catch (error) {

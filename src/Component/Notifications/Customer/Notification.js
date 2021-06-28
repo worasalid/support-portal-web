@@ -64,7 +64,8 @@ export default function Notifications(props) {
             });
 
             if (result.status === 200) {
-                console.log("Success")
+                console.log("Success");
+                window.location.reload(true);
             }
         } catch (error) {
 
@@ -105,8 +106,8 @@ export default function Notifications(props) {
                                     <>
                                         <label className="text-link"
                                             onClick={() => {
+
                                                 history.push({ pathname: "/customer/issue/subject/" + item.ticketid });
-                                                window.location.reload(true);
                                                 updateCountNoti(item.id);
                                             }}
 

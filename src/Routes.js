@@ -40,6 +40,9 @@ import SupportSiteConfig from './Page/Internal/Setting/SupportSiteConfig';
 import CompanySiteConfig from './Page/Internal/Setting/CompanySiteConfig';
 import MappingDeveloper from './Page/Internal/Setting/MapDeveloper';
 import ConfigDeveloper from './Page/Internal/Setting/ConfigDeveloper';
+import IssuePatch from './Page/Internal/PatchUpdate/IssuePatch';
+import PatchHeader from './Page/Internal/PatchUpdate/PatchHeader';
+import PatchDetails from './Page/Internal/PatchUpdate/PatchDetails';
 import MapQA from './Page/Internal/Setting/MapQA';
 import ConfigQA from './Page/Internal/Setting/ConfigQA';
 import MapSA from './Page/Internal/Setting/MapSA';
@@ -50,9 +53,13 @@ import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
 import Organization from './Page/Internal/Setting/System/OrgChart';
 import MasterProduct from './Page/Internal/Setting/System/MasterProduct';
 import MasterModule from './Page/Internal/Setting/System/MasterModule';
+
+// Config
 import ConfigReOpen from './Page/Internal/Setting/System/ConfigReOpen';
 import ConfigVersion from './Page/Internal/Setting/System/ConfigVersion';
+import ConfigEmail from './Page/Internal/Setting/System/ConfigEmail';
 import ConfigReOpenEmail from './Page/Internal/Setting/System/ConfigReOpenEmail';
+import ConfigEmailPatchVersion from './Page/Internal/Setting/System/ConfigEmail_PatchVersion';
 import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
 import ConfigReasonReject from './Page/Internal/Setting/System/ConfigReasonReject';
 
@@ -103,13 +110,18 @@ export default function Routes() {
                                     <Route path="/internal/setting/config_qa/userid-:id?" exact component={ConfigQA} />
                                     <Route path="/internal/setting/mapsa" exact component={MapSA} />
                                     <Route path="/internal/setting/config_sa/userid-:id?" exact component={ConfigSA} />
+
+                                    {/* ตั้งค่าระบบ */}
                                     <Route path="/internal/setting/system" exact component={SystemConfig} />
                                     <Route path="/internal/setting/system/orgchart" exact component={Organization} />
                                     <Route path="/internal/setting/system/product" exact component={MasterProduct} />
                                     <Route path="/internal/setting/system/module" exact component={MasterModule} />
                                     <Route path="/internal/setting/system/reopen" exact component={ConfigReOpen} />
                                     <Route path="/internal/setting/system/version" exact component={ConfigVersion} />
-                                    <Route path="/internal/setting/system/reopen_email" exact component={ConfigReOpenEmail} />
+                                    <Route path="/internal/setting/system/email_config" exact component={ConfigEmail} />
+                                    <Route path="/internal/setting/system/email_config/reopen" exact component={ConfigReOpenEmail} />
+                                    <Route path="/internal/setting/system/email_config/patch" exact component={ConfigEmailPatchVersion} />
+                                    
                                     <Route path="/internal/setting/system/reason_cancel" exact component={ConfigReasonCancel} />
                                     <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
 
@@ -125,6 +137,11 @@ export default function Routes() {
                                     <Route path="/internal/issue/subject/:id?/task-:task?" exact component={SubTask} />
                                     <Route path="/internal/report/charts" exact component={Charts} />
 
+                                    {/* Patch */}
+                                    <Route path="/internal/patch/cut_of_patch" exact component={IssuePatch} />
+                                    <Route path="/internal/patch/header" exact component={PatchHeader} />
+                                    <Route path="/internal/patch/details/id-:id?" exact component={PatchDetails} />
+
 
                                     <Route path="/internal/ricef/all" exact component={Ricef} />
                                     <Route path="/internal/ricef/comp-:compid?" exact component={RicefHeader} />
@@ -134,8 +151,8 @@ export default function Routes() {
                                     <Route path="/internal/ricef/subject-:ricefid?" exact component={RicefSubject} />
 
                                     {/* Migration */}
-                                    <Route path="/internal/migration" exact component={Migration}/>
-                                    <Route path="/internal/migration/sqlscript/comid-:id?" exact component={ScriptSQL}/>
+                                    <Route path="/internal/migration" exact component={Migration} />
+                                    <Route path="/internal/migration/sqlscript/comid-:id?" exact component={ScriptSQL} />
 
                                     <Route path="/customer/login" exact component={Customerlogin} />
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />

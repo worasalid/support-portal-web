@@ -25,7 +25,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         try {
             if (editorRef.current.getValue() !== "") {
                 await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")

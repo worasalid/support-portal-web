@@ -658,6 +658,7 @@ export default function Subject() {
         setTabKey("4")
       }
     }
+
   }, [])
 
 
@@ -687,8 +688,8 @@ export default function Subject() {
     }
   }, [modalSaveDuedate])
 
-  
 
+  //console.log("state",state && state?.usersdata?.organize?.OrganizeCode)
 
   const tabDocDetail = useMemo(() => {
     return {
@@ -878,7 +879,9 @@ export default function Subject() {
 
                     <div style={{ display: activityCollapse }}>
                       {
-                        userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center"
+                        //userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center"
+                        state?.usersdata?.organize?.OrganizeCode === "support" || state?.usersdata?.organize?.OrganizeCode === "cr_center" ||
+                          state?.usersdata?.organize?.OrganizeCode === "consult"
                           ?
 
                           <Tabs defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
@@ -1484,7 +1487,7 @@ export default function Subject() {
         <PreviewImg
           title="Preview"
           visible={modalPreview}
-          width={800}
+          width={1400}
           footer={null}
           onCancel={() => {
             setModalPreview(false);

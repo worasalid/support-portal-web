@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
+import { ConsoleSqlOutlined, DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -182,7 +182,13 @@ export default function InProgress() {
                     <>
                       <Tooltip title="ReleaseNote">
                         <TrademarkOutlined
-                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 12, color: "#17A2B8" }}
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 16, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      &nbsp;
+                      <Tooltip title="SQL Script">
+                        <ConsoleSqlOutlined
+                          style={{ display: record.SQL_Script === 1 ? "inline-block" : "none", fontSize: 16, color: "#17A2B8" }}
                         />
                       </Tooltip>
                       <br />
@@ -258,7 +264,7 @@ export default function InProgress() {
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                           {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ?  "Version :" : "Patch :"}
+                            {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
                           </label>
                         </Col>
                         <Col span={14}>
@@ -323,7 +329,11 @@ export default function InProgress() {
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
-                      <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
+                      <Tooltip title="Company">
+                        <Tag color="#17a2b8" >
+                          <label style={{fontSize: 10}}>{record.CompanyName}</label>
+                        </Tag>
+                      </Tooltip>
 
                     </>
                   )
@@ -394,7 +404,7 @@ export default function InProgress() {
                   );
                 }}
               />
-              
+
               <Column
                 title="Time Tracking" width="5%"
                 align="center"

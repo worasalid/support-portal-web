@@ -52,7 +52,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null) {
                 await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
