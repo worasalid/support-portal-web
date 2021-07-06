@@ -52,6 +52,7 @@ export default function AllMyTask() {
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
           progress: customerstate.filter.progress,
+          version: customerstate.filter.versionState,
           scene: customerstate.filter.scene,
           keyword: customerstate.filter.keyword,
           task: "allmytask",

@@ -25,7 +25,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
     try {
       if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
         await Axios({
-          url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+          url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
           method: "POST",
           headers: {
             "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -62,7 +62,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
       });
 
       if (sendflow.status === 200) {
-        //SaveComment();
+        SaveComment();
         onOk();
         setLoading(false);
 

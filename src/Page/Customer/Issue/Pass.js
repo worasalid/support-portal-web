@@ -93,7 +93,7 @@ export default function Pass() {
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
-        <IssueSearch />
+        <IssueSearch Version="show"/>
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={customerstate.issuedata.data} loading={loading}

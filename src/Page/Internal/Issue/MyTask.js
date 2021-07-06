@@ -283,7 +283,7 @@ export default function Mytask() {
                       <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
                             {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
                           </label>
                         </Col>
@@ -411,7 +411,7 @@ export default function Mytask() {
                         >
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                             เลื่อน Due
-                            </label>
+                          </label>
                         </Tag>
                       </div>
                     </>
@@ -451,9 +451,9 @@ export default function Mytask() {
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
                         <ClockSLA
                           start={moment(record.AssignIconDate)}
-                          due={moment(record.DueDate)}
+                          due={moment(record.SLA_DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-
+                          type={record.Priority}
                         />
                       </div>
                     </>

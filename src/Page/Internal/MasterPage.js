@@ -1,5 +1,5 @@
 import 'antd/dist/antd.css';
-import React, { Component, useState, useContext, useEffect } from 'react';
+import React, { Component, useState, useContext, useEffect, useRef } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
@@ -11,7 +11,8 @@ import {
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
 import MasterContext from "../../utility/masterContext";
-import Notifications from '../../Component/Notifications/Internal/Notification';
+import Notification from '../../Component/Notifications/Internal/Notification';
+import NotificationDetails from '../../Component/Notifications/Internal/NotificationDetails';
 import StickyNote from '../../Component/StickyNote/Internal/StickyNote';
 import axios from 'axios';
 
@@ -56,6 +57,8 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
   const [notiCRDueDate, setNotiCRDueDate] = useState(0);
 
   //Menu
+  const notiRef = useRef(null);
+  const notiDetailsRef = useRef(null);
   const rootSubmenuKeys = ['sub0', 'sub1', 'sub2', 'sub3'];
   const [openKeys, setOpenKeys] = useState(['sub1']);
 
@@ -233,11 +236,14 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       setActive_submenu('99')
     }
 
+    //notiRef.current.getNoti()
+
   }, [match.url])
 
   useEffect(() => {
     localStorage.setItem("menu-collapsed", state.collapsed)
   }, [state.collapsed])
+
 
 
   return (
@@ -262,6 +268,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               }}
 
             />
+           
           </Col>
           <Col span={12} style={{ textAlign: "right" }}>
             <Tooltip title="Sticky Note">
@@ -285,14 +292,14 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 overlayStyle={{ width: 500, height: 400 }}
                 overlay={(
                   <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
-                    <Menu.Item key="1">
+                    <Menu.Item key="1"  >
                       <div>
                         <label style={{ fontSize: 24, fontWeight: "bold" }}><NotificationOutlined /> &nbsp; Notifications</label><br />
                         {/* <div style={{ height: "50vh", overflowY: "scroll" }}> */}
                         <Row style={{ padding: 16 }}>
                           <Col span={24}>
 
-                            <Notifications />
+                            <NotificationDetails ref={notiDetailsRef} />
                           </Col>
                         </Row>
                         {/* </div> */}
@@ -301,16 +308,11 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                   </Menu>
                 )} trigger="click">
 
+
                 <Button type="text" style={{ marginRight: 20, marginTop: 10 }} size="middle"
-                  icon={
-                    <Badge
-                      offset={[10, 0]}
-                      // dot={show_notice} 
-                      count={masterstate?.toolbar?.top_menu?.notification}>
-                      <NotificationOutlined style={{ fontSize: 20 }} />
-                    </Badge>
-                  }
+
                 >
+                  <Notification ref={notiRef} />
                 </Button>
               </Dropdown>
             </Tooltip>
@@ -470,7 +472,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               <Menu.Item key="17"
                 hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
                 onClick={() => history.push('/internal/patch/cut_of_patch')}>
-                  Cut Off Patch
+                Cut Off Patch
               </Menu.Item>
               <Menu.Item key="18" onClick={() => history.push('/internal/patch/header')}>
                 Patch Detail

@@ -716,7 +716,7 @@ export default function Subject() {
                         onClick={() => history.goBack()}
                       >
                         Back
-                        </Button>
+                      </Button>
                     </div>
                   </Col>
                 </Row>
@@ -726,8 +726,8 @@ export default function Subject() {
                       {userstate?.issuedata?.details[0]?.Number}
                       {userstate?.issuedata?.details[0]?.IsReOpen === true ? " (ReOpen)" : ""}
                     </label>
-                  &nbsp; &nbsp;
-                   <label style={{ fontSize: 30, color: "red" }}
+                    &nbsp; &nbsp;
+                    <label style={{ fontSize: 30, color: "red" }}
                       hidden={userstate?.mailbox[0]?.GroupStatus === "Cancel" ? false : true}
                     >
                       ยกเลิก
@@ -814,7 +814,11 @@ export default function Subject() {
                       display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
                         userstate?.mailbox[0]?.NodeName === "cr_center" &&
                         userstate?.mailbox[0]?.MailType === "in" &&
-                        userstate.issuedata.details[0]?.Manday === null ? "block" : "none"
+                        userstate.issuedata.details[0]?.Manday === null &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Complete" ? "block" : "none"
                     }} >
 
                     <Button icon={<FileAddOutlined />}
@@ -822,7 +826,7 @@ export default function Subject() {
                       shape="round"
                       onClick={() => setModaladdtask(true)} >
                       CreateTask
-                        </Button>
+                    </Button>
                   </Col>
 
                   {/* ปุ่ม Create Bug, Use */}
@@ -832,7 +836,8 @@ export default function Subject() {
                         userstate?.mailbox[0]?.NodeName === "support" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
-                        userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" ? "block" : "none"
+                        userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Complete"  ? "block" : "none"
                     }}>
                     <Button icon={<FileAddOutlined />}
                       shape="round"
@@ -844,7 +849,7 @@ export default function Subject() {
                         : setModaladdtask(true)}
                     >
                       CreateTask
-                        </Button>
+                    </Button>
                   </Col>
                 </Row>
                 <Row style={{ marginRight: 24 }}>
@@ -984,7 +989,7 @@ export default function Subject() {
                         />
                         : <label className="value-text">
                           {renderColorPriority(userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority)}&nbsp;&nbsp;
-                         {userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
+                          {userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
                         </label>
                     }
                   </Col>
@@ -1007,7 +1012,7 @@ export default function Subject() {
                         start={moment(userstate?.issuedata?.details[0]?.AssignIconDate)}
                         due={moment(userstate?.issuedata?.details[0]?.SLA_DueDate)}
                         end={userstate?.issuedata?.details[0]?.ResolvedDate === null ? moment() : moment(userstate?.issuedata?.details[0]?.ResolvedDate)}
-
+                        type={userstate?.issuedata?.details[0]?.InternalPriority}
                       />
                     }
                     <label className="header-text">DueDate</label>
@@ -1041,7 +1046,7 @@ export default function Subject() {
                         </label>
                         : <label className="value-text">
                           &nbsp;&nbsp;
-                        {(userstate?.issuedata.details[0]?.SLA_DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
+                          {(userstate?.issuedata.details[0]?.SLA_DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
                         </label>
                     }
                     {/* {history_duedate_data.length >= 1 ?
@@ -1077,7 +1082,7 @@ export default function Subject() {
                         </label>
                         : <label className="value-text">
                           &nbsp;&nbsp;
-                        {(userstate?.issuedata.details[0]?.DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
+                          {(userstate?.issuedata.details[0]?.DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
                         </label>
                     }
 
@@ -1118,14 +1123,14 @@ export default function Subject() {
 
                       <label className="value-text">
                         None
-                    </label>
+                      </label>
                     </div>
 
                     {/* &nbsp; &nbsp; */}
                     {userstate?.issuedata.details[0]?.cntDueDate >= 1 ?
                       <Tag color="warning" onClick={() => setHistoryduedate_visible(true)}>
                         DueDate ถูกเลื่อน
-                   </Tag> : ""
+                      </Tag> : ""
                     }
                   </Col>
                 </Row>

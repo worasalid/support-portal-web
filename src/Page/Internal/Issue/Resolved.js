@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined,ConsoleSqlOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -274,7 +274,7 @@ export default function Resolved() {
                           }
                           className="table-column-detail">
                           รายละเอียด
-                          </label>
+                        </label>
                       </div>
 
                     </>
@@ -332,7 +332,7 @@ export default function Resolved() {
                           }
                         >
                           เลื่อน Due
-                       </Tag>
+                        </Tag>
                       </div>
                     </>
                   )
@@ -372,9 +372,9 @@ export default function Resolved() {
                       <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
                         <ClockSLA
                           start={moment(record.AssignIconDate)}
-                          due={moment(record.DueDate)}
+                          due={moment(record.SLA_DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-
+                          type={record.Priority}
                         />
                       </div>
                     </>

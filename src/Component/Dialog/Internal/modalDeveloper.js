@@ -123,11 +123,16 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
             });
 
             if (sendflow.status === 200) {
-
                 SaveComment();
                 SaveUnitTest(values);
-                SaveDocumentDeploy(values);
-                saveFile_Deploy(values);
+
+                if (values.document_url !== undefined) {
+                    SaveDocumentDeploy(values);
+                }
+                if (values.file_deploy !== undefined) {
+                    saveFile_Deploy(values);
+                }
+
                 onOk();
                 setLoading(false);
 
@@ -172,7 +177,8 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
     }
 
     const onFinish = (values) => {
-        SendFlow(values);
+       // console.log(values)
+         SendFlow(values);
     };
 
 
@@ -214,12 +220,12 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     </Form.Item>
 
                     <Form.Item
-                        labelCol={6}
+                        wrapperCol={6}
                         label="Excel Deploy"
                         name="document_url"
                         rules={[
                             {
-                                required: true,
+                                required: false,
                                 message: 'กรุณาใส่ Url Excel Deploy!',
                             },
                         ]}
@@ -287,7 +293,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 </Form>
                 <TextEditor ref={editorRef} />
                 <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
         </Modal>
     )

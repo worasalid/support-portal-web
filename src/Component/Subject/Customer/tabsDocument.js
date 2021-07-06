@@ -1407,6 +1407,98 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                     </Tabs>
                 </div>
 
+                {/* testResult */}
+                <div
+                    style={{
+                        display: (listfile.filter((x) => x.GroupType === "quotation").length === 0) &&
+                            (listfile.filter((x) => x.GroupType === "testResult").length !== 0) &&
+                            listfile.filter((x) => x.GroupType === "deploy_document").length === 0 &&
+                            listfile.filter((x) => x.GroupType === "file_deploy").length === 0 &&
+                            (listfile.filter((x) => x.GroupType === "vdoUpload").length === 0) ? "block" : "none"
+
+                    }}
+                >
+                    <Tabs defaultActiveKey="1" type="card">
+
+                        <TabPane tab="Test Result" key="1">
+                            <Table dataSource={listfile.filter((x) => x.GroupType === "testResult")} style={{ width: "100%", padding: 0, margin: 0 }} pagination={false}>
+                                <Column title="No"
+                                    width="5%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label>{index + 1}</label>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="ไฟล์ Unit Test" width="55%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileName}<br />
+                                                </label>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+
+                                <Column title="FileSize" width="10%" dataIndex="FileSize"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.FileSize}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title="OwnerName" width="25%"
+                                    align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="value-text">
+                                                    {record.OwnerName}<br />
+                                                </label>
+                                                <label style={{ fontSize: 10, color: "#CCCCCC" }}>
+                                                    {moment(record.ModifyDate).format("DD/MM/YYYY HH:mm")}
+                                                </label>
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                                <Column title=""
+                                    width="3%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="link"
+                                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                                >
+                                                    {record.FileName === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
+
+                                                </Button>
+
+                                            </>
+                                        )
+                                    }
+                                    }
+                                />
+                            </Table>
+                        </TabPane>
+
+                    </Tabs>
+                </div>
+
 
                 {/* testResult, Document Deploy, File Deploy */}
                 <div

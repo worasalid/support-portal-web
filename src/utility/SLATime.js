@@ -152,18 +152,30 @@ function calculateWorkTimeByPeriod(
   return result_minutes;
 }
 
-function timeFormat(time) {
-  // const minutes = Math.floor(time % 60);
-  // const hours = parseInt(Math.floor((time / 60) % 8));
-  // const days = parseInt(Math.floor(time / 60) / 8);
+
+function calculateTimeNoPeriod(startdate, duedate, enddate) {
+
+  let start_date = moment(startdate.format("YYYY-MM-DD HH:mm"))
+  let due_date = moment(duedate.format("YYYY-MM-DD HH:mm"))
+  let end_date = moment(enddate.format("YYYY-MM-DD HH:mm"))
+  let time_result;
+
+
+  if (end_date > due_date) {
+    time_result = Math.abs(moment(due_date.format("YYYY-MM-DD HH:mm")).diff(moment(end_date.format("YYYY-MM-DD HH:mm")), 'minute'))
+  } else {
+    time_result = Math.abs(moment(end_date.format("YYYY-MM-DD HH:mm")).diff(moment(due_date.format("YYYY-MM-DD HH:mm")), 'minute'))
+  }
+
+  return time_result
+}
+
+
+function business_timeFormat(time) {
 
   const minutes = Math.floor(Math.abs(time) % 60);
   const hours = parseInt(Math.floor((Math.abs(time) / 60) % 8));
   const days = parseInt(Math.floor(Math.abs(time) / 60) / 8);
-
-  // console.log("time",Math.abs(time))
-  // const hoursxx = parseInt(Math.floor((Math.abs(time) / 60) % 8));
-  // console.log("hours",hoursxx)
 
   const result =
     (days === 0 ? "" : Math.abs(days) + "d ") +
@@ -173,54 +185,90 @@ function timeFormat(time) {
   return result
 }
 
-export default function SLATime({ start, end, due }) {
+
+function timeFormat(time) {
+  const minutes = Math.floor(Math.abs(time) % 60);
+  const hours = parseInt(Math.floor((Math.abs(time) / 60)));
+  const days = parseInt(Math.abs(hours) / 24 );
+
+  const result =
+    (days === 0 ? "" : Math.abs(days) + "d ") +
+    (hours === 0 ? "" : Math.abs(hours) + "h ") +
+    Math.abs(minutes) + "m"
+
+  return result
+}
+
+export default function SLATime({ start, due, end, type }) {
   const [state, setstate] = useState({});
 
   useEffect(() => {
+    // SLA ในเวลาทำงาน
     let due_minute = calculateWorkTimeByPeriod(start, due);
     let work_minute = calculateWorkTimeByPeriod(start, end);
 
-    // console.log({
-    //   due_minute,
-    //   work_minute,
-    // });
+    // SLA ตามเวลาจริง
+    let due_date = moment(due.format("YYYY-MM-DD HH:mm"))
+    let end_date = moment(end.format("YYYY-MM-DD HH:mm"))
+    let total_minute = calculateTimeNoPeriod(start, due, end)
 
-    setstate({
-      due_minute,
-      work_minute,
-    });
+    if (type === "Critical") {
+      setstate({
+        due_date,
+        end_date,
+        total_minute
+      });
+
+    } else {
+      setstate({
+        due_minute,
+        work_minute,
+      });
+    }
+
+    //console.log("state",state)
   }, [start, end, due]);
 
 
   return (
     <>
-      {/* <div>
-        <p>due minutes: {state.due_minute} นาที</p>
-        <p>used minites: {state.work_minute} นาที</p>
-        <p>
-          คงเหลือ:{" "}
-          {state.work_minute < state.due_minute
-            ? state.due_minute - state.work_minute
-            : "over due" + `${state.due_minute - state.work_minute}`
-          }
-        นาที
-      </p>
-      </div> */}
-      <Button
-        type="default"
-        className={
-          state.work_minute < state.due_minute ? "sla-warning" : "sla-overdue"
-        }
-        size="middle"
-        shape="round"
-        ghost={state.work_minute < state.due_minute ? true : false}
-      >
-        {(state.due_minute < state.work_minute) ? "-" : ""}
-        <label className="value-text">
-          {timeFormat(state.due_minute - state.work_minute)}
-        </label>
-        <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
-      </Button>
+      {
+        type === "Critical" ?
+
+          <Button
+            type="default"
+            className={
+              state.end_date < state.due_date ? "sla-warning" : "sla-overdue"
+            }
+            size="middle"
+            shape="round"
+            ghost={state.end_date < state.due_date ? true : false}
+          >
+            {(state.due_date < state.end_date) ? "-" : ""}
+            <label className="value-text">
+              {timeFormat(state.total_minute)}
+            </label>
+            <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+          </Button>
+
+          :
+          <Button
+            type="default"
+            className={
+              state.work_minute < state.due_minute ? "sla-warning" : "sla-overdue"
+            }
+            size="middle"
+            shape="round"
+            ghost={state.work_minute < state.due_minute ? true : false}
+          >
+            {(state.due_minute < state.work_minute) ? "-" : ""}
+            <label className="value-text">
+
+              {business_timeFormat(state.due_minute - state.work_minute)}
+            </label>
+            <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+          </Button>
+      }
     </>
   );
 }

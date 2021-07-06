@@ -45,8 +45,23 @@ export default function PatchHeader() {
         }
     }
 
+    const getGoogleFolder = async () => {
+        const result = await Axios({
+            url: process.env.REACT_APP_API_URL + "/patch/googleFolder",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+        });
+
+        if (result.status === 200) {
+            console.log("getGoogleFolder",result.data.data, result.data.url)
+        }
+    }
+
     useEffect(() => {
-        getPatchData()
+        getPatchData();
+        getGoogleFolder();
     }, [])
 
     useEffect(() => {

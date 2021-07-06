@@ -84,6 +84,9 @@ export default function Issuesearch({ Progress = "hide", Version = "hide" }) {
         if (e.target.name === "scene") {
             customerdispatch({ type: "SELECT_SCENE", payload: e.target.value })
         }
+        if (e.target.name === "version") {
+            customerdispatch({ type: "SELECT_VERSION", payload: e.target.value })
+        }
 
         if (e.target.name === "date") {
             customerdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })

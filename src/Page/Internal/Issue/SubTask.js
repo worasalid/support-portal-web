@@ -257,7 +257,9 @@ export default function SubTask() {
     // Flow CR
     if (userstate?.taskdata?.data[0]?.IssueType === "ChangeRequest" || userstate?.taskdata?.data[0]?.IssueType === "Memo") {
       if (item.data.NodeName === "support") {
-        if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR") { setModalsendtask_visible(true) }
+        if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR" || item.data.value === "SendToDeploy") {
+          setModalsendtask_visible(true)
+        }
       }
       if (item.data.NodeName === "cr_center") {
         if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }
@@ -271,6 +273,9 @@ export default function SubTask() {
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
         if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject") {
           setModalsendtask_visible(true)
+        }
+        if (item.data.value === "Deploy") {
+          setModalcomplete_visible(true)
         }
 
       }
@@ -460,7 +465,7 @@ export default function SubTask() {
                       onClick={() => history.goBack()}
                     >
                       Back
-                        </Button>
+                    </Button>
                   </div>
                 </Col>
               </Row>
@@ -1046,7 +1051,7 @@ export default function SubTask() {
         />
 
         <ModalDevSendVersion
-          title="ระบุ Version"
+          title="Confirm Deploy File (Patch Version)"
           width={800}
           visible={modalDevSendVersion}
           onCancel={() => { return (setModalDevSendVersion(false)) }}

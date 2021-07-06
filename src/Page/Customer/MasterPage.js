@@ -1,18 +1,19 @@
-import { NotificationOutlined,PieChartOutlined, FileOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip } from "antd";
-import React, { useState, useContext, useEffect } from "react";
+import { PieChartOutlined, FileOutlined } from "@ant-design/icons";
+import { Avatar, Button, Col, Dropdown, Layout, Menu, Row, Tooltip } from "antd";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AuthenContext from "../../utility/authenContext";
 import IssueContext from '../../utility/issueContext';
 //import IssueContext, { customerReducer, customerState } from "../../utility/issueContext";
 import Axios from "axios";
 import MasterContext from "../../utility/masterContext";
-import Notifications from "../../Component/Notifications/Customer/Notification";
+import Notification from "../../Component/Notifications/Customer/Notification";
+import NotificationDetails from "../../Component/Notifications/Customer/NotificationDetails";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
-export default function MasterPage({bgColor='#fff',...props}) {
+export default function MasterPage({ bgColor = '#fff', ...props }) {
   const history = useHistory();
   const match = useRouteMatch();
   const [show_notice, setshow_notice] = useState(true);
@@ -20,6 +21,8 @@ export default function MasterPage({bgColor='#fff',...props}) {
   //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
   const [activemenu, setActivemenu] = useState([])
+  const notiRef = useRef(null);
+  const notiDetailsRef = useRef(null);
 
   const getuser = async () => {
     try {
@@ -30,12 +33,12 @@ export default function MasterPage({bgColor='#fff',...props}) {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
       });
-      if(result.status === 200){
+      if (result.status === 200) {
         dispatch({ type: 'Authen', payload: true });
         dispatch({ type: 'LOGIN', payload: result.data.usersdata });
         CountStatus();
       }
-      
+
     } catch (error) {
       alert(error.response.data)
     }
@@ -64,7 +67,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
     }
   }
 
-  const getNotification = async() => {
+  const getNotification = async () => {
     try {
       const countNoti = await Axios({
         url: process.env.REACT_APP_API_URL + "/master/notification",
@@ -74,11 +77,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
         }
       });
 
-      if(countNoti.status === 200) {
+      if (countNoti.status === 200) {
         masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
       }
     } catch (error) {
-      
+
     }
   }
 
@@ -87,7 +90,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
       getuser();
       getNotification();
       CountStatus();
-    }else{
+    } else {
       getuser();
       setInterval(() => {
         getNotification();
@@ -119,7 +122,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
     if (match.url.search("complete") > 0) {
       setActivemenu(activemenu.push("7"))
     }
-  }, [])
+  }, [match.url])
 
 
   return (
@@ -128,11 +131,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
         <Menu theme="light" mode="horizontal" defaultSelectedKeys={["0"]} style={{ backgroundColor: "#1a73e8" }}>
           <Row>
             <Col span={12}>
-              <img
+              {/* <img
                 style={{ height: "35px" }}
                 src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
                 alt=""
-              />
+              /> */}
             </Col>
             <Col span={12} style={{ textAlign: "right" }}>
               <Tooltip title="Notifications">
@@ -145,42 +148,36 @@ export default function MasterPage({bgColor='#fff',...props}) {
                         <div>
                           <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
                           {/* <div style={{ height: "50vh", overflowY: "scroll" }}> */}
-                            <Row style={{ padding: 16 }}>
-                              <Col span={24}>
+                          <Row style={{ padding: 16 }}>
+                            <Col span={24}>
 
-                                <Notifications />
-                              </Col>
-                            </Row>
+                              <NotificationDetails ref={notiDetailsRef} />
+                            </Col>
+                          </Row>
                           {/* </div> */}
                         </div>
                       </Menu.Item>
                     </Menu>
                   )} trigger="click">
 
-                   <Button type="text" style={{ marginRight: 20,marginTop:10 }} size="middle"
-                  icon={
-                  <Badge 
-                   offset={[10,0]}
-                 // dot={show_notice} 
-                  count={masterstate?.toolbar?.top_menu?.notification}>
-                    <NotificationOutlined style={{ fontSize: 20 }} />
-                    </Badge>
-                    }
-                >
-                </Button>
+                  <Button type="text" style={{ marginRight: 20, marginTop: 10 }} size="middle"
+
+                  >
+                    <Notification ref={notiRef} />
+                  </Button>
                 </Dropdown>
               </Tooltip>
-     
-              <div style={{ display: "inline-block", alignItems: "center" }}>
-                    <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
-                    </Avatar>
-                  </div>
-                  <div style={{ display: "inline-block", marginLeft: 8 }}>
-                    <label className="user-login">
-                      {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
-                    </label>
-                  </div>
+              <div style={{ display: "inline-block", alignItems: "center" }}>
+                <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
+
+                </Avatar>
+              </div>
+              <div style={{ display: "inline-block", marginLeft: 8 }}>
+                <label className="user-login">
+                  {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
+                </label>
+              </div>
             </Col>
           </Row>
         </Menu>
@@ -208,34 +205,34 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Button>
             </div>
             <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
-            <Menu.Item key="01" onClick={() => history.push('/customer/dashboard/all')}>
+              <Menu.Item key="01" onClick={() => history.push('/customer/dashboard/all')}>
                 - All Issue
-                
+
               </Menu.Item>
               <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
                 - DashBoard
-                
+
               </Menu.Item>
             </SubMenu>
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issues">
-            <Menu.Item
+              <Menu.Item
                 key="1"
-                onClick={() =>  history.push('/customer/issue/all-issue')
+                onClick={() => history.push('/customer/issue/all-issue')
                   // {
                   //   return ( history.push({ pathname: "/customer/issue/allmytask" }), window.location.reload(true)) 
                   // }
-                  
+
                 }
               >
                 All Issue
               </Menu.Item>
               <Menu.Item
                 key="2"
-                onClick={() =>  history.push('/customer/issue/alltask')
+                onClick={() => history.push('/customer/issue/alltask')
                   // {
                   //   return ( history.push({ pathname: "/customer/issue/allmytask" }), window.location.reload(true)) 
                   // }
-                  
+
                 }
               >
                 All Task
@@ -274,7 +271,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Menu.Item>
               <Menu.Item
                 key="5"
-                onClick={() =>  history.push('/customer/issue/pass')
+                onClick={() => history.push('/customer/issue/pass')
                   // {
                   //   return ( history.push({ pathname: "/customer/issue/pass" }), window.location.reload(true)) 
                   // }
@@ -325,7 +322,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
 
         <Content
           style={{
-           // padding: 24,
+            // padding: 24,
             margin: 0,
             minHeight: 280,
 

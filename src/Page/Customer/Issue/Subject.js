@@ -116,12 +116,19 @@ export default function Subject() {
       });
 
       if (flow_output.status === 200) {
-        customerdispatch({
-          type: "LOAD_ACTION_FLOW",
-          payload: flow_output.data.filter((x) => x.Type === null || x.Type === "Issue"
-            || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise")
-          )
-        })
+        let result = flow_output.data.filter((x) => x.Type === null || x.Type === "Issue" || x.Type === (value.IsCloudSite === true ? "OnCloud" : "OnPremise"))
+
+        if (value.ProgressStatus === "Automatic Update Patch") {
+          customerdispatch({
+            type: "LOAD_ACTION_FLOW",
+            payload: result.filter((x) => x.value !== "SendToDeploy")
+          })
+        } else {
+          customerdispatch({
+            type: "LOAD_ACTION_FLOW",
+            payload: result
+          })
+        }
       }
 
     } catch (error) {
@@ -269,7 +276,7 @@ export default function Subject() {
                     onClick={() => history.goBack()}
                   >
                     Back
-                </Button>
+                  </Button>
                 </Col>
               </Row>
 
@@ -287,7 +294,7 @@ export default function Subject() {
                         hidden={customerstate?.issuedata?.details[0]?.GroupStatus === "Cancel" ? false : true}
                       >
                         ยกเลิก
-                    </label>
+                      </label>
                       <div className="issue-detail-box">
                         <Row>
                           <Col span={16} style={{ display: "inline" }}>
@@ -410,7 +417,7 @@ export default function Subject() {
                       <label className="value-text">
                         {renderColorPriority(customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority)}&nbsp;&nbsp;
 
-                    {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority}
+                        {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority}
                       </label>
                     </Col>
                   </Row>

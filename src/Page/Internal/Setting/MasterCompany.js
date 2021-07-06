@@ -254,7 +254,8 @@ export default function MasterCompany() {
                     name: values.name,
                     full_name_th: values.fullname_th,
                     full_name_en: values.fullname_en,
-                    cost: values.cost
+                    cost: values.cost,
+                    is_cloud: values.is_cloud
                 }
             });
 
@@ -284,6 +285,7 @@ export default function MasterCompany() {
                     onOk() {
                         setVisible(false);
                         setLoading(true);
+                        window.location.reload(true);
                     },
                 });
             }

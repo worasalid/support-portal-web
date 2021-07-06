@@ -412,10 +412,11 @@ export default function InProgress() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        <ClockSLA
+                      <ClockSLA
                           start={moment(record.AssignIconDate)}
-                          due={moment(record.DueDate)}
-                          end={moment()}
+                          due={moment(record.SLA_DueDate)}
+                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
+                          type={record.Priority}
                         />
                       </div>
                     </>

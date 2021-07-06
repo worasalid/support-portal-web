@@ -5,12 +5,24 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from "react-router-dom";
 import AuthenContext from '../../utility/authenContext';
 
+import { GoogleLogout, GoogleLogin } from '../../utility/googleSignIn/index'
+
+
+
 export default function NormalLoginForm() {
   const { state, dispatch } = useContext(AuthenContext);
   const history = useHistory();
   const [loading, setLoading] = useState(false);
 
-
+  const clientId = '353179342338-988knc9gv71ct89cmdo7ap7go7renato.apps.googleusercontent.com'
+  const success = response => {
+    console.log("success", response) // eslint-disable-line
+  }
+  
+  const error = response => {
+    console.error("error", response) // eslint-disable-line
+  }
+  
 
   const onFinish = async (value) => {
     setLoading(true);
@@ -55,8 +67,6 @@ export default function NormalLoginForm() {
     }
   };
 
-
-
   return (
     <div className="login-backgroundimg">
       <Spin spinning={loading}>
@@ -71,7 +81,6 @@ export default function NormalLoginForm() {
 
           }}
         >
-
           <Form
             style={{ padding: 32, maxWidth: 480, height: 500, backgroundColor: "white" }}
             name="normal_login"
@@ -137,9 +146,11 @@ export default function NormalLoginForm() {
               //className="login-form-button"
               >
                 Log in
-          </Button>
+              </Button>
             </Form.Item>
           </Form>
+
+          <GoogleLogin onSuccess={success} onFailure={error} clientId={clientId} />
         </div>
 
       </Spin>

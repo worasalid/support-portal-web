@@ -52,6 +52,7 @@ export default function MyTask() {
           startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
+          version: customerstate.filter.versionState,
           scene: customerstate.filter.scene,
           keyword: customerstate.filter.keyword,
           task: "mytask",
@@ -131,7 +132,7 @@ export default function MyTask() {
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
-        <IssueSearch />
+        <IssueSearch Version="show" />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={customerstate?.issuedata?.data} loading={loading}
@@ -244,11 +245,11 @@ export default function MyTask() {
                           </label>
                         </Col>
                       </Row>
-                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            Version :
+                            {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
                           </label>
                         </Col>
                         <Col span={14}>
@@ -304,7 +305,7 @@ export default function MyTask() {
                           record.AssignIconDate === null ?
                             <label style={{ fontSize: 12, color: "red" }}>
                               ยังไม่ได้ส่งเรื่องให้ ICON
-                          </label> :
+                            </label> :
                             <label>
                               {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
                               {moment(record.AssignIconDate).format("HH:mm")}
@@ -343,7 +344,7 @@ export default function MyTask() {
                           }
                         >
                           DueDate ถูกเลื่อน
-                   </Tag> : ""
+                        </Tag> : ""
                       }
 
                     </>

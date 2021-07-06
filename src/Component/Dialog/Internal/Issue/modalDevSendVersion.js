@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Form, Spin, Select, DatePicker } from 'antd';
+import { Modal, Form, Spin, Select, DatePicker, Checkbox } from 'antd';
 import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
 import TextEditor from '../../../TextEditor';
@@ -14,29 +14,11 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
     const [loading, setLoading] = useState(false);
     const [version, setVersion] = useState([])
 
-    const getVersion = async () => {
-        try {
-            const version = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/config-data",
-                method: "GET",
-                params: {
-                    groups: details.product_code + "_Version"
-                }
-            });
-
-            if (version.status === 200) {
-                setVersion(version.data)
-            }
-        } catch (error) {
-
-        }
-    }
-
     const SaveComment = async () => {
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -45,7 +27,7 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -69,8 +51,8 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
-                        version: param.version,
-                        patch_update: param.patch_update.format('DD/MM/YYYY'),
+                        deploy_file: param.deploy_file,
+                        patch_update: param.patch_update === undefined ? null : param.patch_update.format('DD/MM/YYYY'),
                         comment_text: editorRef.current.getValue()
                     }
                 }
@@ -85,13 +67,13 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>ระบุ Version ให้ทีม Support</p>
+                            <p></p>
                         </div>
                     ),
                     okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        history.push({ pathname: "/internal/issue/inprogress" });
                     },
                 });
             }
@@ -115,11 +97,12 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
 
     const onFinish = (param) => {
         SendFlow(param);
+        //console.log("xx", param.patch_update)
     };
 
     useEffect(() => {
         if (visible) {
-            getVersion()
+
         }
 
     }, [visible])
@@ -133,7 +116,7 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
                 onOk={() => form.submit()}
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okType="dashed"
-                onCancel={() => {form.resetFields(); onCancel()}}
+                onCancel={() => { form.resetFields(); onCancel() }}
                 {...props}
             >
                 <Spin spinning={loading} size="large" tip="Loading...">
@@ -147,45 +130,40 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
                         onFinish={onFinish}
                     >
                         <Form.Item
-                            style={{ minWidth: 300, maxWidth: 300 }}
-                            label="Version"
-                            name="version"
+                            label="ตรวจสอบการวางไฟล์ Deploy (Update Patch Version)"
+                            name="deploy_file"
+                            valuePropName="checked"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Please Select Version',
+                                    message: 'Please Select',
                                 },
                             ]}
                         >
-                            <Select style={{ width: '100%' }} placeholder="None"
-                                showSearch
-                                filterOption={(input, option) =>
-                                    option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                }
-                                //onChange={(value, item) => setSelect_assign(item.label)}
-                                options={version && version.map((x) => ({
-                                    value: x.Name,
-                                    label: x.Name
-                                }))
-                                }
-                            >
-                            </Select>
+                            <Checkbox style={{ marginLeft: 20 }}>
+                                Upload File แล้ว
+                            </Checkbox>
                         </Form.Item>
+
                         <Form.Item
                             style={{ minWidth: 300, maxWidth: 300 }}
                             label="วันที่ Update Patch"
                             name="patch_update"
                             rules={[
                                 {
-                                    required: true,
+                                    required: false,
                                     message: 'Please Select Date',
                                 },
                             ]}
                         >
-                            <DatePicker format="DD/MM/YYYY" />
+                            <DatePicker
+                                style={{ marginLeft: 20 }}
+                                format="DD/MM/YYYY"
+                            // onChange={(date, datestring) => form.setFieldsValue({ patch_update: datestring })}
+                            />
                         </Form.Item>
+
                         <Form.Item
-                            // style={{ minWidth: 300, maxWidth: 300 }}
                             name="remark"
                             label="Remark :"
 
@@ -194,6 +172,7 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
                             <br />
                             AttachFile : <UploadFile ref={uploadRef} />
                         </Form.Item>
+
                     </Form>
                 </Spin>
             </Modal>

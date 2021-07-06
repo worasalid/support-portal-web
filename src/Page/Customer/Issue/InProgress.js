@@ -50,6 +50,7 @@ export default function InProgress() {
           startdate: customerstate.filter.date.startdate === "" ? "" : moment(customerstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: customerstate.filter.date.enddate === "" ? "" : moment(customerstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           priority: customerstate.filter.priorityState,
+          version: customerstate.filter.versionState,
           scene: customerstate.filter.scene,
           keyword: customerstate.filter.keyword,
           task: "InProgress",
@@ -212,11 +213,11 @@ export default function InProgress() {
                           </label>
                         </Col>
                       </Row>
-                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? false : true}
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
                           <label style={{ color: "#808080", fontSize: "10px" }}>
-                            Version :
+                            {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
                           </label>
                         </Col>
                         <Col span={14}>
