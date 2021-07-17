@@ -1,5 +1,5 @@
 import { PieChartOutlined, FileOutlined } from "@ant-design/icons";
-import { Avatar, Button, Col, Dropdown, Layout, Menu, Row, Tooltip } from "antd";
+import { Avatar, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Modal } from "antd";
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AuthenContext from "../../utility/authenContext";
@@ -40,7 +40,19 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       }
 
     } catch (error) {
-      alert(error.response.data)
+      await Modal.error({
+        title: error.response.data.message,
+        content: (
+          <div>
+            <p>Token หมดอายุ กรุณา Login ใหม่</p>
+          </div>
+        ),
+        okText: "Close",
+        onOk() {
+          window.open(error.response.data.url, "_self");
+          window.close();
+        },
+      });
     }
   }
 
@@ -63,7 +75,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length })
 
     } catch (error) {
-      alert("กรุณา Login")
+
     }
   }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Row, Table, Input } from "antd";
-import { ConsoleSqlOutlined } from '@ant-design/icons';
+import { Button, Col, Row, Table, Input, Upload } from "antd";
+import { ConsoleSqlOutlined, UploadOutlined } from '@ant-design/icons';
 import moment from "moment";
 import Axios from "axios";
 import MasterPage from "../MasterPage";
@@ -16,9 +16,7 @@ export default function Migration() {
 
     const [search, setSearch] = useState(false);
     const [loading, setLoading] = useState(true);
-
-
-    const [masterCompany, setMasterCompany] = useState([]);
+    const [fileList, setFileList] = useState([]);
 
     const searchCompany = (param) => {
         let result = listcompany.filter(o =>
@@ -57,6 +55,41 @@ export default function Migration() {
         }
     }
 
+    const Uploadprops = {
+        name: 'file',
+        action: process.env.REACT_APP_API_URL + "/tickets/test-upload",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+
+        onChange(info) {
+            if (info.file.status !== 'uploading') {
+                setFileList(info.fileList)
+                console.log("info uploading", info)
+            }
+            if (info.file.status === 'done') {
+                console.log("info done", info)
+                setFileList(info.fileList)
+            } else if (info.file.status === 'error') {
+            }
+        },
+        onRemove(info) {
+            console.log("removeinfo", info)
+        }
+    };
+
+    const upload = async () => {
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/company",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                files: fileList && fileList
+            }
+        });
+    }
 
     useEffect(() => {
         GetCompany()
@@ -68,6 +101,17 @@ export default function Migration() {
                 <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
                     <Col span={24}>
                         <label style={{ fontSize: 20, verticalAlign: "top" }}>Migrate Data</label>
+                    </Col>
+                </Row>
+                <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
+                    <Col span={24}>
+                        <Upload {...Uploadprops} onChange={(info) => Uploadprops.onChange(info)}>
+                            <Button icon={<UploadOutlined />}>Click to Attach</Button>
+                        </Upload>
+
+                        <Button icon={<UploadOutlined />}
+                            onClick={() => upload()}
+                        >Click to Upload</Button>
                     </Col>
                 </Row>
 
@@ -99,12 +143,12 @@ export default function Migration() {
                                     return (
                                         <>
                                             <Button type="link"
-                                                icon={<ConsoleSqlOutlined style={{fontSize:24}} />}
+                                                icon={<ConsoleSqlOutlined style={{ fontSize: 24 }} />}
                                                 onClick={() => {
-                                                    history.push({pathname: "/internal/migration/sqlscript/comid-" + record.Id});
+                                                    history.push({ pathname: "/internal/migration/sqlscript/comid-" + record.Id });
                                                 }}
                                             >
-                                               
+
                                             </Button>
                                         </>
                                     )

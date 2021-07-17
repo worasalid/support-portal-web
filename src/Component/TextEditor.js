@@ -2,28 +2,32 @@ import { Editor } from '@tinymce/tinymce-react';
 import React, { forwardRef, useRef, useState, useImperativeHandle } from 'react';
 
 export default forwardRef(function TextEditor(props = null, ref) {
-    const [value, setValue] = useState(null)
+    const [value, setValue] = useState(null);
+    const [fileList, setFileList] = useState([]);
     const editorRef = useRef(null)
 
     useImperativeHandle(ref, () => ({
         getValue: () => value,
-        setvalue: () => editorRef.current.editor.setContent("")
+        setvalue: () => editorRef.current.editor.setContent(""),
+        getFiles: () => fileList,
     }));
 
+
     const image_upload_handler = (blobInfo, success, failure, progress) => {
+
         var xhr, formData;
 
         xhr = new XMLHttpRequest();
         xhr.withCredentials = false;
-        xhr.open("POST", process.env.REACT_APP_API_URL + "/files?check_temp=0");
+        // xhr.open("POST", process.env.REACT_APP_API_URL + "/files?check_temp=0");
+        xhr.open("POST", process.env.REACT_APP_API_URL + "/files/upload");
 
         xhr.upload.onprogress = function (e) {
             progress((e.loaded / e.total) * 100);
         };
 
-        xhr.onload = function () {
+        xhr.onload = function (data) {
             var json;
-
             if (xhr.status === 403) {
                 failure("HTTP Error: " + xhr.status, { remove: true });
                 return;
@@ -41,7 +45,8 @@ export default forwardRef(function TextEditor(props = null, ref) {
                 return;
             }
 
-            success(json.url);
+            // success(json.url);
+            success(json.googledrive_url);
         };
 
         xhr.onerror = function () {
@@ -52,6 +57,7 @@ export default forwardRef(function TextEditor(props = null, ref) {
 
         formData = new FormData();
         formData.append("file", blobInfo.blob(), blobInfo.filename());
+        formData.append("ticket",props.ticket_id);
 
         xhr.send(formData);
     };
@@ -62,7 +68,7 @@ export default forwardRef(function TextEditor(props = null, ref) {
                 ref={editorRef}
                 apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
                 value={props?.value === undefined ? "" : props?.value}
-                
+
                 init={{
                     height: (props?.init?.height === undefined ? 300 : props?.init?.height),
                     menubar: false,
@@ -79,7 +85,7 @@ export default forwardRef(function TextEditor(props = null, ref) {
                     toolbar2: (props?.init?.toolbar2 === undefined ?
                         'alignleft aligncenter alignright alignjustify bullist numlist preview' : props?.init?.toolbar2[0]),
                 }}
-                onEditorChange={(content, editor) => setValue(content)}
+                onEditorChange={(content, editor) => { setValue(content); console.log("content", content) }}
             // onEditorChange={(content, editor) => { return (console.log("onEditorChange", content), setValue(content)) }}
             />
         </>

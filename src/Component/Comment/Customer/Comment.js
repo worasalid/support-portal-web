@@ -86,7 +86,8 @@ export default function CommentBox() {
                     ticketid: match.params.id,
                     comment_text: editorRef.current.getValue(),
                     comment_type: "customer",
-                    files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    files: uploadRef.current.getFiles().map((n) => n.response),
+                    files_id: editorRef.current.getFiles()
                 }
             });
 
@@ -137,7 +138,6 @@ export default function CommentBox() {
         }
 
     }, [commentdata.length])
-
 
     return (
         <>
@@ -248,7 +248,7 @@ export default function CommentBox() {
                                                         onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
                                                         className="text-link value-text">
                                                         <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
-                                                </label>
+                                                    </label>
                                                 </Col>
                                             </Row>
                                         </div>
@@ -275,13 +275,13 @@ export default function CommentBox() {
                         onFinish={onFinish}
                     >
                         <Form.Item name="comment">
-                            <TextEditor ref={editorRef} />
+                            <TextEditor ref={editorRef} ticket_id={match.params.id} />
                         </Form.Item>
                         <Form.Item name="fileattach">
                             <Row>
                                 <Col span={2} style={{ display: "inline" }} >
                                     Attach :
-                            </Col>
+                                </Col>
                                 <Col span={4} style={{ display: "inline" }} >
                                     <Uploadfile ref={uploadRef} />
                                 </Col>

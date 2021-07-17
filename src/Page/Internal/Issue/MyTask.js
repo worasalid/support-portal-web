@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined  } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -347,7 +347,10 @@ export default function Mytask() {
                     <>
 
                       <div>
-                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        <label
+                          //style={{ fontSize: "8px" }}
+                          className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}
+                        >
                           {record.CreateBy}
                         </label>
                       </div>

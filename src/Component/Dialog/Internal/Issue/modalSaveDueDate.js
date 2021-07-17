@@ -33,7 +33,7 @@ export default function ModalSaveDueDate({ visible = false, onOk, onCancel, deta
                         ticketid: details && details.ticketid,
                         comment_text: textValue,
                         comment_type: details.node_name === "cr_center" ? "internal" : "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }

@@ -113,7 +113,7 @@ export default function TaskComment({ loadingComment = false }) {
                     taskid: match.params.task,
                     comment_text: editorRef.current.getValue(),
                     comment_type: "task",
-                    files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    files: uploadRef.current.getFiles().map((n) => n.response),
                     userid: values.send_to === undefined ? values.send_all : values.send_to
                 }
             });
@@ -300,7 +300,7 @@ export default function TaskComment({ loadingComment = false }) {
                     // onFinish={onFinish}
                     >
                         <Form.Item name="Internal_comment">
-                            <TextEditor ref={editorRef} />
+                            <TextEditor ref={editorRef} ticket_id={match.params.id}/>
                         </Form.Item>
                         <Form.Item name="Internal_fileattach">
                             <Row>
@@ -420,7 +420,7 @@ export default function TaskComment({ loadingComment = false }) {
             <PreviewImg
                 title="Preview"
                 visible={modalPreview}
-                width={800}
+                width={1200}
                 footer={null}
                 onCancel={() => {
                     setModalPreview(false);

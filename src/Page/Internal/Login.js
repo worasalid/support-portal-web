@@ -5,24 +5,57 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from "react-router-dom";
 import AuthenContext from '../../utility/authenContext';
 
-import { GoogleLogout, GoogleLogin } from '../../utility/googleSignIn/index'
-
-
+import { GoogleLogin } from 'react-google-login';
 
 export default function NormalLoginForm() {
   const { state, dispatch } = useContext(AuthenContext);
   const history = useHistory();
   const [loading, setLoading] = useState(false);
 
-  const clientId = '353179342338-988knc9gv71ct89cmdo7ap7go7renato.apps.googleusercontent.com'
-  const success = response => {
-    console.log("success", response) // eslint-disable-line
+  const responseGoogle = (response) => {
+    if (response.profileObj.email !== undefined && response.profileObj.email !== "" && response.profileObj.email !== null) {
+       console.log("responseGoogle", response.profileObj);
+      googleLogin(response.profileObj)
+    }
   }
-  
-  const error = response => {
-    console.error("error", response) // eslint-disable-line
+
+  const googleLogin = async (param) => {
+    setLoading(true);
+    try {
+      const result = await axios({
+        url: process.env.REACT_APP_API_URL + "/auth/google/user",
+        method: "POST",
+        data: {
+          email: param.email,
+        },
+      });
+      if (result.status === 200) {
+        setLoading(false);
+        localStorage.setItem("sp-ssid", result.data.ssid);
+        dispatch({ type: 'Authen', payload: true });
+        dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+        history.push("/internal/dashboard");
+        window.location.reload(true);
+      }
+
+    } catch (error) {
+      await Modal.error({
+        title: 'Login ไม่สำเร็จ',
+        content: (
+          <div>
+            <p>{error.response.data}</p>
+            <p>กรุณาติดต่อ ผู้ดูแลระบบ</p>
+          </div>
+        ),
+        okText: "Close",
+        onOk() {
+
+        },
+      });
+
+      setLoading(false);
+    }
   }
-  
 
   const onFinish = async (value) => {
     setLoading(true);
@@ -148,9 +181,23 @@ export default function NormalLoginForm() {
                 Log in
               </Button>
             </Form.Item>
+
+            <div
+              style={{ textAlign: "center", borderRadius: 10 }}
+            >
+              <GoogleLogin
+                clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}
+                // clientId="353179342338-988knc9gv71ct89cmdo7ap7go7renato.apps.googleusercontent.com"
+                onSuccess={responseGoogle}
+                onFailure={responseGoogle}
+                cookiePolicy={'single_host_origin'}
+              // scope='https://www.googleapis.com/auth/drive.file'
+              />
+            </div>
+
           </Form>
 
-          <GoogleLogin onSuccess={success} onFailure={error} clientId={clientId} />
+
         </div>
 
       </Spin>

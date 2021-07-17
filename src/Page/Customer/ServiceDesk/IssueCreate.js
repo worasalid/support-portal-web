@@ -44,7 +44,7 @@ export default function IssueCreate() {
 
         xhr = new XMLHttpRequest();
         xhr.withCredentials = false;
-        xhr.open("POST", process.env.REACT_APP_API_URL + "/files");
+        xhr.open("POST", process.env.REACT_APP_API_URL + "/files/upload");
 
         xhr.upload.onprogress = function (e) {
             progress((e.loaded / e.total) * 100);
@@ -70,7 +70,8 @@ export default function IssueCreate() {
                 return;
             }
 
-            success(json.url);
+            //success(json.url);
+            success(json.googledrive_url);
         };
 
         xhr.onerror = function () {
@@ -199,7 +200,7 @@ export default function IssueCreate() {
                     priority: values.priority,
                     title: values.subject,
                     description: description,
-                    files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    files: uploadRef.current.getFiles().map((n) => n.response),
 
                 },
             });

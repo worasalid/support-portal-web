@@ -53,7 +53,7 @@ export default function ModalCancel({ visible = false, onOk, onCancel, datarow, 
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: details.flowoutput.Type === null ? "customer" : "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }

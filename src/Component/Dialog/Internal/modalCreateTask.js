@@ -49,7 +49,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     description: editorRef.current.getValue(),
                     moduleid: values.module,
                     mailboxid: details.mailboxid,
-                    files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    files: uploadRef.current.getFiles().map((n) => n.response),
                 }
             });
             if (createtask.status === 200) {

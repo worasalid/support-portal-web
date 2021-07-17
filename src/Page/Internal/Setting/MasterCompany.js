@@ -137,7 +137,7 @@ export default function MasterCompany() {
                 }
             });
             if (product.status === 200) {
-                setListProduct(product.data.filter((n) => !cusProduct.find((item) => item.ProductId === n.Id )).map((x) => {
+                setListProduct(product.data.filter((n) => !cusProduct.find((item) => item.ProductId === n.Id)).map((x) => {
                     return {
                         key: x.Id,
                         Name: x.Name,
@@ -359,7 +359,7 @@ export default function MasterCompany() {
                             }}
                         >
                             เพิ่มข้อมูล
-                    </Button>
+                        </Button>
                     </Col>
                 </Row>
                 <Table
@@ -482,7 +482,7 @@ export default function MasterCompany() {
                             onClick={() => { return (setModalProduct(true), getMasterProduct()) }}
                         >
                             Add Product
-                    </Button>
+                        </Button>
                     </Col>
                 </Row>
                 <Row>
@@ -514,7 +514,6 @@ export default function MasterCompany() {
                         onFinish={onFinish}
 
                     >
-
                         <Form.Item name="code" label="Code">
                             <Input disabled={true} />
                         </Form.Item>
@@ -549,15 +548,16 @@ export default function MasterCompany() {
                                 onClick={() => { return (setModalProduct(true), getMasterProduct()) }}
                             >
                                 Add Product
-                    </Button>
+                            </Button>
                         </Col>
                     </Row>
                     <Row>
                         <Col span={24}>
                             <Table dataSource={[...cusProduct]}>
-                                <Column title="No" width="10%" dataIndex="Row" />
-                                <Column title="Product Code" width="20%" dataIndex="Name" />
-                                <Column title="Product Name" width="60%" dataIndex="FullName" />
+                                <Column title="No" width="5%" dataIndex="Row" />
+                                <Column title="Code" width="10%" dataIndex="Name" />
+                                <Column title="Product Name" width="40%" dataIndex="FullName" />
+                                <Column title="PassPortID" width="30%" dataIndex="PassportID" />
                                 <Column title=""
                                     align="center"
                                     width="10%"

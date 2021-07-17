@@ -207,6 +207,7 @@ export default function SystemConfig() {
                     </Col>
                 </Row>
             </div>
+           
         </MasterPage>
     )
 }

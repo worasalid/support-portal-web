@@ -59,7 +59,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "task",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }

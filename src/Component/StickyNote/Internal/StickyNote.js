@@ -26,7 +26,6 @@ export default function StickyNote({ visible, onClose, ...props }) {
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
-
             });
 
             if (result.status === 200) {
@@ -179,12 +178,13 @@ export default function StickyNote({ visible, onClose, ...props }) {
                 width={1200}
                 closable={true}
                 onClose={() => onClose()}
-
+               // drawerStyle={{color:"red", backgroundColor:"red"}}
                 {...props}
             >
 
                 <Spin spinning={loading}>
                     <List
+                      
                         grid={{ gutter: 16, column: 5 }}
                         dataSource={stckyNote}
                         renderItem={item => (
@@ -224,45 +224,6 @@ export default function StickyNote({ visible, onClose, ...props }) {
 
                                     </Col>
                                 </Row>
-                                {/* <Card
-                                    className="sticky-background"
-                                    style={{ width: 200, marginTop: 16, borderRadius: 20 }}
-                                    title={
-                                        <>
-                                            <Row>
-                                                <Col span={16}>
-                                                    <label style={{ fontSize: 10 }}>
-                                                        {moment(item.create_date).format("DD/MM/YYYY HH:mm")}
-                                                    </label>
-
-                                                </Col>
-                                                <Col span={4}>
-                                                    <EditOutlined key="edit" onClick={() => { setEditDrawer(true); getStickyNoteDetail(item.id) }} />
-                                                </Col>
-                                                <Col span={4}>
-                                                    <DeleteOutlined key="setting" onClick={() => deletetStickyNote(item.id)} />
-                                                </Col>
-                                            </Row>
-                                        </>
-                                    }
-                                >
-                                    <Meta
-                                        style={{ fontSize: 10 }}
-                                        description={
-                                            <div dangerouslySetInnerHTML={{ __html: item.description }}
-                                                style={{
-                                                    textOverflow: "ellipsis",
-                                                    overflow: "hidden",
-                                                    width: 150,
-                                                    height: 90
-                                                }}
-
-                                            >
-
-                                            </div>
-                                        }
-                                    />
-                                </Card> */}
                             </List.Item>
                         )}
                     />
@@ -309,7 +270,7 @@ export default function StickyNote({ visible, onClose, ...props }) {
                                 style={{ backgroundColor: "#00CC00" }}
                             >
                                 Save
-                             </Button>
+                            </Button>
                         </Col>
                     </Row>
 
@@ -342,7 +303,7 @@ export default function StickyNote({ visible, onClose, ...props }) {
                             style={{ backgroundColor: "#00CC00", marginTop: 12 }}
                         >
                             Save
-                           </Button>
+                        </Button>
                     </div>
                 }
             >

@@ -268,7 +268,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               }}
 
             />
-           
+
           </Col>
           <Col span={12} style={{ textAlign: "right" }}>
             <Tooltip title="Sticky Note">
@@ -537,7 +537,8 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               <Menu.Item key="13"
                 style={{
                   display: state.usersdata?.organize.OrganizeCode === "dev" ||
-                    state.usersdata?.organize?.ComCode === "ERP" ? "block" : "none"
+                    state.usersdata?.organize?.ComCode === "ERP" ||
+                    state.usersdata?.users?.code === "I0017" ? "block" : "none"
 
                 }}
                 onClick={() => history.push('/internal/setting/mapdeveloper')}

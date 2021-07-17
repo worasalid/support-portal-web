@@ -28,7 +28,7 @@ export default function ModalDevSendVersion({ visible = false, onOk, onCancel, d
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "task",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }

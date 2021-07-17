@@ -8,7 +8,6 @@ import { useHistory } from 'react-router-dom';
 import TextEditor from '../../TextEditor';
 
 
-
 export default function ModalSendIssue({ visible = false, onOk, onCancel, datarow, details, ...props }) {
   const history = useHistory();
   const uploadRef = useRef(null);
@@ -34,7 +33,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             ticketid: details && details.ticketid,
             comment_text: editorRef.current.getValue(),
             comment_type: "customer",
-            files: uploadRef.current.getFiles().map((n) => n.response.id),
+            files: uploadRef.current.getFiles().map((n) => n.response),
           }
         });
       }

@@ -483,13 +483,15 @@ export default function SubTask() {
                 <Col span={24}>
                   <div className="issue-detail-box">
                     <Row>
+                      <Col span={2} style={{ display: "inline" }}>
+                        <Avatar size={32} icon={<UserOutlined />} />
+                      </Col>
                       <Col span={16} style={{ display: "inline" }}>
                         <Typography.Title level={4}>
-                          {/* <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title} */}
-                          <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.taskdata?.data[0]?.Title}
+                          {userstate?.taskdata?.data[0]?.Title}
                         </Typography.Title>
                       </Col>
-                      <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                      <Col span={6} style={{ display: "inline", textAlign: "right" }}>
                         <Button title="file attach" type="link"
                           style={{ display: userstate?.taskdata?.data[0]?.cntFile === 0 ? "none" : "inline-block" }}
                           icon={<img
@@ -507,7 +509,7 @@ export default function SubTask() {
                           />}
                           onClick={() => setModalpreview(true)}
                         />
-                        <Divider type="vertical" />
+                      
                         <Button type="link"
                           onClick={
                             () => {
@@ -521,6 +523,7 @@ export default function SubTask() {
                         </Button>
                       </Col>
                     </Row>
+                    <br/>
                     <Row>
                       <div style={{ display: divcollapse }}>
                         <div className="issue-description"
@@ -777,6 +780,8 @@ export default function SubTask() {
           title="Preview"
           width={1000}
           visible={modalpreview}
+          okButtonProps={{ hidden: true }}
+          cancelText="Close"
           onCancel={() => setModalpreview(false)}
         >
           <Row>

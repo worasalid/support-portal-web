@@ -134,7 +134,7 @@ export default function CommentBox() {
                     ticketid: match.params.id,
                     comment_text: editorRef.current.getValue(),
                     comment_type: "customer",
-                    files: uploadRef.current.getFiles().map((n) => n.response.id),
+                    files: uploadRef.current.getFiles().map((n) => n.response),
                 }
             });
 
@@ -340,7 +340,7 @@ export default function CommentBox() {
                     >
                         <Form.Item name="customer_comment">
 
-                            <TextEditor ref={editorRef} />
+                            <TextEditor ref={editorRef} ticket_id={match.params.id}/>
                         </Form.Item>
                         <Form.Item name="customer_fileattach">
                             <Row>
@@ -395,7 +395,7 @@ export default function CommentBox() {
             <PreviewImg
                 title="Preview"
                 visible={modalPreview}
-                width={800}
+                width={1200}
                 footer={null}
                 onCancel={() => {
                     setModalPreview(false);

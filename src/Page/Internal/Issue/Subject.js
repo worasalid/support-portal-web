@@ -47,8 +47,7 @@ export default function Subject() {
   const history = useHistory();
   const selectRef = useRef(null)
   const subTaskRef = useRef(null)
-  // const clockRef = useRef(null)
-  // const clockRef2 = useRef(null)
+
   const { state, dispatch } = useContext(AuthenContext);
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
   const [loadingPage, setLoadingPage] = useState(true);
@@ -689,8 +688,6 @@ export default function Subject() {
   }, [modalSaveDuedate])
 
 
-  //console.log("state",state && state?.usersdata?.organize?.OrganizeCode)
-
   const tabDocDetail = useMemo(() => {
     return {
       refId: userstate?.issuedata?.details[0]?.Id
@@ -734,17 +731,22 @@ export default function Subject() {
                     </label>
                   </Col>
                 </Row>
+                
                 {/* Issue Description */}
                 <Row style={{ marginRight: 24, overflow: "hidden" }}>
                   <Col span={24}>
                     <div className="issue-detail-box">
                       <Row>
+                        <Col span={2} style={{ display: "inline" }}>
+                          <Avatar size={32} icon={<UserOutlined />} />
+                        </Col>
                         <Col span={16} style={{ display: "inline" }}>
                           <Typography.Title level={4}>
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate?.issuedata?.details[0]?.Title}
+                            {/* <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;   */}
+                            {userstate?.issuedata?.details[0]?.Title}
                           </Typography.Title>
                         </Col>
-                        <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                        <Col span={6} style={{ display: "inline", textAlign: "right" }}>
                           <Button title="file attach" type="link"
                             style={{ display: userstate?.issuedata?.details[0]?.cntFile === 0 ? "none" : "inline-block" }}
                             icon={<img
@@ -762,7 +764,7 @@ export default function Subject() {
                             />}
                             onClick={() => setModalpreview(true)}
                           />
-                          <Divider type="vertical" />
+                          {/* <Divider type="vertical" /> */}
                           <Button type="link"
                             onClick={
                               () => {
@@ -776,6 +778,7 @@ export default function Subject() {
                           </Button>
                         </Col>
                       </Row>
+
                       <Row>
                         <div style={{ display: divcollapse }}>
                           <div className="issue-description"
@@ -837,7 +840,7 @@ export default function Subject() {
                         userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&
-                        userstate?.mailbox[0]?.GroupStatus !== "Complete"  ? "block" : "none"
+                        userstate?.mailbox[0]?.GroupStatus !== "Complete" ? "block" : "none"
                     }}>
                     <Button icon={<FileAddOutlined />}
                       shape="round"

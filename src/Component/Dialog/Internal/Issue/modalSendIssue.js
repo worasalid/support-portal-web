@@ -27,7 +27,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: details.flowoutput.Type === null ? "customer" : "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }

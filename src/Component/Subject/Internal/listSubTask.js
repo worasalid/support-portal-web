@@ -132,7 +132,6 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
     }, [ticketId])
 
 
-
     return (
         <>
             {
@@ -153,7 +152,6 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                         >
                             {collapseicon}
                         </span>
-
                     </>
                     : ""
 
@@ -175,16 +173,18 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                             <Row style={{ padding: "0px 0px 0px 10px" }}>
                                                 <Col span={23} >
                                                     <Row>
-                                                        <Col span={18}>
+                                                        <Col span={1}>
                                                             <img
                                                                 style={{ height: "25px", width: "25px" }}
                                                                 src={`${process.env.PUBLIC_URL}/icons-doc-task.png`}
                                                                 alt=""
                                                             />&nbsp;
+                                                        </Col>
+                                                        <Col span={17}>
                                                             <label className="value-text">
                                                                 {item.title}
                                                             </label>
-                                                               &nbsp;&nbsp;
+                                                            &nbsp;&nbsp;
                                                             <label className="value-text">
                                                                 {
                                                                     item.cntFile !== 0 ?
@@ -195,8 +195,8 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                                         /> : ""
                                                                 }
                                                             </label>
-                                                               &nbsp;&nbsp;
-                                                              <Tag color="#17A2B8">{item.module}
+                                                            &nbsp;&nbsp;
+                                                            <Tag color="#17A2B8">{item.module}
                                                             </Tag>
                                                             &nbsp;&nbsp;
                                                             <Tag color="#87d068"
@@ -213,15 +213,21 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                                 ({item.manday} Manday)
                                                             </label>
                                                         </Col>
-                                                        <Col span={6} style={{ textAlign: "right" }} >{renderTaskStatus(item.status)}</Col>
-                                                    </Row>
-                                                    <Row style={{ textAlign: "right" }}>
-                                                        <Col span={24}>
+                                                        <Col span={6} style={{ textAlign: "right" }} >
+                                                            {renderTaskStatus(item.status)}
+                                                            <br/>
                                                             <label className="value-text">
                                                                 {item.flowstatus === null ? "" : `(${item.flowstatus})`}
                                                             </label>
                                                         </Col>
                                                     </Row>
+                                                    {/* <Row style={{ textAlign: "right" }}>
+                                                        <Col span={24}>
+                                                            <label className="value-text">
+                                                                {item.flowstatus === null ? "" : `(${item.flowstatus})`}
+                                                            </label>
+                                                        </Col>
+                                                    </Row> */}
 
                                                 </Col>
 

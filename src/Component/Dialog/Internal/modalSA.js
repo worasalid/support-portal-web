@@ -62,7 +62,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }

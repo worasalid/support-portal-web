@@ -50,7 +50,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }

@@ -90,7 +90,11 @@ export default function ModalFileDownload({ visible = false, onOk, onCancel, det
                         return (
                             <>
                                 <Button type="link"
-                                    onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank")}
+                                    onClick={() => {
+                                        record.Url === "" || record.Url === null ?
+                                            window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + record.FileId, "_blank") :
+                                            window.open(record.Url, "_blank")
+                                    }}
                                 >
                                     {record.FileId === null ? "" : <DownloadOutlined style={{ fontSize: 20, color: "#007bff" }} />}
 
