@@ -127,7 +127,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-       SendFlow(values);
+        SendFlow(values);
     };
 
 
@@ -139,7 +139,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => {form.resetFields(); onCancel() }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -179,10 +179,10 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         <UploadFile ref={uploadRef_unittest} />
                     </Form.Item> */}
                 </Form>
-                 Remark :
-            <TextEditor ref={editorRef} />
+                Remark :
+                <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                 <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
 
         </Modal>

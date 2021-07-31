@@ -14,6 +14,10 @@ export default function Issuesearch({ Progress = "hide", Version = "hide" }) {
 
     const progressstatus = [
         {
+            value: "Open",
+            text: "Open"
+        },
+        {
             value: "InProgress",
             text: "InProgress"
         },

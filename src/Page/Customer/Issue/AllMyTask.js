@@ -175,7 +175,7 @@ export default function AllMyTask() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.Number}
                       </label>
                     </>
@@ -192,7 +192,7 @@ export default function AllMyTask() {
                     <div>
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label className="table-column-text" style={{ color: "#808080" }}>
+                          <label className="table-column-text11" style={{ color: "#808080" }}>
                             Type :
                           </label>
                         </Col>
@@ -319,7 +319,7 @@ export default function AllMyTask() {
                   return (
                     <>
 
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
                         {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                       </label>
@@ -353,15 +353,15 @@ export default function AllMyTask() {
                   return (
                     <>
                       <div hidden={record.GroupStatus === "Resolved" ? false : true}>
-                        <label className="table-column-text">{record.GroupStatus}</label>
+                        <label className="table-column-text11">{record.GroupStatus}</label>
                         <br />
-                        <label className="table-column-text">
+                        <label className="table-column-text11">
                           {moment(record.ResolvedDate).format("DD/MM/YYYY")}
                         </label>
                       </div>
 
                       <div hidden={record.GroupStatus === "Completed" ? false : true}>
-                        <label className="table-column-text">
+                        <label className="table-column-text11">
                           {record.GroupStatus} <br />
                           {moment(record.CompleteDate).format("DD/MM/YYYY")}
                         </label>

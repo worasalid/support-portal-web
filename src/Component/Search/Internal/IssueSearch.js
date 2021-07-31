@@ -63,7 +63,6 @@ export default function Issuesearch({ Progress = "hide" }) {
         },
     ]
 
-
     const handleChange = (e) => {
         if (e.target.group === "company") {
             userdispatch({ type: "SELECT_COMPANY", payload: e.target.value })

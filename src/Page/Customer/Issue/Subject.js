@@ -50,11 +50,36 @@ export default function Subject() {
   const [modalPreview, setModalPreview] = useState(false);
 
   // data
-  const [ticketdata, setTicketdata] = useState([]);
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [mailbox, setMailbox] = useState([]);
+  const [issueType, setIssueType] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [imgUrl, setImgUrl] = useState(null);
+
+
+
+  const cusScene = [
+    {
+      name: "None",
+      value: "None"
+    },
+    {
+      name: "Application",
+      value: "Application"
+    },
+    {
+      name: "Report",
+      value: "Report"
+    },
+    {
+      name: "Printform",
+      value: "Printform"
+    },
+    {
+      name: "Data",
+      value: "Data"
+    }
+  ]
 
   const getdetail = async () => {
     try {
@@ -78,6 +103,48 @@ export default function Subject() {
     } catch (error) {
 
     }
+  }
+
+  const getIssueType = async () => {
+    try {
+      const issuetype = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/issue-types",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        }
+      });
+      if (issuetype.status === 200) {
+
+        customerdispatch({ type: "LOAD_TYPE", payload: issuetype.data })
+        // setIssueType(issuetype.data.map((value) => {
+        //     return {
+        //         id: value.Id,
+        //         name: value.Name,
+        //         description: value.Description
+        //     }
+        // }))
+      }
+    } catch (error) {
+
+    }
+  }
+
+  const getproducts = async () => {
+    const products = await Axios({
+      url: process.env.REACT_APP_API_URL + "/master/customer-products",
+      method: "get",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        company_id: state?.usersdata?.users?.company_id
+      }
+    });
+    if (products.status === 200) {
+      customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
+    }
+
   }
 
   const getMailbox = async (value) => {
@@ -134,8 +201,6 @@ export default function Subject() {
     } catch (error) {
 
     }
-
-
   }
 
   const getDueDateHistory = async () => {
@@ -238,11 +303,220 @@ export default function Subject() {
     }
   }
 
+  function onChange(value, item) {
+    if (item.group === "product") {
+      Modal.info({
+        title: 'เปลียนข้อมูล Product',
+        content: (
+          <div>
+
+          </div>
+        ),
+        okCancel() {
+
+        },
+        onOk() {
+          updateProduct(item)
+        },
+      });
+    }
+    if (item.group === "issuetype") {
+      Modal.info({
+        title: 'เปลียนข้อมูล Issue Type',
+        content: (
+          <div>
+
+          </div>
+        ),
+        okCancel() {
+
+        },
+        onOk() {
+          updateIssueType(item)
+        },
+      });
+    }
+    if (item.group === "scene") {
+      Modal.info({
+        title: 'เปลียนข้อมูล Scene',
+        content: (
+          <div>
+
+          </div>
+        ),
+        okCancel() {
+
+        },
+        onOk() {
+          updateScene(item)
+        },
+      });
+    }
+  }
+
+  const updateProduct = async (params) => {
+    try {
+      const scene = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/product",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          ticketid: match.params.id,
+          product_id: params.value,
+          history: {
+            value: customerstate?.issuedata?.details[0]?.ProductName,
+            value2: params.code
+          }
+        }
+      });
+      if (scene.status === 200) {
+        Modal.success({
+          title: 'บันทึกข้อมูลเรียบร้อย',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+
+            window.location.reload(true)
+          },
+        });
+      }
+
+    } catch (error) {
+
+    }
+  }
+
+  const updateScene = async (params) => {
+    try {
+      const scene = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/scene",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          ticketid: match.params.id,
+          scene: params.value,
+          history: {
+            value: customerstate?.issuedata?.details[0]?.Scene,
+            value2: params.label
+          }
+        }
+      });
+      if (scene.status === 200) {
+        Modal.success({
+          title: 'บันทึกข้อมูลเรียบร้อย',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+
+            window.location.reload(true)
+          },
+        });
+      }
+
+    } catch (error) {
+
+    }
+  }
+
+  const updatePriority = async (params) => {
+    try {
+      const scene = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/priority",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          ticketid: match.params.id,
+          priority: params.value,
+          history: {
+            value: customerstate?.issuedata?.details[0]?.Priority,
+            value2: params.label
+          }
+        }
+      });
+      if (scene.status === 200) {
+        Modal.success({
+          title: 'บันทึกข้อมูลเรียบร้อย',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+
+            window.location.reload(true)
+          },
+        });
+      }
+
+    } catch (error) {
+
+    }
+  }
+
+  const updateIssueType = async (params) => {
+    try {
+      const scene = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/issuetype",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          ticketid: match.params.id,
+          issue_type: params.value,
+          history: {
+            value: customerstate?.issuedata?.details[0]?.IssueType,
+            value2: params.label
+          }
+        }
+      });
+      if (scene.status === 200) {
+        Modal.success({
+          title: 'บันทึกข้อมูลเรียบร้อย',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+
+            window.location.reload(true)
+          },
+        });
+      }
+
+    } catch (error) {
+
+    }
+  }
 
   useEffect(() => {
     getdetail();
 
   }, [])
+
+  useEffect(() => {
+    if (state?.usersdata?.users?.company_id) {
+      getIssueType();
+      getproducts();
+    }
+  }, [state?.usersdata?.users?.company_id]);
 
   useEffect(() => {
     if (historyduedate_visible) {
@@ -257,10 +531,6 @@ export default function Subject() {
   }, [customerstate?.issuedata?.details[0]?.Id])
 
 
-
-  // if(customerstate?.issuedata?.details[0]?.CreateId !== state?.userdata?.users?.id){
-  //    console.log("true")
-  // }
   return (
     <MasterPage>
       <Spin spinning={loadingPage} tip="Loading..." style={{ height: "100%" }}>
@@ -287,7 +557,6 @@ export default function Subject() {
                   {/* Issue Description */}
                   <Row style={{ marginRight: 24 }}>
                     <Col span={24}>
-                      {/* <label className="topic-text">{ticketdata[0] && ticketdata[0].ticket_number}</label> */}
                       <label className="topic-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Number}</label>
                       &nbsp; &nbsp;
                       <label style={{ fontSize: 30, color: "red" }}
@@ -369,7 +638,7 @@ export default function Subject() {
                   style={{ backgroundColor: "#fafafa", padding: 24, border: "1px" }}
                 >
                   <Row style={{ marginBottom: 20 }}>
-                    <Col span={16}>
+                    <Col span={18}>
                       <label className="header-text">Progress Status</label>
                       <br />
                       <Select
@@ -380,30 +649,38 @@ export default function Subject() {
                         value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                         options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                         disabled={
-                          // customerstate?.issuedata?.details[0]?.MailType === "out" ? true : false
+                          mailbox?.MailType === "in"  ? false : true
+                        }
+                      >
+                      </Select>
+                    </Col>
+
+                  </Row>
+
+                  <Row style={{ marginBottom: 20 }}
+                    hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                  >
+                    <Col span={18}>
+                      <label className="header-text">IssueType</label>
+                      <br />
+                      <Select
+                        style={{ width: "100%", marginTop: 8 }}
+
+                        placeholder="None"
+                        onChange={onChange}
+                        value={`${customerstate?.issuedata?.details[0]?.IssueType}`}
+                        options={customerstate && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name, group: "issuetype" }))}
+                        disabled={
                           mailbox?.MailType === "in" ? false : true
                         }
                       >
                       </Select>
                     </Col>
-                    {/* <Col span={8}>
-                      <Button type="primary" icon={<UndoOutlined />} color="green"
-                        style={{
-                          marginLeft: 20,
-                          width: 100,
-                          marginTop: 35,
-                          display: customerstate.issuedata.details[0]?.IsUndo === true &&
-                            customerstate.issuedata.details[0].MailType === "out" &&
-                            customerstate.issuedata.details[0].NodeActionText === "Create" ? "block" : "none"
-                        }}
-                        onClick={() => UndoIssue(customerstate.issuedata.details[0].MailBoxId)}
-                      >
-                        Undo
-                    </Button>
-                    </Col> */}
-
                   </Row>
-                  <Row style={{ marginBottom: 20 }}>
+
+                  <Row style={{ marginBottom: 20 }}
+                    hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}
+                  >
                     <Col span={18}>
                       <label className="header-text">IssueType</label>
                       <br />
@@ -421,7 +698,30 @@ export default function Subject() {
                       </label>
                     </Col>
                   </Row>
-                  <Row style={{ marginBottom: 20 }}>
+
+                  <Row style={{ marginBottom: 20 }}
+                    hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                  >
+                    <Col span={18}>
+                      <label className="header-text">Product</label>
+                      <br />
+                      <Select
+                        style={{ width: "100%", marginTop: 8 }}
+
+                        placeholder="None"
+                        onChange={onChange}
+                        value={`${customerstate?.issuedata?.details[0]?.ProductName} (${customerstate?.issuedata?.details[0]?.ProductFullName})`}
+                        options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: `${x.Name} - (${x.FullName})`, code: x.Name, group: "product" }))}
+                        disabled={
+                          // customerstate?.issuedata?.details[0]?.MailType === "out" ? true : false
+                          mailbox?.MailType === "in" ? false : true
+                        }
+                      >
+                      </Select>
+                    </Col>
+                  </Row>
+
+                  <Row style={{ marginBottom: 20 }} hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}>
                     <Col span={18}>
                       <label className="header-text">Product</label>
                       <br />
@@ -429,15 +729,31 @@ export default function Subject() {
                     </Col>
                   </Row>
 
-                  {/* <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Module</label>
-                  <br />
-                  <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ModuleName}</label>
-                </Col>
-              </Row> */}
 
-                  <Row style={{ marginBottom: 20 }}>
+                  <Row style={{ marginBottom: 20 }}
+                    hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                  >
+                    <Col span={18}>
+                      <label className="header-text">Scene</label>
+                      <br />
+                      <Select
+                        style={{ width: "100%", marginTop: 8 }}
+
+                        placeholder="None"
+                        onChange={onChange}
+                        value={customerstate?.issuedata?.details[0]?.Scene === null ? "None" : customerstate?.issuedata?.details[0]?.Scene}
+                        options={cusScene.map((x) => ({ value: x.value, label: x.name, group: "scene" }))}
+                        disabled={
+                          // customerstate?.issuedata?.details[0]?.MailType === "out" ? true : false
+                          mailbox?.MailType === "in" ? false : true
+                        }
+                      />
+                    </Col>
+                  </Row>
+
+                  <Row style={{ marginBottom: 20 }}
+                    hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}
+                  >
                     <Col span={18}>
                       <label className="header-text">Scene</label>
                       <br />

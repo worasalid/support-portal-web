@@ -130,10 +130,10 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             visible={visible}
             confirmLoading={loading}
             okText="Send"
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit() }
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -152,7 +152,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                         label="Remark :"
 
                     >
-                        <TextEditor ref={editorRef} />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Col, Row, Table, Input, Upload } from "antd";
 import { ConsoleSqlOutlined, UploadOutlined } from '@ant-design/icons';
 import moment from "moment";
@@ -17,6 +17,7 @@ export default function Migration() {
     const [search, setSearch] = useState(false);
     const [loading, setLoading] = useState(true);
     const [fileList, setFileList] = useState([]);
+    const [ref, setRef] = useRef()
 
     const searchCompany = (param) => {
         let result = listcompany.filter(o =>
@@ -105,13 +106,10 @@ export default function Migration() {
                 </Row>
                 <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
                     <Col span={24}>
-                        <Upload {...Uploadprops} onChange={(info) => Uploadprops.onChange(info)}>
+                        <Upload {...Uploadprops} onChange={(info) => Uploadprops.onChange(info)} ref={ref} >
                             <Button icon={<UploadOutlined />}>Click to Attach</Button>
                         </Upload>
-
-                        <Button icon={<UploadOutlined />}
-                            onClick={() => upload()}
-                        >Click to Upload</Button>
+                       
                     </Col>
                 </Row>
 

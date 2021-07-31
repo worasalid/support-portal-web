@@ -141,7 +141,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                         label="Description"
 
                     >
-                        <TextEditor ref={editorRef} />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                     </Form.Item>
 
                     <Form.Item

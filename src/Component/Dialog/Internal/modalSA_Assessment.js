@@ -4,9 +4,6 @@ import { Modal, Row, Col } from 'antd';
 import moment from "moment";
 import Axios from 'axios';
 
-
-
-
 export default function ModalSA_Assessment({ visible = false, onOk, onCancel, details, ...props }) {
     const history = useHistory();
     const [assessment, setAssessment] = useState([]);

@@ -24,10 +24,14 @@ const tailLayout = {
 
 export default function IssueCreate() {
     const history = useHistory();
+    const match = useRouteMatch();
+    const uploadRef = useRef(null);
+    const editorRef = useRef(null);
+
     const { state, dispatch } = useContext(AuthenContext);
     const [customerstate, customerdispatch] = useReducer(customerReducer, customerState)
+    const [loading, setLoading] = useState(false);
 
-    const match = useRouteMatch();
     const [hiddenForm, sethiddenForm] = useState(false);
     const [issueType, setIssueType] = useState([]);
     const [title, setTitle] = useState(match.params.id);
@@ -35,16 +39,15 @@ export default function IssueCreate() {
     const [description, setDescription] = useState();
 
     const [form] = Form.useForm();
-    const uploadRef = useRef(null);
-    const editorRef = useRef(null);
-    const [loading, setLoading] = useState(false);
+
+    const [fileList, setFileList] = useState([]);
 
     const image_upload_handler = (blobInfo, success, failure, progress) => {
         var xhr, formData;
 
         xhr = new XMLHttpRequest();
         xhr.withCredentials = false;
-        xhr.open("POST", process.env.REACT_APP_API_URL + "/files/upload");
+        xhr.open("POST", process.env.REACT_APP_API_URL + "/files");
 
         xhr.upload.onprogress = function (e) {
             progress((e.loaded / e.total) * 100);
@@ -70,8 +73,19 @@ export default function IssueCreate() {
                 return;
             }
 
-            //success(json.url);
-            success(json.googledrive_url);
+            let result = [...fileList]
+            result.push(json);
+            setFileList(result);
+
+            console.log("result", result)
+            console.log("filelist", fileList)
+
+            success(json.url);
+
+            //success(json.googledrive_url);
+
+
+
         };
 
         xhr.onerror = function () {
@@ -82,6 +96,7 @@ export default function IssueCreate() {
 
         formData = new FormData();
         formData.append("file", blobInfo.blob(), blobInfo.filename());
+        formData.append("ticket", 0);
 
         xhr.send(formData);
     };
@@ -200,6 +215,7 @@ export default function IssueCreate() {
                     priority: values.priority,
                     title: values.subject,
                     description: description,
+                    img_file: fileList,
                     files: uploadRef.current.getFiles().map((n) => n.response),
 
                 },
@@ -285,6 +301,14 @@ export default function IssueCreate() {
         }
     }, [customerstate.filter.productState]);
 
+    useEffect(() => {
+        // if (fileList.length !== 0) {
+        //     console.log("fileList", fileList)
+        // }
+        console.log("fileList", fileList)
+    }, [fileList.length]);
+
+
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>
@@ -300,7 +324,19 @@ export default function IssueCreate() {
                                     onClick={() => history.push({ pathname: "/customer/servicedesk" })}
                                 >
                                     <HomeOutlined style={{ fontSize: 20 }} /> กลับสู่เมนูหลัก
-                            </Button>
+                                </Button>
+                                {/* <Button
+                                type="link"
+                                onClick={() => {
+                                    let result = [...fileList]
+                                    result.push({ id: 1, value: "A" })
+
+                                    setFileList(result)
+
+                                }}
+                            >
+                                Add
+                            </Button> */}
                             </Col>
                         </Row>
 
@@ -537,6 +573,7 @@ export default function IssueCreate() {
                                     toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
                                 }}
                                 onEditorChange={(content, editor) => setDescription(content)}
+                                
                             />
                         </Form.Item>
                         <Form.Item label="ไฟล์แนบ" name="attach">

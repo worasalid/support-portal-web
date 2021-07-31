@@ -136,7 +136,7 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.Number}
                       </label>
                     </>
@@ -236,7 +236,7 @@ export default function InProgress() {
                   return (
                     <>
                       <div>
-                        <label className="table-column-text">
+                        <label className="table-column-text11">
                           {record.Title}
                           {record.IsReOpen === true ? " (ReOpen)" : ""}
                         </label>
@@ -264,7 +264,7 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
                         {moment(record.AssignIconDate).format("HH:mm")}
                       </label>
@@ -282,7 +282,7 @@ export default function InProgress() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
                         {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                       </label>
@@ -312,7 +312,7 @@ export default function InProgress() {
                 align="center"
                 render={(record) => {
                   return (
-                    <label className="table-column-text">{record.ProgressStatus}</label>
+                    <label className="table-column-text11">{record.ProgressStatus}</label>
                   );
                 }}
               />

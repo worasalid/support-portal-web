@@ -153,7 +153,7 @@ export default function All() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.Number}
                       </label>
                     </>
@@ -170,7 +170,7 @@ export default function All() {
                     <div>
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label className="table-column-text" style={{ color: "#808080" }}>
+                          <label className="table-column-text11" style={{ color: "#808080" }}>
                             Type :
                           </label>
                         </Col>
@@ -242,7 +242,7 @@ export default function All() {
                   return (
                     <>
                       <div>
-                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}>
                           {record.Title}
                         </label>
                       </div>
@@ -270,14 +270,14 @@ export default function All() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.CreateBy}
                       </label>
                       <br />
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {
                           record.AssignIconDate === null ?
-                            <label style={{ fontSize: 12, color: "red" }}>
+                            <label style={{ fontSize: 11, color: "red" }}>
                               ยังไม่ได้ส่งเรื่องให้ ICON
                           </label> :
                             <label>
@@ -301,7 +301,7 @@ export default function All() {
                   return (
                     <>
 
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
                         {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                       </label>
@@ -335,24 +335,24 @@ export default function All() {
                   return (
                     <>
                       <div hidden={record.GroupStatus === "Resolved" ? false : true}>
-                        <label className="table-column-text">{record.GroupStatus}</label>
+                        <label className="table-column-text11">{record.GroupStatus}</label>
                         <br/>
-                        <label className="table-column-text">
+                        <label className="table-column-text11">
                           {moment(record.ResolvedDate).format("DD/MM/YYYY")}
                         </label>
                       </div>
 
-                      <div hidden={record.GroupStatus === "Completed" ? false : true}>
-                        <label className="table-column-text">
+                      <div hidden={record.GroupStatus === "Complete" || record.GroupStatus === "Completed" ? false : true}>
+                        <label className="table-column-text11">
                           {record.GroupStatus} <br />
                           {moment(record.CompleteDate).format("DD/MM/YYYY")}
                         </label>
                       </div>
 
-                      <div hidden={record.GroupStatus !== "Completed" && record.GroupStatus !== "Resolved" ? false : true}>
-                        <label className="table-column-text">{record.GroupStatus}</label>
+                      <div hidden={(record.GroupStatus === "Complete" || record.GroupStatus === "Completed") || record.GroupStatus === "Resolved" ? true : false}>
+                        <label className="table-column-text11">{record.GroupStatus}</label>
                         <br/>
-                        <label className="table-column-text">
+                        <label className="table-column-text11">
                           {record.ProgressStatus === null || record.ProgressStatus === record.GroupStatus ? "" : `(${record.ProgressStatus})`}
                         </label>
                       </div>

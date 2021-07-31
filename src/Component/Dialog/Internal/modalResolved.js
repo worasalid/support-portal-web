@@ -4,7 +4,6 @@ import { Modal, Form, Select, Spin } from 'antd';
 import UploadFile from '../../UploadFile';
 import Axios from 'axios';
 import TextEditor from '../../TextEditor';
-import TextArea from 'antd/lib/input/TextArea';
 
 const { Option } = Select;
 
@@ -229,9 +228,9 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 </Form>
 
                 <label className="header-text">Remark</label>
-                <TextEditor ref={editorRef} />
+                <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                 <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
 
         </Modal>

@@ -52,27 +52,26 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
 
   const [show_notice, setshow_notice] = useState(true)
-  const [activemenu, setActivemenu] = useState('')
   const [active_submenu, setActive_submenu] = useState('')
-  const [notiCRDueDate, setNotiCRDueDate] = useState(0);
+
 
   //Menu
   const notiRef = useRef(null);
   const notiDetailsRef = useRef(null);
-  const rootSubmenuKeys = ['sub0', 'sub1', 'sub2', 'sub3'];
-  const [openKeys, setOpenKeys] = useState(['sub1']);
+  // const rootsubmenukeys = ['sub0', 'sub1', 'sub2', 'sub3'];
+  // const [openKeys, setOpenKeys] = useState(['sub1']);
 
   // Drawer
   const [drawerCollapsed, setDrawerCollapsed] = useState(false)
 
-  const onOpenChange = keys => {
-    const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
-    if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-      setOpenKeys(keys);
-    } else {
-      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-    }
-  }
+  // const onOpenChange = keys => {
+  //   const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
+  //   if (rootsubmenukeys.indexOf(latestOpenKey) === -1) {
+  //     setOpenKeys(keys);
+  //   } else {
+  //     setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+  //   }
+  // }
 
 
   const getuser = async () => {
@@ -242,6 +241,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
   useEffect(() => {
     localStorage.setItem("menu-collapsed", state.collapsed)
+    //console.log("xx", localStorage.getItem("menu-collapsed"))
   }, [state.collapsed])
 
 
@@ -364,7 +364,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
           style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
           width={205}
           collapsed={state.collapsed}
-
+        //collapsed={localStorage.getItem("menu-collapsed")}
         >
 
           <Menu theme="light"
@@ -375,10 +375,19 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
           >
 
             <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{ marginTop: 16 }}>
-              <Menu.Item key="20" onClick={() => history.push('/internal/dashboard')}>
-                - DashBoard
+              <Menu.Item key="20" onClick={() => history.push('/internal/mydashboard')}>
+                <label>
+                  My DashBoard
+                </label>
+
+              </Menu.Item>
+              <Menu.Item key="21" onClick={() => history.push('/internal/dashboard')}>
+                <label>
+                  All DashBoard
+                </label>
               </Menu.Item>
             </SubMenu>
+
             <SubMenu key="issue" icon={<FileOutlined />} title="Issue" >
               <Menu.Item key="0" onClick={() => {
                 history.push({ pathname: '/internal/issue/other' });
@@ -483,7 +492,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             <SubMenu key="ricef"
               style={{
                 display: state.usersdata?.organize?.OrganizeCode === "consult" ||
-                  // state.usersdata?.organize?.OrganizeCode === "support" ||
+                  state.usersdata?.users?.code === "I0017" ||
                   state.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
               }}
               icon={<AuditOutlined />} title="RICEF">

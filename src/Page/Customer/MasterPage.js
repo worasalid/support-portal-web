@@ -217,17 +217,17 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Button>
             </div>
             <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
+              <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
+                - My DashBoard
+              </Menu.Item>
               <Menu.Item key="01" onClick={() => history.push('/customer/dashboard/all')}>
                 - All Issue
-
               </Menu.Item>
-              <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
-                - DashBoard
 
-              </Menu.Item>
             </SubMenu>
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issues">
               <Menu.Item
+                className="test"
                 key="1"
                 onClick={() => history.push('/customer/issue/all-issue')
                   // {

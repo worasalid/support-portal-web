@@ -4,10 +4,9 @@ import { Modal, Form, Tabs, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import TextEditor from '../../TextEditor';
 
 import AuthenContext from "../../../utility/authenContext";
-
-const { TabPane } = Tabs;
 
 export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const { state, dispatch } = useContext(AuthenContext);
@@ -18,15 +17,9 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
     const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
-
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
-
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
@@ -36,7 +29,7 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response),
                     }
@@ -145,25 +138,9 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                             },
                         ]}
                     >
-                        <Editor
-                            apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                            ref={editorRef}
-                            initialValue=""
-                            init={{
-                                height: 300,
-                                menubar: false,
-                                plugins: [
-                                    'advlist autolink lists link image charmap print preview anchor',
-                                    'searchreplace visualblocks code fullscreen',
-                                    'insertdatetime media table paste code help wordcount'
-                                ],
-                                toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                                toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                            }}
-                            onEditorChange={handleEditorChange}
-                        />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
             </Spin>

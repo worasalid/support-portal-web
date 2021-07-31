@@ -190,7 +190,7 @@ export default function MyTask() {
                     <div>
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}
+                          <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}
                             style={{ color: "#808080", fontSize: "10px" }}>
                             Type :
                           </label>
@@ -204,7 +204,7 @@ export default function MyTask() {
                       </Row>
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}
+                          <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}
                             style={{ color: "#808080", fontSize: "10px" }}>
                             Priority :
                           </label>
@@ -219,7 +219,7 @@ export default function MyTask() {
                       </Row>
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}
+                          <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}
                             style={{ color: "#808080", fontSize: "10px" }}>
                             Product :
                           </label>
@@ -233,7 +233,7 @@ export default function MyTask() {
 
                       <Row style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}
+                          <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}
                             style={{ color: "#808080", fontSize: "10px" }}>
 
                             Scene :
@@ -245,10 +245,11 @@ export default function MyTask() {
                           </label>
                         </Col>
                       </Row>
+                      
                       <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
-                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                          <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"} style={{ color: "#808080", fontSize: "10px" }}>
                             {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
                           </label>
                         </Col>
@@ -269,7 +270,7 @@ export default function MyTask() {
                   return (
                     <>
                       <div>
-                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}>
                           {record.Title}
                           {record.IsReOpen === true ? " (ReOpen)" : ""}
                         </label>
@@ -294,16 +295,17 @@ export default function MyTask() {
                 }
                 }
               />
+
               <Column title="Issue Date"
                 align="center"
                 width="10%"
                 render={(record) => {
                   return (
                     <>
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}>
                         {
                           record.AssignIconDate === null ?
-                            <label style={{ fontSize: 12, color: "red" }}>
+                            <label style={{ fontSize: 11, color: "red" }}>
                               ยังไม่ได้ส่งเรื่องให้ ICON
                             </label> :
                             <label>
@@ -327,7 +329,7 @@ export default function MyTask() {
                   return (
                     <>
                       {record.GroupStatus === "Wait For Progress" ? "" :
-                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}>
                           {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
                           {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                         </label>
@@ -359,12 +361,13 @@ export default function MyTask() {
                 align="center"
                 render={(record) => {
                   return (
-                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                    <label className={record.ReadDate !== null ? "table-column-text11" : "table-column-text-unread"}>
                       {record.ProgressStatus}
                     </label>
                   );
                 }}
               />
+
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
                 width="10%"
                 align="center"

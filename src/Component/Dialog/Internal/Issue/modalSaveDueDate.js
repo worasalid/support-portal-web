@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Modal, DatePicker, Row, Col, Form, Input, Spin } from 'antd';
 import UploadFile from '../../../UploadFile'
 import Axios from 'axios';
-import { Editor } from '@tinymce/tinymce-react';
+import TextEditor from '../../../TextEditor';
 import IssueContext from '../../../../utility/issueContext';
 
 
@@ -16,13 +16,10 @@ export default function ModalSaveDueDate({ visible = false, onOk, onCancel, deta
     const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
@@ -31,7 +28,7 @@ export default function ModalSaveDueDate({ visible = false, onOk, onCancel, deta
                     },
                     data: {
                         ticketid: details && details.ticketid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: details.node_name === "cr_center" ? "internal" : "customer",
                         files: uploadRef.current.getFiles().map((n) => n.response),
                     }
@@ -159,25 +156,9 @@ export default function ModalSaveDueDate({ visible = false, onOk, onCancel, deta
                     <Row>
                         <Col span={24}>
                             <label className="header-text">Remark</label>
-                            <Editor
-                                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                                ref={editorRef}
-                                initialValue=""
-                                init={{
-                                    height: 300,
-                                    menubar: false,
-                                    plugins: [
-                                        'advlist autolink lists link image charmap print preview anchor',
-                                        'searchreplace visualblocks code fullscreen',
-                                        'insertdatetime media table paste code help wordcount'
-                                    ],
-                                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                                }}
-                                onEditorChange={handleEditorChange}
-                            />
+                            <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                             <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                            AttachFile : <UploadFile ref={uploadRef} />
                         </Col>
                     </Row>
                 </Form>

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Input, Select, Button, Spin } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import TextEditor from '../../TextEditor';
 
 export default function ModalReject({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
@@ -13,16 +13,10 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
     const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
-
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
-
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
@@ -31,7 +25,7 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response),
                     }
@@ -94,17 +88,17 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
         }
 
     }, [visible])
-   
+
 
     return (
         <Modal
             visible={visible}
             confirmLoading={true}
-            onOk={() => { return (form.submit()) }}
+            onOk={() => form.submit() }
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -130,25 +124,9 @@ export default function ModalReject({ visible = false, onOk, onCancel, datarow, 
                         ]}
                     >
                         {/* Remark : */}
-                        <Editor
-                            apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                            ref={editorRef}
-                            initialValue=""
-                            init={{
-                                height: 300,
-                                menubar: false,
-                                plugins: [
-                                    'advlist autolink lists link image charmap print preview anchor',
-                                    'searchreplace visualblocks code fullscreen',
-                                    'insertdatetime media table paste code help wordcount'
-                                ],
-                                toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                                toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                            }}
-                            onEditorChange={handleEditorChange}
-                        />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
             </Spin>

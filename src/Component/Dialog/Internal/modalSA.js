@@ -6,6 +6,7 @@ import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import TextArea from 'antd/lib/input/TextArea';
 
+
 const radioStyle = {
     display: 'inline-block',
     height: '30px',
@@ -144,7 +145,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), setRadiovalue(null), setRadiovalue2(null), onCancel()) }}
+            onCancel={() => { form.resetFields(); setRadiovalue(null); setRadiovalue2(null); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -204,7 +205,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         <Radio.Group onChange={(e) => { return setRadiovalue2(e.target.value), form.setFieldsValue({ description: null }) }}>
                             <Radio value={1}>
                                 มีผลกระทบ
-                        </Radio>
+                            </Radio>
                             <Radio value={2}>ไม่มีผลกระทบ</Radio>
                         </Radio.Group>
                     </Form.Item>
@@ -230,9 +231,9 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         label="Remark :"
 
                     >
-                        <TextEditor ref={editorRef} />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
 

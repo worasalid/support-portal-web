@@ -162,7 +162,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                         label="Remark :"
 
                     >
-                        <TextEditor ref={editorRef} />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>

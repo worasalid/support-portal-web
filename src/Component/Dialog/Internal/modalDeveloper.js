@@ -291,7 +291,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     </Form.Item>
 
                 </Form>
-                <TextEditor ref={editorRef} />
+                <TextEditor ref={editorRef} ticket_id={details.ticketid}/>
                 <br />
                 AttachFile : <UploadFile ref={uploadRef} />
             </Spin>

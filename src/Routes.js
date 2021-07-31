@@ -15,7 +15,11 @@ import CustomerCancel from './Page/Customer/Issue/Cancel';
 import CustomerSubject from './Page/Customer/Issue/Subject';
 import Customerlogin from './Page/Customer/login';
 
-import Dashboard from './Page/Internal/DashBoard/MyDashBoard';
+import MyDashboard from './Page/Internal/DashBoard/MyDashBoard';
+import AllDashBoard from './Page/Internal/DashBoard/AllDashBoard';
+import Dashboard1 from './Page/Internal/DashBoard/DashBoard1';
+import Dashboard2 from './Page/Internal/DashBoard/Dashboard2';
+import DashBoard3 from './Page/Internal/DashBoard/DashBoard3';
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
 import MyTask from './Page/Internal/Issue/MyTask';
@@ -77,10 +81,6 @@ import UserContext, { userReducer, userState } from "./utility/issueContext";
 import RicefContext, { ricefReducer, ricefState } from './utility/ricefContext';
 
 
-
-
-
-
 export default function Routes() {
     const [state, dispatch] = useReducer(reducer, initState);
     const [masterstate, masterdispatch] = useReducer(masterReducer, masterState);
@@ -125,7 +125,11 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/reason_cancel" exact component={ConfigReasonCancel} />
                                     <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
 
-                                    <Route path="/internal/dashboard" exact component={Dashboard} />
+                                    <Route path="/internal/mydashboard" exact component={MyDashboard} />
+                                    <Route path="/internal/dashboard" exact component={AllDashBoard} />
+                                    <Route path="/internal/dashboard/dashboard1" exact component={Dashboard1} />
+                                    <Route path="/internal/dashboard/dashboard2" exact component={Dashboard2} />
+                                    <Route path="/internal/dashboard/dashboard3" exact component={DashBoard3} />
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
                                     <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />

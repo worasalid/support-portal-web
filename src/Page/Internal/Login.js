@@ -14,7 +14,7 @@ export default function NormalLoginForm() {
 
   const responseGoogle = (response) => {
     if (response.profileObj.email !== undefined && response.profileObj.email !== "" && response.profileObj.email !== null) {
-       console.log("responseGoogle", response.profileObj);
+       //console.log("responseGoogle", response.profileObj);
       googleLogin(response.profileObj)
     }
   }
@@ -34,7 +34,7 @@ export default function NormalLoginForm() {
         localStorage.setItem("sp-ssid", result.data.ssid);
         dispatch({ type: 'Authen', payload: true });
         dispatch({ type: 'LOGIN', payload: result.data.usersdata });
-        history.push("/internal/dashboard");
+        history.push("/internal/mydashboard");
         window.location.reload(true);
       }
 
@@ -76,7 +76,7 @@ export default function NormalLoginForm() {
         localStorage.setItem("sp-ssid", result.data.ssid);
         dispatch({ type: 'Authen', payload: true });
         dispatch({ type: 'LOGIN', payload: result.data.usersdata });
-        history.push("/internal/dashboard");
+        history.push("/internal/mydashboard");
         window.location.reload(true);
       }
 

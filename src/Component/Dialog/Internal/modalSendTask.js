@@ -145,7 +145,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                         label="Remark :"
 
                     >
-                        <TextEditor ref={editorRef} />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>

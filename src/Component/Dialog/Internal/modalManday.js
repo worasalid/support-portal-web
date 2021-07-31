@@ -388,7 +388,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                 <Row style={{ marginTop: 50 }}>
                     <Col span={24}>
                         <label>Remark :</label> <br />
-                        <TextEditor ref={editorRef} />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                     </Col>

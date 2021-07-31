@@ -197,7 +197,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         ]}
                     >
                         {/* Remark : */}
-                        <TextEditor ref={editorRef} />
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
                      AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>

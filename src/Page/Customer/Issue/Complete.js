@@ -132,7 +132,7 @@ export default function Complete() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.Number}
                       </label>
                     </>
@@ -223,7 +223,7 @@ export default function Complete() {
                   return (
                     <>
                       <div>
-                        <label className="table-column-text">
+                        <label className="table-column-text11">
                           {record.Title}
                         </label>
                       </div>
@@ -251,7 +251,7 @@ export default function Complete() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
                         {moment(record.AssignIconDate).format("HH:mm")}
                       </label>
@@ -269,7 +269,7 @@ export default function Complete() {
                 render={(record) => {
                   return (
                     <>
-                      <label className="table-column-text">
+                      <label className="table-column-text11">
                         {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}<br />
                         {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
                       </label>
@@ -301,10 +301,10 @@ export default function Complete() {
                   return (
                     <>
                       <div>
-                        <label className="table-column-text">{record.GroupStatus}</label>
+                        <label className="table-column-text11">{record.GroupStatus}</label>
                       </div>
                       <div>
-                        <label className="table-column-text" style={{ display: record.CompleteDate === null ? "none" : "block" }}>
+                        <label className="table-column-text11" style={{ display: record.CompleteDate === null ? "none" : "block" }}>
                           {moment(record.CompleteDate).format("DD/MM/YYYY")} <br /> {moment(record.CompleteDate).format("HH:mm")}
                         </label>
                       </div>

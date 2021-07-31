@@ -395,7 +395,7 @@ export default function AllIssue() {
 
                       <div>
                         <label className="table-column-text">
-                          {record.GroupStatus}<br />
+                          {record.InternalStatus === "Open" ? "Open" : record.GroupStatus}<br />
                           {record.FlowStatus === null || record.GroupStatus === record.FlowStatus ? "" : `(${record.FlowStatus})`}
                         </label>
 

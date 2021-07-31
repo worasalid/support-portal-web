@@ -192,7 +192,7 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                     >
                         <Checkbox >
                             ReCheck (ส่งกลับมาให้ Leader ตรวจสอบ)
-                         </Checkbox>
+                        </Checkbox>
                     </Form.Item>
                     {/* </Col>
                 </Row> */}
@@ -201,10 +201,10 @@ export default function ModalqaAssign({ visible = false, onOk, onCancel, datarow
                 {/* Remark : */}
                 <br />
                 <br />
-            Remark :
-            <br />
-                <TextEditor ref={editorRef} />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                Remark :
+                <br />
+                <TextEditor ref={editorRef} ticket_id={details.ticketid} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
         </Modal>
     )
