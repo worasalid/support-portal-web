@@ -3,20 +3,24 @@ import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'rea
 import { List, Row, Col, Button, Popconfirm, Modal, Tag } from 'antd'
 import Axios from 'axios'
 import { useHistory } from 'react-router-dom'
-import { ArrowRightOutlined, DeleteOutlined, FileOutlined, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, DeleteOutlined, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
 
 
 
 export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
     const history = useHistory();
     const [listdata, setListdata] = useState([]);
+    const [countdata, setCountdata] = useState(null)
 
     //div
     const [divcollapse, setDivcollapse] = useState("none")
-    const [collapseicon, setCollapseicon] = useState(<UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+    const [collapseicon, setCollapseicon] = useState(<DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+
 
     useImperativeHandle(ref, () => ({
-        GetTask: () => GetTask()
+        GetTask: () => GetTask(),
+        getData: () => listdata,
+        CountData: () => countdata
     }));
 
     const GetTask = async () => {
@@ -28,10 +32,12 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    ticketId: ticketId,
-                    mailtype: mailtype
+                    ticketId: ticketId
+                    // mailtype: mailtype
                 }
             });
+
+            setCountdata(task.data.length)
 
             setListdata(task.data.map((value) => {
                 return {
@@ -41,7 +47,9 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     status: value.Status,
                     flowstatus: value.FlowStatus,
                     description: value.Description,
-                    releasenote: value.IsReleaseNote
+                    releasenote: value.IsReleaseNote,
+                    manday: value.Manday,
+                    cntFile: value.cntFile
                 }
             }))
         } catch (error) {
@@ -64,13 +72,14 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
             });
 
             if (deletetask.status === 200) {
-                await Modal.info({
+                await Modal.success({
                     title: 'ลบ Task งานสำเร็จ',
                     content: (
                         <div>
                             <p></p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         GetTask()
                     },
@@ -108,6 +117,11 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     <ArrowRightOutlined style={{ fontSize: "16px", color: "#27AE60" }} />&nbsp;&nbsp;
                     <label style={{ color: "#52c41a" }}>{param}</label>
                 </>
+            case 'Cancel':
+                return <>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#cd201f" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#cd201f" }}>{param}</label>
+                </>
 
         }
     }
@@ -115,13 +129,8 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
     useEffect(() => {
         GetTask();
         setDivcollapse("block")
-    }, [mailtype])
+    }, [ticketId])
 
-    // useEffect(() => {
-    //     GetTask();
-
-    // }, [listdata.length])
-    //  console.log("mailtype", mailtype)
 
     return (
         <>
@@ -131,22 +140,18 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     <>
                         <label className="header-text">Task</label>
                         <span
-
                             style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
                             onClick={
                                 () => {
                                     return (
                                         setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                        setCollapseicon(divcollapse === 'block' ? <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+                                        setCollapseicon(divcollapse === 'block' ? <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
                                     )
                                 }
                             }
                         >
                             {collapseicon}
                         </span>
-                        {/* <div>
-                            <Progress percent={30} strokeColor="#52c41a"></Progress>
-                        </div> */}
                     </>
                     : ""
 
@@ -159,22 +164,39 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     renderItem={item => (
                         <Row align="middle">
                             <Col span={23} className="task-active"
-                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px" }}
+                                style={{ boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom: 20 }}
                                 onClick={() => history.push({ pathname: "/internal/issue/subject/" + ticketId + "/task-" + item.taskId })}
                             >
                                 <List.Item >
                                     <List.Item.Meta
                                         title={
-                                            <Row >
+                                            <Row style={{ padding: "0px 0px 0px 10px" }}>
                                                 <Col span={23} >
                                                     <Row>
-                                                        <Col span={1}>{<FileOutlined />}</Col>
+                                                        <Col span={1}>
+                                                            <img
+                                                                style={{ height: "25px", width: "25px" }}
+                                                                src={`${process.env.PUBLIC_URL}/icons-doc-task.png`}
+                                                                alt=""
+                                                            />&nbsp;
+                                                        </Col>
                                                         <Col span={17}>
                                                             <label className="value-text">
                                                                 {item.title}
                                                             </label>
-                                                               &nbsp;&nbsp;
-                                                              <Tag color="#f50">{item.module}
+                                                            &nbsp;&nbsp;
+                                                            <label className="value-text">
+                                                                {
+                                                                    item.cntFile !== 0 ?
+                                                                        <img
+                                                                            style={{ height: "20px", width: "20px" }}
+                                                                            src={`${process.env.PUBLIC_URL}/icons-attach.png`}
+                                                                            alt=""
+                                                                        /> : ""
+                                                                }
+                                                            </label>
+                                                            &nbsp;&nbsp;
+                                                            <Tag color="#17A2B8">{item.module}
                                                             </Tag>
                                                             &nbsp;&nbsp;
                                                             <Tag color="#87d068"
@@ -182,16 +204,30 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                             >
                                                                 ReleaseNote
                                                             </Tag>
+                                                            <label
+                                                                style={{
+                                                                    display: item.manday !== 0 ? "inline-block" : "none",
+                                                                    fontSize: 12
+                                                                }}
+                                                            >
+                                                                ({item.manday} Manday)
+                                                            </label>
                                                         </Col>
-                                                        <Col span={6} style={{ textAlign: "right" }} >{renderTaskStatus(item.status)}</Col>
-                                                    </Row>
-                                                    <Row style={{ textAlign: "right" }}>
-                                                        <Col span={24}>
+                                                        <Col span={6} style={{ textAlign: "right" }} >
+                                                            {renderTaskStatus(item.status)}
+                                                            <br/>
                                                             <label className="value-text">
                                                                 {item.flowstatus === null ? "" : `(${item.flowstatus})`}
                                                             </label>
                                                         </Col>
                                                     </Row>
+                                                    {/* <Row style={{ textAlign: "right" }}>
+                                                        <Col span={24}>
+                                                            <label className="value-text">
+                                                                {item.flowstatus === null ? "" : `(${item.flowstatus})`}
+                                                            </label>
+                                                        </Col>
+                                                    </Row> */}
 
                                                 </Col>
 
@@ -219,6 +255,10 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     )}
                 />
             </div>
+            <div className="task-animation">
+
+            </div>
         </>
     )
 });
+

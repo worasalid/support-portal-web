@@ -35,13 +35,18 @@ export default function Index() {
                 </Card>
                 <Card className="card-box issue-active" bordered hoverable
                     style={{ marginTop: 30 }}
-                    onClick={() => history.push({ pathname: "/customer/dashboard" })}>
+                    onClick={() => {
+                        history.push({ pathname: "/customer/dashboard" })
+                        window.location.reload(true);
+                    }
+                    }
+                >
                     <Meta
                         avatar={
                             <HomeOutlined style={{ fontSize: 30 }} />
                         }
-                        title={<label className="card-title-menu">เข้าสู่ระบบ</label>}
-                        description="เข้าใช้งานระบบ / Home"
+                        title={<label className="card-title-menu">หน้าหลัก</label>}
+                        description="เข้าสู่ หน้าหลัก / Home"
                     />
                 </Card>
             </div>

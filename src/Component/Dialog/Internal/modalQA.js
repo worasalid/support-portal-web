@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Form, Tabs } from 'antd';
+import { Modal, Form, Tabs, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -16,7 +16,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     const uploadRef_unittest = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     //data
     // const [listunittest, setListunittest] = useState([]);
@@ -37,8 +38,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
             data: {
                 ticketId: details && details.ticketid,
                 taskid: details.taskid,
-                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
-                url: values.linkurl,
+                //files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                unit_test_url: values.unit_test_url,
                 grouptype: "test_result_QA"
             }
         })
@@ -46,9 +47,9 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -57,8 +58,8 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        comment_type: "task",
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }
@@ -68,6 +69,7 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -89,28 +91,33 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
                 SaveComment();
                 SaveUnitTest(values);
                 onOk();
+                setLoading(false);
 
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>ตรวจสอบผ่าน</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        history.push({ pathname: "/internal/issue/inprogress" });
+                        window.location.reload(true);
                     },
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -120,7 +127,6 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
         SendFlow(values);
     };
 
@@ -128,54 +134,56 @@ export default function ModalQA({ visible = false, onOk, onCancel, datarow, deta
     return (
         <Modal
             visible={visible}
-            onOk={() => { return (form.submit()) }}
+            confirmLoading={loading}
+            onOk={() => form.submit()}
             okText="Send"
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
-
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white", marginTop: 0 }}
-                name="qa-test"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="linkurl"
-                    label="URL"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white", marginTop: 0 }}
+                    name="qa-test"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <TextArea rows="2" style={{ width: "100%" }} />
-                </Form.Item>
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="unit_test_url"
+                        label="Test Result URL"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'กรุณาแนบ url ผลทดสอบ!',
+                            },
+                        ]}
+                    >
+                        <TextArea rows="2" style={{ width: "100%" }} />
+                    </Form.Item>
 
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="Unit Test"
-                    name="unittest"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-                    <UploadFile ref={uploadRef_unittest} />
-                </Form.Item>
-            </Form>
-                 Remark :
-            <TextEditor ref={editorRef} />
-            <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                    {/* <Form.Item
+                        style={{ minWidth: 300, maxWidth: 300 }}
+                        label="Unit Test"
+                        name="unittest"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        <UploadFile ref={uploadRef_unittest} />
+                    </Form.Item> */}
+                </Form>
+                Remark :
+                <TextEditor ref={editorRef} ticket_id={details.ticketid} />
+                <br />
+                AttachFile : <UploadFile ref={uploadRef} />
+            </Spin>
 
         </Modal>
     )

@@ -1,23 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Select } from 'antd';
+import { Modal, Form, Select, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import { useHistory } from "react-router-dom";
 import UploadFile from '../../../UploadFile'
+import TextEditor from '../../../TextEditor';
 import Axios from 'axios';
 
 export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
-    const [select_assign, setSelect_assign] = useState(null);
     const editorRef = useRef(null)
 
     const [assignlist, setAssignlist] = useState([]);
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
+    const [loading, setLoading] = useState(false);
 
     const GetAssign = async () => {
         try {
@@ -41,9 +37,9 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -51,9 +47,9 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
+                        comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }
@@ -63,6 +59,7 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
     }
 
     const SendFlow = async (value) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -76,7 +73,7 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                     flowoutputid: details.flowoutputid,
                     value: {
                         assigneeid: value,
-                        comment_text: textValue
+                        comment_text: editorRef.current.getValue()
                     }
 
                 }
@@ -84,24 +81,25 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
 
             if (sendflow.status === 200) {
                 SaveComment();
-                onOk();
-                
-                await Modal.info({
+                setLoading(false);
+                onCancel();
+                Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>Assign งานให้ {select_assign}</p>
+                            <p>สอบถามข้อมูลกับทาง Developer</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
-                        editorRef.current.editor.setContent("");
-                        
+                        editorRef.current.setvalue("");
                         history.push({ pathname: "/internal/issue/inprogress" })
                     },
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
@@ -109,30 +107,33 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                     </div>
                 ),
                 onOk() {
-                    editorRef.current.editor.setContent("");
+                    editorRef.current.setvalue("");
                     onOk();
-                   
+
                 },
             });
         }
     }
 
     const onFinish = (values, item) => {
-        console.log('Success:', values, item);
         SendFlow(values.assignto);
     };
 
     useEffect(() => {
         if (visible) {
             GetAssign();
+
         }
 
     }, [visible])
+
+
 
     return (
         <>
             <Modal
                 visible={visible}
+                confirmLoading={loading}
                 onOk={() => { return (form.submit()) }}
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okText="Send"
@@ -140,67 +141,51 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                 onCancel={() => { return (form.resetFields(), onCancel()) }}
                 {...props}
             >
-
-                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                    layout="vertical"
-                    name="assigndev"
-                    className="login-form"
-                    initialValues={{
-                        remember: true,
-                    }}
-                    onFinish={onFinish}
-                >
-                    <Form.Item
-                        style={{ minWidth: 300, maxWidth: 300 }}
-                        label="AssignTo"
-                        name="assignto"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'กรุณาเลือก Developer',
-                            },
-                        ]}
+                <Spin spinning={loading} size="large" tip="Loading...">
+                    <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                        layout="vertical"
+                        name="assigndev"
+                        className="login-form"
+                        initialValues={{
+                            remember: true,
+                        }}
+                        onFinish={onFinish}
                     >
-                        {/* <label>Assign To </label> */}
-                        <Select style={{ width: '100%' }} placeholder="None"
-                            showSearch
-                            filterOption={(input, option) =>
-                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            onClick={(value, item) => assignlist.length === 0 ? alert("ไม่มีผู้ดูแล Module") : ""}
-                            options={
-                                assignlist && assignlist.map((item) => ({
-                                    value: item.UserId,
-                                    label: item.UserName
-                                }))
-                            }
+                        <Form.Item
+                            style={{ minWidth: 300, maxWidth: 300 }}
+                            label="AssignTo"
+                            name="assignto"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'กรุณาเลือก Developer',
+                                },
+                            ]}
                         >
-                        </Select>
-                    </Form.Item>
+                            {/* <label>Assign To </label> */}
+                            <Select style={{ width: '100%' }} placeholder="None"
+                                showSearch
+                                filterOption={(input, option) =>
+                                    option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                }
+                                onClick={(value, item) => assignlist.length === 0 ? alert("ไม่มีผู้ดูแล Module") : ""}
+                                options={
+                                    assignlist && assignlist.map((item) => ({
+                                        value: item.UserId,
+                                        label: item.UserName
+                                    }))
+                                }
+                            >
+                            </Select>
+                        </Form.Item>
 
-                </Form>
+                    </Form>
 
-                {/* Remark : */}
-                <Editor
-                    apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                    ref={editorRef}
-                    initialValue=""
-                    init={{
-                        height: 300,
-                        menubar: false,
-                        plugins: [
-                            'advlist autolink lists link image charmap print preview anchor',
-                            'searchreplace visualblocks code fullscreen',
-                            'insertdatetime media table paste code help wordcount'
-                        ],
-                        toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                        toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                    }}
-                    onEditorChange={handleEditorChange}
-                />
-                <br />
+                    {/* Remark : */}
+                    <TextEditor ref={editorRef} />
+                    <br />
                      AttachFile : <UploadFile ref={uploadRef} />
-
+                </Spin>
             </Modal>
         </>
     )

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, DatePicker, Row, Col, Form, Button, Input } from 'antd';
+import { Modal, DatePicker, Row, Col, Form, Spin } from 'antd';
 import UploadFile from '../../UploadFile'
 import { Editor } from '@tinymce/tinymce-react';
 import Axios from 'axios';
-import IssueContext from '../../../utility/issueContext';
+import IssueContext, { userState } from '../../../utility/issueContext';
 import moment from 'moment';
 
 
@@ -16,6 +16,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
     const [duedate, setDuedate] = useState(null);
     const editorRef = useRef(null)
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
+    const [loading, setLoading] = useState(false);
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);
@@ -34,7 +35,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: textValue,
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response.id),
                     }
                 });
@@ -45,6 +46,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
     }
 
     const SendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -67,31 +69,34 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
+                setLoading(false);
 
-                await Modal.info({
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
+                            <p>ประเมิน DueDate เรียบร้อยแล้ว</p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
-                        editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        editorRef.current.editor.setContent("");
+                        window.location.reload(false)
                     },
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
-                    onOk();
                     history.push({ pathname: "/internal/issue/inprogress" })
                 },
             });
@@ -99,6 +104,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
     }
 
     const SendIssue = async (values) => {
+        setLoading(true);
         try {
             const sendissue = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
@@ -121,14 +127,15 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
             if (sendissue.status === 200) {
                 SaveComment();
                 onOk();
-
-                await Modal.info({
+                setLoading(false);
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
                         editorRef.current.editor.setContent("")
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -136,16 +143,17 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
-                    onOk();
                     history.push({ pathname: "/internal/issue/inprogress" })
                 },
             });
@@ -165,12 +173,14 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
 
     useEffect(() => {
 
-    }, [])
+    }, [visible])
 
-    
+
+
     return (
         <Modal
             visible={visible}
+            confirmLoading={loading}
             okText="Save"
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
@@ -181,53 +191,55 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
             {...props}
         >
 
-            <Form form={form} style={{ padding: 0, width: "100%", backgroundColor: "white" }}
-                name="logDueDate"
-                className="login-form"
-                onFinish={onFinish}
-            >
-                <Row>
-                    <Col span={24}>
-                        <label className="header-text">กำหนด DueDate :</label><br />
-                        <Form.Item
-                            name="duedate"
-                            rules={[
-                                {
-                                    required: false,
-                                    message: 'กรุณาระบุ DueDate',
-                                },
-                            ]}
-                        >
-                            <DatePicker
-                            format="DD/MM/YYYY"
-                            defaultValue={details.duedate === null ? "" : moment(details?.duedate,"DD/MM/YYYY")}
-                            onChange={(date, datestring) => { form.setFieldsValue({ duedate: datestring }); setDuedate(datestring) }} /><br />
-                        </Form.Item>
-                    </Col>
-                </Row>
-            </Form>
+            <Spin spinning={loading}>
+                <Form form={form} style={{ padding: 0, width: "100%", backgroundColor: "white" }}
+                    name="logDueDate"
+                    className="login-form"
+                    onFinish={onFinish}
+                >
+                    <Row>
+                        <Col span={24}>
+                            <label className="header-text">กำหนด DueDate :</label><br />
+                            <Form.Item
+                                name="duedate"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'กรุณาระบุ DueDate',
+                                    },
+                                ]}
+                            >
+                                <DatePicker
+                                    format="DD/MM/YYYY HH:mm"
+                                    showTime
+                                    defaultValue={details.duedate === null ? "" : moment(details?.duedate, "DD/MM/YYYY")}
+                                    onChange={(date, datestring) => { form.setFieldsValue({ duedate: datestring }); setDuedate(datestring) }} /><br />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
 
-            <label className="header-text">Remark</label>
-            <Editor
-                apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                ref={editorRef}
-                initialValue=""
-                init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                    toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                }}
-                onEditorChange={handleEditorChange}
-            />
-            <br />
+                <label className="header-text">Remark</label>
+                <Editor
+                    apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
+                    ref={editorRef}
+                    initialValue=""
+                    init={{
+                        height: 300,
+                        menubar: false,
+                        plugins: [
+                            'advlist autolink lists link image charmap print preview anchor',
+                            'searchreplace visualblocks code fullscreen',
+                            'insertdatetime media table paste code help wordcount'
+                        ],
+                        toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
+                        toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
+                    }}
+                    onEditorChange={handleEditorChange}
+                />
+                <br />
                      AttachFile : <UploadFile ref={uploadRef} />
-
+            </Spin>
         </Modal >
     )
 }

@@ -14,11 +14,11 @@ class Clock extends Component {
       overdue: false
     };
   }
-  componentWillMount() {
-    const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
-    // this.getTimeUntil(deadline, createdate, resolvedDate);
-    // this.getTimeWorking(node_receivedate, node_senddate)
-  }
+  // componentWillMount() {
+  //   const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
+  //   // this.getTimeUntil(deadline, createdate, resolvedDate);
+  //   // this.getTimeWorking(node_receivedate, node_senddate)
+  // }
   componentDidMount() {
     const { deadline, createdate, resolvedDate, node_receivedate, node_senddate, type } = this.props;
     // คำนวนระยะเวลาทำงาน
@@ -40,7 +40,7 @@ class Clock extends Component {
     if (this.props.resolvedDate === undefined &&
       moment(this.props.deadline).format("YYYY-MM-DD HH:mm") < moment().format("YYYY-MM-DD HH:mm") &&
       type === undefined) {
-      //setInterval(() => this.getTimeUntil(this.props.deadline), 1000);
+     // setInterval(() => this.getTimeUntil(this.props.deadline), 1000);
       this.dateTimeDiffToNow(this.props.deadline)
       //console.log("C")
     }
@@ -243,7 +243,9 @@ class Clock extends Component {
         <Button
           type="default"
           onClick={this.props.onClick}
-          className={this.state.overdue === true ? "sla-overdue" : "sla-warning"}
+          //className={this.state.overdue === true ? "sla-overdue" : "sla-warning"}
+          // this.state.seconds === 0
+           style={{color: this.state.seconds === 0 ? "#fa8c16" : "#00CC00"}}
           size="middle"
           shape="round"
           ghost={this.state.overdue === false ? true : false}
@@ -274,10 +276,10 @@ class Clock extends Component {
               <>
                 {timeformat === "en"
                   ? this.state.minutes === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.minutes))}m`}&nbsp;</span>
-                  : this.state.minutes === 0 ? "" : <span> {`${this.leading0(Math.abs(this.state.minutes))}นาที`}&nbsp;</span>
+                  : this.state.minutes === 0 ? "" : <span > {`${this.leading0(Math.abs(this.state.minutes))}นาที`}&nbsp;</span>
                 }
               </>
-            )
+            ) 
           }
 
           {
@@ -305,8 +307,7 @@ class Clock extends Component {
             this.props.type === "timeworking" && this.state.seconds === 0 ? "กำลังดำเนินการ" : ""
           }
           <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
-
-
+         
         </Button>
       </>
 

@@ -1,11 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Input, Select, Button } from 'antd';
-import { Editor } from '@tinymce/tinymce-react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { Modal, Form, Select, Spin } from 'antd';
+//import { Editor } from '@tinymce/tinymce-react';
+import TextEditor from '../../TextEditor';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
+import AuthenContext from "../../../utility/authenContext";
 
 export default function ModalLeaderAssign({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const { state, dispatch } = useContext(AuthenContext);
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
@@ -14,10 +17,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
     const editorRef = useRef(null)
 
     const [assignlist, setAssignlist] = useState([]);
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
+    const [loading, setLoading] = useState(false);
 
     const GetAssign = async () => {
         try {
@@ -41,9 +41,9 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -51,9 +51,9 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
-                        comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "task",
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }
@@ -62,7 +62,8 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
         }
     }
 
-    const SendFlow = async (value) => {
+    const SendFlow = async (param) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -75,7 +76,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
-                        assigneeid: value,
+                        assigneeid: param,
                         comment_text: textValue
                     }
 
@@ -85,40 +86,47 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                
-                await Modal.info({
+                setLoading(false);
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>Assign งานให้ {select_assign}</p>
                         </div>
                     ),
+                    okText:"Close",
                     onOk() {
-                        editorRef.current.editor.setContent("");
-                        
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        editorRef.current.setvalue();
+                        if (param === state?.usersdata?.users?.id) {
+                            window.location.reload(true);
+                        } else {
+                            history.push({ pathname: "/internal/issue/inprogress" });
+                            window.location.reload(true);
+                        }
+
                     },
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText:"Close",
                 onOk() {
-                    editorRef.current.editor.setContent("");
+                    editorRef.current.setvalue();
                     onOk();
-                   
+
                 },
             });
         }
     }
 
     const onFinish = (values, item) => {
-        console.log('Success:', values, item);
         SendFlow(values.assignto);
     };
 
@@ -132,84 +140,69 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
     return (
         <Modal
             visible={visible}
-            onOk={() => { return (form.submit()) }}
+            confirmLoading={loading}
+            onOk={() => form.submit() }
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => { return (form.resetFields(), onCancel()) }}
+            onCancel={() => {form.resetFields(); onCancel() }}
             {...props}
         >
-
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                layout="vertical"
-                name="leader-assign"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    label="AssignTo"
-                    name="assignto"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please Select Assign',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    layout="vertical"
+                    name="leader-assign"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    {/* <label>Assign To </label> */}
-                    <Select style={{ width: '100%' }} placeholder="None"
-                        showSearch
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={(value, item) => setSelect_assign(item.label)}
-                        options={
-                            assignlist && assignlist.map((item) => ({
-                                value: item.UserId,
-                                label: item.UserName
-                            }))
-                        }
+                    <Form.Item
+                        style={{ minWidth: 300, maxWidth: 300 }}
+                        label="AssignTo"
+                        name="assignto"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please Select Assign',
+                            },
+                        ]}
                     >
-                    </Select>
-                </Form.Item>
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="remark"
-                    label="Remark"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
-                >
-                    {/* Remark : */}
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
+                        {/* <label>Assign To </label> */}
+                        <Select style={{ width: '100%' }} placeholder="None"
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            onChange={(value, item) => setSelect_assign(item.label)}
+                            options={
+                                assignlist && assignlist.map((item) => ({
+                                    value: item.UserId,
+                                    label: item.UserName
+                                }))
+                            }
+                        >
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="remark"
+                        label="Remark"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        {/* Remark : */}
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
+                        <br />
                      AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form>
-
+                    </Form.Item>
+                </Form>
+            </Spin>
         </Modal>
     )
 }

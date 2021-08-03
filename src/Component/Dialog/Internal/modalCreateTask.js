@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Select, Button } from 'antd';
+import { Modal, Form, Input, Select, Spin } from 'antd';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
 import IssueContext from '../../../utility/issueContext';
@@ -12,7 +12,9 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
 
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
     const [form] = Form.useForm();
-    const editorRef = useRef(null)
+    const editorRef = useRef(null);
+    const uploadRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     const LoadModule = async () => {
         try {
@@ -23,7 +25,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    productId: details.productId
+                    productId: details.productid
                 }
             });
             userdispatch({ type: "LOAD_MODULE", payload: module.data })
@@ -33,6 +35,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
     }
 
     const CreateTask = async (values) => {
+        setLoading(true);
         try {
             const createtask = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/create-task",
@@ -45,17 +48,21 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     title: values.title,
                     description: editorRef.current.getValue(),
                     moduleid: values.module,
-                    mailboxid: details.mailboxid
+                    mailboxid: details.mailboxid,
+                    files: uploadRef.current.getFiles().map((n) => n.response),
                 }
             });
             if (createtask.status === 200) {
-                await Modal.info({
+                setLoading(false);
+                onCancel();
+                await Modal.success({
                     title: 'สร้าง Task งานสำเร็จ',
                     content: (
                         <div>
                             <p></p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         onOk();
                         form.resetFields();
@@ -63,7 +70,8 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'สร้าง Task งานไม่สำเร็จ',
                 content: (
                     <div>
@@ -71,6 +79,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     onOk();
                 },
@@ -91,13 +100,13 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
 
     }, [visible])
 
-    // console.log("details",details)
     return (
         <Modal
             visible={visible}
-            onOk={() => { form.submit(); onCancel() }}
+            confirmLoading={loading}
+            onOk={() => { form.submit() }}
             okText="Create"
-            okButtonProps={{ type: "primary", htmlType: "submit" }}
+            okButtonProps={{ type: "primary", htmlType: "submit", color: "#00CC00" }}
             onCancel={() => {
                 return (form.resetFields(), onCancel())
             }
@@ -105,62 +114,65 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
             {...props}
 
         >
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="form-createtask"
-                className="login-form"
-                layout="vertical"
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    style={{ width: "100%" }}
-                    name="title"
-                    label="Title"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'กรุณาระบุ หัวข้อ!',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    name="form-createtask"
+                    className="login-form"
+                    layout="vertical"
+                    onFinish={onFinish}
                 >
-                    <Input />
-                </Form.Item>
-
-                <Form.Item
-                    style={{ width: "100%" }}
-                    name="description"
-                    label="Description"
-
-                >
-                    <TextEditor ref={editorRef} />
-                </Form.Item>
-
-                <Form.Item
-                    style={{ minWidth: 300, maxWidth: 300 }}
-                    name="module"
-                    label="Module"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please Select module!',
-                        },
-                    ]}
-                >
-                    <Select style={{ width: '100%' }} placeholder="None"
-                        showSearch
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        options={
-                            userstate.masterdata.moduleState && userstate.masterdata.moduleState.map((item) => ({
-                                value: item.Id,
-                                label: item.Name
-                            }))
-                        }
+                    <Form.Item
+                        style={{ width: "100%" }}
+                        name="title"
+                        label="Title"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'กรุณาระบุ หัวข้อ!',
+                            },
+                        ]}
                     >
-                    </Select>
-                </Form.Item>
-            </Form>
+                        <Input />
+                    </Form.Item>
 
+                    <Form.Item
+                        style={{ width: "100%" }}
+                        name="description"
+                        label="Description"
+
+                    >
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
+                    </Form.Item>
+
+                    <Form.Item
+                        style={{ minWidth: 300, maxWidth: 300 }}
+                        name="module"
+                        label="Module"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please Select module!',
+                            },
+                        ]}
+                    >
+                        <Select style={{ width: '100%' }} placeholder="None"
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            options={
+                                userstate.masterdata.moduleState && userstate.masterdata.moduleState.map((item) => ({
+                                    value: item.Id,
+                                    label: item.Name
+                                }))
+                            }
+                        >
+                        </Select>
+                    </Form.Item>
+                </Form>
+                <br />
+                     AttachFile : <UploadFile ref={uploadRef} />
+            </Spin>
         </Modal>
     )
 }

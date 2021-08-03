@@ -2,9 +2,11 @@ import { ClockCircleOutlined } from '@ant-design/icons'
 import { Modal, Timeline, Row, Col, Button } from 'antd'
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import moment from 'moment';
 
 export default function DuedateLog({ visible = false, onOk, onCancel, details, ...props }) {
     const [history, setHistory] = useState([]);
+
     const getDueDateHistory = async () => {
         try {
             const history = await Axios({
@@ -27,8 +29,11 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
     }
 
     useEffect(() => {
-        getDueDateHistory();
+        if (visible) {
+            getDueDateHistory();
+        }
     }, [visible])
+
 
     return (
         <Modal
@@ -39,7 +44,25 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
             {...props}
         >
             <Timeline>
-                {history.map((item, index) => {
+                <Row style={{ marginBottom: 20 }}>
+                    <Col span={24}>
+                        <label className="header-text">
+                            วันที่แล้วเสร็จ:
+                        </label>
+                        <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em", marginLeft: 20 }} />
+                        <label className="value-text" style={{ marginLeft: 5 }} >
+                            {history[0]?.due_date === undefined ? "None" : moment(history[0]?.due_date).format("DD/MM/YYYY HH:mm")}
+                        </label>
+                    </Col>
+                </Row>
+                <Row style={{ marginBottom: 20 }}>
+                    <Col span={24}>
+                        <label className="header-text">
+                            เลื่อน DueDate
+                        </label>
+                    </Col>
+                </Row>
+                {history.filter((x) => x.type === "Change").map((item, index) => {
                     return (
                         <Timeline.Item>
                             <Row>
@@ -50,18 +73,18 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
                                     >
                                         ครั้งที่ {index + 1}
                                     </label>
-                                    <Button type="text"
-                                        style={{ marginRight: 16 }}
-                                        icon={<ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />}
-                                        className="value-text"
-                                    >
-                                        {new Date(item.due_date).toLocaleDateString('en-GB')}
-                                    </Button>
+                                    <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em", marginLeft: 20 }} />
+                                    <label className="value-text" style={{ marginLeft: 5 }} >
+                                        {moment(item.due_date).format("DD/MM/YYYY HH:mm")}
+                                    </label>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col>
-                                    <p>{item.description}</p></Col>
+                                    <label className="value-text">
+                                       {item.description}
+                                    </label>
+                                </Col>
                             </Row>
                         </Timeline.Item>
                     )

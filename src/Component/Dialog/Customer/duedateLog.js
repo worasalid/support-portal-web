@@ -29,7 +29,10 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
     }
 
     useEffect(() => {
-        getDueDateHistory();
+        if (visible) {
+            getDueDateHistory();
+        }
+
     }, [visible])
 
     return (
@@ -48,7 +51,7 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
                         </label>
                         <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em", marginLeft: 20 }} />
                         <label className="value-text" style={{ marginLeft: 5 }} >
-                            {moment(details.duedate).format("DD/MM/YYYY HH:mm")}
+                            {moment(history[0]?.due_date).format("DD/MM/YYYY HH:mm")}
                         </label>
                     </Col>
                 </Row>
@@ -59,7 +62,7 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
                         </label>
                     </Col>
                 </Row>
-                {history.map((item, index) => {
+                {history.filter((x) => x.type === "Change").map((item, index) => {
                     return (
                         <>
                             <Timeline.Item>
@@ -83,8 +86,8 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
 
                                         </Button>
                                     </Col>
-                                    <Divider type="vertical"/>
-                                    <Col span={12} style={{marginTop:"10px"}}>
+                                    <Divider type="vertical" />
+                                    <Col span={12} style={{ marginTop: "10px" }}>
                                         <label className="value-text" >
                                             <p>{item.description}</p>
                                         </label>

@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Column } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
 import { Row, Col, Card, Spin, Table } from 'antd';
+import { FileOutlined } from '@ant-design/icons';
 import Axios from "axios";
+
+const { Meta } = Card;
+
 
 export default function MyDashboard() {
     const [loading, setLoading] = useState(true)
@@ -22,7 +26,7 @@ export default function MyDashboard() {
         //     end: 2,
         //     maxLimit: 100,
         // },
-
+        columnWidthRatio: 0.1,
         label: {
             position: 'middle',
             content: function content(item) {
@@ -38,6 +42,7 @@ export default function MyDashboard() {
             if (x.Status === "Open") { return "gray" }
             if (x.Status === "InProgress") { return "#5B8FF9" }
             if (x.Status === "Resolved") { return "#FF5500" }
+            if (x.Status === "ReOpen") { return "#FF5500" }
             if (x.Status === "Cancel") { return "#CD201F" }
             if (x.Status === "Complete") { return "#87D068" }
 
@@ -70,6 +75,7 @@ export default function MyDashboard() {
             if (x.Status === "Open") { return "gray" }
             if (x.Status === "InProgress") { return "#5B8FF9" }
             if (x.Status === "Resolved") { return "#FF5500" }
+            if (x.Status === "ReOpen") { return "#FF5500" }
             if (x.Status === "Cancel") { return "#CD201F" }
             if (x.Status === "Complete") { return "#87D068" }
 
@@ -98,7 +104,6 @@ export default function MyDashboard() {
 
         } catch (error) {
             setLoading(false)
-            alert("Error")
         }
     }
 
@@ -108,25 +113,56 @@ export default function MyDashboard() {
     }, [])
 
     return (
-        <MasterPage>
+        <MasterPage bgColor="#f0f2f5">
             <Spin spinning={loading}>
-                <Row gutter={16}>
+                <Row gutter={16} style={{padding: "24px 24px 24px 24px"}}>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
-                                <label className="dashboard-card-status" >
-                                    Open
-                            </label>
+                                <Row>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-status" >
+                                            Open
+                                          </label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-status" >
+                                            Hold
+                                         </label>
+                                    </Col>
+                                </Row>
+                            </div>
+                            <div>
+                                <Row>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-value">
+                                            {dashboard[0]?.Value}
+                                        </label>
+                                    </Col>
+                                    <Col span={12}>
+                                        <label className="dashboard-card-value">
+                                            {dashboard[4]?.Value}
+                                        </label>
+                                    </Col>
+                                </Row>
+                            </div>
+                        </Card> */}
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>Open</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[0]?.Value}
+                                    </label>
 
-                            </div>
-                            <div>
-                                <label className="dashboard-card-value">
-                                    {dashboard[0]?.Value}
-                                </label>
-                            </div>
+                                }
+                            />
                         </Card>
                     </Col>
-                    <Col span={4}>
+                    {/* <Col span={4}>
                         <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
@@ -140,9 +176,25 @@ export default function MyDashboard() {
                                 </label>
                             </div>
                         </Card>
+                    </Col> */}
+                    <Col span={4}>
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>InProgress</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[1]?.Value}
+                                    </label>
+
+                                }
+                            />
+                        </Card>
                     </Col>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
                                     Resolved
@@ -154,10 +206,24 @@ export default function MyDashboard() {
                                     {dashboard[2]?.Value}
                                 </label>
                             </div>
+                        </Card> */}
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Resolved</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[2]?.Value}
+                                    </label>
+
+                                }
+                            />
                         </Card>
                     </Col>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
                                     Cancel
@@ -169,10 +235,24 @@ export default function MyDashboard() {
                                     {dashboard[3]?.Value}
                                 </label>
                             </div>
+                        </Card> */}
+                         <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[3]?.Value}
+                                    </label>
+
+                                }
+                            />
                         </Card>
                     </Col>
                     <Col span={4}>
-                        <Card bordered={true} style={{ width: "100%" }}>
+                        {/* <Card bordered={true} style={{ width: "100%" }}>
                             <div>
                                 <label className="dashboard-card-status">
                                     Complete
@@ -184,6 +264,20 @@ export default function MyDashboard() {
                                     {dashboard[4]?.Value}
                                 </label>
                             </div>
+                        </Card> */}
+                         <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                        >
+                            <Meta
+                                avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
+                                description={
+                                    <label className="dashboard-card-value" >
+                                        {dashboard[4]?.Value}
+                                    </label>
+
+                                }
+                            />
                         </Card>
                     </Col>
                     <Col span={4}>
@@ -202,12 +296,12 @@ export default function MyDashboard() {
                         </Card>
                     </Col>
                 </Row>
-                <Row gutter={16} style={{ marginTop: "30px" }}>
+                <Row gutter={16} style={{ marginTop: "30px", padding: "24px 24px 24px 24px" }}>
                     <Col span={18}>
                         <div >
                             <Card title="Issue By Company" bordered={true} style={{ width: "100%" }}>
                                 <Column {...chartCompany_config}
-                                    data={chartCompany}
+                                    data={chartCompany.filter((x) => x.Status === "Open" || x.Status === "InProgress" || x.Status === "ReOpen")}
                                     height={200}
                                     //scrollbar="true"
                                     xAxis={{ position: "bottom" }}
@@ -218,9 +312,9 @@ export default function MyDashboard() {
                     </Col>
                     <Col span={6}>
                         <div className="site-card-wrapper">
-                            <Card title="Total" bordered={true} style={{ width: "100%" }}>
+                            <Card title="Hand Over" bordered={true} style={{ width: "100%" }}>
                                 <Column {...dashboard_config}
-                                    data={dashboard.filter((x) => x.Status !== "Total")}
+                                    data={dashboard.filter((x) => x.Status === "Open" || x.Status === "InProgress" || x.Status === "ReOpen")}
                                     height={200}
                                     //scrollbar="true"
                                     xAxis={{ position: "bottom" }}
@@ -230,10 +324,10 @@ export default function MyDashboard() {
                         </div>
                     </Col>
                 </Row>
-                <Row gutter={16} style={{ marginTop: "30px" }}>
+                <Row gutter={16} style={{ marginTop: "30px", padding: "24px 24px 24px 24px" }}>
                     <Col span={12}>
                         <Table dataSource={statusbyCompany}>
-                            <Column title="No" width="5%" dataIndex="Row"/>
+                            <Column title="No" width="5%" dataIndex="Row" />
                             <Column title="Company"
                                 align="center"
                                 width="55%"
@@ -247,10 +341,11 @@ export default function MyDashboard() {
 
                                 }
                             />
-                               <Column title="Open" width="10%" dataIndex="Open" />
-                               <Column title="InProgress" width="10%" dataIndex="InProgress"/>
-                               <Column title="Resolved" width="10%" dataIndex="Resolved"/>
-                               <Column title="Complete" width="10%" dataIndex="Complete"/>
+                            <Column title="Open" width="10%" dataIndex="Open" />
+                            <Column title="InProgress" width="10%" dataIndex="InProgress" />
+                            <Column title="Resolved" width="10%" dataIndex="Resolved" />
+                            <Column title="Hold" width="10%" dataIndex="Hold" />
+                            <Column title="Complete" width="10%" dataIndex="Complete" />
                         </Table>
                     </Col>
                 </Row>

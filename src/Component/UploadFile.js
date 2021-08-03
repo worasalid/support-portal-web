@@ -12,6 +12,8 @@ export default forwardRef(function UploadFile(props, ref) {
         display: (text) => alert(text)
     }));
 
+   
+
     const Uploadprops = {
         name: 'file',
         action: process.env.REACT_APP_API_URL + "/files",

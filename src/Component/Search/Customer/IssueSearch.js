@@ -1,19 +1,22 @@
-import React, { useReducer, useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { Row, Col, Input, Button, DatePicker, Select, Tag, Spin } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import Axios from 'axios';
-import { productReducer, moduleReducer, issueTypeReducer, keywordReducer, initState } from '../../../utility/reducer';
 import { useEffect } from 'react';
 import AuthenContext from '../../../utility/authenContext';
 import IssueContext from '../../../utility/issueContext';
 
-export default function Issuesearch({Progress = "hide"}) {
+export default function Issuesearch({ Progress = "hide", Version = "hide" }) {
     const { RangePicker } = DatePicker;
     const { Option } = Select;
     const { state, dispatch } = useContext(AuthenContext);
     const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
 
     const progressstatus = [
+        {
+            value: "Open",
+            text: "Open"
+        },
         {
             value: "InProgress",
             text: "InProgress"
@@ -23,14 +26,52 @@ export default function Issuesearch({Progress = "hide"}) {
             text: "Resolved"
         },
         {
+            value: "Waiting Deploy PRD",
+            text: "Waiting Deploy PRD"
+        },
+        {
             value: "Complete",
             text: "Complete"
         },
+        {
+            value: "Cancel",
+            text: "Cancel"
+        },
+        {
+            value: "ReOpen",
+            text: "ReOpen"
+        },
     ]
+
+    const sceneData = [
+        {
+            value: "None",
+            text: "None"
+        },
+        {
+            value: "Application",
+            text: "Application"
+        },
+        {
+            value: "Report",
+            text: "Report"
+        },
+        {
+            value: "Printform",
+            text: "Printform"
+        },
+        {
+            value: "Data",
+            text: "Data"
+        },
+    ]
+
+    const proGress = []
 
     const handleChange = (e) => {
         if (e.target.name === "issuetype") {
             customerdispatch({ type: "SELECT_TYPE", payload: e.target.value })
+            //console.log(e.target.value)
         }
         if (e.target.name === "product") {
             customerdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
@@ -44,7 +85,13 @@ export default function Issuesearch({Progress = "hide"}) {
         if (e.target.name === "progress") {
             customerdispatch({ type: "SELECT_PROGRESS", payload: e.target.value })
         }
-       
+        if (e.target.name === "scene") {
+            customerdispatch({ type: "SELECT_SCENE", payload: e.target.value })
+        }
+        if (e.target.name === "version") {
+            customerdispatch({ type: "SELECT_VERSION", payload: e.target.value })
+        }
+
         if (e.target.name === "date") {
             customerdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })
         }
@@ -52,29 +99,30 @@ export default function Issuesearch({Progress = "hide"}) {
             customerdispatch({ type: "SELECT_KEYWORD", payload: e.target.value })
         }
     }
-    const getproducts = async () => {
+
+    const getProducts = async () => {
         const products = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/products",
-            method: "get",
+            url: process.env.REACT_APP_API_URL + "/master/customer-products",
+            method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                company_id: state.usersdata?.users?.company_id
             }
         });
         customerdispatch({ type: "LOAD_PRODUCT", payload: products.data });
     }
 
-    const getmodule = async () => {
-        const module = await Axios({
-            url: process.env.REACT_APP_API_URL + "/master/modules",
+    const getPatch = async () => {
+        const patch = await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/ticket-patch",
             method: "get",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
-            params: {
-                productId: customerstate.filter.productState
-            }
         });
-        customerdispatch({ type: "LOAD_MODULE", payload: module.data });
+        customerdispatch({ type: "LOAD_PATCH", payload: patch.data });
 
     }
 
@@ -102,27 +150,22 @@ export default function Issuesearch({Progress = "hide"}) {
     }
 
     const getMasterdata = async () => {
-        try {
-            getproducts();
-            getmodule();
-            getissue_type();
-            getpriority();
-        } catch (error) {
-
-        }
+        getProducts();
+        getissue_type();
+        getpriority();
+        getPatch();
     }
-    useEffect(() => {
-        if (state.authen) {
-            getMasterdata();
-        }
-    }, [state.authen]);
 
     useEffect(() => {
-        if (state.authen) {
-            getmodule();
-
+        if (state.usersdata !== null) {
+            setInterval(() => {
+                customerdispatch({ type: "SEARCH", payload: true })
+            }, 500000)
+            getMasterdata()
         }
-    }, [customerstate.filter.productState]);
+    }, [state.usersdata])
+
+
     return (
         <>
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
@@ -137,6 +180,7 @@ export default function Issuesearch({Progress = "hide"}) {
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", name: "issuetype" } })}
                         options={customerstate.masterdata && customerstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name.replace("ChangeRequest", "CR") }))}
+                    //onClick={() => getissue_type()}
                     >
 
                     </Select>
@@ -148,22 +192,18 @@ export default function Issuesearch({Progress = "hide"}) {
                         maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'priority' } })}
                         options={customerstate.masterdata && customerstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onClear={() => alert()}
+                    //onClick={() => getpriority()}
                     />
                 </Col>
                 <Col span={4}>
-                    <Select placeholder="Module" style={{ width: "100%" }}
-                    mode="multiple"
-                        showSearch
+                    <Select placeholder="Product" style={{ width: "100%" }}
+                        mode="multiple"
                         allowClear
                         maxTagCount={1}
-                        filterOption={(input, option) =>
-                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={(value) => handleChange({ target: { value: value || "", name: 'module' } })}
-                        options={customerstate.masterdata && customerstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onClear={() => alert()}
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'product' } })}
+                        options={customerstate.masterdata && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: x.Name }))}
                     />
+
                 </Col>
                 <Col span={6} >
                     <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder={["IssueDate (Start)", "IssueDate (End)"]}
@@ -171,20 +211,21 @@ export default function Issuesearch({Progress = "hide"}) {
                     />
                 </Col>
                 <Col span={2}>
-                    <Button type="primary"  shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
+                    <Button type="primary" shape="round" icon={<SearchOutlined />} style={{ backgroundColor: "#00CC00" }}
                         onClick={() => customerdispatch({ type: "SEARCH", payload: true })}
                     >
                         Search
                     </Button>
                 </Col>
             </Row>
+
             <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-                <Col span={6}>
+                <Col span={2}>
                 </Col>
-                <Col span={4}>
-                <Select placeholder="Progress" 
-                style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
-                    mode="multiple"
+                <Col span={4} hidden={Progress === "hide"}>
+                    <Select placeholder="Progress"
+                        style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
+                        mode="multiple"
                         showSearch
                         allowClear
                         maxTagCount={1}
@@ -193,11 +234,47 @@ export default function Issuesearch({Progress = "hide"}) {
                         }
                         onChange={(value) => handleChange({ target: { value: value || "", name: 'progress' } })}
                         options={progressstatus.map((x) => ({ value: x.value, label: x.text }))}
-                        onClear={() => alert()}
+                    />
+                </Col>
+                <Col span={4} hidden={Version === "hide"}>
+                    <Select placeholder="Patch Version"
+                        style={{ width: "100%", display: Version === "show" ? "block" : "none" }}
+                        mode="multiple"
+                        showSearch
+                        allowClear
+                        maxTagCount={1}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'version' } })}
+                        options={customerstate.masterdata && customerstate.masterdata.patchState.map((x) => ({ value: x.Version, label: x.Version }))}
+                    />
+                </Col>
+                <Col span={4}>
+                    <Select placeholder="Scene"
+                        style={{ width: "100%" }}
+                        mode="multiple"
+                        showSearch
+                        allowClear
+                        maxTagCount={1}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={(value) => handleChange({ target: { value: value || "", name: 'scene' } })}
+                        options={sceneData.map((x) => ({ value: x.value, label: x.text }))}
                     />
                 </Col>
                 <Col span={10}>
-                    <Input placeholder="Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", name: 'keyword' } })}></Input>
+                    <Input placeholder="IssueNo / Subject" name="subject" prefix="" suffix={<SearchOutlined />}
+                        onChange={(value) => handleChange({ target: { value: value.target.value || "", name: 'keyword' } })}
+                        onKeyDown={(x) => {
+                            if (x.keyCode === 13) {
+                                customerdispatch({ type: "SEARCH", payload: true })
+                            }
+                        }}
+
+                    />
+
                 </Col>
             </Row>
         </>

@@ -1,5 +1,5 @@
-import { Col, Tag, Row, Select, Divider, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Popconfirm } from "antd";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import { Col, Tag, Row, Select, Divider, Typography, Button, Avatar, Tabs, Modal, Menu, Spin, Skeleton } from "antd";
+import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import CommentBox from "../../../Component/Comment/Internal/Comment";
@@ -7,12 +7,16 @@ import InternalCommentBox from "../../../Component/Comment/Internal/Internal_com
 import Historylog from "../../../Component/History/Customer/Historylog";
 import InternalHistorylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, FileAddOutlined, LeftCircleOutlined, UserOutlined,
+  UpCircleOutlined, DownCircleOutlined, InfoCircleOutlined
+} from "@ant-design/icons";
 import Axios from "axios";
+import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
-import Clock from "../../../utility/countdownTimer";
-import ClockTimer from "../../../utility/countTimer";
+// import Clock from "../../../utility/countdownTimer";
+import ClockSLA from "../../../utility/SLATime";
 import moment from "moment";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
@@ -26,9 +30,15 @@ import ModalMandayLog from "../../../Component/Dialog/Internal/modalMandayLog";
 import ModalSA_Assessment from "../../../Component/Dialog/Internal/modalSA_Assessment";
 import ModalQuotation from "../../../Component/Dialog/Internal/modalQuotation";
 import ModalChangeDueDate from "../../../Component/Dialog/Internal/modalChangeDueDate";
+import ModalSaveDueDate from "../../../Component/Dialog/Internal/Issue/modalSaveDueDate";
+import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
+import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
+import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
+import ModalCancel from "../../../Component/Dialog/Internal/Issue/modalCancel";
 
 
 const { Option } = Select;
+const { SubMenu } = Menu;
 const { TabPane } = Tabs;
 
 
@@ -37,10 +47,11 @@ export default function Subject() {
   const history = useHistory();
   const selectRef = useRef(null)
   const subTaskRef = useRef(null)
-  const clockRef = useRef(null)
-  const clockRef2 = useRef(null)
-  const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
+  const { state, dispatch } = useContext(AuthenContext);
+  const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
+  const [loadingPage, setLoadingPage] = useState(true);
+  const [tabKey, setTabKey] = useState("1")
 
   //modal
   // const [visible, setVisible] = useState(false);
@@ -49,35 +60,70 @@ export default function Subject() {
   const [modaladdtask, setModaladdtask] = useState(false);
   const [modalduedate_visible, setModalduedate_visible] = useState(false);
   const [modalChangeduedate, setModalChangeduedate] = useState(false);
+  const [modalSaveDuedate, setModalSaveDuedate] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalresolved_visible, setModalresolved_visible] = useState(false);
   const [modalsa_visible, setModalsa_visible] = useState(false);
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
-  const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalmanday_visible, setModalmanday_visible] = useState(false);
   const [modalmandaylog_visible, setModalmandaylog_visible] = useState(false);
   const [modalAssessment_visible, setModalAssessment_visible] = useState(false);
   const [modalQuotation_visible, setModalQuotation_visible] = useState(false);
+  const [modalPreview, setModalPreview] = useState(false);
+  const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+  const [modalCancel_visible, setModalCancel_visible] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
   const [divcollapse, setDivcollapse] = useState("block")
   const [collapsetext, setCollapsetext] = useState("Hide details")
-  const [divProgress, setDivProgress] = useState("hide")
+  const [imgUrl, setImgUrl] = useState(null);
+
+  //div
+  const [activityCollapse, setActivityCollapse] = useState("block")
+  const [activityIcon, setActivityIcon] = useState(<DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
 
 
   // data
   const [ProgressStatus, setProgressStatus] = useState("");
-  const [history_duedate_data, setHistory_duedate_data] = useState([]);
-  const [duedate, setDuedate] = useState(null);
-  const [selected, setSelected] = useState()
-  const [SLA, setSLA] = useState(null);
-  const [createddate, setCreateddate] = useState(null);
-  const [resolveddate, setResolveddate] = useState(null);
   const [history_loading, setHistory_loading] = useState(false);
+  const [duedateType, setDuedateType] = useState(null)
 
+  const style = {
+    height: 40,
+    width: 40,
+    lineHeight: '40px',
+    borderRadius: 4,
+    backgroundColor: '#1088e9',
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 14,
+  };
 
+  const issueScene = [
+    {
+      name: "None",
+      value: "None"
+    },
+    {
+      name: "Application",
+      value: "Application"
+    },
+    {
+      name: "Report",
+      value: "Report"
+    },
+    {
+      name: "Printform",
+      value: "Printform"
+    },
+    {
+      name: "Data",
+      value: "Data"
+    }
+  ]
 
+  // Load ข้อมูล Master 
   const getIssueType = async () => {
     try {
       const issuetype = await Axios({
@@ -102,13 +148,40 @@ export default function Subject() {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
       });
-      userdispatch({ type: "LOAD_PRIORITY", payload: priority.data })
+      if (priority.status === 200) {
+        userdispatch({ type: "LOAD_PRIORITY", payload: priority.data })
+      }
+
     } catch (error) {
 
     }
   }
 
+  const getVersion = async () => {
+    try {
+      const version = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/version",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          // productId: userstate?.issuedata?.details[0]?.ProductId
+          productId: [4]
+        }
+      });
+
+      if (version.status === 200) {
+        userdispatch({ type: "LOAD_VERSION", payload: version.data });
+      }
+    } catch (error) {
+
+    }
+  }
+
+  // Load flow ที่จะใช้ในการ Action งาน
   const getflow_output = async (trans_id) => {
+
     try {
       const flow_output = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
@@ -122,9 +195,9 @@ export default function Subject() {
       });
 
       if (flow_output.status === 200) {
-        if ((flow_output.data.filter((x) => x.Type === "Issue").length) > 0) {
-          setDivProgress("show")
-        }
+        // if ((flow_output.data.filter((x) => x.Type === "Issue").length) > 0) {
+        //   setDivProgress("show")
+        // }
         userdispatch({
           type: "LOAD_ACTION_FLOW",
           payload: flow_output.data.filter((x) => x.Type === "Issue" || x.Type === null)
@@ -134,6 +207,28 @@ export default function Subject() {
 
     }
 
+  }
+
+  // Load ข้อมูล Detail ของ Issue และ ข้อมูล mailbox ล่าสุด
+  const getMailBox = async () => {
+    try {
+      const mailbox = await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/load-mailbox",
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        params: {
+          ticketid: match.params.id
+        }
+      });
+
+      if (mailbox.status === 200) {
+        userdispatch({ type: "LOAD_MAILBOX", payload: mailbox.data })
+      }
+    } catch (error) {
+
+    }
   }
 
   const getdetail = async () => {
@@ -150,10 +245,8 @@ export default function Subject() {
       });
 
       if (ticket_detail.status === 200) {
+        setLoadingPage(false);
         userdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
-        setSLA(ticket_detail.data.SLA);
-        setCreateddate(ticket_detail.data.CreateDate);
-        setResolveddate(ticket_detail.data.ResolvedDate)
         // getflow_output(ticket_detail.data[0].TransId)
       }
     } catch (error) {
@@ -161,27 +254,7 @@ export default function Subject() {
     }
   }
 
-  const GetDueDateHistory = async () => {
-    try {
-      const history = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/log_duedate",
-        method: "GET",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-        params: {
-          ticketId: match.params.id
-        }
-      });
-
-      if (history.status === 200) {
-        setHistory_duedate_data(history.data)
-      }
-    } catch (error) {
-
-    }
-  }
-
+  // Update ข้อมูล
   const SaveIssueType = async (value, item) => {
     const issuetype = await Axios({
       url: process.env.REACT_APP_API_URL + "/tickets/update-issuetype",
@@ -192,12 +265,11 @@ export default function Subject() {
       data: {
         ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
         typeid: value,
-        transid: userstate?.issuedata?.details[0]?.TransId
+        transid: userstate?.mailbox[0]?.TransId
       }
     });
     if (issuetype.status === 200) {
-
-      Modal.info({
+      Modal.success({
         title: 'บันทึกข้อมูลเรียบร้อย',
         content: (
           <div>
@@ -205,7 +277,9 @@ export default function Subject() {
           </div>
         ),
         onOk() {
+          setLoadingPage(true);
           getdetail();
+          subTaskRef.current.GetTask();
         },
       });
     }
@@ -213,7 +287,6 @@ export default function Subject() {
   }
 
   const UpdatePriority = async (value, item) => {
-    console.log("UpdatePriority", value)
     try {
       const priority = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/update-priority",
@@ -233,17 +306,18 @@ export default function Subject() {
       });
 
       if (priority.status === 200) {
-        Modal.info({
+        Modal.success({
           title: 'บันทึกข้อมูลเรียบร้อย',
           content: (
             <div>
               <p></p>
             </div>
           ),
+          okText: "Close",
           onOk() {
             getdetail();
             setHistory_loading(true);
-            window.location.reload()
+            window.location.reload(true)
           },
         });
       }
@@ -264,26 +338,149 @@ export default function Subject() {
     }
   }
 
+  const updateScene = async (value, item) => {
+    try {
+      const scene = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/scene",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          ticketid: userstate?.issuedata?.details[0]?.Id,
+          scene: value,
+          history: {
+            value: userstate?.issuedata?.details[0]?.Scene,
+            value2: item.label
+          }
+        }
+      });
+      if (scene.status === 200) {
+        Modal.success({
+          title: 'บันทึกข้อมูลเรียบร้อย',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+            getdetail();
+            setHistory_loading(true);
+            window.location.reload(true)
+          },
+        });
+      }
+
+    } catch (error) {
+
+    }
+  }
+
+  const updateVersion = async (value, item) => {
+    try {
+      const version = await Axios({
+        url: process.env.REACT_APP_API_URL + "/tickets/version",
+        method: "PATCH",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          ticketid: userstate?.issuedata?.details[0]?.Id,
+          version: value,
+          history: {
+            value: userstate?.issuedata?.details[0]?.Version,
+            value2: item.label
+          }
+        }
+      });
+      if (version.status === 200) {
+        Modal.success({
+          title: 'บันทึกข้อมูลเรียบร้อย',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "Close",
+          onOk() {
+            getdetail();
+            setHistory_loading(true);
+            window.location.reload(true)
+          },
+        });
+      }
+
+    } catch (error) {
+
+    }
+  }
+
+
+  // Fuction 
   function HandleChange(value, item) {
-    console.log("value", value)
-    console.log("item", item)
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
 
     // Bug Flow
     if (userstate.issuedata.details[0]?.IssueType === "Bug") {
-      if (userstate?.issuedata?.details[0]?.NodeName === "support") {
-        if (item.data.value === "RequestInfo") { return setModalsendissue_visible(true) }
-        if (item.data.value === "Resolved" || item.data.value === "Deploy") { return (setModalresolved_visible(true)) }
+      if (userstate?.mailbox[0]?.NodeName === "support") {
+        if (item.data.value === "RequestInfo" || item.data.value === "Hold") {
+          setModalsendissue_visible(true)
+        }
+        if (item.data.value === "Resolved") {
+          if (userstate.issuedata.details[0]?.taskResolved > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่เสร็จ',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Resolved งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
+
+              }
+            });
+          }
+          if (userstate.issuedata.details[0]?.taskResolved === 0) {
+            setModalresolved_visible(true);
+          }
+        }
+        if (item.data.value === "Deploy") {
+          if (userstate.issuedata.details[0]?.taskComplete > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่เสร็จ',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Deploy งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
+
+              }
+            });
+          }
+          if (userstate.issuedata.details[0]?.taskComplete === 0) {
+            setModalresolved_visible(true);
+          }
+        }
+        if (item.data.value === "Cancel") {
+          setModalCancel_visible(true);
+        }
       }
     }
     //CR FLOW
-    if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest") {
-      if (userstate.issuedata.details[0]?.NodeName === "support") {
+    if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") {
+      if (userstate?.mailbox[0]?.NodeName === "support") {
         if (item.data.value === "SendCR_Center") {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "RequestInfo") {
+          setModalsendissue_visible(true)
+        }
+        if (item.data.value === "Hold") {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "SendManday") {
@@ -296,10 +493,32 @@ export default function Subject() {
           setModalduedate_visible(true)
         }
         if (item.data.value === "Resolved") {
+          setModalresolved_visible(true)
+        }
+        if (item.data.value === "RejectToCR") {
           setModalsendissue_visible(true)
         }
+        if (item.data.value === "Deploy") {
+          if (userstate.issuedata.details[0]?.taskComplete > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่เสร็จ',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Deploy งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
+
+              }
+            });
+          }
+          if (userstate.issuedata.details[0]?.taskResolved === 0 && userstate.issuedata.details[0]?.taskComplete === 0) {
+            setModalresolved_visible(true);
+          }
+        }
       }
-      if (userstate.issuedata.details[0]?.NodeName === "cr_center") {
+      if (userstate?.mailbox[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
           setModalsendissue_visible(true)
         }
@@ -318,7 +537,10 @@ export default function Subject() {
         if (item.data.value === "SendPR") {
           setModalQuotation_visible(true)
         }
-        if (item.data.value === "ConfirmPayment") {
+        if (item.data.value === "ConfirmPayment" || item.data.value === "RejectPO") {
+          setModalsendissue_visible(true)
+        }
+        if (item.data.value === "RejectToSupport") {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "RequestDueDate") {
@@ -327,25 +549,45 @@ export default function Subject() {
         if (item.data.value === "SendDueDate") {
           setModalduedate_visible(true)
         }
+        if (item.data.value === "ResolvedToSupport") {
+          if (userstate.issuedata.details[0]?.taskResolved > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่เสร็จ',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Resolved งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
 
+              }
+            });
+          } else {
+            setModalsendissue_visible(true);
+          }
+        }
       }
-      if (userstate.issuedata.details[0]?.NodeName === "sa") { return setModalsa_visible(true) }
+      if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
     }
     // Use Flow
     if (userstate.issuedata.details[0]?.IssueType === "Use") {
-      if (userstate.issuedata.details[0]?.NodeName === "support") {
+      if (userstate?.mailbox[0]?.NodeName === "support") {
         if (item.data.value === "RequestInfo") {
-          setModalsendissue_visible(true)
+          setModalsendissue_visible(true);
         }
         if (item.data.value === "SendToSA") {
-          setModalsendissue_visible(true)
+          setModalsendissue_visible(true);
         }
         if (item.data.value === "Resolved") {
-          setModalsendissue_visible(true)
+          setModalsendissue_visible(true);
+        }
+        if (item.data.value === "Cancel") {
+          setModalCancel_visible(true);
         }
       }
 
-      if (userstate.issuedata.details[0]?.NodeName === "sa") {
+      if (userstate?.mailbox[0]?.NodeName === "sa") {
         if (item.data.value === "Assessment") {
           setModalsendissue_visible(true)
         }
@@ -357,6 +599,7 @@ export default function Subject() {
   }
 
   function onChange(value, item) {
+
     if (item.type !== "progress") {
       Modal.info({
         title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
@@ -375,8 +618,17 @@ export default function Subject() {
           if (item.type === "priority") {
             UpdatePriority(value, item)
           }
+          if (item.type === "scene") {
+            updateScene(value, item)
+          }
+          if (item.type === "version") {
+            updateVersion(value, item)
+          }
         },
       });
+    }
+    if (item.type === "progress") {
+      alert()
     }
   }
 
@@ -395,68 +647,115 @@ export default function Subject() {
   }
 
   useEffect(() => {
-    getdetail();
+    if (userstate?.issuedata?.details[0] !== undefined) {
+      getdetail();
+      getMailBox();
+    }
+    if (userstate?.mailbox[0]?.NodeName === "support") {
+      // setTabKey("1");
+      if (userstate?.mailbox[0]?.NodeName !== "support" && userstate?.mailbox[0]?.NodeName !== undefined) {
+        setTabKey("4")
+      }
+    }
+
   }, [])
 
+
   useEffect(() => {
-    getdetail();
-    getflow_output(userstate?.issuedata?.details[0]?.TransId);
-  }, [userstate?.issuedata?.details[0]?.TransId])
+    if (userstate?.mailbox[0]?.TransId !== undefined) {
+      getflow_output(userstate?.mailbox[0]?.TransId);
+    }
+  }, [userstate?.mailbox[0]?.TransId])
 
   useEffect(() => {
     if (modalChangeduedate === false) {
       getdetail();
+      getMailBox();
     }
   }, [modalChangeduedate])
 
 
-  // useEffect(() => {
-  //   getdetail();
-  // }, [SLA])
-
   useEffect(() => {
     if (historyduedate_visible) {
-      GetDueDateHistory();
+      // GetDueDateHistory();
     }
   }, [historyduedate_visible])
 
+  useEffect(() => {
+    if (modalSaveDuedate === false) {
+      // getdetail();
+    }
+  }, [modalSaveDuedate])
+
+
+  const tabDocDetail = useMemo(() => {
+    return {
+      refId: userstate?.issuedata?.details[0]?.Id
+    }
+  }, [userstate?.issuedata?.details[0]?.Id])
+
   return (
     <MasterPage>
-      <div style={{ height: "100%" }} >
-        <div className="scrollable-container" ref={setContainer} >
-          <Affix target={() => container}>
-            <Row>
-              <Col>
-                <a
-                  href="/#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    history.goBack();
-                  }}
-                >
-                  Back
-          </a>
-              </Col>
-            </Row>
-          </Affix>
-
-          <Row>
-            {/* Content */}
-            <Col span={16} style={{ paddingTop: 10 }}>
-              <div style={{ height: "80vh", overflowY: "scroll" }}>
-                {/* Issue Description */}
-                <Row style={{ marginRight: 24 }}>
+      <Spin spinning={loadingPage} tip="Loading..." style={{ height: "100vh" }}>
+        <Skeleton loading={loadingPage}>
+          <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer}  >
+            <Row style={{ height: 'calc(100% - 0px)' }}>
+              {/* Content */}
+              <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+                <Row style={{ textAlign: "left" }}>
+                  <Col span={24} style={{ textAlign: "left" }}>
+                    <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
+                      <Button
+                        type="link"
+                        icon={<LeftCircleOutlined />}
+                        // style={{zIndex:99}}
+                        style={{ fontSize: 18, padding: 0, backgroundColor: "white", width: "100%", textAlign: "left" }}
+                        onClick={() => history.goBack()}
+                      >
+                        Back
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
+                <Row style={{ marginTop: 30 }} align="middle">
                   <Col span={24}>
-
-                    <label className="topic-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].Number}</label>
+                    <label className="topic-text">
+                      {userstate?.issuedata?.details[0]?.Number}
+                      {userstate?.issuedata?.details[0]?.IsReOpen === true ? " (ReOpen)" : ""}
+                    </label>
+                    &nbsp; &nbsp;
+                    <label style={{ fontSize: 30, color: "red" }}
+                      hidden={userstate?.mailbox[0]?.GroupStatus === "Cancel" ? false : true}
+                    >
+                      ยกเลิก
+                    </label>
+                  </Col>
+                </Row>
+                
+                {/* Issue Description */}
+                <Row style={{ marginRight: 24, overflow: "hidden" }}>
+                  <Col span={24}>
                     <div className="issue-detail-box">
                       <Row>
+                        <Col span={2} style={{ display: "inline" }}>
+                          <Avatar size={32} icon={<UserOutlined />} />
+                        </Col>
                         <Col span={16} style={{ display: "inline" }}>
                           <Typography.Title level={4}>
-                            <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
+                            {/* <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;   */}
+                            {userstate?.issuedata?.details[0]?.Title}
                           </Typography.Title>
                         </Col>
-                        <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                        <Col span={6} style={{ display: "inline", textAlign: "right" }}>
+                          <Button title="file attach" type="link"
+                            style={{ display: userstate?.issuedata?.details[0]?.cntFile === 0 ? "none" : "inline-block" }}
+                            icon={<img
+                              style={{ height: "20px", width: "20px" }}
+                              src={`${process.env.PUBLIC_URL}/icons-attach.png`}
+                              alt=""
+                            />}
+                            onClick={() => setModalfiledownload_visible(true)}
+                          />
                           <Button title="preview" type="link"
                             icon={<img
                               style={{ height: "20px", width: "20px" }}
@@ -465,7 +764,7 @@ export default function Subject() {
                             />}
                             onClick={() => setModalpreview(true)}
                           />
-                          <Divider type="vertical" />
+                          {/* <Divider type="vertical" /> */}
                           <Button type="link"
                             onClick={
                               () => {
@@ -479,12 +778,23 @@ export default function Subject() {
                           </Button>
                         </Col>
                       </Row>
+
                       <Row>
                         <div style={{ display: divcollapse }}>
-                          <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }} ></div>
+                          <div className="issue-description"
+                            dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }}
+                            onClick={e => {
+                              if (e.target.tagName == "IMG") {
+                                setImgUrl(e.target.src);
+                                setModalPreview(true);
+                              }
+                            }}>
+
+                          </div>
                         </div>
                       </Row>
                     </div>
+
                   </Col>
                 </Row>
 
@@ -493,10 +803,7 @@ export default function Subject() {
                   <Col span={24}>
 
                     <TabsDocument
-                      details={{
-                        refId: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-                        //reftype: "Master_Ticket",
-                      }}
+                      details={tabDocDetail}
                     />
                   </Col>
                 </Row>
@@ -507,9 +814,14 @@ export default function Subject() {
                   {/* ปุ่ม Create CR */}
                   <Col span={24}
                     style={{
-                      display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
-                        userstate.issuedata.details[0]?.NodeName === "cr_center" &&
-                        userstate.issuedata.details[0]?.Manday === null ? "block" : "none"
+                      display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
+                        userstate?.mailbox[0]?.NodeName === "cr_center" &&
+                        userstate?.mailbox[0]?.MailType === "in" &&
+                        userstate.issuedata.details[0]?.Manday === null &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Complete" ? "block" : "none"
                     }} >
 
                     <Button icon={<FileAddOutlined />}
@@ -517,16 +829,18 @@ export default function Subject() {
                       shape="round"
                       onClick={() => setModaladdtask(true)} >
                       CreateTask
-                        </Button>
+                    </Button>
                   </Col>
 
                   {/* ปุ่ม Create Bug, Use */}
                   <Col span={24}
                     style={{
                       display: (userstate?.issuedata?.details[0]?.IssueType === "Bug" || userstate?.issuedata?.details[0]?.IssueType === "Use") &&
-                        userstate.issuedata.details[0].NodeName === "support" &&
-                        userstate.issuedata.details[0].InternalStatus !== "Resolved" &&
-                        userstate.issuedata.details[0].InternalStatus !== "Deploy" ? "block" : "none"
+                        userstate?.mailbox[0]?.NodeName === "support" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&
+                        userstate?.mailbox[0]?.GroupStatus !== "Complete" ? "block" : "none"
                     }}>
                     <Button icon={<FileAddOutlined />}
                       shape="round"
@@ -538,16 +852,17 @@ export default function Subject() {
                         : setModaladdtask(true)}
                     >
                       CreateTask
-                        </Button>
+                    </Button>
                   </Col>
                 </Row>
                 <Row style={{ marginRight: 24 }}>
                   <Col span={24}>
                     <ListSubTask
-                      // ticketId={match.params.id} ref={subTaskRef}
-                      ticketId={userstate.issuedata.details[0]?.Id}
+                      ticketId={match.params.id} ref={subTaskRef}
+                      //  ticketId={userstate?.issuedata?.details[0]?.Id}
+                      // ticketId={ticketTaskId}
                       ref={subTaskRef}
-                      mailtype={userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType}
+                    // mailtype={userstate?.mailbox[0]?.MailType}
                     />
                   </Col>
                 </Row>
@@ -556,448 +871,672 @@ export default function Subject() {
                 <Row style={{ marginTop: 36, marginRight: 24 }}>
                   <Col span={24}>
                     <label className="header-text">Activity</label>
+                    <span
+                      style={{ marginTop: 10, marginLeft: 12, marginRight: 12, cursor: "pointer" }}
+                      onClick={
+                        () => {
+                          return (
+                            setActivityCollapse(activityCollapse === 'block' ? 'none' : 'block'),
+                            setActivityIcon(activityCollapse === 'block' ? <UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} /> : <DownCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
+                          )
+                        }
+                      }
+                    >
+                      {activityIcon}
+                    </span>
+
+                    <div style={{ display: activityCollapse }}>
+                      {
+                        //userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center"
+                        state?.usersdata?.organize?.OrganizeCode === "support" || state?.usersdata?.organize?.OrganizeCode === "cr_center" ||
+                          state?.usersdata?.organize?.OrganizeCode === "consult"
+                          ?
+
+                          <Tabs defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
+                            <TabPane tab="Comment" key="1">
+                              <CommentBox />
+                            </TabPane>
+                            <TabPane tab="Internal Note" key="2">
+                              {
+                                tabKey === "2" ? <InternalCommentBox /> : ""
+                              }
+
+                            </TabPane>
+                            <TabPane tab="History Log" key="3">
+                              <InternalHistorylog loading={history_loading} />
+                            </TabPane>
+                          </Tabs>
+                          :
+                          <Tabs defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
+                            <TabPane tab="Internal Note" key="1" >
+                              {
+                                tabKey === "1" ? <InternalCommentBox /> : ""
+                              }
+                            </TabPane>
+                            <TabPane tab="History Log" key="2">
+                              <InternalHistorylog loading={history_loading} />
+                            </TabPane>
+                          </Tabs>
+                      }
+                    </div>
+                  </Col>
+                </Row>
+
+              </Col>
+              {/* Content */}
+
+              {/* SideBar */}
+              <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
+
+                <Row style={{ marginBottom: 20, marginTop: 24 }}>
+                  <Col span={18}>
+                    <label className="header-text">Progress Status</label>
+                  </Col>
+                  <Col span={18} style={{ marginTop: 10 }}>
 
                     {
-                      userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
-                        ?
-                        <Tabs defaultActiveKey="1" >
-                          <TabPane tab="Comment" key="1">
-                            <CommentBox />
-                          </TabPane>
-                          <TabPane tab="Comment (Internal)" key="2">
-                            <InternalCommentBox />
-                          </TabPane>
-                          <TabPane tab="History Log" key="3">
-                            <Historylog loading={history_loading} />
-                          </TabPane>
-                        </Tabs>
+                      // userstate?.mailbox[0]?.MailType === "in"
+                      //   && (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "sa" || userstate?.mailbox[0]?.NodeName === "cr_center")
+                      userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length !== 0
 
-                        :
-                        <Tabs defaultActiveKey="1" >
-                          <TabPane tab="Internal Note" key="1" >
-                            <InternalCommentBox />
-                          </TabPane>
-                          <TabPane tab="History Log" key="2">
-                            <Historylog loading={history_loading} />
-                          </TabPane>
-                        </Tabs>
+                        ? <Select ref={selectRef}
+                          value={userstate?.mailbox[0]?.FlowStatus}
+                          style={{ width: '100%' }} placeholder="None"
+                          //onClick={() => getflow_output(userstate?.mailbox[0]?.TransId)}
+                          onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
+                            Modal.info({
+                              title: 'กรุณา ระบุ Priority',
+                              okText: "Close"
+                            })
+                            : getflow_output(userstate?.mailbox[0]?.TransId)}
+                          onChange={(value, item) => HandleChange(value, item)}
+                          options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
+                        />
+
+                        : <label className="value-text">{userstate?.mailbox[0]?.FlowStatus}</label>
+                    }
+
+                  </Col>
+                </Row>
+                <Row style={{ marginBottom: 20 }} align="middle">
+                  <Col span={24}>
+                    <label className="header-text">Priority</label>
+                    <label className="value-text"> (Customer)</label>
+                  </Col>
+                  <Col span={18}>
+                    <label className="value-text">{userstate.issuedata.details[0]?.Priority}</label>
+                  </Col>
+                </Row>
+
+                <Row style={{ marginBottom: 20 }} align="middle">
+                  <Col span={24}>
+                    <label className="header-text">Priority</label>
+                    <label className="value-text"> (ICON)</label>
+                  </Col>
+                  <Col span={18} style={{ marginTop: 10 }}>
+                    {
+                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue")
+                        ? <Select
+                          style={{ width: '100%' }}
+                          allowClear
+                          showSearch
+
+                          filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          onClick={() => GetPriority()}
+
+                          options={userstate.masterdata.priorityState && userstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))}
+                          onChange={(value, item) => onChange(value, item)}
+                          value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
+                        />
+                        : <label className="value-text">
+                          {renderColorPriority(userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority)}&nbsp;&nbsp;
+                          {userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
+                        </label>
                     }
                   </Col>
                 </Row>
-              </div>
-            </Col>
-            {/* Content */}
 
-            {/* SideBar */}
-            <Col span={6} style={{ backgroundColor: "", height: 500, marginLeft: 20 }}>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Progress Status</label>
-                </Col>
-                <Col span={18} style={{ marginTop: 10 }}>
+                <Row style={{
+                  marginBottom: 20,
+                  display: (userstate.issuedata.details[0]?.IssueType === "Bug" || userstate.issuedata.details[0]?.IssueType === "Use") &&
+                    (userstate.issuedata.details[0]?.SLA_DueDate !== undefined &&
+                      userstate.issuedata.details[0]?.SLA_DueDate !== null) ? "block" : "none"
+                }}
+                >
 
-                  {
-                    userstate.issuedata.details[0] && userstate.issuedata.details[0].MailType === "in"
-                      && (userstate.issuedata.details[0].NodeName === "support" || userstate.issuedata.details[0].NodeName === "sa" || userstate.issuedata.details[0].NodeName === "cr_center")
-                      // && divProgress === "show"
+                  <Col span={24} style={{ marginTop: "10px", display: userstate?.issuedata?.details[0]?.IssueType === "Bug" ? "block" : "none" }}>
+                    <label className="header-text">SLA</label>
+                    {
+                      userstate.issuedata.details[0] &&
 
-                      ? <Select ref={selectRef}
-                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}
-                        style={{ width: '100%' }} placeholder="None"
-                        onClick={() => getflow_output(userstate.issuedata.details[0].TransId)}
-                        onChange={(value, item) => HandleChange(value, item)}
-                        options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
+                      <ClockSLA
+                        start={moment(userstate?.issuedata?.details[0]?.AssignIconDate)}
+                        due={moment(userstate?.issuedata?.details[0]?.SLA_DueDate)}
+                        end={userstate?.issuedata?.details[0]?.ResolvedDate === null ? moment() : moment(userstate?.issuedata?.details[0]?.ResolvedDate)}
+                        type={userstate?.issuedata?.details[0]?.InternalPriority}
                       />
+                    }
+                    <label className="header-text">DueDate</label>
+                    <label className="value-text" style={{ marginLeft: 10 }}>
+                      {(userstate?.issuedata?.details[0]?.SLA_DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
+                    </label>
 
-                      : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].FlowStatus}</label>
-                  }
+                  </Col>
+                </Row>
 
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }} align="middle">
-                <Col span={24}>
-                  <label className="header-text">Priority</label>
-                  <label className="value-text"> (Customer)</label>
-                </Col>
-                <Col span={18}>
-                  <label className="value-text">{userstate.issuedata.details[0]?.Priority}</label>
-                </Col>
-              </Row>
+                {/*  DueDate (Internal) เคส CR , Memo*/}
+                <Row style={{
+                  marginBottom: 20,
+                  display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo" ? "block" : "none"
+                }}>
+                  <Col span={18}>
+                    <label className="header-text">DueDate (ICON)</label>
 
-              <Row style={{ marginBottom: 20 }} align="middle">
-                <Col span={24}>
-                  <label className="header-text">Priority</label>
-                  <label className="value-text"> (ICON)</label>
-                </Col>
-                <Col span={18} style={{ marginTop: 10 }}>
-                  {
-                    (userstate.issuedata.details[0]?.MailType === "in" && userstate.issuedata.details[0]?.NodeName === "support" && userstate.issuedata.details[0]?.NodeActionText === "CheckIssue")
-                      ? <Select
-                        style={{ width: '100%' }}
-                        allowClear
-                        showSearch
-
-                        filterOption={(input, option) =>
-                          option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onClick={() => GetPriority()}
-
-                        options={userstate.masterdata.priorityState && userstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))}
-                        onChange={(value, item) => onChange(value, item)}
-                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
-                      />
-                      : <label className="value-text">
-                        {renderColorPriority(userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority)}&nbsp;&nbsp;
-                         {userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
-                      </label>
-                  }
-                </Col>
-              </Row>
-
-
-              <Row style={{
-                marginBottom: 20,
-                display: userstate.issuedata.details[0]?.IssueType === "Bug" &&
-                  userstate.issuedata.details[0]?.SLA_DueDate !== null ? "block" : "none"
-              }}
-              >
-
-                <Col span={24} style={{ marginTop: "10px" }}>
-                  <label className="header-text">SLA</label>
-                  {
-                    userstate.issuedata.details[0] &&
-                    <Clock
-                      ref={clockRef}
-                      showseconds={false}
-                      deadline={userstate.issuedata.details[0] && userstate.issuedata.details[0].SLA_DueDate}
-                      createdate={userstate.issuedata.details[0].AssignIconDate === null ? undefined : userstate.issuedata.details[0].AssignIconDate}
-                      resolvedDate={userstate.issuedata.details[0].ResolvedDate === null ? undefined : userstate.issuedata.details[0].ResolvedDate}
-                      onClick={() => { setModaltimetracking_visible(true) }}
+                    <Button type="link" icon={<ClockCircleOutlined
+                      style={{ fontSize: 18, marginLeft: 12 }} />}
                     />
-                  }
-                  <label className="header-text">DueDate</label>
-                  <label className="value-text" style={{ marginLeft: 10 }}>
-                    {(userstate?.issuedata?.details[0]?.SLA_DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
-                  </label>
 
-                </Col>
-              </Row>
-
-              <Row style={{marginBottom: 20}}>
-                <Col span={24} style={{ marginTop: "10px" }}>
-                  <ClockTimer
-                    ref={clockRef2}
-                    duedate={userstate?.issuedata?.details[0]?.SLA_DueDate}
-                    type="SLA"
-                  />
-                </Col>
-              </Row>
-
-
-              <Row style={{ marginBottom: 20, display: userstate.issuedata.details[0]?.DueDate === null ? "none" : "block" }}>
-                <Col span={18}>
-                  <label className="header-text">DueDate (Customer)</label>
-
-                  <ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} onClick={() => setHistoryduedate_visible(true)} />
-                  <br />
-                  {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
-                  {
-                    userstate.issuedata.details[0] && userstate.issuedata.details[0].NodeName === "support"
-                      ? <label className="text-link value-text"
-                        onClick={() => setModalChangeduedate(true)}
-                      >
-                        {userstate.issuedata.details[0] &&
-                          (userstate.issuedata.details[0].DueDate === null ? "None" : moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
-                      </label>
-                      : <label className="value-text">&nbsp;&nbsp;{userstate.issuedata.details[0] && moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
-                  }
-                  {history_duedate_data.length >= 1 ?
+                    <br />
+                    {
+                      userstate?.mailbox[0]?.NodeName === "cr_center"
+                        ? <label className="text-link value-text"
+                          onClick={() => (setModalSaveDuedate(true), setDuedateType("internal"))}
+                        >
+                          {userstate.issuedata.details[0] &&
+                            (userstate.issuedata.details[0].SLA_DueDate === null ? "None" : moment(userstate.issuedata.details[0].SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
+                        </label>
+                        : <label className="value-text">
+                          &nbsp;&nbsp;
+                          {(userstate?.issuedata.details[0]?.SLA_DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
+                        </label>
+                    }
+                    {/* {history_duedate_data.length >= 1 ?
                     <Tag color="warning">
                       DueDate ถูกเลื่อน
                    </Tag> : ""
-                  }
-                </Col>
-              </Row>
+                  } */}
+                  </Col>
+                </Row>
 
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Company</label>
-                  <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].CompanyName}</label>
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">IssueType</label>
-                </Col>
-                <Col span={18} style={{ marginTop: 10 }}>
-                  {
-                    (userstate.issuedata.details[0]?.MailType === "in" && userstate.issuedata.details[0]?.NodeName === "support" && userstate.issuedata.details[0]?.NodeActionText === "CheckIssue")
-                      ? <Select
-                        style={{ width: '100%' }}
-                        allowClear
-                        showSearch
+                {/*  DueDate (Customer) เคส CR , Memo*/}
+                <Row style={{
+                  marginBottom: 20,
+                  display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo")
+                    && userstate?.issuedata?.details[0]?.SLA_DueDate !== null
+                    && userstate?.issuedata?.details[0]?.DueDate === null ? "block" : "none"
+                }}>
+                  <Col span={18}>
+                    <label className="header-text">DueDate (Customer)</label>
 
-                        filterOption={(input, option) =>
-                          option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onClick={() => getIssueType()}
-                        options={userstate.masterdata.issueTypeState && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name, type: "issuetype" }))}
-                        onChange={(value, item) => onChange(value, item)}
-                        value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}
-                      />
+                    <Button type="link"
+                      icon={<ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} />}
+                      onClick={() => setHistoryduedate_visible(true)}
+                    />
+                    <br />
+                    {
+                      userstate?.mailbox[0]?.NodeName === "support"
+                        ? <label className="text-link value-text"
+                          onClick={() => (setModalSaveDuedate(true), setDuedateType("customer"))}
+                        >
+                          {userstate.issuedata.details[0] &&
+                            (userstate.issuedata.details[0].DueDate === null ? "None" : moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
+                        </label>
+                        : <label className="value-text">
+                          &nbsp;&nbsp;
+                          {(userstate?.issuedata.details[0]?.DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.DueDate).format("DD/MM/YYYY HH:mm"))}
+                        </label>
+                    }
 
-                      : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
-                  }
+                  </Col>
+                </Row>
 
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Product</label>
-                  <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && `${userstate.issuedata.details[0].ProductName} - (${userstate.issuedata.details[0].ProductFullName})`}</label>
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Module</label>
-                  <br />
-                  <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
-                </Col>
-              </Row>
+                {/* Change DueDate (Customer) */}
+                <Row style=
+                  {{
+                    marginBottom: 20,
+                    display: userstate?.mailbox[0]?.NodeName === "support" && userstate?.issuedata?.details[0]?.DueDate !== null ? "block" : "none"
+                  }}>
+                  <Col span={18}>
+                    <label className="header-text">DueDate (Customer)</label>
 
-              <Row style={{
-                marginBottom: 20,
-                display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" && userstate.issuedata.details[0]?.IsAssessment === 1 ? "block" : "none"
-              }}>
-                <Col span={18}>
-                  <label className="header-text">SA ประเมินผลกระทบ</label>
-                  <Button type="link" onClick={() => setModalAssessment_visible(true)}> รายละเอียด </Button>
-                </Col>
-              </Row>
+                    <Button type="link"
+                      icon={<ClockCircleOutlined style={{ fontSize: 18, marginLeft: 12 }} />}
+                      onClick={() => setHistoryduedate_visible(true)}
+                    />
 
-              <Row style={{
-                marginBottom: 20,
-                display: userstate.issuedata.details[0]?.IssueType === "ChangeRequest" &&
-                  userstate.issuedata.details[0]?.Manday ? "block" : "none"
-              }}>
-                <Col span={18}>
-                  <label className="header-text">Total Manday</label>
-                  <Button type="link" onClick={() => setModalmandaylog_visible(true)} >{userstate.issuedata.details[0]?.Manday}</Button>
+                    <br />
+                    {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
+                    <div
+                      style={{
+                        display: userstate?.mailbox[0]?.NodeName === "support" && userstate?.issuedata?.details[0]?.SLA_DueDate !== null ?
+                          "block" : "none"
+                      }}>
+                      <label className="text-link value-text" onClick={() => setModalChangeduedate(true)}>
+                        {userstate.issuedata.details[0] &&
+                          (userstate.issuedata.details[0].DueDate === null ? "None" : moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
+                      </label>
+                    </div>
+                    <div
+                      style={{
+                        display: userstate?.mailbox[0]?.NodeName === "support" && userstate?.issuedata?.details[0]?.SLA_DueDate === null ?
+                          "block" : "none"
+                      }}>
 
-                </Col>
-              </Row>
+                      <label className="value-text">
+                        None
+                      </label>
+                    </div>
 
+                    {/* &nbsp; &nbsp; */}
+                    {userstate?.issuedata.details[0]?.cntDueDate >= 1 ?
+                      <Tag color="warning" onClick={() => setHistoryduedate_visible(true)}>
+                        DueDate ถูกเลื่อน
+                      </Tag> : ""
+                    }
+                  </Col>
+                </Row>
+
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Company</label>
+                    <br />
+                    <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].CompanyName}</label>
+                  </Col>
+                </Row>
+
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">IssueType</label>
+                  </Col>
+                  <Col span={18} style={{ marginTop: 10 }}>
+                    {
+                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue")
+                        ? <Select
+                          style={{ width: '100%' }}
+                          allowClear
+                          showSearch
+
+                          filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          onClick={() => getIssueType()}
+                          options={userstate.masterdata.issueTypeState && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name, type: "issuetype" }))}
+                          onChange={(value, item) => onChange(value, item)}
+                          value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}
+                        />
+
+                        : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
+                    }
+
+                  </Col>
+                </Row>
+
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Product</label>
+                    <br />
+                    <label className="value-text">{userstate.issuedata.details[0] && `${userstate.issuedata.details[0].ProductName} - (${userstate.issuedata.details[0].ProductFullName})`}</label>
+                  </Col>
+                </Row>
+                {/* <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Module</label>
+                    <br />
+                    <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
+                  </Col>
+                </Row> */}
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Scene</label>
+                    <br />
+                    {
+                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue")
+                        ? <Select
+                          style={{ width: '100%' }}
+                          allowClear
+                          showSearch
+
+                          filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          onClick={() => issueScene}
+                          options={issueScene.map((x) => ({ value: x.value, label: x.name, type: "scene" }))}
+                          onChange={(value, item) => onChange(value, item)}
+                          value={userstate?.issuedata?.details[0]?.Scene}
+                        />
+
+                        : <label className="value-text">{userstate?.issuedata?.details[0]?.Scene}</label>
+                    }
+                  </Col>
+                </Row>
+
+                <Row style={{ marginBottom: 20 }}
+                  hidden={userstate?.mailbox[0]?.NodeName !== "cr_center" && userstate?.issuedata?.details[0]?.Version === null ? true : false}
+                >
+                  <Col span={18}>
+                    <label className="header-text">Version</label>
+                    <br />
+                    {
+                      (userstate?.mailbox[0]?.NodeName === "cr_center")
+                        ? <Select
+                          style={{ width: '100%' }}
+                          allowClear
+                          showSearch
+
+                          filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          onClick={() => getVersion()}
+                          options={userstate.masterdata.versionState && userstate.masterdata.versionState.map((x) => ({ value: x.Name, label: x.Name, type: "version" }))}
+                          onChange={(value, item) => onChange(value, item)}
+                          value={userstate?.issuedata?.details[0]?.Version === null ? "None" : userstate?.issuedata?.details[0]?.Version}
+                        />
+
+                        : <label className="value-text">{userstate?.issuedata?.details[0]?.Version}</label>
+                    }
+                  </Col>
+                </Row>
+
+                <Row style={{
+                  marginBottom: 20,
+                  display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
+                    userstate.issuedata.details[0]?.IsAssessment !== 0 ? "block" : "none"
+                }}>
+                  <Col span={18}>
+                    <label className="header-text">ผลประเมินผลของ SA</label>
+                    <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} />
+                  </Col>
+                </Row>
+
+                <Row style={{
+                  marginBottom: 20,
+                  display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
+                    userstate.issuedata.details[0]?.Manday ? "block" : "none"
+                }}>
+                  <Col span={18}>
+                    <label className="header-text">Total Manday</label>
+                    <Button type="link"
+                      icon={<InfoCircleOutlined />}
+                      onClick={() => setModalmandaylog_visible(true)} >
+                    </Button>
+
+                  </Col>
+                  <Col span={18}>
+                    <label className="value-text">
+                      {`${userstate.issuedata.details[0]?.Manday} Manday`}
+                    </label>
+                    <label className="value-text">
+                      {userstate.issuedata.details[0]?.Cost === 0 ? " (ฟรี ไม่มีค่าใช้จ่าย)" : " (มีค่าใช้จ่าย)"}
+                    </label>
+                  </Col>
+                </Row>
+
+              </Col>
+              {/* SideBar */}
+            </Row>
+          </div>
+
+        </Skeleton>
+        {/* Modal */}
+        <Modal
+          title="Preview"
+          width={1000}
+          visible={modalpreview}
+          okButtonProps={{ hidden: true }}
+          cancelText="Close"
+          onCancel={() => setModalpreview(false)}
+        >
+          <Row>
+            <Col span={16} style={{ display: "inline" }}>
+              <Typography.Title level={4}>
+                <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
+              </Typography.Title>
             </Col>
-            {/* SideBar */}
           </Row>
-        </div>
-      </div>
 
+          <div className="issue-description"
+            dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }} >
 
-//#region 
-//#endregion
-      {/* Modal */}
-      <Modal
-        title="Preview"
-        width={1000}
-        visible={modalpreview}
-        okButtonProps={{ hidden: true }}
-        cancelText="Close"
-        onCancel={() => setModalpreview(false)}
-      >
-        <Row>
-          <Col span={16} style={{ display: "inline" }}>
-            <Typography.Title level={4}>
-              <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {userstate.issuedata.details[0] && userstate.issuedata.details[0].Title}
-            </Typography.Title>
-          </Col>
-        </Row>
+          </div>
+          {/* <img 
+            src="https://space-api.iconrem.com/files/16"
+            /> */}
+        </Modal>
 
-        <div className="issue-description" dangerouslySetInnerHTML={{ __html: userstate?.issuedata?.details[0]?.Description }} ></div>
-      </Modal>
+        {/* ประวัติ DueDate Customer */}
+        <DuedateLog
+          title="ประวัติ DueDate"
+          visible={historyduedate_visible}
+          onCancel={() => setHistoryduedate_visible(false)}
+          details={{
+            ticketId: userstate?.issuedata.details[0]?.Id
+          }}
+        />
 
-      <Modal
-        title="ประวัติ DueDate"
-        visible={historyduedate_visible}
-        onCancel={() => setHistoryduedate_visible(false)}
-        cancelText="Close"
-        okButtonProps={{ hidden: true }}
-      >
-        <Timeline>
-          {history_duedate_data.map((item, index) => {
-            return (
-              <Timeline.Item>
-                <p><b>ครั้งที่ {index + 1}  <ClockCircleOutlined style={{ fontSize: 18 }} />
-                  {new Date(item.due_date).toLocaleDateString('en-GB')}</b></p>
-                <p>{item.description}</p>
-              </Timeline.Item>
-            )
-          })}
-        </Timeline>
-      </Modal>
+        <ModalCreateTask
+          title={ProgressStatus}
+          visible={modaladdtask}
+          width={800}
+          onCancel={() => setModaladdtask(false)}
+          onOk={() => {
+            setModaladdtask(false);
+            subTaskRef.current.GetTask()
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            title: userstate?.issuedata?.details[0]?.Title,
+            productid: userstate?.issuedata?.details[0]?.ProductId
 
-      <ModalCreateTask
-        title={ProgressStatus}
-        visible={modaladdtask}
-        width={800}
-        onCancel={() => { return (setModaladdtask(false), setSelected(null)) }}
-        onOk={() => {
-          setModaladdtask(false);
-          subTaskRef.current.GetTask()
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          title: userstate?.issuedata?.details[0]?.Title
+          }}
+        />
 
-        }}
-      />
+        <ModalDueDate
+          title="DueDate"
+          visible={modalduedate_visible}
+          width={800}
+          onCancel={() => setModalduedate_visible(false)}
+          onOk={() => {
+            setModalduedate_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            duedate: userstate.issuedata.details[0]?.DueDate === null ? null : moment(userstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
+          }}
+        />
 
-      <ModalDueDate
-        title="DueDate"
-        visible={modalduedate_visible}
-        width={800}
-        onCancel={() => setModalduedate_visible(false)}
-        onOk={() => {
-          setModalduedate_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutput: userstate.node.output_data,
-          duedate: userstate.issuedata.details[0]?.DueDate === null ? null : moment(userstate.issuedata.details[0]?.DueDate).format("DD/MM/YYYY")
-        }}
-      />
+        <ModalSaveDueDate
+          title="กำหนด Due Date"
+          visible={modalSaveDuedate}
+          width={800}
+          onCancel={() => setModalSaveDuedate(false)}
+          onOk={() => {
+            setModalSaveDuedate(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            type: duedateType,
+            node_name: userstate?.mailbox[0]?.NodeName
+          }}
+        />
 
-      <ModalChangeDueDate
-        title="เปลียน Due Date"
-        visible={modalChangeduedate}
-        width={800}
-        onCancel={() => setModalChangeduedate(false)}
-        onOk={() => {
-          setModalChangeduedate(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-        }}
-      />
+        <ModalChangeDueDate
+          title="เปลียน Due Date"
+          visible={modalChangeduedate}
+          width={800}
+          onCancel={() => setModalChangeduedate(false)}
+          onOk={() => {
+            setModalChangeduedate(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            duedate: userstate?.issuedata?.details[0]?.DueDate
+          }}
+        />
 
-      <ModalTimetracking
-        title="Time Tracking"
-        width={600}
-        visible={modaltimetracking_visible}
-        onCancel={() => { return (setModaltimetracking_visible(false)) }}
-        details={{
-          transgroupId: userstate.issuedata.details[0] && userstate.issuedata.details[0].TransGroupId,
+        <ModalTimetracking
+          title="Time Tracking"
+          width={600}
+          visible={modaltimetracking_visible}
+          onCancel={() => { return (setModaltimetracking_visible(false)) }}
+          details={{
+            transgroupId: userstate?.mailbox[0]?.TransGroupId,
 
-        }}
-      />
+          }}
+        />
 
-      <ModalSendIssue
-        title={ProgressStatus}
-        visible={modalsendissue_visible}
-        width={800}
-        onCancel={() => { return (setModalsendissue_visible(false), setSelected(null)) }}
-        onOk={() => {
-          setModalsendissue_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalSendIssue
+          title={ProgressStatus}
+          visible={modalsendissue_visible}
+          width={800}
+          onCancel={() => { return (setModalsendissue_visible(false)) }}
+          onOk={() => {
+            setModalsendissue_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
-      <ModalSA
-        title={ProgressStatus}
-        visible={modalsa_visible}
-        width={800}
-        onCancel={() => { return (setModalsa_visible(false)) }}
-        onOk={() => {
-          setModalsa_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalSA
+          title={ProgressStatus}
+          visible={modalsa_visible}
+          width={800}
+          onCancel={() => { return (setModalsa_visible(false)) }}
+          onOk={() => {
+            setModalsa_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            product_code: userstate?.issuedata?.details[0]?.ProductName
+          }}
+        />
 
-      <ModalResolved
-        title="Resolved"
-        visible={modalresolved_visible}
-        width={800}
-        onCancel={() => { return (setModalresolved_visible(false), setSelected(null)) }}
-        onOk={() => {
-          setModalresolved_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutput: userstate.node.output_data,
-          iscloudsite: userstate?.issuedata?.details[0]?.IsCloudSite
+        <ModalResolved
+          title="Resolved"
+          visible={modalresolved_visible}
+          width={800}
+          onCancel={() => { return (setModalresolved_visible(false)) }}
+          onOk={() => {
+            setModalresolved_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            iscloudsite: userstate?.issuedata?.details[0]?.IsCloudSite
 
-        }}
-      />
+          }}
+        />
 
-      <ModalManday
-        title={ProgressStatus}
-        visible={modalmanday_visible}
-        width={800}
-        onCancel={() => { return (setModalmanday_visible(false)) }}
-        onOk={() => {
-          setModalmanday_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutput: userstate.node.output_data,
-          costmanday: userstate.issuedata.details[0]?.CostPerManday
-        }}
-      />
+        <ModalManday
+          title={ProgressStatus}
+          visible={modalmanday_visible}
+          width={800}
+          onCancel={() => { return (setModalmanday_visible(false)) }}
+          onOk={() => {
+            setModalmanday_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            costmanday: userstate.issuedata.details[0]?.CostPerManday,
+            totalcost: userstate.issuedata.details[0]?.Cost,
+          }}
+        />
 
-      <ModalMandayLog
-        title="ข้อมูล Manday"
-        visible={modalmandaylog_visible}
-        width={800}
-        onCancel={() => { return (setModalmandaylog_visible(false)) }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailtype: userstate.issuedata.details[0]?.MailType,
-          cost: userstate.issuedata.details[0]?.Cost,
-          totalmanday: userstate.issuedata.details[0]?.Manday
-        }}
-      />
+        <ModalMandayLog
+          title="ข้อมูล Manday"
+          visible={modalmandaylog_visible}
+          width={800}
+          onCancel={() => { return (setModalmandaylog_visible(false)) }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailtype: userstate?.mailbox[0]?.MailType,
+            cost: userstate.issuedata.details[0]?.Cost,
+            totalmanday: userstate.issuedata.details[0]?.Manday
+          }}
+        />
 
-      <ModalSA_Assessment
-        title="ข้อมูลประเมิน ผลกระทบ"
-        visible={modalAssessment_visible}
-        width={600}
-        onCancel={() => { return (setModalAssessment_visible(false)) }}
-        details={{
-          ticketid: userstate.issuedata.details[0]?.Id,
-        }}
-      />
+        <ModalSA_Assessment
+          title="ข้อมูลประเมิน ผลกระทบ"
+          visible={modalAssessment_visible}
+          width={600}
+          onCancel={() => { return (setModalAssessment_visible(false)) }}
+          details={{
+            ticketid: userstate.issuedata.details[0]?.Id,
+          }}
+        />
 
-      <ModalQuotation
-        title={ProgressStatus}
-        visible={modalQuotation_visible}
-        width={800}
-        onCancel={() => { return (setModalQuotation_visible(false), setSelected(null)) }}
-        onOk={() => {
-          setModalQuotation_visible(false);
-        }}
-        details={{
-          ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
-          mailboxid: userstate.issuedata.details[0] && userstate.issuedata.details[0].MailBoxId,
-          flowoutput: userstate.node.output_data
-        }}
-      />
+        <ModalQuotation
+          title={ProgressStatus}
+          visible={modalQuotation_visible}
+          width={800}
+          onCancel={() => { return (setModalQuotation_visible(false)) }}
+          onOk={() => {
+            setModalQuotation_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
 
+        <PreviewImg
+          title="Preview"
+          visible={modalPreview}
+          width={1400}
+          footer={null}
+          onCancel={() => {
+            setModalPreview(false);
+            setImgUrl(null);
+          }}
+          pathUrl={imgUrl}
+        />
 
+        <ModalFileDownload
+          title="File Download"
+          visible={modalfiledownload_visible}
+          onCancel={() => { return (setModalfiledownload_visible(false)) }}
+          width={600}
+          onOk={() => {
+            setModalfiledownload_visible(false);
 
+          }}
+          details={{
+            refId: userstate?.issuedata?.details[0]?.Id,
+            reftype: "Master_Ticket",
+            grouptype: "attachment"
+          }}
+        />
+
+        <ModalCancel
+          title={ProgressStatus}
+          visible={modalCancel_visible}
+          width={800}
+          onCancel={() => setModalCancel_visible(false)}
+          onOk={() => {
+            setModalCancel_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            ticket_number: userstate?.issuedata?.details[0]?.Number,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
+
+      </Spin>
     </MasterPage >
   );
 }

@@ -1,4 +1,4 @@
-import { Comment, Avatar, Form, Button, List, Row, Col, Select, Divider, Modal, Checkbox } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col, Select, Divider, Modal, Checkbox, Spin, message } from 'antd';
 import moment from 'moment';
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -6,9 +6,12 @@ import { Tabs } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import Uploadfile from "../../../Component/UploadFile"
 import Axios from 'axios';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownCircleOutlined, DownloadOutlined, DownOutlined, EllipsisOutlined, RightCircleOutlined, RightOutlined } from '@ant-design/icons';
 import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 import TextEditor from '../../TextEditor';
+import PreviewImg from '../../Dialog/Internal/modalPreviewImg';
+import _ from 'lodash'
+
 
 
 const { TabPane } = Tabs;
@@ -16,7 +19,7 @@ const { Option } = Select;
 
 export default function CommentBox({ loadingComment = false }) {
     const editorRef = useRef(null)
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const uploadRef = useRef(null);
     const history = useHistory();
     const match = useRouteMatch();
@@ -29,13 +32,18 @@ export default function CommentBox({ loadingComment = false }) {
     const [commentid, setCommentid] = useState(null);
     const [listmailbox, setListmailbox] = useState([]);
     const [listmailto, setListmailto] = useState([]);
-    const mailto = []
+
+    const [imgUrl, setImgUrl] = useState(null);
+
+    const [divcollapse, setDivcollapse] = useState([])
 
     // Modal
     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
     const [modalemail_visible, setModalemail_visible] = useState(false);
-
-    const [disabled, setDisabled] = useState(false)
+    const [modalLoading, setModalLoading] = useState(false);
+    const [modalPreview, setModalPreview] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+    const [buttonLoading, setbuttonLoading] = useState(false);
 
     const loadInternalComment = async () => {
         try {
@@ -51,8 +59,10 @@ export default function CommentBox({ loadingComment = false }) {
                 }
             });
             if (commment_list.status === 200) {
+                setLoading(false);
                 setCommentdata(commment_list.data.map((values) => {
                     return {
+                        key: values.Id,
                         id: values.Id,
                         author: values.CreateName,
                         datetime: moment(values.CreateDate).format("DD/MM/YYYY H:mm"),
@@ -87,10 +97,12 @@ export default function CommentBox({ loadingComment = false }) {
         }
     }
 
-    const onFinish = async (values) => {
+    const saveComment = async (values) => {
+        setModalLoading(true);
+        setbuttonLoading(true);
         try {
 
-            if (editorRef.current.getValue() === "" || editorRef.current.getValue() === null) {
+            if (editorRef.current.getValue() === "" && editorRef.current.getValue() === null && editorRef.current.getValue() === undefined) {
                 throw ("กรุณาระบุ Comment!")
             }
 
@@ -102,143 +114,210 @@ export default function CommentBox({ loadingComment = false }) {
                 },
                 data: {
                     ticketid: match.params.id,
-                    taskid: match.params.task,
+                    //taskid: match.params.task,
                     comment_text: editorRef.current.getValue(),
                     comment_type: "internal",
-                    files: uploadRef.current.getFiles().map((n) => n.response.id),
-                    userid: values.sendto
+                    files: uploadRef.current.getFiles().map((n) => n.response),
+                    userid: values.send_to === undefined ? values.send_all : values.send_to
                 }
             });
 
             if (createcomment.status === 200) {
-                Modal.info({
-                    title: 'บันทึกข้อมูลสำเร็จ',
-                    content: (
-                        <div>
-                            <p>บันทึกข้อมูลสำเร็จ</p>
-                        </div>
-                    ),
-                    onOk() {
-                        editorRef.current.setvalue()
-                        form.resetFields();
-                        setModalemail_visible(false)
-                        setLoading(true);
 
-
+                message.success({
+                    content: 'บันทึกข้อมูลสำเร็จ',
+                    style: {
+                        marginTop: '10vh',
                     },
                 });
-
-
+                editorRef.current.setvalue()
+                form.resetFields();
+                setModalemail_visible(false)
+                setLoading(true);
+                setbuttonLoading(false);
+                setModalLoading(false);
+                loadInternalComment();
             }
 
         } catch (error) {
-            console.log(error.response);
-            Modal.info({
+            setModalemail_visible(false);
+            Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
 
                 okText: "Close",
-                // okCancel:true,
                 content: (
                     <div>
                         <p>{error.response?.data ? error.response?.data : error.message || error}</p>
                     </div>
                 ),
                 onOk() {
-                    setModalemail_visible(false)
-                    editorRef.current.setvalue()
                     form.resetFields();
+                    setbuttonLoading(false);
+                    setModalLoading(false);
                 },
-                onCancel() {
 
-                }
             });
         }
     }
 
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false)
-            loadInternalComment()
-        }, 1000)
-    }, [])
+    const onFinish = async (values) => {
+        saveComment(values)
+    }
 
     useEffect(() => {
-        setTimeout(() => {
+        if (commentdata.length === 0) {
             loadInternalComment()
-            setLoading(false)
-        }, 1000)
-
-    }, [loading])
+        }
+    }, [commentdata.length])
 
 
     return (
         <>
             <List
+                className="korn"
                 loading={loading}
                 itemLayout="horizontal"
                 dataSource={commentdata}
+
                 renderItem={item => (
                     <Comment
                         author={
-                            <p><b>{item.author}</b></p>
+                            <p
+                                style={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    let newKeys = [...divcollapse];
+                                    if (newKeys.includes(item.key)) {
+                                        newKeys = _.filter(newKeys, n => n !== item.key)
+                                    } else {
+                                        newKeys.push(item.key)
+                                    }
+                                    setDivcollapse(newKeys)
+                                }}
+                            ><b>{item.author}</b></p>
                         }
                         datetime={
-                            <p>{item.datetime}</p>
+                            <>
+                                <label
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => {
+                                        let newKeys = [...divcollapse];
+                                        if (newKeys.includes(item.key)) {
+                                            newKeys = _.filter(newKeys, n => n !== item.key)
+                                        } else {
+                                            newKeys.push(item.key)
+                                        }
+                                        setDivcollapse(newKeys)
+                                    }}
+                                >
+                                    {item.datetime}
+                                </label>
+
+                                {
+                                    divcollapse.includes(item.key) &&
+                                    (
+                                        <label
+                                            // style={{ cursor: "pointer",fontSize:20,color:"#C7C7C7" }}
+                                            onClick={() => {
+                                                let newKeys = [...divcollapse];
+                                                if (newKeys.includes(item.key)) {
+                                                    newKeys = _.filter(newKeys, n => n !== item.key)
+                                                } else {
+                                                    newKeys.push(item.key)
+                                                }
+                                                setDivcollapse(newKeys)
+                                            }}
+                                        >
+                                            {/* <EllipsisOutlined style={{ fontSize: 20,color:"#C7C7C7" }} /> */}
+
+                                        </label>
+                                    )
+                                }
+
+                            </>
                         }
                         avatar={
-                            <Avatar
-                                src={item.avatar}
-                                icon={item.email.substring(0, 1).toLocaleUpperCase()}
-                            />
+                            <>
+                                &nbsp;&nbsp;
+                                <Avatar
+                                    onClick={() => {
+                                        let newKeys = [...divcollapse];
+                                        if (newKeys.includes(item.key)) {
+                                            newKeys = _.filter(newKeys, n => n !== item.key)
+                                        } else {
+                                            newKeys.push(item.key)
+                                        }
+                                        setDivcollapse(newKeys)
+                                    }}
+                                    src={item.avatar}
+                                    icon={item.email.substring(0, 1).toLocaleUpperCase()}
+                                />
+                            </>
                         }
                         content={
                             <>
-                                <div className="comment-description " dangerouslySetInnerHTML={{ __html: item.content }} ></div>
+                                {
+
+                                    divcollapse.includes(item.key) === false ? (
+                                        <div className="comment-description" dangerouslySetInnerHTML={{ __html: item.content }}
+                                            style={{ display: divcollapse }}
+                                            onClick={e => {
+                                                if (e.target.tagName == "IMG") {
+                                                    setImgUrl(e.target.src);
+                                                    setModalPreview(true);
+                                                }
+                                            }}>
+
+                                        </div>
+                                    )
+                                        : ""
+                                }
+
                                 <Divider style={{ margin: 0, marginBottom: 10 }} />
-                                {item.cntfile === 0 ? "" :
-                                    <div>
-                                        <Row>
-                                            <Col span={24}>
-                                                <label
-                                                    onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
-                                                    className="text-link value-text">
-                                                    <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
+                                {
+                                    item.cntfile === 0 ? "" :
+                                        <div>
+                                            <Row>
+                                                <Col span={24}>
+                                                    <label
+                                                        onClick={() => { setCommentid(item.id); setModalfiledownload_visible(true) }}
+                                                        className="text-link value-text">
+                                                        <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
                                                 </label>
-                                            </Col>
-                                        </Row>
-                                    </div>
+                                                </Col>
+                                            </Row>
+                                        </div>
                                 }
                             </>
 
                         }
-                        actions={[
-                            // (item.filename === null ? "" : (
-                            //     <>
-                            //         <div>
-                            //             <Row>
-                            //                 <Col span={24}>
-                            //                     <label
-                            //                         onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
-                            //                         className="text-link-hover">
-                            //                         <FileOutlined /> {item.filename}
-                            //                     </label>
-                            //                 </Col>
+                        actions={
+                            [
+                                // (item.filename === null ? "" : (
+                                //     <>
+                                //         <div>
+                                //             <Row>
+                                //                 <Col span={24}>
+                                //                     <label
+                                //                         onClick={() => window.open(process.env.REACT_APP_FILE_DOWNLOAD_URL + '/' + item.fileId, "_blank")}
+                                //                         className="text-link-hover">
+                                //                         <FileOutlined /> {item.filename}
+                                //                     </label>
+                                //                 </Col>
 
-                            //             </Row>
+                                //             </Row>
 
-                            //         </div>
-                            //     </>
-                            // )
-                            // )
-                        ]
+                                //         </div>
+                                //     </>
+                                // )
+                                // )
+                            ]
                         }
                     >
-
-                    </Comment>
+                    </Comment >
                 )}
             />
 
-            <Tabs defaultActiveKey="1">
+            < Tabs defaultActiveKey="1" >
                 <TabPane tab="Internal Note" key="1">
                     <Form
                         name="Internal"
@@ -248,7 +327,7 @@ export default function CommentBox({ loadingComment = false }) {
                     // onFinish={onFinish}
                     >
                         <Form.Item name="Internal_comment">
-                            <TextEditor ref={editorRef} />
+                            <TextEditor ref={editorRef} ticket_id={match.params.id}/>
                         </Form.Item>
                         <Form.Item name="Internal_fileattach">
                             <Row>
@@ -264,10 +343,10 @@ export default function CommentBox({ loadingComment = false }) {
                                     </Button> */}
                                     <Button type="primary"
                                         onClick={() => {
-                                                return (
-                                                    (editorRef?.current?.getValue() === "" || editorRef?.current?.getValue() === null ? alert("กรุณาระบุ Comment!") :  setModalemail_visible(true)),
-                                                    LoadUserInmailbox()
-                                                )
+                                            return (
+                                                (editorRef?.current?.getValue() === "" || editorRef?.current?.getValue() === null ? alert("กรุณาระบุ Comment!") : setModalemail_visible(true)),
+                                                LoadUserInmailbox()
+                                            )
                                         }
                                         }
                                     >
@@ -279,10 +358,10 @@ export default function CommentBox({ loadingComment = false }) {
                         </Form.Item>
                     </Form>
                 </TabPane>
-            </Tabs>
+            </Tabs >
 
             {/* Modal */}
-            <ModalFileDownload
+            < ModalFileDownload
                 title="File Download"
                 visible={modalfiledownload_visible}
                 onCancel={() => { return (setModalfiledownload_visible(false)) }}
@@ -298,8 +377,9 @@ export default function CommentBox({ loadingComment = false }) {
                 }}
             />
 
-            <Modal
-                title="Internal Note"
+            < Modal
+                title="Issue Note"
+                confirmLoading={buttonLoading}
                 visible={modalemail_visible}
                 onCancel={() => {
                     return (
@@ -312,50 +392,70 @@ export default function CommentBox({ loadingComment = false }) {
                 width={600}
                 okText="Send"
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
-                onOk={() => { return (form.submit()) }}
+                onOk={() => {
+                    form.submit();
+                    //setbuttonLoading(true);
+                    //setModalLoading(true);
+                }}
 
             >
-                <Form
-                    form={form}
-                    name="email_send"
-                    initialValues={{
+                <Spin spinning={modalLoading}>
+                    <Form
+                        form={form}
+                        name="send_email"
+                        initialValues={{
 
-                    }}
-                    layout="horizontal"
-                    onFinish={onFinish}
-                >
-                    <Form.Item name="email_All" label="ส่งทุกคน" valuePropName="checked">
-                        <Checkbox onChange={(e) => {
-                            return (
-                                setDisabled(e.target.checked)
-                            )
-
-
-                        }} />
-                    </Form.Item>
-                    <Form.Item name="sendto" label="To" >
-                        <Select style={{ width: '100%' }} placeholder="None"
-                            // showSearch
-                            mode="multiple"
-                            disabled={disabled}
-                            allowClear
-                            filterOption={(input, option) =>
-                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-
-                            // onChange={(value, item) => setListmailbox(item.value)}
-                            options={
-                                listmailbox && listmailbox.map((item) => ({
-                                    value: item.UserId,
-                                    label: item.UserName + " (" + item.Email + ")"
-                                }))
-                            }
+                        }}
+                        layout="horizontal"
+                        onFinish={onFinish}
+                    >
+                        <Form.Item name="send_all" label="ส่งทุกคน"
+                        // valuePropName="checked"
                         >
-                        </Select>
-                    </Form.Item>
-                </Form>
+                            <Checkbox onChange={(e) => {
+                                setDisabled(e.target.checked)
+                                if (e.target.checked === true) {
+                                    form.setFieldsValue({ send_all: listmailbox && listmailbox.map((x) => x.UserId )})
+                                    form.setFieldsValue({ send_to: undefined})
+                                }else{
+                                    form.setFieldsValue({ send_all: undefined})
+                                }
+                            }}
+                            />
+                        </Form.Item>
+                        <Form.Item name="send_to" label="To" >
+                            <Select style={{ width: '100%' }} placeholder="None"
+                                // showSearch
+                                mode="multiple"
+                                disabled={disabled}
+                                allowClear
+                                filterOption={(input, option) =>
+                                    option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                }
+                                options={
+                                    listmailbox && listmailbox.map((item) => ({
+                                        value: item.UserId,
+                                        label: item.UserName + " (" + item.Email + ")"
+                                    }))
+                                }
+                            >
+                            </Select>
+                        </Form.Item>
+                    </Form>
+                </Spin>
+            </Modal >
 
-            </Modal>
+            <PreviewImg
+                title="Preview"
+                visible={modalPreview}
+                width={1200}
+                footer={null}
+                onCancel={() => {
+                    setModalPreview(false);
+                    setImgUrl(null);
+                }}
+                pathUrl={imgUrl}
+            />
         </>
     );
 }

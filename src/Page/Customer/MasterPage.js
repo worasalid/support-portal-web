@@ -1,18 +1,19 @@
-import { BarChartOutlined, NotificationOutlined,PieChartOutlined, FileOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Divider, List } from "antd";
-import React, { useState, useContext, useEffect } from "react";
+import { PieChartOutlined, FileOutlined } from "@ant-design/icons";
+import { Avatar, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Modal } from "antd";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import AuthenContext from "../../utility/authenContext";
 import IssueContext from '../../utility/issueContext';
 //import IssueContext, { customerReducer, customerState } from "../../utility/issueContext";
 import Axios from "axios";
 import MasterContext from "../../utility/masterContext";
-import Notifications from "../../Component/Notifications/Customer/Notification";
+import Notification from "../../Component/Notifications/Customer/Notification";
+import NotificationDetails from "../../Component/Notifications/Customer/NotificationDetails";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
-export default function MasterPage({bgColor='#fff',...props}) {
+export default function MasterPage({ bgColor = '#fff', ...props }) {
   const history = useHistory();
   const match = useRouteMatch();
   const [show_notice, setshow_notice] = useState(true);
@@ -20,20 +21,38 @@ export default function MasterPage({bgColor='#fff',...props}) {
   //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
   const [activemenu, setActivemenu] = useState([])
+  const notiRef = useRef(null);
+  const notiDetailsRef = useRef(null);
 
   const getuser = async () => {
     try {
       const result = await Axios({
-        url: process.env.REACT_APP_API_URL + "/auth/customer/me",
+        url: process.env.REACT_APP_API_URL + "/auth/login/customer/me",
         method: "get",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
       });
-      dispatch({ type: 'Authen', payload: true });
-      dispatch({ type: 'LOGIN', payload: result.data.usersdata });
-    } catch (error) {
+      if (result.status === 200) {
+        dispatch({ type: 'Authen', payload: true });
+        dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+        CountStatus();
+      }
 
+    } catch (error) {
+      await Modal.error({
+        title: error.response.data.message,
+        content: (
+          <div>
+            <p>Token หมดอายุ กรุณา Login ใหม่</p>
+          </div>
+        ),
+        okText: "Close",
+        onOk() {
+          window.open(error.response.data.url, "_self");
+          window.close();
+        },
+      });
     }
   }
 
@@ -50,8 +69,8 @@ export default function MasterPage({bgColor='#fff',...props}) {
         }
       });
       masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length });
-      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
-      masterdispatch({ type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Pass").length });
+      masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Open" || x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
+      masterdispatch({ type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Waiting Deploy PRD").length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length });
       masterdispatch({ type: "COUNT_COMPLETE", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Complete").length })
 
@@ -60,47 +79,45 @@ export default function MasterPage({bgColor='#fff',...props}) {
     }
   }
 
-  const GetNotifications = async () => {
+  const getNotification = async () => {
     try {
-      const notification = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/countstatus",
+      const countNoti = await Axios({
+        url: process.env.REACT_APP_API_URL + "/master/notification",
         method: "GET",
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         }
       });
+
+      if (countNoti.status === 200) {
+        masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
+      }
     } catch (error) {
 
     }
   }
 
-  const data = [
-    {
-      title: 'ISSUE-001-20120020',
-      description: "มีงานใหม่ส่งถึงคุณ"
-    },
-    {
-      title: 'ISSUE-001-20120019',
-      description: "มีการ Update Comment"
-    },
-    {
-      title: 'ISSUE-001-20120018',
-      description: "มีการ Update Comment"
-    },
-
-  ];
-
   useEffect(() => {
-    if (!state.authen) {
-      getuser()
+    if (state.authen === false) {
+      getuser();
+      getNotification();
+      CountStatus();
+    } else {
+      getuser();
+      setInterval(() => {
+        getNotification();
+        CountStatus();
+      }, 500000)
     }
-    getuser();
-    CountStatus();
-  }, [])
+
+  }, [state.authen])
 
   useEffect(() => {
     if (match.url.search("alltask") > 0) {
       setActivemenu(activemenu.push("2"))
+    }
+    if (match.url.search("all-issue") > 0) {
+      setActivemenu(activemenu.push("1"))
     }
     if (match.url.search("mytask") > 0) {
       setActivemenu(activemenu.push("3"))
@@ -117,7 +134,8 @@ export default function MasterPage({bgColor='#fff',...props}) {
     if (match.url.search("complete") > 0) {
       setActivemenu(activemenu.push("7"))
     }
-  }, [])
+  }, [match.url])
+
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -125,11 +143,11 @@ export default function MasterPage({bgColor='#fff',...props}) {
         <Menu theme="light" mode="horizontal" defaultSelectedKeys={["0"]} style={{ backgroundColor: "#1a73e8" }}>
           <Row>
             <Col span={12}>
-              <img
+              {/* <img
                 style={{ height: "35px" }}
-                src={`${process.env.PUBLIC_URL}/logo-space.png`}
+                src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
                 alt=""
-              />
+              /> */}
             </Col>
             <Col span={12} style={{ textAlign: "right" }}>
               <Tooltip title="Notifications">
@@ -141,64 +159,37 @@ export default function MasterPage({bgColor='#fff',...props}) {
                       <Menu.Item key="1">
                         <div>
                           <label style={{ fontSize: 24, fontWeight: "bold" }}>Notifications</label><br />
-                          <div style={{ height: "50vh", overflowY: "scroll" }}>
-                            <Row style={{ padding: 16 }}>
-                              <Col span={24}>
+                          {/* <div style={{ height: "50vh", overflowY: "scroll" }}> */}
+                          <Row style={{ padding: 16 }}>
+                            <Col span={24}>
 
-                                <Notifications />
-                              </Col>
-                            </Row>
-                          </div>
+                              <NotificationDetails ref={notiDetailsRef} />
+                            </Col>
+                          </Row>
+                          {/* </div> */}
                         </div>
                       </Menu.Item>
                     </Menu>
                   )} trigger="click">
 
-                  <Button type="text" style={{ marginRight: 5 }} size="middle"
-                    icon={<Badge dot={show_notice}><NotificationOutlined style={{ fontSize: 20 }} /></Badge>}
+                  <Button type="text" style={{ marginRight: 20, marginTop: 10 }} size="middle"
+
                   >
+                    <Notification ref={notiRef} />
                   </Button>
                 </Dropdown>
               </Tooltip>
-              <Dropdown
-                placement="topCenter"
-                overlayStyle={{
-                  width: 200,
-                  boxShadow:
-                    "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px",
-                }}
-                overlay={
-                  <Menu mode="inline" theme="light" onMouseOver="">
-                    <Menu.Item key="1" onClick={() => alert("Profile")}>
-                      Profile
-                    </Menu.Item>
-                    <Menu.Item key="2" onClick={() => alert("Setting")}>
-                      Setting
-                    </Menu.Item>
-                    <Divider style={{ margin: 4 }} />
-                    <Menu.Item key="2" onClick={() => history.push("/Login")}>
-                      Log Out
-                    </Menu.Item>
-                  </Menu>
-                }
-                trigger="click"
-              >
-                <Button type="link" >
-                  <div style={{ display: "inline-block", alignItems: "center" }}>
-                    <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
-                    </Avatar>
-                  </div>
-                  <div style={{ display: "inline-block", marginLeft: 8 }}>
-                    <label className="user-login">
-                      {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
-                    </label>
-                  </div>
-                </Button>
+              <div style={{ display: "inline-block", alignItems: "center" }}>
+                <Avatar size={48} icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}>
 
-
-              </Dropdown>
-
+                </Avatar>
+              </div>
+              <div style={{ display: "inline-block", marginLeft: 8 }}>
+                <label className="user-login">
+                  {state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}
+                </label>
+              </div>
             </Col>
           </Row>
         </Menu>
@@ -227,23 +218,36 @@ export default function MasterPage({bgColor='#fff',...props}) {
             </div>
             <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
               <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
-                - DashBoard
-                
+                - My DashBoard
               </Menu.Item>
+              <Menu.Item key="01" onClick={() => history.push('/customer/dashboard/all')}>
+                - All Issue
+              </Menu.Item>
+
             </SubMenu>
             <SubMenu key="sub1" icon={<FileOutlined />} title="Issues">
               <Menu.Item
-                key="2"
-                onClick={() =>  history.push('/customer/issue/alltask')
+                className="test"
+                key="1"
+                onClick={() => history.push('/customer/issue/all-issue')
                   // {
                   //   return ( history.push({ pathname: "/customer/issue/allmytask" }), window.location.reload(true)) 
                   // }
-                  
+
+                }
+              >
+                All Issue
+              </Menu.Item>
+              <Menu.Item
+                key="2"
+                onClick={() => history.push('/customer/issue/alltask')
+                  // {
+                  //   return ( history.push({ pathname: "/customer/issue/allmytask" }), window.location.reload(true)) 
+                  // }
+
                 }
               >
                 All Task
-               
-
               </Menu.Item>
               <Menu.Item
                 key="3"
@@ -279,13 +283,13 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Menu.Item>
               <Menu.Item
                 key="5"
-                onClick={() =>  history.push('/customer/issue/pass')
+                onClick={() => history.push('/customer/issue/pass')
                   // {
                   //   return ( history.push({ pathname: "/customer/issue/pass" }), window.location.reload(true)) 
                   // }
                 }
               >
-                Pass
+                Waiting Deploy
                 {
                   masterstate.toolbar.sider_menu.issue.pass.count === 0
                     ? ""
@@ -295,11 +299,7 @@ export default function MasterPage({bgColor='#fff',...props}) {
               </Menu.Item>
               <Menu.Item
                 key="6"
-                onClick={() =>
-                  {
-                    return ( history.push({ pathname: "/customer/issue/cancel" }), window.location.reload(true)) 
-                  }
-                }
+                onClick={() => history.push({ pathname: "/customer/issue/cancel" })}
               >
                 Cancel
                 {
@@ -320,26 +320,21 @@ export default function MasterPage({bgColor='#fff',...props}) {
                 Completed
               </Menu.Item>
             </SubMenu>
-            <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
+            {/* <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
               <Menu.Item key="10" onClick={() => history.push('/customer/report/charts')}>
                 - Report
                   <Badge count={1}>
                   <span style={{ marginLeft: 60, textAlign: "right" }}></span>
                 </Badge>
               </Menu.Item>
-            </SubMenu>
+            </SubMenu> */}
           </Menu>
         </Sider>
 
-        {/* <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
-            </Breadcrumb> */}
 
         <Content
           style={{
-            padding: 24,
+            // padding: 24,
             margin: 0,
             minHeight: 280,
 

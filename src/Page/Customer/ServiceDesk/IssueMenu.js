@@ -1,11 +1,10 @@
-import React, { useReducer, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Row,Typography,List } from 'antd'
+import { Button, Card, Col, Row,List } from 'antd'
 import { useHistory } from "react-router-dom";
 
 import MasterPage from "./MasterPage"
 import AuthenContext from '../../../utility/authenContext';
-import { userReducer, userState } from '../../../utility/reducer';
 import Axios from 'axios';
 
 
@@ -15,7 +14,6 @@ export default function IssueMenu() {
     const history = useHistory();
     const { state, dispatch } = useContext(AuthenContext);
     const [issuedata, setIssuedata] = useState([])
-
 
     const GetIssueType = async () => {
         try {
@@ -39,7 +37,6 @@ export default function IssueMenu() {
 
         }
     }
-
 
     useEffect(() => {
         GetIssueType();

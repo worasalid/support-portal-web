@@ -1,6 +1,6 @@
-import React, { useReducer, useContext, useState } from 'react'
-import { Row, Col, Input, Button, DatePicker, Select } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
+import React, { useContext } from 'react'
+import { Row, Col, Input, Button, DatePicker, Select, Checkbox, Tooltip } from 'antd'
+import { SearchOutlined, TrademarkOutlined } from '@ant-design/icons'
 import Axios from 'axios';
 import { useEffect } from 'react';
 import AuthenContext from '../../../utility/authenContext';
@@ -9,11 +9,15 @@ import IssueContext, { userState } from '../../../utility/issueContext';
 
 export default function Issuesearch({ Progress = "hide" }) {
     const { RangePicker } = DatePicker;
-    //const { Option } = Select;
+    const { Option, OptGroup } = Select;
     const { state, dispatch } = useContext(AuthenContext);
     const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
     const progressstatus = [
+        {
+            value: "Open",
+            text: "Open"
+        },
         {
             value: "InProgress",
             text: "InProgress"
@@ -23,8 +27,39 @@ export default function Issuesearch({ Progress = "hide" }) {
             text: "Resolved"
         },
         {
+            value: "ReOpen",
+            text: "ReOpen"
+        },
+        {
+            value: "Cancel",
+            text: "Cancel"
+        },
+        {
             value: "Complete",
             text: "Complete"
+        },
+    ]
+
+    const sceneData = [
+        {
+            value: "None",
+            text: "None"
+        },
+        {
+            value: "Application",
+            text: "Application"
+        },
+        {
+            value: "Report",
+            text: "Report"
+        },
+        {
+            value: "Printform",
+            text: "Printform"
+        },
+        {
+            value: "Data",
+            text: "Data"
         },
     ]
 
@@ -42,8 +77,14 @@ export default function Issuesearch({ Progress = "hide" }) {
         if (e.target.group === "module") {
             userdispatch({ type: "SELECT_MODULE", payload: e.target.value })
         }
-        if (e.target.name === "progress") {
+        if (e.target.group === "version") {
+            userdispatch({ type: "SELECT_VERSION", payload: e.target.value })
+        }
+        if (e.target.group === "progress") {
             userdispatch({ type: "SELECT_PROGRESS", payload: e.target.value })
+        }
+        if (e.target.group === "scene") {
+            userdispatch({ type: "SELECT_SCENE", payload: e.target.value })
         }
         if (e.target.group === "date") {
             userdispatch({ type: "SELECT_DATE", payload: { startdate: e.target.value[0], enddate: e.target.value[1] } })
@@ -51,7 +92,11 @@ export default function Issuesearch({ Progress = "hide" }) {
         if (e.target.group === "keyword") {
             userdispatch({ type: "SELECT_KEYWORD", payload: e.target.value })
         }
+        if (e.target.group === "release_note") {
+            userdispatch({ type: "SELECT_ISRELEASENOTE", payload: e.target.value })
+        }
     }
+
     const getcompany = async () => {
         const company = await Axios({
             url: process.env.REACT_APP_API_URL + "/master/company",
@@ -72,6 +117,27 @@ export default function Issuesearch({ Progress = "hide" }) {
             }
         });
         userdispatch({ type: "LOAD_PRODUCT", payload: products.data });
+    }
+
+    const getVersion = async () => {
+        try {
+            const version = await Axios({
+                url: process.env.REACT_APP_API_URL + "/master/version",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                params: {
+                    productId: userstate.filter.productState
+                }
+            });
+
+            if (version.status === 200) {
+                userdispatch({ type: "LOAD_VERSION", payload: version.data });
+            }
+        } catch (error) {
+
+        }
     }
 
     const getmodule = async () => {
@@ -105,31 +171,37 @@ export default function Issuesearch({ Progress = "hide" }) {
         try {
             getcompany();
             getproducts();
-            getmodule();
             getissue_type();
+
         } catch (error) {
 
         }
     }
     useEffect(() => {
-        if (state.authen) {
+        // if (state.authen) {
+        //     getMasterdata();
+        // }
+        if (state.authen === false) {
+
+        } else {
             getMasterdata();
+            setInterval(() => {
+                userdispatch({ type: "SEARCH", payload: true })
+            }, 100000)
         }
     }, [state.authen]);
 
     useEffect(() => {
-        if (state.authen) {
+        if (userstate.filter.productState.length !== 0) {
             getmodule();
-
+            getVersion();
         }
     }, [userstate.filter.productState]);
 
-
     return (
         <>
-
-            <Row style={{ marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
-            <Col span={4}>
+            <Row style={{ padding: "0px 0px 0px 24px", marginBottom: 16, textAlign: "left" }} gutter={[16, 16]}>
+                <Col span={4}>
                     <Select placeholder="Progress"
                         style={{ width: "100%", display: Progress === "show" ? "block" : "none" }}
                         mode="multiple"
@@ -139,9 +211,9 @@ export default function Issuesearch({ Progress = "hide" }) {
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        onChange={(value) => handleChange({ target: { value: value || "", name: 'progress' } })}
+                        onChange={(value) => handleChange({ target: { value: value || "", group: 'progress' } })}
                         options={progressstatus.map((x) => ({ value: x.value, label: x.text }))}
-                        onClear={() => alert()}
+
                     />
                 </Col>
                 <Col span={4} >
@@ -153,6 +225,7 @@ export default function Issuesearch({ Progress = "hide" }) {
                         maxTagCount={1}
                         // onKeyUp={(e) => {console.log(e.target)}}
                         onChange={(value, option) => handleChange({ target: { value: value || "", group: "company" } })}
+                        // onClick={() => getcompany()}
                         options={userstate.masterdata && userstate.masterdata.companyState.map((x) => ({ value: x.Id, label: x.Name, id: x.Id }))}
                     >
 
@@ -166,7 +239,8 @@ export default function Issuesearch({ Progress = "hide" }) {
                         maxTagCount={2}
                         style={{ width: "100%" }}
                         onChange={(value) => handleChange({ target: { value: value || "", group: "issuetype" } })}
-                        options={userstate.masterdata && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name }))}
+                        //onClick={() => getissue_type()}
+                        options={userstate.masterdata && userstate.masterdata.issueTypeState.map((x) => ({ value: x.Id, label: x.Name === "ChangeRequest" ? "CR" : x.Name }))}
                     >
 
                     </Select>
@@ -181,26 +255,15 @@ export default function Issuesearch({ Progress = "hide" }) {
                         }
                         //maxTagCount={1}
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'product' } })}
-                        options={userstate.masterdata && userstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
-                    // dropdownRender={(value) => (
-                    //     <div >
-                    //         <Row>
-                    //             <Col>
-                    //                 {value}
-                    //             </Col>
-                    //             <Col>
+                        // onClick={() => getproducts()}
+                        options={userstate.masterdata && userstate.masterdata.productState.map((x) => ({ value: x.Id, label: `${x.Name}` }))}
 
-                    //             </Col>
-                    //         </Row>
-                    //     </div>
-                    // )
-                    // }
                     />
                 </Col>
                 <Col span={4}>
-
-                    <Select placeholder="Module"
+                    {/* <Select placeholder="Module"
                         mode='multiple'
+                        disabled={userstate?.filter?.productState?.length === 0 ? true : false}
                         style={{ width: "100%" }}
                         filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -209,11 +272,22 @@ export default function Issuesearch({ Progress = "hide" }) {
                         allowClear
                         onChange={(value) => handleChange({ target: { value: value || "", group: 'module' } })}
                         options={userstate.masterdata && userstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name }))}
-                        onClear={() => alert()}
-                    />
+                    /> */}
+                    <Select placeholder="version"
+                        mode='multiple'
+                        disabled={userstate?.filter?.productState?.length === 0 ? true : false}
+                        style={{ width: "100%" }}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount={1}
+                        allowClear
+                        onChange={(value) => handleChange({ target: { value: value || "", group: 'version' } })}
 
+                        options={userstate.masterdata && userstate.masterdata.versionState.map((x) => ({ value: x.Name, label: x.Name }))}
+                    />
                 </Col>
-               
+
                 <Col span={2}>
                     <Button type="primary" shape="round" icon={<SearchOutlined />}
                         style={{ backgroundColor: "#00CC00" }}
@@ -223,15 +297,53 @@ export default function Issuesearch({ Progress = "hide" }) {
                     </Button>
                 </Col>
             </Row>
-            <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
-                <Col span={4}></Col>
+            <Row style={{ padding: "0px 0px 0px 24px", marginBottom: 16 }} gutter={[16, 16]}>
+                <Col span={4}>
+                    <Select placeholder="Scene"
+                        mode='multiple'
+                        style={{ width: "100%" }}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        maxTagCount={1}
+                        allowClear
+                        onChange={(value) => handleChange({ target: { value: value || "", group: 'scene' } })}
+                        options={sceneData.map((x) => ({ value: x.value, label: x.text }))}
+
+                    />
+                </Col>
                 <Col span={8} >
                     <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
                         onChange={(date, dateString) => handleChange({ target: { value: dateString || "", group: 'date' } })}
                     />
                 </Col>
                 <Col span={8}>
-                    <Input placeholder="IssueNo / Subject" name="subject" prefix="" suffix={<SearchOutlined />} onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}></Input>
+                    <Input placeholder="IssueNo / Subject" name="subject" prefix=""
+                        suffix={<SearchOutlined />}
+                        onChange={(value) => handleChange({ target: { value: value.target.value || "", group: 'keyword' } })}
+                        onKeyDown={(x) => {
+                            if (x.keyCode === 13) {
+                                userdispatch({ type: "SEARCH", payload: true })
+                            }
+                        }}
+                    />
+                </Col>
+                <Col span={2}>
+
+                    <Tooltip title="ReleaseNote">
+                        <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note' } })}>
+                            <TrademarkOutlined
+                                style={{fontSize: 14, color: "#17A2B8" }}
+                            />
+                          
+
+                        </Checkbox>
+                        {/* <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note_N' } })}>
+                            <label style={{ fontSize: 10, display: "inline" }}>N</label>
+
+                        </Checkbox> */}
+                    </Tooltip>
+
                 </Col>
             </Row>
         </>

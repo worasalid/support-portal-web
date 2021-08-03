@@ -1,9 +1,10 @@
 import React, { useContext, useEffect } from 'react'
-import { Card, Avatar } from 'antd'
+import { Card, Avatar, Modal } from 'antd'
 import axios from 'axios'
 import { UserOutlined } from '@ant-design/icons'
 import AuthenContext from '../../../utility/authenContext';
 import IssueContext from '../../../utility/issueContext';
+
 
 export default function MasterPage(props) {
     const { state, dispatch } = useContext(AuthenContext);
@@ -12,25 +13,39 @@ export default function MasterPage(props) {
     const getuser = async () => {
         try {
             const result = await axios({
-                url: process.env.REACT_APP_API_URL + "/auth/customer/me",
+                url: process.env.REACT_APP_API_URL + "/auth/login/customer/me",
                 method: "get",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 }
-
             });
             dispatch({ type: 'Authen', payload: true });
             dispatch({ type: 'LOGIN', payload: result.data.usersdata });
         } catch (error) {
 
+            await Modal.error({
+                title: error.response.data.message,
+                content: (
+                    <div>
+                        <p>Token หมดอายุ กรุณา Login ใหม่</p>
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
+                    window.open(error.response.data.url, "_self");
+                    window.close();
+                },
+            });
         }
     }
 
     useEffect(() => {
         if (!state.authen) {
             getuser();
+        } else {
+            getuser();
         }
-        getuser();
+
     }, []);
 
 
@@ -59,7 +74,7 @@ export default function MasterPage(props) {
                         textAlign: "right",
                         padding: "16px",
                     }}>
-                    <label className="user-login">{ state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}</label>
+                    <label className="user-login">{state?.usersdata?.users.first_name + ' ' + state?.usersdata?.users.last_name}</label>
                     <Avatar size="default" icon={<UserOutlined />}></Avatar>
 
                 </div>

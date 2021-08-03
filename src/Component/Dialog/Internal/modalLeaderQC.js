@@ -1,35 +1,27 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Modal, Form, Table, Tabs } from 'antd';
+import React, { useState, useRef, useContext } from 'react';
+import { useHistory, } from "react-router-dom";
+import { Modal, Form, Tabs, Spin } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-import { DownloadOutlined } from '@ant-design/icons';
-import Column from 'antd/lib/table/Column';
+import TextEditor from '../../TextEditor';
 
-const { TabPane } = Tabs;
+import AuthenContext from "../../../utility/authenContext";
 
 export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const { state, dispatch } = useContext(AuthenContext);
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const [textValue, setTextValue] = useState("");
-    const editorRef = useRef(null)
-
-    const [listunittest, setListunittest] = useState([]);
-    const [listfiledeploy, setFiledeploy] = useState([]);
-    const [listdocument, setDocument] = useState([]);
-
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
+    const editorRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -37,9 +29,9 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     data: {
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
-                        comment_text: textValue,
-                        comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "task",
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }
@@ -63,34 +55,43 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
                     value: {
                         comment_text: textValue
                     }
-                  
+
                 }
             });
 
             if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                await Modal.info({
+                setLoading(false);
+                await Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
                             <p>ส่งงานให้ทีม QA ตรวจสอบ</p>
                         </div>
                     ),
+                    okText: "Close",
                     onOk() {
                         editorRef.current.editor.setContent("")
-                        history.push({ pathname: "/internal/issue/inprogress" })
+                        if (state?.usersdata?.organize?.PositionLevel === 0) {
+                            // ถ้า H.Dev แก้ไขงานเอง ให้ refresh หน้าจอ แล้วทำงานต่อ ไม่ต้องเปลียน page
+                            window.location.reload();
+                        } else {
+                            history.push({ pathname: "/internal/issue/inprogress" })
+                        }
                     },
                 });
             }
         } catch (error) {
-            await Modal.info({
+            setLoading(false);
+            await Modal.error({
                 title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         <p>{error.response.data}</p>
                     </div>
                 ),
+                okText: "Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
                     onOk();
@@ -101,14 +102,14 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
     }
 
     const onFinish = (values) => {
-        console.log('Success:', values);
+        setLoading(true);
         SendFlow();
     };
-
 
     return (
         <Modal
             visible={visible}
+            confirmLoading={loading}
             okText="Send"
             onOk={() => { return (form.submit()) }}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
@@ -116,49 +117,33 @@ export default function ModalLeaderQC({ visible = false, onOk, onCancel, datarow
             onCancel={() => { return (form.resetFields(), onCancel()) }}
             {...props}
         >
-  
-            <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                name="qa-test"
-                layout="vertical"
-                className="login-form"
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-            >
-                <Form.Item
-                    // style={{ minWidth: 300, maxWidth: 300 }}
-                    name="remark"
-                    label="Remark :"
-                    rules={[
-                        {
-                            required: false,
-                            message: 'Please input your UnitTest!',
-                        },
-                    ]}
+            <Spin spinning={loading} size="large" tip="Loading...">
+                <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
+                    name="qa-test"
+                    layout="vertical"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
                 >
-                    <Editor
-                        apiKey="e1qa6oigw8ldczyrv82f0q5t0lhopb5ndd6owc10cnl7eau5"
-                        ref={editorRef}
-                        initialValue=""
-                        init={{
-                            height: 300,
-                            menubar: false,
-                            plugins: [
-                                'advlist autolink lists link image charmap print preview anchor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table paste code help wordcount'
-                            ],
-                            toolbar1: 'undo redo | styleselect | bold italic underline forecolor fontsizeselect | link image',
-                            toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
-                        }}
-                        onEditorChange={handleEditorChange}
-                    />
-                    <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
-                </Form.Item>
-            </Form>
-
+                    <Form.Item
+                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        name="remark"
+                        label="Remark :"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Please input your UnitTest!',
+                            },
+                        ]}
+                    >
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
+                        <br />
+                        AttachFile : <UploadFile ref={uploadRef} />
+                    </Form.Item>
+                </Form>
+            </Spin>
         </Modal>
     )
 }

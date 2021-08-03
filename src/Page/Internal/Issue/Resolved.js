@@ -8,14 +8,14 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
-import Clock from "../../../utility/countdownTimer";
+import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 
 export default function Resolved() {
@@ -42,7 +42,7 @@ export default function Resolved() {
 
 
   const loadIssue = async (value) => {
-    // setLoadding(true);
+    setLoadding(true);
     try {
       const results = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/loadticket-user",
@@ -55,17 +55,20 @@ export default function Resolved() {
           issue_type: userstate.filter.TypeState,
           productId: userstate.filter.productState,
           moduleId: userstate.filter.moduleState,
+          version: userstate.filter.versionState,
+          scene: userstate.filter.scene,
           startdate: userstate.filter.date.startdate === "" ? "" : moment(userstate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           enddate: userstate.filter.date.enddate === "" ? "" : moment(userstate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
           keyword: userstate.filter.keyword,
           task: "Resolved",
+          is_release_note: userstate.filter.isReleaseNote,
           pageCurrent: pageCurrent,
           pageSize: pageSize
         }
       });
 
       if (results.status === 200) {
-
+        setLoadding(false);
         setPageTotal(results.data.total)
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data })
       }
@@ -76,31 +79,38 @@ export default function Resolved() {
 
 
   useEffect(() => {
-    userdispatch({ type: "LOADING", payload: true })
-    setTimeout(() => {
-      loadIssue();
-      userdispatch({ type: "LOADING", payload: false })
-    }, 1000)
+    if (userstate.search === true) {
+      if (pageCurrent !== 1) {
+        setPageCurrent(1);
+        setPageSize(10);
+      } else {
+        loadIssue();
+      }
+    }
 
     userdispatch({ type: "SEARCH", payload: false })
-  }, [userstate.search, pageCurrent]);
+  }, [userstate.search, visible]);
+
+  useEffect(() => {
+    loadIssue();
+  }, [pageCurrent]);
 
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
-        <Row style={{ marginBottom: 16, textAlign: "left" }}>
+        <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
           <Col span={24}>
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
         <IssueSearch />
         <Row>
-          <Col span={24}>
+          <Col span={24} style={{ padding: "0px 0px 0px 24px" }}>
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
               // scroll={{y:350}}
               style={{ padding: "5px 5px" }}
-              pagination={{ pageSize: pageSize, total: pageTotal }}
-              onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
+              pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
+              onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
               onRow={(record, rowIndex) => {
                 // console.log(record, rowIndex)
                 return {
@@ -120,62 +130,131 @@ export default function Resolved() {
             >
 
               <Column
-                title="Issue No"
-                width="25%"
+                title="IssueNo"
+                width="5%"
                 render={(record) => {
                   return (
-                    <div>
+                    <>
+                      <Tooltip title="ReleaseNote">
+                        <TrademarkOutlined
+                          style={{ display: record.IsReleaseNote === 1 ? "inline-block" : "none", fontSize: 16, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      &nbsp;
+                      <Tooltip title="SQL Script">
+                        <ConsoleSqlOutlined
+                          style={{ display: record.SQL_Script === 1 ? "inline-block" : "none", fontSize: 16, color: "#17A2B8" }}
+                        />
+                      </Tooltip>
+                      <br />
                       <label className="table-column-text">
                         {record.Number}
                       </label>
+                    </>
+                  )
+                }
+                }
+              />
 
-                      <div style={{ marginTop: 10, fontSize: "smaller" }}>
-                        <Tooltip title="Issue Type">
-                          <Tag color={record.IssueType === 'Bug' ? "#f50" : "#108ee9"} >
-                            <label style={{ fontSize: "10px" }}>
-                              {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Priority">
-                          <Tag color="#808080">
-                            <label style={{ fontSize: "10px" }}>
-                              {record.Priority}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Product">
-                          <Tag color="#808080">
-                            <label style={{ fontSize: "10px" }}>
-                              {record.ProductName}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                        {/* <Divider type="vertical" /> */}
-                        <Tooltip title="Module">
-                          <Tag color="#808080">
-                            <label style={{ fontSize: "10px" }}>
-                              {record.ModuleName}
-                            </label>
-                          </Tag>
-                        </Tooltip>
-                      </div>
+              <Column
+                title="Details"
+                width="15%"
+                render={(record) => {
+                  return (
+                    <div>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label className="table-column-text" style={{ color: "#808080" }}>
+                            Type :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.IssueType === 'ChangeRequest' ? "CR" : record.IssueType}
+                          </label>
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Priority :
+                          </label>
+                        </Col>
+                        <Col span={14} >
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Priority}
+                          </label>
+                          {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
+
+                        </Col>
+                      </Row>
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Product :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.ProductName}
+                          </label>
+                        </Col>
+                      </Row>
+                      {/* <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Module :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.ModuleName}
+                          </label>
+                        </Col>
+                      </Row> */}
+                      <Row style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            Scene :
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Scene}
+                          </label>
+                        </Col>
+                      </Row>
+
+                      <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
+                        style={{ borderBottom: "1px dotted" }}>
+                        <Col span={8}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.IssueType === "ChangeRequest" || record.IssueType === "Memo" ? "Version :" : "Patch :"}
+                          </label>
+                        </Col>
+                        <Col span={14}>
+                          <label style={{ color: "#808080", fontSize: "10px" }}>
+                            {record.Version}
+                          </label>
+                        </Col>
+                      </Row>
+
                     </div>
                   );
                 }}
               />
 
               <Column title="Subject"
-                width="30%"
+                width="35%"
                 render={(record) => {
                   return (
                     <>
                       <div>
                         <label className="table-column-text">
                           {record.Title}
+                          {record.IsReOpen === true ? " (ReOpen)" : ""}
                         </label>
+
                         <Tag color="#00CC00"
                           style={{
                             borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
@@ -195,7 +274,7 @@ export default function Resolved() {
                           }
                           className="table-column-detail">
                           รายละเอียด
-                          </label>
+                        </label>
                       </div>
 
                     </>
@@ -221,7 +300,7 @@ export default function Resolved() {
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
-                      <Tooltip title="Company"><Tag color="#f50">{record.CompanyName}</Tag></Tooltip>
+                      <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
 
                     </>
                   )
@@ -237,11 +316,14 @@ export default function Resolved() {
                   return (
                     <>
                       <label className="table-column-text">
-                        {moment(record.DueDate).format("DD/MM/YYYY HH:mm")}
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("DD/MM/YYYY")}
                       </label>
                       <br />
-
-                      {record.cntDueDate >= 1 ?
+                      <label className="table-column-text">
+                        {record.DueDate === null ? "" : moment(record.DueDate).format("HH:mm")}
+                      </label>
+                      <br />
+                      <div style={{ display: record.cntDueDate >= 1 ? "block" : "none" }}>
                         <Tag style={{ marginLeft: 16 }} color="warning"
                           onClick={() => {
                             userdispatch({ type: "SELECT_DATAROW", payload: record })
@@ -250,9 +332,8 @@ export default function Resolved() {
                           }
                         >
                           เลื่อน Due
-                       </Tag>
-                        : ""
-                      }
+                        </Tag>
+                      </div>
                     </>
                   )
                 }
@@ -276,7 +357,6 @@ export default function Resolved() {
                           {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("DD/MM/YYYY")}<br />
                           {record.ResolvedDate === null ? "" : moment(record.ResolvedDate).format("HH:mm")}
                         </label>
-
                       </div>
                     </>
                   );
@@ -290,12 +370,11 @@ export default function Resolved() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
-                        <Clock
-                          showseconds={false}
-                          deadline={record.DueDate}
-                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
+                        <ClockSLA
+                          start={moment(record.AssignIconDate)}
+                          due={moment(record.SLA_DueDate)}
+                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
+                          type={record.Priority}
                         />
                       </div>
                     </>

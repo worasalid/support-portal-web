@@ -13,7 +13,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
     const uploadRef = useRef(null);
     const editorRef = useRef(null)
     const [textValue, setTextValue] = useState("")
-    const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
+    //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
 
     const handleEditorChange = (content, editor) => {
         setTextValue(content);

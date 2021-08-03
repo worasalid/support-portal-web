@@ -25,7 +25,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
         try {
             if (editorRef.current.getValue() !== "") {
                 await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -35,7 +35,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }
