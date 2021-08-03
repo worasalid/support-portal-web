@@ -78,6 +78,10 @@ export default function Subject() {
     {
       name: "Data",
       value: "Data"
+    },
+    {
+      name: "API",
+      value: "API"
     }
   ]
 
@@ -649,7 +653,7 @@ export default function Subject() {
                         value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                         options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                         disabled={
-                          mailbox?.MailType === "in"  ? false : true
+                          mailbox?.MailType === "in" ? false : true
                         }
                       >
                       </Select>
