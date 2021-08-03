@@ -121,6 +121,10 @@ export default function IssueCreate() {
         {
             name: "Data",
             value: "Data"
+        },
+        {
+            name: "API",
+            value: "API"
         }
     ]
 
