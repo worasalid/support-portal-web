@@ -8,7 +8,7 @@ import Historylog from "../../../Component/History/Customer/Historylog";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import AuthenContext from "../../../utility/authenContext";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, LeftCircleOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, LeftCircleOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import moment from 'moment';
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
@@ -55,8 +55,6 @@ export default function Subject() {
   const [issueType, setIssueType] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [imgUrl, setImgUrl] = useState(null);
-
-
 
   const cusScene = [
     {

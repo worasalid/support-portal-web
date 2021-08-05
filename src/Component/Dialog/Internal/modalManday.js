@@ -84,8 +84,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "internal",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        comment_type: details.flowoutput.Type === "Task" ? "task" : "internal",
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }
@@ -219,7 +219,6 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     useEffect(() => {
         if (visible) {
             GetTask();
-            console.log("detail",details)
         }
     }, [visible])
 
