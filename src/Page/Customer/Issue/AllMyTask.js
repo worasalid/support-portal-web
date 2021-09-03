@@ -132,7 +132,7 @@ export default function AllMyTask() {
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
-        <IssueSearch Progress="show"  />
+        <IssueSearch Progress="show" />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={customerstate.issuedata.data} loading={loading}
@@ -297,7 +297,7 @@ export default function AllMyTask() {
                           record.AssignIconDate === null ?
                             <label style={{ fontSize: 12, color: "red" }}>
                               ยังไม่ได้ส่งเรื่องให้ ICON
-                          </label> :
+                            </label> :
                             <label>
                               {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
                               {moment(record.AssignIconDate).format("HH:mm")}
@@ -336,7 +336,7 @@ export default function AllMyTask() {
                           }
                         >
                           DueDate ถูกเลื่อน
-                   </Tag> : ""
+                        </Tag> : ""
                       }
 
                     </>
@@ -364,6 +364,14 @@ export default function AllMyTask() {
                         <label className="table-column-text11">
                           {record.GroupStatus} <br />
                           {moment(record.CompleteDate).format("DD/MM/YYYY")}
+                        </label>
+                      </div>
+
+                      <div hidden={(record.GroupStatus === "Complete" || record.GroupStatus === "Completed") || record.GroupStatus === "Resolved" ? true : false}>
+                        <label className="table-column-text11">{record.GroupStatus}</label>
+                        <br />
+                        <label className="table-column-text11">
+                          {record.ProgressStatus === null || record.ProgressStatus === record.GroupStatus ? "" : `(${record.ProgressStatus})`}
                         </label>
                       </div>
                     </>

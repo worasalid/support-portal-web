@@ -38,7 +38,7 @@ export default function Subject() {
   const [collapsetext, setCollapsetext] = useState("Hide details");
 
   // modal
-  const [visible, setVisible] = useState(false);
+  //const [visible, setVisible] = useState(false);
   const [modalsendissue_visible, modalSendissue_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
@@ -52,7 +52,7 @@ export default function Subject() {
   // data
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [mailbox, setMailbox] = useState([]);
-  const [issueType, setIssueType] = useState([]);
+  //const [issueType, setIssueType] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [imgUrl, setImgUrl] = useState(null);
 

@@ -249,7 +249,7 @@ export default function StickyNote({ visible, onClose, ...props }) {
             {/* Add */}
             <Drawer
                 title="Add StickyNote"
-                width={800}
+                width={1200}
                 closable={true}
                 onClose={() => { setAddDrawer(false); editorRef.current.setvalue("") }}
                 visible={addDrawer}

@@ -509,22 +509,6 @@ export default function IssueCreate() {
                             </Select>
                         </Form.Item>
 
-                        {/* <Form.Item label="Module" name="module">
-                        <Select
-                            placeholder="Module"
-                            mode="multiple"
-                            // defaultValue="None"
-                            showSearch
-                            allowClear
-                            filterOption={(input, option) =>
-                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            options={customerstate && customerstate.masterdata.moduleState.map(x => ({ value: x.Id, label: x.Name }))}
-                        >
-
-                        </Select>
-                    </Form.Item> */}
-
                         <Form.Item label="Priority" name="priority">
                             <Select
                                 defaultValue={4}

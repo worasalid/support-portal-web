@@ -177,10 +177,8 @@ export default function Issuesearch({ Progress = "hide" }) {
 
         }
     }
+
     useEffect(() => {
-        // if (state.authen) {
-        //     getMasterdata();
-        // }
         if (state.authen === false) {
 
         } else {
@@ -197,6 +195,8 @@ export default function Issuesearch({ Progress = "hide" }) {
             getVersion();
         }
     }, [userstate.filter.productState]);
+
+
 
     return (
         <>
@@ -333,9 +333,9 @@ export default function Issuesearch({ Progress = "hide" }) {
                     <Tooltip title="ReleaseNote">
                         <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note' } })}>
                             <TrademarkOutlined
-                                style={{fontSize: 14, color: "#17A2B8" }}
+                                style={{ fontSize: 14, color: "#17A2B8" }}
                             />
-                          
+
 
                         </Checkbox>
                         {/* <Checkbox onChange={(value) => handleChange({ target: { value: value.target.checked || "", group: 'release_note_N' } })}>

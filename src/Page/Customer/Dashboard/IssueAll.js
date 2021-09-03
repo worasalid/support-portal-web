@@ -28,10 +28,6 @@ export default function IssueAll() {
             },
             style: { fill: '#fff' },
         },
-        meta: {
-            Status: { alias: '类别' },
-            Value: { alias: '销售额' },
-        },
         columnWidthRatio: 0.4,
         legend: {
             layout: 'horizontal',
@@ -83,104 +79,132 @@ export default function IssueAll() {
             <Spin spinning={loading}>
                 <div style={{ padding: "24px 24px 24px 24px" }}>
                     <Row gutter={16}>
-                        <Col span={4}>
+                        <Col span={3}>
 
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>Open</label>}
+                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                    title={<label className="card-title-menu" style={{ color: "#868686" }}>Open</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {/* {dashboard[0]?.Value} */}
+                                            {dashboard[0]?.Value}
                                         </label>
-
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
 
+                        <Col span={3}>
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
                                     title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>InProgress</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {/* {dashboard[1]?.Value} */}
+                                            {dashboard[1]?.Value}
                                         </label>
-
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
 
+                        <Col span={3}>
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                    // avatar={<FileOutlined style={{ fontSize: 25 }} />}
                                     title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Resolved</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {/* {dashboard[2]?.Value} */}
+                                            {dashboard[2]?.Value}
                                         </label>
-
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
 
+                        <Col span={3}>
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                    // avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                    title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Waiting Deploy</label>}
+                                    description={
+                                        <label className="dashboard-card-value" >
+                                            {dashboard[3]?.Value}
+                                        </label>
+                                    }
+                                />
+                            </Card>
+                        </Col>
+
+                        <Col span={3}>
+                            <Card className="card-box issue-active" bordered hoverable
+                                style={{ width: "100%" }}
+                            >
+                                <Meta
+                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
                                     title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {/* {dashboard[3]?.Value} */}
+                                            {dashboard[4]?.Value}
                                         </label>
-
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
 
+                        <Col span={3}>
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
+                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                    title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Hold</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {/* {dashboard[5]?.Value} */}
+                                            {dashboard[5]?.Value}
                                         </label>
-
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
-                            <Card bordered={true} style={{ width: "100%" }}>
-                                <div>
-                                    <label className="dashboard-card-status">
-                                        Total
-                            </label>
 
-                                </div>
-                                <div>
-                                    <label className="dashboard-card-value">
-                                        {/* {dashboard[7]?.Value} */}
-                                    </label>
-                                </div>
+                        <Col span={3}>
+                            <Card className="card-box issue-active" bordered hoverable
+                                style={{ width: "100%" }}
+                            >
+                                <Meta
+                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
+                                    description={
+                                        <label className="dashboard-card-value" >
+                                            {dashboard[6]?.Value}
+                                        </label>
+                                    }
+                                />
+                            </Card>
+                        </Col>
+
+                        <Col span={3}>
+                            <Card bordered={true} style={{ width: "100%" }}>
+                                <Meta
+                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>Total</label>}
+                                    description={
+                                        <label className="dashboard-card-value" >
+                                            {
+                                                dashboard[0]?.Value + dashboard[1]?.Value + dashboard[2]?.Value + dashboard[3]?.Value +
+                                                dashboard[4]?.Value + dashboard[5]?.Value + dashboard[6]?.Value
+                                            }
+                                        </label>
+                                    }
+                                />
                             </Card>
                         </Col>
                     </Row>
@@ -202,8 +226,8 @@ export default function IssueAll() {
                                         <Column {...config}
                                             tooltip="xxx"
                                             style={{ height: 350 }}
-                                           // data={dashboard.filter((x) => x.Status !== "Total")}
-                                            data = {dashboard}
+                                            // data={dashboard.filter((x) => x.Status !== "Total")}
+                                            data={dashboard}
                                             xAxis={{
                                                 position: "bottom",
                                             }}

@@ -333,6 +333,7 @@ export default function SupportSiteConfig() {
                             <Table dataSource={configList}>
                                 <Column title="Code"
                                     width="10%"
+                                    
                                     render={(record) => {
                                         return (
                                             <div

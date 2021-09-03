@@ -7,6 +7,7 @@
     "@ant-design/charts": "^1.0.17",
     "@ant-design/icons": "^4.0.0",
     "@balkangraph/orgchart.js": "^7.7.25",
+    "@line/liff": "^2.13.0",
     "@reduxjs/toolkit": "^1.5.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -20,6 +21,7 @@
     "query-string": "^6.13.1",
     "react": "^16.13.1",
     "react-data-export": "^0.6.0",
+    "react-device-detect": "^1.17.0",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
     "react-google-login": "^5.2.2",
@@ -48,5 +50,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@iconify/react": "^3.0.1"
   }
 }
