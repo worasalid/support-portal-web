@@ -8,7 +8,7 @@ import Historylog from "../../../Component/History/Customer/Historylog";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import AuthenContext from "../../../utility/authenContext";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, LeftCircleOutlined, UndoOutlined, UserOutlined } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowUpOutlined, LeftCircleOutlined, UserOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import moment from 'moment';
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
@@ -38,7 +38,7 @@ export default function Subject() {
   const [collapsetext, setCollapsetext] = useState("Hide details");
 
   // modal
-  const [visible, setVisible] = useState(false);
+  //const [visible, setVisible] = useState(false);
   const [modalsendissue_visible, modalSendissue_visible] = useState(false);
   const [historyduedate_visible, setHistoryduedate_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
@@ -52,7 +52,7 @@ export default function Subject() {
   // data
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [mailbox, setMailbox] = useState([]);
-  const [issueType, setIssueType] = useState([]);
+  //const [issueType, setIssueType] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [imgUrl, setImgUrl] = useState(null);
 

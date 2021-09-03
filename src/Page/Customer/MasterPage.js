@@ -1,4 +1,5 @@
-import { PieChartOutlined, FileOutlined } from "@ant-design/icons";
+import { PieChartOutlined, FileOutlined, ReadOutlined } from "@ant-design/icons";
+import { Icon } from '@iconify/react';
 import { Avatar, Button, Col, Dropdown, Layout, Menu, Row, Tooltip, Modal } from "antd";
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -9,6 +10,7 @@ import Axios from "axios";
 import MasterContext from "../../utility/masterContext";
 import Notification from "../../Component/Notifications/Customer/Notification";
 import NotificationDetails from "../../Component/Notifications/Customer/NotificationDetails";
+import UserManual from "../../Component/UserManual";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -21,8 +23,11 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
   //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
   const [activemenu, setActivemenu] = useState([])
+
+  //Menu
   const notiRef = useRef(null);
   const notiDetailsRef = useRef(null);
+  const [visibleChange, setVisibleChange] = useState(false);
 
   const getuser = async () => {
     try {
@@ -150,6 +155,34 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               /> */}
             </Col>
             <Col span={12} style={{ textAlign: "right" }}>
+              <Tooltip title="คู่มือการใช้งาน">
+                <Dropdown
+                  placement="bottomCenter"
+                  overlayStyle={{ width: 500, height: 400 }}
+                  onVisibleChange={(x) => setVisibleChange(x)}
+                  overlay={(
+                    <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
+                      <div>
+                        <label style={{ fontSize: 24, fontWeight: "bold", marginLeft: 16 }}>คู่มือการใช้งาน</label><br />
+                        <Row style={{ padding: 16 }}>
+                          <Col span={24}>
+
+                            <UserManual type="customer" visible={visibleChange} />
+
+                          </Col>
+                        </Row>
+                      </div>
+
+                    </Menu>
+                  )} trigger="click">
+
+                  <Button type="text" style={{ marginRight: 0, marginTop: 10 }}
+                    icon={<ReadOutlined style={{ fontSize: 20 }} />}
+                  >
+                  </Button>
+                </Dropdown>
+              </Tooltip>
+
               <Tooltip title="Notifications">
                 <Dropdown
                   placement="bottomCenter"
@@ -218,10 +251,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             </div>
             <SubMenu key="sub0" icon={<PieChartOutlined />} title="DashBoard">
               <Menu.Item key="0" onClick={() => history.push('/customer/dashboard')}>
-                - My DashBoard
+                My DashBoard
               </Menu.Item>
               <Menu.Item key="01" onClick={() => history.push('/customer/dashboard/all')}>
-                - All Issue
+                All Issue
               </Menu.Item>
 
             </SubMenu>
@@ -249,76 +282,81 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               >
                 All Task
               </Menu.Item>
-              <Menu.Item
-                key="3"
-                onClick={() => history.push('/customer/issue/mytask')
-                  // {
-                  //   return ( history.push({ pathname: "/customer/issue/mytask" }), window.location.reload(true)) 
-                  // }
-                }
-              >
-                My Task
-                {
-                  masterstate.toolbar.sider_menu.issue.mytask.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
+              <Menu.ItemGroup key="g1" title="In Box">
+                <Menu.Item
+                  key="3"
+                  onClick={() => history.push('/customer/issue/mytask')
+                    // {
+                    //   return ( history.push({ pathname: "/customer/issue/mytask" }), window.location.reload(true)) 
+                    // }
+                  }
+                >
+                  My Task
+                  {
+                    masterstate.toolbar.sider_menu.issue.mytask.count === 0
+                      ? ""
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
 
-                }
+                  }
 
-              </Menu.Item>
-              <Menu.Item
-                key="4"
-                onClick={() =>
-                  // history.push({ pathname: "/customer/issue/inprogress" })
-                  history.push('/customer/issue/inprogress')
-                }
-              >
-                In progress
-                {
-                  masterstate.toolbar.sider_menu.issue.inprogress.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+                </Menu.Item>
+              </Menu.ItemGroup>
 
-                }
-              </Menu.Item>
-              <Menu.Item
-                key="5"
-                onClick={() => history.push('/customer/issue/pass')
-                  // {
-                  //   return ( history.push({ pathname: "/customer/issue/pass" }), window.location.reload(true)) 
-                  // }
-                }
-              >
-                Waiting Deploy
-                {
-                  masterstate.toolbar.sider_menu.issue.pass.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
+              <Menu.ItemGroup key="g2" title="Out Box">
+                <Menu.Item
+                  key="4"
+                  onClick={() =>
+                    // history.push({ pathname: "/customer/issue/inprogress" })
+                    history.push('/customer/issue/inprogress')
+                  }
+                >
+                  In progress
+                  {
+                    masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                      ? ""
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
 
-                }
-              </Menu.Item>
-              <Menu.Item
-                key="6"
-                onClick={() => history.push({ pathname: "/customer/issue/cancel" })}
-              >
-                Cancel
-                {
-                  masterstate.toolbar.sider_menu.issue.cancel.count === 0
-                    ? ""
-                    : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+                  }
+                </Menu.Item>
+                <Menu.Item
+                  key="5"
+                  onClick={() => history.push('/customer/issue/pass')
+                    // {
+                    //   return ( history.push({ pathname: "/customer/issue/pass" }), window.location.reload(true)) 
+                    // }
+                  }
+                >
+                  Waiting Deploy
+                  {
+                    masterstate.toolbar.sider_menu.issue.pass.count === 0
+                      ? ""
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
 
-                }
-              </Menu.Item>
-              <Menu.Item
-                key="7"
-                onClick={() => history.push('/customer/issue/complete')
-                  // {
-                  //   return ( history.push({ pathname: "/customer/issue/complete" }), window.location.reload(true)) 
-                  // }
-                }
-              >
-                Completed
-              </Menu.Item>
+                  }
+                </Menu.Item>
+                <Menu.Item
+                  key="6"
+                  onClick={() => history.push({ pathname: "/customer/issue/cancel" })}
+                >
+                  Cancel
+                  {
+                    masterstate.toolbar.sider_menu.issue.cancel.count === 0
+                      ? ""
+                      : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+
+                  }
+                </Menu.Item>
+                <Menu.Item
+                  key="7"
+                  onClick={() => history.push('/customer/issue/complete')
+                    // {
+                    //   return ( history.push({ pathname: "/customer/issue/complete" }), window.location.reload(true)) 
+                    // }
+                  }
+                >
+                  Completed
+                </Menu.Item>
+              </Menu.ItemGroup>
             </SubMenu>
             {/* <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
               <Menu.Item key="10" onClick={() => history.push('/customer/report/charts')}>

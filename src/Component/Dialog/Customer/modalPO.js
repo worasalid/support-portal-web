@@ -1,13 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Form, Tabs, Spin } from 'antd';
+import { Modal, Form, Spin } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
-
-
-const { TabPane } = Tabs;
-
 
 export default function ModalPO({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
@@ -18,20 +14,26 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
     const [loading, setLoading] = useState(false);
 
     const SavePO = async (values) => {
-        const documentPO = await Axios({
-            url: process.env.REACT_APP_API_URL + "/tickets/save-document",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            data: {
-                ticketid: details && details.ticketid,
-                taskid: details.taskid,
-                files: upload_PO.current.getFiles().map((n) => n.response.id),
-                reftype: "Master_Ticket",
-                grouptype: "PO_Document"
-            }
-        })
+        try {
+            await Axios({
+                url: process.env.REACT_APP_API_URL + "/tickets/save-document",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ticketid: details && details.ticketid,
+                    taskid: details.taskid,
+                    files: upload_PO.current.getFiles().map((n) => n.response),
+                    reftype: "Master_Ticket",
+                    grouptype: "PO_Document"
+                }
+            });
+
+        } catch (error) {
+
+        }
+
     }
 
     const SaveComment = async () => {
@@ -157,10 +159,10 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
                         <UploadFile ref={upload_PO} />
                     </Form.Item>
                 </Form>
-                 Remark :
-                 <TextEditor ref={editorRef} />
+                Remark :
+                <TextEditor ref={editorRef} />
                 <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
         </Modal>
     )

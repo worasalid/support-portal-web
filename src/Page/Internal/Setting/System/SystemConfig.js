@@ -13,7 +13,7 @@ export default function SystemConfig() {
         <MasterPage bgColor="#f0f2f5">
             <div style={{ padding: "24px 24px 24px 24px" }}>
                 <Row gutter={[16, 16]}>
-                    <Col span={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/orgchart")}
@@ -30,14 +30,14 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         Organization Chart
-                                </label>
+                                    </label>
 
                                 }
                             />
                         </Card>
                     </Col>
 
-                    <Col span={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/product")}
@@ -54,14 +54,14 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         เพิ่ม,แก้ไข ข้อมูล Product
-                                </label>
+                                    </label>
 
                                 }
                             />
                         </Card>
                     </Col>
 
-                    <Col span={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/module")}
@@ -78,14 +78,14 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         เพิ่ม,แก้ไข,ลบ ข้อมูล Module
-                                </label>
+                                    </label>
 
                                 }
                             />
                         </Card>
                     </Col>
 
-                    <Col span={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/version")}
@@ -102,16 +102,14 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         รายละเอียด Version
-                                </label>
+                                    </label>
 
                                 }
                             />
                         </Card>
                     </Col>
 
-                </Row>
-                <Row gutter={[16, 16]}>
-                    <Col span={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/reopen")}
@@ -128,14 +126,14 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         ตั้งค่าเหตุผลในการ ReOpen ของลูกค้า
-                                </label>
+                                    </label>
 
                                 }
                             />
                         </Card>
                     </Col>
 
-                    <Col span={6}>
+                    <Col xs={24} sm={42} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/email_config")}
@@ -152,15 +150,14 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         ตั้งค่าการส่ง Email
-                                </label>
+                                    </label>
 
                                 }
                             />
                         </Card>
                     </Col>
 
-
-                    <Col span={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/reason_cancel")}
@@ -177,13 +174,13 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         ตั้งค่าเหตุผลการยกเลิก ของลูกค้า
-                                </label>
+                                    </label>
                                 }
                             />
                         </Card>
                     </Col>
 
-                    <Col span={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/reason_reject")}
@@ -200,14 +197,38 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         ตั้งค่าเหตุผลการ Reject
-                                </label>
+                                    </label>
+                                }
+                            />
+                        </Card>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                            onClick={() => history.push("/internal/setting/system/user-manual")}
+                        >
+                            <Meta
+                                avatar={
+                                    <img
+                                        style={{ height: "40px", width: "40px" }}
+                                        src={`${process.env.PUBLIC_URL}/icons-upload.png`}
+                                        alt=""
+                                    />
+                                }
+                                title={<label className="card-title-menu"> Upload คู่มือการใช้งาน</label>}
+                                description={
+                                    <label className="value-text">
+                                        ตั้งค่า Upload คู่มือเพื่อใช้ในระบบ
+                                    </label>
+
                                 }
                             />
                         </Card>
                     </Col>
                 </Row>
             </div>
-           
+
         </MasterPage>
     )
 }

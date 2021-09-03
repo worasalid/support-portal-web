@@ -29,8 +29,6 @@ export default function ConfigReOpen() {
             });
 
             if (result.status === 200) {
-
-
                 setTimeout(() => {
                     setLoading(false)
                     setDataReOpen(result.data)

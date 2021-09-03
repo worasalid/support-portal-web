@@ -78,7 +78,6 @@ export default function Dashboard2() {
 
     const getProduct = async () => {
         try {
-
             const result = await Axios.get(process.env.REACT_APP_API_URL + "/master/products", {
                 params: {
                     item: "A",

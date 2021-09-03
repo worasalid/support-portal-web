@@ -28,6 +28,12 @@ export default function AllDashBoard() {
                 dashboard_name: "DashBoard All Site (OverDue) By Product",
                 description: "ดูข้อมูล Issue ที่ค้างและเกิน SLA ของแต่ละ site แยกตาม Product",
                 url: "/internal/dashboard/dashboard3"
+            },
+            {
+                no: "4",
+                dashboard_name: "DashBoard By Team",
+                description: "ดูข้อมูล Issue ที่ค้างเป็นรายทีม",
+                url: "/internal/dashboard/dashboard4"
             }
         ]
 

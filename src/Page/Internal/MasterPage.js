@@ -3,10 +3,9 @@ import React, { Component, useState, useContext, useEffect, useRef } from 'react
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
-import { PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined, BellOutlined } from '@ant-design/icons';
 import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined
+  PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined,
+  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
@@ -15,6 +14,7 @@ import Notification from '../../Component/Notifications/Internal/Notification';
 import NotificationDetails from '../../Component/Notifications/Internal/NotificationDetails';
 import StickyNote from '../../Component/StickyNote/Internal/StickyNote';
 import axios from 'axios';
+import UserManual from "../../Component/UserManual";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -54,25 +54,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
   const [show_notice, setshow_notice] = useState(true)
   const [active_submenu, setActive_submenu] = useState('')
 
-
   //Menu
   const notiRef = useRef(null);
   const notiDetailsRef = useRef(null);
-  // const rootsubmenukeys = ['sub0', 'sub1', 'sub2', 'sub3'];
-  // const [openKeys, setOpenKeys] = useState(['sub1']);
+  const [visibleChange, setVisibleChange] = useState(false);
 
   // Drawer
   const [drawerCollapsed, setDrawerCollapsed] = useState(false)
-
-  // const onOpenChange = keys => {
-  //   const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
-  //   if (rootsubmenukeys.indexOf(latestOpenKey) === -1) {
-  //     setOpenKeys(keys);
-  //   } else {
-  //     setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-  //   }
-  // }
-
 
   const getuser = async () => {
     try {
@@ -152,13 +140,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
   useEffect(() => {
     if (state.authen === false) {
       getuser();
-      getNotification();
+      // getNotification();
       CountStatus();
     } else {
       setInterval(() => {
         getNotification();
         CountStatus();
-      }, 100000)
+      }, 500000)
     }
   }, [state.authen])
 
@@ -256,7 +244,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
           height: "60px",
           boxshadow: "0 30px 500px rgba(0,0,0,75)"
         }}>
-        <Row>
+        <Row align="middle">
           <Col span={12}>
             <img
               style={{ height: "60px", width: "130px" }}
@@ -270,10 +258,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             />
 
           </Col>
-          <Col span={12} style={{ textAlign: "right" }}>
+          <Col span={12} style={{ textAlign: "right", marginBottom: 5 }}>
             <Tooltip title="Sticky Note">
               <Button
-                style={{ backgroundColor: "#BE1E2D", borderColor: "#BE1E2D" }}
+                style={{ backgroundColor: "#BE1E2D", borderColor: "#BE1E2D", marginRight: 10 }}
                 icon={
                   <img
                     style={{ height: "30px", width: "30px" }}
@@ -284,6 +272,34 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 onClick={() => setDrawerCollapsed(true)}
               >
               </Button>
+            </Tooltip>
+
+            <Tooltip title="คู่มือการใช้งาน">
+              <Dropdown
+                placement="bottomCenter"
+                overlayStyle={{ width: 500, height: 400 }}
+                onVisibleChange={(x) => setVisibleChange(x)}
+                overlay={(n) => (
+
+                  <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
+                    <div>
+                      <label style={{ fontSize: 24, fontWeight: "bold", marginLeft: 16 }}>คู่มือการใช้งาน</label><br />
+                      <Row style={{ padding: 16 }}>
+                        <Col span={24}>
+                          <UserManual type="internal" visible={visibleChange} />
+                        </Col>
+                      </Row>
+                    </div>
+
+                  </Menu>
+
+                )} trigger="click">
+
+                <Button type="text" style={{ marginRight: 0, marginTop: 10 }}
+                  icon={<ReadOutlined style={{ fontSize: 20 }} />}
+                >
+                </Button>
+              </Dropdown>
             </Tooltip>
 
             <Tooltip title="Notifications">
@@ -339,11 +355,12 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 )} trigger="click">
 
                 <Button type="text" ghost style={{ display: state?.usersdata?.users?.profile_image !== "" ? "inline-block" : "none" }}>
-                  <div >
-                    <Avatar size={48} src={state?.usersdata?.users?.profile_image}
-                      icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}
-                    />
-                  </div>
+                  {/* <div > */}
+                  <Avatar size={48} src={state?.usersdata?.users?.profile_image}
+
+                    icon={state?.usersdata?.users?.email.substring(0, 1).toLocaleUpperCase()}
+                  />
+                  {/* </div> */}
                 </Button>
 
               </Dropdown>
@@ -376,15 +393,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
             <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{ marginTop: 16 }}>
               <Menu.Item key="20" onClick={() => history.push('/internal/mydashboard')}>
-                <label>
-                  My DashBoard
-                </label>
-
+                My DashBoard
               </Menu.Item>
               <Menu.Item key="21" onClick={() => history.push('/internal/dashboard')}>
-                <label>
-                  All DashBoard
-                </label>
+                All DashBoard
               </Menu.Item>
             </SubMenu>
 
@@ -405,7 +417,8 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
                 All Task
               </Menu.Item>
-              <Menu.ItemGroup key="g2" title="In Box">
+
+              <Menu.ItemGroup key="g1" title="In Box">
                 <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
                   My Task
                   {

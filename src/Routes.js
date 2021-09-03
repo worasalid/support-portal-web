@@ -1,6 +1,8 @@
 import React, { useReducer } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
+import Login from './Page/Internal/Login';
+import LineRegister from './Page/Internal/LineRegister'
 import Profile from './Page/Internal/Profile';
 
 import CustomerDashboard from './Page/Customer/Dashboard/MyDashboard';
@@ -20,6 +22,8 @@ import AllDashBoard from './Page/Internal/DashBoard/AllDashBoard';
 import Dashboard1 from './Page/Internal/DashBoard/DashBoard1';
 import Dashboard2 from './Page/Internal/DashBoard/Dashboard2';
 import DashBoard3 from './Page/Internal/DashBoard/DashBoard3';
+import DashBoard4 from './Page/Internal/DashBoard/DashBoard4';
+
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
 import MyTask from './Page/Internal/Issue/MyTask';
@@ -37,7 +41,6 @@ import RicefInProgress from './Page/Internal/Ricef/InProgress';
 import RicefSubject from './Page/Internal/Ricef/Subject';
 
 import UnAssign from './Page/Internal/Issue/UnAssign';
-import Login from './Page/Internal/Login';
 import MasterCompany from './Page/Internal/Setting/MasterCompany';
 import MappingCompany from './Page/Internal/Setting/MapCompany';
 import SupportSiteConfig from './Page/Internal/Setting/SupportSiteConfig';
@@ -66,6 +69,7 @@ import ConfigReOpenEmail from './Page/Internal/Setting/System/ConfigReOpenEmail'
 import ConfigEmailPatchVersion from './Page/Internal/Setting/System/ConfigEmail_PatchVersion';
 import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
 import ConfigReasonReject from './Page/Internal/Setting/System/ConfigReasonReject';
+import UserManual from './Page/Internal/Setting/System/UserManual';
 
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
@@ -97,6 +101,7 @@ export default function Routes() {
                                 <Switch>
                                     <Route path="/" exact component={Login} />
                                     <Route path="/login" exact component={Login} />
+                                    <Route path="/line/register" exact component={LineRegister} />
                                     <Route path="/internal/user/profile" exact component={Profile} />
                                     <Route path="/internal/issue" exact component={MyTask} />
                                     <Route path="/internal/issue/unassign" exact component={UnAssign} />
@@ -121,15 +126,20 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/email_config" exact component={ConfigEmail} />
                                     <Route path="/internal/setting/system/email_config/reopen" exact component={ConfigReOpenEmail} />
                                     <Route path="/internal/setting/system/email_config/patch" exact component={ConfigEmailPatchVersion} />
-                                    
+
                                     <Route path="/internal/setting/system/reason_cancel" exact component={ConfigReasonCancel} />
                                     <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
+                                    <Route path="/internal/setting/system/user-manual" exact component={UserManual} />
+                                    
 
+                                    {/* dashboard */}
                                     <Route path="/internal/mydashboard" exact component={MyDashboard} />
                                     <Route path="/internal/dashboard" exact component={AllDashBoard} />
                                     <Route path="/internal/dashboard/dashboard1" exact component={Dashboard1} />
                                     <Route path="/internal/dashboard/dashboard2" exact component={Dashboard2} />
                                     <Route path="/internal/dashboard/dashboard3" exact component={DashBoard3} />
+                                    <Route path="/internal/dashboard/dashboard4" exact component={DashBoard4} />
+
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
                                     <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />

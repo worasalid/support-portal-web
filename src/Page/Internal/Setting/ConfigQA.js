@@ -6,7 +6,6 @@ import { useHistory, useRouteMatch } from 'react-router-dom';
 import MasterPage from '../MasterPage'
 
 const { Column } = Table;
-const { TabPane } = Tabs;
 
 export default function ConfigQA() {
 

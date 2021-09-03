@@ -1,12 +1,11 @@
 import { LeftCircleOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
+import { Button, Table, Modal, message, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import MasterPage from '../MasterPage'
 
 const { Column } = Table;
-const { TabPane } = Tabs;
 
 export default function ConfigSA() {
 

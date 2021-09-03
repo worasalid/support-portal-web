@@ -1,9 +1,9 @@
-import { EditOutlined, SearchOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Select, Radio, Spin } from 'antd';
+import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Radio, Spin } from 'antd';
 
 import Column from 'antd/lib/table/Column';
 import Axios from 'axios'
-import React, { createRef, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MasterPage from '../MasterPage'
 import Draggable from 'react-draggable';
 
@@ -391,18 +391,17 @@ export default function MasterCompany() {
                                                 }),
                                                 setVisible(true)
                                             )
-                                        }
-                                        }
+                                        }}
                                     >
                                         Edit
                                     </Button>
                                 </>
                             )
-                        }
-                        }
+                        }}
                     />
                 </Table>
             </div>
+            
             {/* Add ข้อมูลบริษัท */}
             <Modal
                 visible={modalAdd}

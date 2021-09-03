@@ -1,193 +1,94 @@
 import React, { useState, useEffect } from 'react';
 import { Column } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, DatePicker, Tabs } from 'antd';
+import { Row, Col, Card, Spin, DatePicker, Tabs, Select, Checkbox, Button } from 'antd';
 import { FileOutlined } from '@ant-design/icons';
 import Axios from "axios";
-import moment from 'moment';
+import { useHistory } from 'react-router-dom';
+import xlsx from 'xlsx';
+import moment from "moment";
 
 const { Meta } = Card;
-const { RangePicker } = DatePicker;
-const { TabPane } = Tabs;
-
-
-const DashBoard = React.memo(({ data }) => {
-    const config = {
-        xField: 'Status',
-        yField: 'Value',
-        label: {
-            position: 'middle',
-            content: function content(item) {
-                return item.Value.toFixed(0);
-            },
-            style: { fill: '#fff' },
-        },
-        columnWidthRatio: 0.4,
-        legend: {
-            layout: 'horizontal',
-            position: 'bottom'
-        },
-        color: function color(x) {
-            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
-            if (x.Status === "InProgress") { return "#5B8FF9" }
-            if (x.Status === "Resolved") { return "#FF5500" }
-            if (x.Status === "Cancel") { return "#CD201F" }
-            if (x.Status === "ReOpen") { return "#CD201F" }
-            if (x.Status === "Complete") { return "#87D068" }
-
-        },
-    };
-
-    return (
-        <>
-            <Card title="Issue" bordered={true} style={{ width: "100%" }}>
-                <Column {...config}
-                    data={data.filter((x) => x.Status !== "Total")}
-                    height={280}
-                    //scrollbar="true"
-                    xAxis={{ position: "bottom" }}
-                />
-            </Card>
-        </>
-    )
-})
 
 export default function MyDashboard() {
+    const history = useHistory();
     const [loading, setLoading] = useState(true);
-    const [dashboard, setDashboard] = useState([]);
-    const [dashBoardWeekly, setDashBoardWeekly] = useState([]);
-    const [dashBoardMonthly, setDashBoardMonthly] = useState([]);
-    const [filterDate, setFilterDate] = useState([]);
-    const [dashboardType, setDashBoardType] = useState("total");
 
-    const [dates, setDates] = useState([]);
+    //data
+    const [cusProduct, setCusProduct] = useState(null)
+    const [dashboard, setDashboard] = useState([]);
+    const [chartData, setChartData] = useState([]);
+    const [excelData, setExcelData] = useState([])
+
+    const [selectCusProduct, setSelectCusProduct] = useState(null);
+    const [isStack, setIsStack] = useState(false);
 
     const config = {
-        xField: 'Status',
-        yField: 'Value',
-        seriesField: 'Status',
+        xField: cusProduct?.length > 1 ? 'productcode' : 'status',
+        yField: 'value',
+        seriesField: 'status',
+        isStack: isStack,
+        isGroup: !isStack,
         label: {
             position: 'middle',
             content: function content(item) {
-                return item.Value.toFixed(0);
+                return item.value.toFixed(0);
             },
             style: { fill: '#fff' },
         },
-        meta: {
-            Status: { alias: '类别' },
-            Value: { alias: '销售额' },
-        },
-        columnWidthRatio: 0.4,
+        columnWidthRatio: isStack && selectCusProduct !== null ? 0.1 :
+            isStack && selectCusProduct === null ? 0.2 : 0.4,
         legend: {
             layout: 'horizontal',
             position: 'bottom'
         },
         color: function color(x) {
-            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
-            if (x.Status === "InProgress") { return "#5B8FF9" }
-            if (x.Status === "Resolved") { return "#FF5500" }
-            if (x.Status === "Cancel") { return "#CD201F" }
-            if (x.Status === "ReOpen") { return "#CD201F" }
-            if (x.Status === "Complete") { return "#87D068" }
-
+            if (x.status === "MyTask") { return "#5B8FF9" }
+            if (x.status === "InProgress") { return "#87D068" }
+            if (x.status === "Waiting Deploy") { return "#FF5500" }
+            if (x.status === "Cancel") { return "#CD201F" }
         }
     }
 
-    const configWeek = {
-        xField: 'Status',
-        yField: 'Value',
-        // seriesField: 'status',
-        // isStack: true,
-        label: {
-            position: 'middle',
-            // content: function content(item) {
-            //     return item.Value.toFixed(0);
-            // },
-            style: { fill: '#fff' },
-        },
-        legend: {
-            layout: 'horizontal',
-            position: 'bottom'
-        },
-        color: function color(x) {
-            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
-            if (x.Status === "InProgress") { return "#5B8FF9" }
-            if (x.Status === "Resolved") { return "#FF5500" }
-            if (x.Status === "Cancel") { return "#CD201F" }
-            if (x.Status === "Complete") { return "#87D068" }
-
-        },
-    };
-
-    const configMonth = {
-        xField: 'Status',
-        yField: 'Value',
-        seriesField: 'Status',
-        isStack: true,
-        label: {
-            position: 'middle',
-            content: function content(item) {
-                return item.Value.toFixed(0);
-            },
-            style: { fill: '#fff' },
-        },
-        columnWidthRatio: 0.8,
-        legend: {
-            layout: 'horizontal',
-            position: 'bottom'
-        },
-        color: function color(x) {
-            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
-            if (x.Status === "InProgress") { return "#5B8FF9" }
-            if (x.Status === "Resolved") { return "#FF5500" }
-            if (x.Status === "Cancel") { return "#CD201F" }
-            if (x.Status === "Complete") { return "#87D068" }
-
-        },
-    };
-
-    const GetIssueTotal = async (param) => {
+    const getProduct = async () => {
         try {
-            const issuestatus = await Axios({
-                url: process.env.REACT_APP_API_URL + "/dashboard/issue-status",
-                method: "GET",
+            const result = await Axios.get(process.env.REACT_APP_API_URL + "/master/customer-products", {
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
-                params: {
-                    dash_board_type: dashboardType
-                }
-
             });
-            if (issuestatus.status === 200) {
-                setLoading(false);
-                setDashboard(issuestatus.data.total)
+
+            if (result.status === 200) {
+                setCusProduct(result.data)
             }
 
         } catch (error) {
-            //setLoading(false)
+
         }
     }
 
-    const getIssueByWeek = async (param) => {
-        setLoading(true);
+    const getData = async (param) => {
         try {
-            const issuestatus = await Axios({
-                url: process.env.REACT_APP_API_URL + "/dashboard/issue-status",
+            const result = await Axios({
+                url: process.env.REACT_APP_API_URL + "/dashboard/customer/mytask",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    start_date: moment(param[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
-                    end_date: moment(param[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
-                    dash_board_type: dashboardType
+                    product_id: selectCusProduct
                 }
-
             });
-            if (issuestatus.status === 200) {
+
+            if (result.status === 200) {
                 setLoading(false);
-                setDashBoardWeekly(issuestatus.data.total);
+                setDashboard(result.data.total);
+                setChartData(result.data.chartdata.map((n) => ({
+                    productcode: n.ProductCode,
+                    status: n.Status === "Resolved" ? "Waiting Deploy" : n.Status,
+                    value: n.Value
+                })));
+                setExcelData(result.data.exceldata)
             }
 
         } catch (error) {
@@ -195,44 +96,41 @@ export default function MyDashboard() {
         }
     }
 
-    const getIssueByMonth = async (param) => {
-        setLoading(true);
-        try {
-            const issuestatus = await Axios({
-                url: process.env.REACT_APP_API_URL + "/dashboard/issue-status",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    start_date: moment(param, "MM/YYYY").format("YYYY-MM"),
-                    dash_board_type: dashboardType
-                }
+    const ExportExcel = (json) => {
+        if (json !== undefined) {
+            let ws = xlsx.utils.json_to_sheet(json.map((x) => (
+                {
+                    No: x.Row,
+                    Issue: x.Number,
+                    IssueType: x.IssueType,
+                    Priority: x.Priority,
+                    Title: x.Title,
+                    Status: x.GroupStatus,
+                    Progress: x.ProgressStatus,
+                    AssignDate: x.AssignIconDate,
+                    DueDate: x.DueDate,
+                    OverDue: x.OverDue
 
-            });
-            if (issuestatus.status === 200) {
-                setLoading(false);
-                setDashBoardMonthly(issuestatus.data.total);
-            }
+                })
+            ));
 
-        } catch (error) {
-            setLoading(false)
+            let wb = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(wb, ws, 'Issue');
+            xlsx.writeFile(wb, `My DashBoard - ${moment().format("YYMMDD_HHmm")}.xlsx`);
         }
     }
+
 
     useEffect(() => {
-        GetIssueTotal();
+        getData();
+        getProduct();
     }, [])
 
     useEffect(() => {
-        if (dashboardType === "weekly") {
-            getIssueByWeek([moment(moment().add(-7, 'day').format("DD/MM/YYYY"), "DD/MM/YYYY"), moment(moment().format("DD/MM/YYYY"), "DD/MM/YYYY")]);
+        if (selectCusProduct !== null) {
+            getData();
         }
-        if (dashboardType === "monthly") {
-            getIssueByMonth(moment(moment().format("MM/YYYY"), "MM/YYYY"));
-        }
-
-    }, [dashboardType])
+    }, [selectCusProduct])
 
 
     return (
@@ -241,162 +139,89 @@ export default function MyDashboard() {
                 <div style={{ padding: "24px 24px 24px 24px" }}>
                     <Row gutter={16}>
                         <Col span={4}>
-                            {/* <Card bordered={true} style={{ width: "100%" }}>
-                            <div>
-                                <Row>
-                                    <Col span={12}>
-                                        <label className="dashboard-card-status" >
-                                            Open
-                                          </label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="dashboard-card-status" >
-                                            Hold
-                                         </label>
-                                    </Col>
-                                </Row>
-                            </div>
-                            <div>
-                                <Row>
-                                    <Col span={12}>
-                                        <label className="dashboard-card-value">
-                                            {dashboard[0]?.Value}
-                                        </label>
-                                    </Col>
-                                    <Col span={12}>
-                                        <label className="dashboard-card-value">
-                                            {dashboard[4]?.Value}
-                                        </label>
-                                    </Col>
-                                </Row>
-                            </div>
-                        </Card>
-                    */}
+
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
+                                onClick={() => history.push({ pathname: "/customer/issue/mytask" })}
                             >
                                 <Meta
                                     avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>Open</label>}
+                                    title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>MyTask</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[0]?.Value}
+                                            {dashboard[0]?.MyTask}
                                         </label>
 
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
-                            {/* <Card bordered={true} style={{ width: "100%" }}>
-                            <div>
-                                <label className="dashboard-card-status">
-                                    InProgress
-                            </label>
 
-                            </div>
-                            <div>
-                                <label className="dashboard-card-value" style={{ color: "#5B8FF9" }}>
-                                    {dashboard[1]?.Value}
-                                </label>
-                            </div>
-                        </Card> */}
+                        <Col span={4}>
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
+                                onClick={() => history.push({ pathname: "/customer/issue/inprogress" })}
                             >
                                 <Meta
                                     avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>InProgress</label>}
+                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>InProgress</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[1]?.Value}
+                                            {dashboard[0]?.InProgress}
                                         </label>
 
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
-                            {/* <Card bordered={true} style={{ width: "100%" }}>
-                            <div>
-                                <label className="dashboard-card-status">
-                                    Resolved
-                            </label>
 
-                            </div>
-                            <div>
-                                <label className="dashboard-card-value" style={{ color: "#FF5500" }}>
-                                    {dashboard[2]?.Value}
-                                </label>
-                            </div>
-                        </Card> */}
+                        <Col span={4}>
+
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
+                                onClick={() => history.push({ pathname: "/customer/issue/pass" })}
                             >
                                 <Meta
                                     avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Resolved</label>}
+                                    title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Waiting Deploy</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[2]?.Value}
+                                            {dashboard[0]?.Resolved}
                                         </label>
 
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
-                            {/* <Card bordered={true} style={{ width: "100%" }}>
-                            <div>
-                                <label className="dashboard-card-status">
-                                    Cancel
-                            </label>
 
-                            </div>
-                            <div>
-                                <label className="dashboard-card-value" style={{ color: "#CD201F" }}>
-                                    {dashboard[3]?.Value}
-                                </label>
-                            </div>
-                        </Card> */}
+                        <Col span={4}>
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
+                                onClick={() => history.push({ pathname: "/customer/issue/cancel" })}
                             >
                                 <Meta
                                     avatar={<FileOutlined style={{ fontSize: 25 }} />}
                                     title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[3]?.Value}
+                                            {dashboard[0]?.Cancel}
                                         </label>
-
                                     }
                                 />
                             </Card>
                         </Col>
-                        <Col span={4}>
-                            {/* <Card bordered={true} style={{ width: "100%" }}>
-                            <div>
-                                <label className="dashboard-card-status">
-                                    Complete
-                            </label>
 
-                            </div>
-                            <div>
-                                <label className="dashboard-card-value" style={{ color: "#87D068" }}>
-                                    {dashboard[5]?.Value}
-                                </label>
-                            </div>
-                        </Card> */}
+                        <Col span={4}>
                             <Card className="card-box issue-active" bordered hoverable
                                 style={{ width: "100%" }}
+                                onClick={() => history.push({ pathname: "/customer/issue/complete" })}
                             >
                                 <Meta
                                     avatar={<FileOutlined style={{ fontSize: 25 }} />}
                                     title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[5]?.Value}
+                                            {dashboard[0]?.Complete}
                                         </label>
 
                                     }
@@ -408,103 +233,79 @@ export default function MyDashboard() {
                                 <div>
                                     <label className="dashboard-card-status">
                                         Total
-                            </label>
+                                    </label>
 
                                 </div>
                                 <div>
                                     <label className="dashboard-card-value">
-                                        {dashboard[7]?.Value}
+                                        {
+                                            dashboard[0]?.MyTask + dashboard[0]?.InProgress + dashboard[0]?.Resolved +
+                                            dashboard[0]?.Cancel + dashboard[0]?.Complete
+
+                                        }
                                     </label>
                                 </div>
                             </Card>
                         </Col>
                     </Row>
 
-
                     <Row gutter={16} style={{ marginTop: "30px" }}>
-                        {/* <Col span={12}>
-                            {<DashBoard data={dashboard} />}
-                        </Col> */}
                         <Col span={24}>
-                            <div className="card-container">
-                                <Tabs type="card" defaultActiveKey="Day" onChange={(x) => setDashBoardType(x)}>
-                                    <TabPane tab="Total" key="total">
+                            <Card bordered={true}
+                                title={
+                                    <>
                                         <Row>
-                                            <Col span={24}>
-
-                                            </Col>
-                                        </Row>
-                                        <Column {...config}
-                                            tooltip="xxx"
-                                            style={{ height: 350 }}
-                                            data={dashboard.filter((x) => x.Status !== "Total")}
-                                            xAxis={{
-                                                position: "bottom",
-                                            }}
-                                        />
-
-                                    </TabPane>
-                                    <TabPane tab="By Weekly" key="weekly">
-                                        <Row style={{ marginBottom: 24 }}>
                                             <Col span={16}>
-
+                                                <label>จำนวน Issue</label>
                                             </Col>
-                                            <Col span={8}>
-                                                <RangePicker format="DD/MM/YYYY" style={{ width: "100%" }}
-                                                    defaultValue={
-                                                        [
-                                                            moment(moment().add(-7, 'day').format("DD/MM/YYYY"), "DD/MM/YYYY"),
-                                                            moment(moment().format("DD/MM/YYYY"), "DD/MM/YYYY")
-                                                        ]
+                                            <Col span={6} hidden={cusProduct?.length > 1 ? false : true}>
+                                                <Select
+                                                    placeholder="Select Product"
+                                                    showSearch
+                                                    allowClear
+                                                    defaultActiveFirstOption
+                                                    style={{ width: "100%" }}
+                                                    filterOption={(input, option) =>
+                                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                                     }
-                                                    disabledDate={(current) => {
-                                                        if (!dates || dates.length === 0) {
-                                                            return false;
-                                                        }
-                                                        const tooLate = dates[0] && current.diff(dates[0], 'days') >= 7;
-                                                        const tooEarly = dates[1] && dates[1].diff(current, 'days') >= 7;
-                                                        return tooEarly || tooLate;
-                                                    }}
-                                                    onOpenChange={() => setDates([])}
-                                                    onChange={(date, dateString) => { getIssueByWeek(dateString) }}
-                                                    onCalendarChange={val => setDates(val)}
-                                                />
+                                                    onChange={(value) => setSelectCusProduct(value)}
+                                                    options={cusProduct && cusProduct.map((n) => ({ value: n.ProductId, label: n.Name + ` (${n.FullName})` }))}
+                                                >
+                                                </Select>
                                             </Col>
                                         </Row>
-                                        <Column {...configWeek}
-                                            style={{ height: 280 }}
-                                            data={dashBoardWeekly.filter((x) => x.status !== "Total")}
-                                            //scrollbar="true"
-                                            xAxis={{ position: "bottom" }}
-                                        />
+                                    </>
+                                }
+                                extra={
+                                    <>
+                                        <Checkbox style={{ display: cusProduct?.length > 1 ? "block" : "none" }} onChange={(value) => setIsStack(value.target.checked)}>
+                                            Is Stack
+                                        </Checkbox>
 
-                                    </TabPane>
-                                    <TabPane tab="By Monthly" key="monthly">
-                                        <Row style={{ marginBottom: 24 }}>
-                                            <Col span={16}>
-
-                                            </Col>
-                                            <Col span={8}>
-                                                <DatePicker  picker="month" format="MM/YYYY"  style={{ width: "100%" }}
-                                                    defaultValue={moment(moment().format("MM/YYYY"), "MM/YYYY")}
-                                                    onChange={(date, dateString) => { getIssueByMonth(dateString) }}
+                                        <Button type="default"
+                                            onClick={() => ExportExcel(excelData)}
+                                            icon={
+                                                <img
+                                                    style={{ height: "25px" }}
+                                                    src={`${process.env.PUBLIC_URL}/icons-excel.png`}
+                                                    alt="Excel Export"
                                                 />
-                                            </Col>
-                                        </Row>
-                                        <Column {...configMonth}
-                                            style={{ height: 280 }}
-                                            data={dashBoardMonthly.filter((x) => x.status !== "Total")}
-                                            //scrollbar="true"
-                                            xAxis={{ position: "bottom" }}
-                                        />
-                                    </TabPane>
-                                </Tabs>
-                            </div>
-
+                                            }>
+                                            Export
+                                        </Button>
+                                    </>
+                                }
+                            >
+                                <Column {...config}
+                                    style={{ height: 350 }}
+                                    data={chartData.filter((n) => n.value !== 0)}
+                                    xAxis={{
+                                        position: "bottom",
+                                    }}
+                                />
+                            </Card>
                         </Col>
                     </Row>
-
-
                 </div>
             </Spin>
         </MasterPage >

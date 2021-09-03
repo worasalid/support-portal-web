@@ -1,9 +1,8 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
 import { useHistory } from "react-router-dom";
-import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import IssueSearch from "../../../Component/Search/Customer/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
