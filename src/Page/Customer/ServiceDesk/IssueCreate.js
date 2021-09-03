@@ -97,6 +97,7 @@ export default function IssueCreate() {
         formData = new FormData();
         formData.append("file", blobInfo.blob(), blobInfo.filename());
         formData.append("ticket", 0);
+        formData.append("group_type", "issue_description");
 
         xhr.send(formData);
     };
@@ -561,7 +562,7 @@ export default function IssueCreate() {
                                     toolbar2: 'alignleft aligncenter alignright alignjustify bullist numlist preview table openlink',
                                 }}
                                 onEditorChange={(content, editor) => setDescription(content)}
-                                
+
                             />
                         </Form.Item>
                         <Form.Item label="ไฟล์แนบ" name="attach">

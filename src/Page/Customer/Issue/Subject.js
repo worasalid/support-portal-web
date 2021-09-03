@@ -20,6 +20,7 @@ import ModalConfirmManday from "../../../Component/Dialog/Customer/modalConfirmM
 import ModalPO from "../../../Component/Dialog/Customer/modalPO";
 import ModalDueDate from "../../../Component/Dialog/Customer/modalDueDate";
 import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
+import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -48,6 +49,7 @@ export default function Subject() {
   const [modalPO_visible, setModalPO_visible] = useState(false);
   const [modalDueDate_visible, setModalDueDate_visible] = useState(false);
   const [modalPreview, setModalPreview] = useState(false);
+  const [modalfiledownload, setModalfiledownload] = useState(false);
 
   // data
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
@@ -568,12 +570,24 @@ export default function Subject() {
                       </label>
                       <div className="issue-detail-box">
                         <Row>
+                          <Col span={2} style={{ display: "inline" }}>
+                            <Avatar size={32} icon={<UserOutlined />} />
+                          </Col>
                           <Col span={16} style={{ display: "inline" }}>
                             <Typography.Title level={4}>
-                              <Avatar size={32} icon={<UserOutlined />} />&nbsp;&nbsp;  {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Title}
+                              {customerstate.issuedata.details[0]?.Title}
                             </Typography.Title>
                           </Col>
-                          <Col span={8} style={{ display: "inline", textAlign: "right" }}>
+                          <Col span={6} style={{ display: "inline", textAlign: "right" }}>
+                            <Button title="file attach" type="link"
+                              style={{ display: customerstate?.issuedata?.details[0]?.cntFile === 0 ? "none" : "inline-block" }}
+                              icon={<img
+                                style={{ height: "20px", width: "20px" }}
+                                src={`${process.env.PUBLIC_URL}/icons-attach.png`}
+                                alt=""
+                              />}
+                              onClick={() => setModalfiledownload(true)}
+                            />
                             <Button type="link"
                               onClick={
                                 () => {
@@ -930,6 +944,22 @@ export default function Subject() {
             setImgUrl(null);
           }}
           pathUrl={imgUrl}
+        />
+
+        <ModalFileDownload
+          title="File Download"
+          visible={modalfiledownload}
+          onCancel={() => setModalfiledownload(false)}
+          width={600}
+          onOk={() => {
+            setModalfiledownload(false);
+
+          }}
+          details={{
+            refId: customerstate?.issuedata?.details[0]?.Id,
+            reftype: "Master_Ticket",
+            grouptype: "attachment"
+          }}
         />
       </Spin>
     </MasterPage>
