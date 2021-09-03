@@ -387,7 +387,7 @@ export default function DashboardStatus() {
                                                         const tooEarly = dates[1] && dates[1].diff(current, 'days') >= 7;
                                                         return tooEarly || tooLate;
                                                     }}
-                                                    onOpenChange={() => setDates([])}
+                                                   // onOpenChange={() => setDates([])}
                                                     onChange={(date, dateString) => { getIssueByWeek(dateString) }}
                                                     onCalendarChange={val => setDates(val)}
                                                 />

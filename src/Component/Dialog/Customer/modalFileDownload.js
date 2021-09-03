@@ -6,7 +6,6 @@ import Column from 'antd/lib/table/Column';
 import { DownloadOutlined } from '@ant-design/icons';
 
 export default function ModalFileDownload({ visible = false, onOk, onCancel, details, ...props }) {
-    //const history = useHistory();
     const [listFiledownload, setListFiledownload] = useState([]);
 
     const getfile = async () => {

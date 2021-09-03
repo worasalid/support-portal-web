@@ -6,7 +6,7 @@ import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
 
-export default forwardRef (function Notifications(props, ref) {
+export default forwardRef (function Notifications({ref, visible, ...props}) {
     const history = useHistory()
     const [pageStart, setPageStart] = useState(1)
     const [loading, setLoading] = useState(true)
@@ -77,8 +77,8 @@ export default forwardRef (function Notifications(props, ref) {
     }
 
     useEffect(() => {
-        getNotiDetails(pageStart);
-    }, [])
+       if (visible) getNotiDetails(pageStart);
+    }, [visible])
 
 
     return (
@@ -104,8 +104,8 @@ export default forwardRef (function Notifications(props, ref) {
                     itemLayout="horizontal"
                     dataSource={notification}
                     renderItem={item => (
-                        <List.Item>
-                            <List.Item.Meta
+                        <List.Item key={item.id}>
+                            <List.Item.Meta key= {item.id}
                                 title={
                                     <>
                                         <Badge dot={true}

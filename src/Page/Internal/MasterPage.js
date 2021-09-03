@@ -306,6 +306,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               <Dropdown
                 placement="bottomCenter"
                 overlayStyle={{ width: 500, height: 400 }}
+                onVisibleChange={(x) => setVisibleChange(x)}
                 overlay={(
                   <Menu mode="inline" theme="light" style={{ width: 500, height: 400 }}>
                     <Menu.Item key="1"  >
@@ -315,7 +316,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                         <Row style={{ padding: 16 }}>
                           <Col span={24}>
 
-                            <NotificationDetails ref={notiDetailsRef} />
+                            <NotificationDetails ref={notiDetailsRef} visible={visibleChange} />
                           </Col>
                         </Row>
                         {/* </div> */}

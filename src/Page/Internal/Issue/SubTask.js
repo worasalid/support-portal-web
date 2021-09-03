@@ -1,4 +1,4 @@
-import { Col, Row, Select, Typography, Affix, Button, Avatar, Tabs, Modal, Timeline, Divider, Checkbox, message, Spin } from "antd";
+import { Col, Row, Select, Typography, Button, Avatar, Tabs, Modal, Timeline, Skeleton, Checkbox, message, Spin } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -447,211 +447,211 @@ export default function SubTask() {
 
   return (
     <MasterPage>
-      <Spin spinning={pageLoading} tip="Loading...">
-        <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
+      <Spin spinning={pageLoading} tip="Loading">
+        <Skeleton loading={pageLoading}>
+          <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
+            <Row style={{ height: 'calc(100% - 0px)' }}>
+              {/* Content */}
+              <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
 
-          <Row style={{ height: 'calc(100% - 0px)' }}>
-            {/* Content */}
-            <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+                <Row style={{ textAlign: "left" }}>
+                  <Col span={24} style={{ textAlign: "left" }}>
+                    <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
+                      <Button
+                        type="link"
+                        icon={<LeftCircleOutlined />}
+                        // style={{zIndex:99}}
+                        style={{ fontSize: 18, padding: 0, backgroundColor: "white", width: "100%", textAlign: "left" }}
+                        onClick={() => history.goBack()}
+                      >
+                        Back
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
+                <Row style={{ marginTop: 30 }}>
+                  <Col span={24}>
+                    <label className="topic-text">
+                      {userstate?.taskdata?.data[0]?.TicketNumber}
+                      {userstate?.taskdata?.data[0]?.IsReOpen === true ? " (ReOpen)" : ""}
+                    </label>
+                  </Col>
+                </Row>
 
-              <Row style={{ textAlign: "left" }}>
-                <Col span={24} style={{ textAlign: "left" }}>
-                  <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
-                    <Button
-                      type="link"
-                      icon={<LeftCircleOutlined />}
-                      // style={{zIndex:99}}
-                      style={{ fontSize: 18, padding: 0, backgroundColor: "white", width: "100%", textAlign: "left" }}
-                      onClick={() => history.goBack()}
-                    >
-                      Back
-                    </Button>
-                  </div>
-                </Col>
-              </Row>
-              <Row style={{ marginTop: 30 }}>
-                <Col span={24}>
-                  <label className="topic-text">
-                    {userstate?.taskdata?.data[0]?.TicketNumber}
-                    {userstate?.taskdata?.data[0]?.IsReOpen === true ? " (ReOpen)" : ""}
-                  </label>
-                </Col>
-              </Row>
+                {/* Issue Description */}
+                <Row style={{ marginRight: 24 }}>
+                  <Col span={24}>
+                    <div className="issue-detail-box">
+                      <Row>
+                        <Col span={2} style={{ display: "inline" }}>
+                          <Avatar size={32} icon={<UserOutlined />} />
+                        </Col>
+                        <Col span={16} style={{ display: "inline" }}>
+                          <Typography.Title level={4}>
+                            {userstate?.taskdata?.data[0]?.Title}
+                          </Typography.Title>
+                        </Col>
+                        <Col span={6} style={{ display: "inline", textAlign: "right" }}>
+                          <Button title="file attach" type="link"
+                            style={{ display: userstate?.taskdata?.data[0]?.cntFile === 0 ? "none" : "inline-block" }}
+                            icon={<img
+                              style={{ height: "20px", width: "20px" }}
+                              src={`${process.env.PUBLIC_URL}/icons-attach.png`}
+                              alt=""
+                            />}
+                            onClick={() => setModalfiledownload_visible(true)}
+                          />
+                          <Button title="preview" type="link"
+                            icon={<img
+                              style={{ height: "20px", width: "20px" }}
+                              src={`${process.env.PUBLIC_URL}/icons-expand.png`}
+                              alt=""
+                            />}
+                            onClick={() => setModalpreview(true)}
+                          />
 
-              {/* Issue Description */}
-              <Row style={{ marginRight: 24 }}>
-                <Col span={24}>
-                  <div className="issue-detail-box">
-                    <Row>
-                      <Col span={2} style={{ display: "inline" }}>
-                        <Avatar size={32} icon={<UserOutlined />} />
-                      </Col>
-                      <Col span={16} style={{ display: "inline" }}>
-                        <Typography.Title level={4}>
-                          {userstate?.taskdata?.data[0]?.Title}
-                        </Typography.Title>
-                      </Col>
-                      <Col span={6} style={{ display: "inline", textAlign: "right" }}>
-                        <Button title="file attach" type="link"
-                          style={{ display: userstate?.taskdata?.data[0]?.cntFile === 0 ? "none" : "inline-block" }}
-                          icon={<img
-                            style={{ height: "20px", width: "20px" }}
-                            src={`${process.env.PUBLIC_URL}/icons-attach.png`}
-                            alt=""
-                          />}
-                          onClick={() => setModalfiledownload_visible(true)}
-                        />
-                        <Button title="preview" type="link"
-                          icon={<img
-                            style={{ height: "20px", width: "20px" }}
-                            src={`${process.env.PUBLIC_URL}/icons-expand.png`}
-                            alt=""
-                          />}
-                          onClick={() => setModalpreview(true)}
-                        />
-                      
-                        <Button type="link"
-                          onClick={
-                            () => {
-                              return (
-                                setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
-                                setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
-                              )
+                          <Button type="link"
+                            onClick={
+                              () => {
+                                return (
+                                  setDivcollapse(divcollapse === 'none' ? 'block' : 'none'),
+                                  setCollapsetext(divcollapse === 'block' ? 'Show details' : 'Hide details')
+                                )
+                              }
                             }
-                          }
-                        >{collapsetext}
-                        </Button>
-                      </Col>
-                    </Row>
-                    <br/>
-                    <Row>
-                      <div style={{ display: divcollapse }}>
-                        <div className="issue-description"
-                          dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }}
-                          onClick={e => {
-                            if (e.target.tagName == "IMG") {
-                              setImgUrl(e.target.src);
-                              setModalPreview(true);
-                            }
-                          }}>
+                          >{collapsetext}
+                          </Button>
+                        </Col>
+                      </Row>
+                      <br />
+                      <Row>
+                        <div style={{ display: divcollapse }}>
+                          <div className="issue-description"
+                            dangerouslySetInnerHTML={{ __html: userstate?.taskdata?.data[0]?.Description }}
+                            onClick={e => {
+                              if (e.target.tagName == "IMG") {
+                                setImgUrl(e.target.src);
+                                setModalPreview(true);
+                              }
+                            }}>
 
+                          </div>
                         </div>
-                      </div>
-                    </Row>
-                  </div>
-                </Col>
-              </Row>
+                      </Row>
+                    </div>
+                  </Col>
+                </Row>
 
-              {/* TAB Document */}
-              <Row style={{ marginTop: 36, marginRight: 24 }}>
-                <Col span={24}>
-                  <TabsDocument
-                    details={{
-                      refId: userstate?.taskdata?.data[0]?.TaskId,
-                      reftype: "Ticket_Task",
+                {/* TAB Document */}
+                <Row style={{ marginTop: 36, marginRight: 24 }}>
+                  <Col span={24}>
+                    <TabsDocument
+                      details={{
+                        refId: userstate?.taskdata?.data[0]?.TaskId,
+                        reftype: "Ticket_Task",
+                      }}
+                    />
+                  </Col>
+                </Row>
+
+                {/* TAB Activity */}
+                <Row style={{ marginTop: 36, marginRight: 24 }} >
+                  <Col span={24} >
+                    <label className="header-text">Activity</label>
+
+                    {
+                      <Tabs defaultActiveKey="1" size="small" >
+                        <TabPane tab="Task Note" key="1" >
+                          <TaskComment />
+                        </TabPane>
+                        <TabPane tab="History Log" key="2">
+                          <InternalHistorylog subtype="task" />
+                        </TabPane>
+                      </Tabs>
+                    }
+
+
+                  </Col>
+                </Row>
+                {/* </div> */}
+              </Col>
+              {/* Content */}
+
+              {/* SideBar */}
+              <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
+                <Row style={{ marginBottom: 20, marginTop: 24 }}>
+                  <Col span={18}>
+                    <label className="header-text">Progress Status</label>
+                  </Col>
+                  <Col span={18}
+                    style={{
+                      marginTop: 10,
+                      //display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
+                      display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
                     }}
-                  />
-                </Col>
-              </Row>
+                  >
+                    <Select ref={selectRef}
+                      value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
+                      style={{ width: '100%' }} placeholder="None"
+                      onChange={(value, item) => HandleChange(value, item)}
+                      options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
+                    />
+                  </Col>
+                  <Col span={18}
+                    style={{
+                      // display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
+                      display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
+                    }}>
+                    <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
+                  </Col>
+                  <Col span={18}
+                    style={{
+                      //display: userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
+                      display: userstate?.mailbox[0]?.MailType === "out" ? "block" : "none"
+                    }}>
+                    <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
+                  </Col>
 
-              {/* TAB Activity */}
-              <Row style={{ marginTop: 36, marginRight: 24 }} >
-                <Col span={24} >
-                  <label className="header-text">Activity</label>
+                </Row>
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Priority</label>
+                    <br />
+                    <label className="value-text">{userstate?.taskdata?.data[0]?.Priority}</label>
+                  </Col>
+                </Row>
 
-                  {
-                    <Tabs defaultActiveKey="1" size="small" >
-                      <TabPane tab="Task Note" key="1" >
-                        <TaskComment />
-                      </TabPane>
-                      <TabPane tab="History Log" key="2">
-                        <InternalHistorylog subtype="task" />
-                      </TabPane>
-                    </Tabs>
-                  }
-
-
-                </Col>
-              </Row>
-              {/* </div> */}
-            </Col>
-            {/* Content */}
-
-            {/* SideBar */}
-            <Col span={8} style={{ padding: "0px 0px 0px 20px", height: "100%", overflowY: "auto" }}>
-              <Row style={{ marginBottom: 20, marginTop: 24 }}>
-                <Col span={18}>
-                  <label className="header-text">Progress Status</label>
-                </Col>
-                <Col span={18}
-                  style={{
-                    marginTop: 10,
-                    //display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
-                    display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
-                  }}
+                <Row style={{
+                  marginBottom: 20,
+                  display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" &&
+                    userstate.taskdata.data[0]?.DueDate !== null ? "inline-block" : "none"
+                }}
                 >
-                  <Select ref={selectRef}
-                    value={userstate.taskdata.data[0] && userstate.taskdata.data[0].FlowStatus}
-                    style={{ width: '100%' }} placeholder="None"
-                    onChange={(value, item) => HandleChange(value, item)}
-                    options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
-                  />
-                </Col>
-                <Col span={18}
-                  style={{
-                    // display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
-                    display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
-                  }}>
-                  <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
-                </Col>
-                <Col span={18}
-                  style={{
-                    //display: userstate.taskdata.data[0]?.MailType === "out" ? "block" : "none"
-                    display: userstate?.mailbox[0]?.MailType === "out" ? "block" : "none"
-                  }}>
-                  <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
-                </Col>
-
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Priority</label>
-                  <br />
-                  <label className="value-text">{userstate?.taskdata?.data[0]?.Priority}</label>
-                </Col>
-              </Row>
-
-              <Row style={{
-                marginBottom: 20,
-                display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" &&
-                  userstate.taskdata.data[0]?.DueDate !== null ? "inline-block" : "none"
-              }}
-              >
-                {/* <Col span={3} style={{ marginTop: "10px" }}>
+                  {/* <Col span={3} style={{ marginTop: "10px" }}>
                   <label className="header-text">SLA</label>
                 </Col> */}
-                <Col span={24} >
-                  <label className="header-text">Time Tracking</label>
-                  {
-                    userstate.taskdata.data[0] &&
+                  <Col span={24} >
+                    <label className="header-text">Time Tracking</label>
+                    {
+                      userstate.taskdata.data[0] &&
 
-                    <Button type="link"
-                      icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
-                      onClick={() => { setModaltimetracking_visible(true) }}
-                    />
-                  }
+                      <Button type="link"
+                        icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
+                        onClick={() => { setModaltimetracking_visible(true) }}
+                      />
+                    }
 
-                </Col>
-              </Row>
+                  </Col>
+                </Row>
 
-              <Row style={{ marginBottom: 20, display: userstate.taskdata.data[0]?.DueDate === null ? "none" : "block" }}>
-                <Col span={24}>
-                  <label className="header-text">DueDate</label>
-                  <br />
+                <Row style={{ marginBottom: 20, display: userstate.taskdata.data[0]?.DueDate === null ? "none" : "block" }}>
+                  <Col span={24}>
+                    <label className="header-text">DueDate</label>
+                    <br />
 
 
-                  {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
-                  {/* {
+                    {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
+                    {/* {
                     userstate?.mailbox[0]?.NodeName === "cr_center"
                       ? <Button type="link"
                         onClick={() => setModalduedate_visible(true)}
@@ -666,115 +666,115 @@ export default function SubTask() {
                     icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
                     onClick={() => { setHistoryduedate_visible(true) }}
                   /> */}
-                  <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
-                </Col>
-              </Row>
+                    <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
+                  </Col>
+                </Row>
 
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Company</label>
-                  <br />
-                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].CompanyName}</label>
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">IssueType</label>
-                  <br />
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Company</label>
+                    <br />
+                    <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].CompanyName}</label>
+                  </Col>
+                </Row>
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">IssueType</label>
+                    <br />
 
-                  <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].IssueType}</label>
+                    <label className="value-text">{userstate.taskdata.data[0] && userstate.taskdata.data[0].IssueType}</label>
 
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Product</label>
-                  <br />
+                  </Col>
+                </Row>
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Product</label>
+                    <br />
 
-                  <label className="value-text">{userstate.taskdata.data[0] && `${userstate.taskdata.data[0].ProductName} - (${userstate.taskdata.data[0].ProductFullName})`}</label>
-                </Col>
-              </Row>
-              <Row style={{ marginBottom: 20 }}>
-                <Col span={18}>
-                  <label className="header-text">Module</label>
-                  <br />
-                  {
-                    (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center") &&
-                      userstate.taskdata.data[0]?.MailType === "in" &&
-                      userstate?.taskdata?.data[0]?.Status === "Waiting Progress"
-                      ? <Select
-                        style={{ width: '100%' }}
-                        allowClear
-                        showSearch
+                    <label className="value-text">{userstate.taskdata.data[0] && `${userstate.taskdata.data[0].ProductName} - (${userstate.taskdata.data[0].ProductFullName})`}</label>
+                  </Col>
+                </Row>
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">Module</label>
+                    <br />
+                    {
+                      (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center") &&
+                        userstate.taskdata.data[0]?.MailType === "in" &&
+                        userstate?.taskdata?.data[0]?.Status === "Waiting Progress"
+                        ? <Select
+                          style={{ width: '100%' }}
+                          allowClear
+                          showSearch
 
-                        filterOption={(input, option) =>
-                          option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        onClick={() => loadModule()}
-                        options={userstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name, type: "module" }))}
-                        onChange={(value, item) => onChange(value, item)}
-                        value={userstate?.taskdata?.data[0]?.ModuleName}
-                      />
+                          filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          onClick={() => loadModule()}
+                          options={userstate.masterdata.moduleState.map((x) => ({ value: x.Id, label: x.Name, type: "module" }))}
+                          onChange={(value, item) => onChange(value, item)}
+                          value={userstate?.taskdata?.data[0]?.ModuleName}
+                        />
 
-                      : <label className="value-text">{userstate?.taskdata?.data[0]?.ModuleName}</label>
-                  }
-                </Col>
-              </Row>
+                        : <label className="value-text">{userstate?.taskdata?.data[0]?.ModuleName}</label>
+                    }
+                  </Col>
+                </Row>
 
-              <Row style={{
-                marginBottom: 20,
-                display: userstate.taskdata.data[0]?.IssueType === "ChangeRequest" &&
-                  userstate.taskdata.data[0]?.Manday !== null ? "block" : "none"
-              }}>
-                <Col span={18}>
-                  <label className="header-text">Manday</label>
-                  <label style={{ marginLeft: 10 }} className="value-text">{userstate.taskdata.data[0]?.Manday}</label>
-                </Col>
-
-              </Row>
-
-              <Row style={{ marginBottom: 20, }}>
-                <Col span={18}>
-                  <label className="header-text">Release Note</label>&nbsp;&nbsp;
-                  <Checkbox
-                    checked={userstate.taskdata.data[0]?.IsReleaseNote}
-                    onChange={(x) => updateReleaseNote(x.target.checked)} />
-                </Col>
-              </Row>
-
-              <Row
-                style={{
+                <Row style={{
                   marginBottom: 20,
-                  display: userstate?.taskdata?.data[0]?.IssueType === "Bug" && userstate.taskdata.data[0]?.PatchUpdate !== null ? "block" : "none"
+                  display: userstate.taskdata.data[0]?.IssueType === "ChangeRequest" &&
+                    userstate.taskdata.data[0]?.Manday !== null ? "block" : "none"
                 }}>
-                <Col span={18}>
-                  <label className="header-text">Version</label>
-                  <br />
-                  <label className="value-text">
-                    {userstate.taskdata.data[0]?.Version}
-                  </label>
-                </Col>
-              </Row>
+                  <Col span={18}>
+                    <label className="header-text">Manday</label>
+                    <label style={{ marginLeft: 10 }} className="value-text">{userstate.taskdata.data[0]?.Manday}</label>
+                  </Col>
 
-              <Row
-                style={{
-                  marginBottom: 20,
-                  display: userstate?.taskdata?.data[0]?.IssueType === "Bug" && userstate.taskdata.data[0]?.PatchUpdate !== null ? "block" : "none"
-                }}>
-                <Col span={18}>
-                  <label className="header-text">วันที่ Update Patch</label>
-                  <br />
-                  <label className="value-text">
-                    {moment(userstate.taskdata.data[0]?.PatchUpdate).format("DD/MM/YYYY HH:mm")}
-                  </label>
-                </Col>
-              </Row>
+                </Row>
 
-            </Col>
-            {/* SideBar */}
-          </Row>
-        </div>
+                <Row style={{ marginBottom: 20, }}>
+                  <Col span={18}>
+                    <label className="header-text">Release Note</label>&nbsp;&nbsp;
+                    <Checkbox
+                      checked={userstate.taskdata.data[0]?.IsReleaseNote}
+                      onChange={(x) => updateReleaseNote(x.target.checked)} />
+                  </Col>
+                </Row>
 
+                <Row
+                  style={{
+                    marginBottom: 20,
+                    display: userstate?.taskdata?.data[0]?.IssueType === "Bug" && userstate.taskdata.data[0]?.PatchUpdate !== null ? "block" : "none"
+                  }}>
+                  <Col span={18}>
+                    <label className="header-text">Version</label>
+                    <br />
+                    <label className="value-text">
+                      {userstate.taskdata.data[0]?.Version}
+                    </label>
+                  </Col>
+                </Row>
+
+                <Row
+                  style={{
+                    marginBottom: 20,
+                    display: userstate?.taskdata?.data[0]?.IssueType === "Bug" && userstate.taskdata.data[0]?.PatchUpdate !== null ? "block" : "none"
+                  }}>
+                  <Col span={18}>
+                    <label className="header-text">วันที่ Update Patch</label>
+                    <br />
+                    <label className="value-text">
+                      {moment(userstate.taskdata.data[0]?.PatchUpdate).format("DD/MM/YYYY HH:mm")}
+                    </label>
+                  </Col>
+                </Row>
+
+              </Col>
+              {/* SideBar */}
+            </Row>
+          </div>
+        </Skeleton>
         {/* Modal */}
         <Modal
           title="Preview"
