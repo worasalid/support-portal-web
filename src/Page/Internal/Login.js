@@ -101,7 +101,7 @@ export default function NormalLoginForm() {
   };
 
   return (
-    <div className="login-backgroundimg">
+    <div style={{backgroundImage: `url(${process.env.PUBLIC_URL}/icon-background.png)`}}>
       <Spin spinning={loading}>
         <div
           style={{
@@ -110,7 +110,7 @@ export default function NormalLoginForm() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            background: "#ccc",
+            //background: "#ccc",
 
           }}
         >

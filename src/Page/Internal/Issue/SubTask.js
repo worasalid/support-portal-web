@@ -39,10 +39,10 @@ export default function SubTask() {
   const match = useRouteMatch();
   const history = useHistory();
   const selectRef = useRef(null)
-  const { state, dispatch } = useContext(AuthenContext);
+  // const { state, dispatch } = useContext(AuthenContext);
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
-  const [defaultFlow, setDefaultFlow] = useState(undefined)
+  // const [defaultFlow, setDefaultFlow] = useState(undefined)
   const [pageLoading, setPageLoading] = useState(true);
 
   //modal
@@ -77,7 +77,7 @@ export default function SubTask() {
   const [ProgressStatus, setProgressStatus] = useState("");
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [selected, setSelected] = useState()
-  const [SLA, setSLA] = useState(null);
+  // const [SLA, setSLA] = useState(null);
   const [createddate, setCreateddate] = useState(null);
   const [resolveddate, setResolveddate] = useState(null);
 

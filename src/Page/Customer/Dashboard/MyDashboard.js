@@ -7,6 +7,7 @@ import Axios from "axios";
 import { useHistory } from 'react-router-dom';
 import xlsx from 'xlsx';
 import moment from "moment";
+import { Icon } from '@iconify/react';
 
 const { Meta } = Card;
 
@@ -138,9 +139,8 @@ export default function MyDashboard() {
             <Spin spinning={loading}>
                 <div style={{ padding: "24px 24px 24px 24px" }}>
                     <Row gutter={16}>
-                        <Col span={4}>
-
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/mytask" })}
                             >
@@ -158,7 +158,7 @@ export default function MyDashboard() {
                         </Col>
 
                         <Col span={4}>
-                            <Card className="card-box issue-active" bordered hoverable
+                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/inprogress" })}
                             >
@@ -177,7 +177,7 @@ export default function MyDashboard() {
 
                         <Col span={4}>
 
-                            <Card className="card-box issue-active" bordered hoverable
+                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/pass" })}
                             >
@@ -195,7 +195,7 @@ export default function MyDashboard() {
                         </Col>
 
                         <Col span={4}>
-                            <Card className="card-box issue-active" bordered hoverable
+                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/cancel" })}
                             >
@@ -212,7 +212,7 @@ export default function MyDashboard() {
                         </Col>
 
                         <Col span={4}>
-                            <Card className="card-box issue-active" bordered hoverable
+                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/complete" })}
                             >
@@ -278,21 +278,23 @@ export default function MyDashboard() {
                                 }
                                 extra={
                                     <>
-                                        <Checkbox style={{ display: cusProduct?.length > 1 ? "block" : "none" }} onChange={(value) => setIsStack(value.target.checked)}>
-                                            Is Stack
-                                        </Checkbox>
+                                        <Row align="middle">
+                                            <Col span={24}>
 
-                                        <Button type="default"
-                                            onClick={() => ExportExcel(excelData)}
-                                            icon={
-                                                <img
-                                                    style={{ height: "25px" }}
-                                                    src={`${process.env.PUBLIC_URL}/icons-excel.png`}
-                                                    alt="Excel Export"
-                                                />
-                                            }>
-                                            Export
-                                        </Button>
+                                                <Checkbox style={{ display: cusProduct?.length > 1 ? "block" : "none" }} onChange={(value) => setIsStack(value.target.checked)}>
+                                                    Is Stack
+                                                </Checkbox>
+
+                                                <Button type="text"
+                                                    onClick={() => ExportExcel(excelData)}
+                                                    icon={
+                                                        <Icon icon="vscode-icons:file-type-excel2" fontSize="18px" />
+                                                    }
+                                                >
+                                                    <label style={{ fontSize: "16px", cursor: "pointer" }}> Export </label>
+                                                </Button>
+                                            </Col>
+                                        </Row>
                                     </>
                                 }
                             >

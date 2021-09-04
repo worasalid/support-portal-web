@@ -4,12 +4,12 @@ import moment from 'moment';
 import Axios from 'axios';
 import { useRouteMatch } from 'react-router-dom';
 import { ClockCircleOutlined, SwapRightOutlined } from '@ant-design/icons';
-import AuthenContext from "../../../utility/authenContext";
+// import AuthenContext from "../../../utility/authenContext";
 
 export default function Historylog({ type = "Issue", subtype = "ticket" }) {
 
     const match = useRouteMatch();
-    const { state, dispatch } = useContext(AuthenContext);
+    // const { state, dispatch } = useContext(AuthenContext);
     const [loading, setLoading] = useState(true)
     const [historylog, setHistorylog] = useState([]);
 

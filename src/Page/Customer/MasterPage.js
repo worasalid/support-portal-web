@@ -41,6 +41,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       if (result.status === 200) {
         dispatch({ type: 'Authen', payload: true });
         dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+        
         CountStatus();
       }
 
@@ -73,7 +74,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
           type: "customer"
         }
       });
-      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete").length });
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Complete" && x.GroupStatus !== "Cancel").length });
       masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Open" || x.GroupStatus === "InProgress" || x.GroupStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_PASS", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "Waiting Deploy PRD").length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.GroupStatus === "Cancel").length });
@@ -144,8 +145,8 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header style={{ backgroundColor: "#1a73e8" }}>
-        <Menu theme="light" mode="horizontal" defaultSelectedKeys={["0"]} style={{ backgroundColor: "#1a73e8" }}>
+      <Header style={{ backgroundColor: localStorage.getItem("sites-color") }}>
+        <Menu theme="light" mode="horizontal" defaultSelectedKeys={["0"]} style={{ backgroundColor: localStorage.getItem("sites-color") }}>
           <Row>
             <Col span={12}>
               {/* <img

@@ -5,6 +5,8 @@ import { Row, Col, Card, Spin, Table, Checkbox, Button } from 'antd';
 import { FileOutlined } from '@ant-design/icons';
 import Axios from "axios";
 import { useHistory } from 'react-router-dom';
+import xlsx from 'xlsx';
+import moment from "moment"
 
 const { Meta } = Card;
 
@@ -15,6 +17,9 @@ export default function MyDashboard() {
     const [dashboard, setDashboard] = useState([])
     const [chartCompany, setChartCompany] = useState([])
     const [statusbyCompany, setStatusbyCompany] = useState([])
+
+    //data
+    const [excelData, setExcelData] = useState([])
 
     //filter
     const [isStack, setIsStack] = useState(false)
@@ -53,8 +58,8 @@ export default function MyDashboard() {
 
     const piechart_config = {
         appendPadding: 10,
-        angleField: 'Total',
-        colorField: 'Company',
+        angleField: 'total',
+        colorField: 'company',
         radius: 0.75,
         label: {
             type: 'spider',
@@ -64,8 +69,7 @@ export default function MyDashboard() {
         interactions: [{ type: 'element-selected' }, { type: 'element-active' }],
     };
 
-
-    const GetIssueStatus = async () => {
+    const getDashboadData = async () => {
         try {
             const issuestatus = await Axios({
                 url: process.env.REACT_APP_API_URL + "/dashboard/user/mytask",
@@ -74,14 +78,24 @@ export default function MyDashboard() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 }
             });
+
             if (issuestatus.status === 200) {
-                console.log("issuestatus", issuestatus.data)
-                setTimeout(() => {
-                    setLoading(false)
-                    setDashboard(issuestatus.data.total)
-                    setChartCompany(issuestatus.data.chartdata)
-                    setStatusbyCompany(issuestatus.data.table)
-                }, 1000)
+                setLoading(false);
+                setDashboard(issuestatus.data.total);
+                setChartCompany(issuestatus.data.chartdata);
+
+                setExcelData(issuestatus.data.exceldata);
+                setStatusbyCompany(issuestatus.data.table.map((n, index) => {
+                    return {
+                        key: index,
+                        company: n.Company,
+                        mytask: n.MyTask,
+                        inprogress: n.InProgress,
+                        resolved: n.Resolved,
+                        cancel: n.Cancel,
+                        total: n.Total
+                    }
+                }));
             }
 
         } catch (error) {
@@ -89,17 +103,39 @@ export default function MyDashboard() {
         }
     }
 
-    useEffect(() => {
-        GetIssueStatus()
+    const exportExcel = (json) => {
+        if (json !== undefined) {
+            let ws = xlsx.utils.json_to_sheet(json.map((x, index) => {
+                return {
+                    No: index + 1,
+                    Issue: x.Number,
+                    Company: x.CompanyName,
+                    IssueType: x.IssueType,
+                    Priority: x.Priority,
+                    Status: x.GroupStatus,
+                    Title: x.Title,
+                    AssignDate: x.AssignIconDate,
+                    DueDate: x.DueDate,
+                    OverDueAll: x.OverDueAll,
+                    OverDue: x.OverDue
+                }
+            }));
+            let wb = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(wb, ws, 'Issue');
+            xlsx.writeFile(wb, `My DashBoard - ${moment().format("YYMMDD_HHmm")}.xlsx`);
+        }
+    }
 
+    useEffect(() => {
+        getDashboadData()
     }, [])
 
     return (
         <MasterPage bgColor="#f0f2f5">
             <Spin spinning={loading}>
                 <Row gutter={16} style={{ padding: "24px 24px 24px 24px" }}>
-                    <Col span={6}>
-                        <Card className="card-box issue-active" bordered hoverable
+                    <Col xs={24} sm={12} md={8} lg={8} xl={6}>
+                        <Card bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push({ pathname: "/internal/issue/mytask" })}
                         >
@@ -114,9 +150,8 @@ export default function MyDashboard() {
                             />
                         </Card>
                     </Col>
-
-                    <Col span={6}>
-                        <Card className="card-box issue-active" bordered hoverable
+                    <Col xs={24} sm={12} md={8} lg={8} xl={6}>
+                        <Card bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push({ pathname: "/internal/issue/inprogress" })}
                         >
@@ -132,9 +167,8 @@ export default function MyDashboard() {
                             />
                         </Card>
                     </Col>
-                    <Col span={6}>
-
-                        <Card className="card-box issue-active" bordered hoverable
+                    <Col xs={24} sm={12} md={8} lg={8} xl={6}>
+                        <Card bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push({ pathname: "/internal/issue/resolved" })}
                         >
@@ -150,9 +184,8 @@ export default function MyDashboard() {
                             />
                         </Card>
                     </Col>
-                    <Col span={6}>
-
-                        <Card className="card-box issue-active" bordered hoverable
+                    <Col xs={24} sm={12} md={8} lg={8} xl={6}>
+                        <Card bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push({ pathname: "/internal/issue/cancel" })}
                         >
@@ -168,13 +201,12 @@ export default function MyDashboard() {
                             />
                         </Card>
                     </Col>
-
                 </Row>
 
                 <Row gutter={16} style={{ padding: "12px 24px 24px 24px" }}>
                     <Col span={24}>
                         <div >
-                            <Card title="Issue By Company" bordered={true} style={{ width: "100%" }}
+                            <Card title="Issue By Company" bordered={true} className="card-dashboard" style={{ width: "100%" }}
                                 extra={
                                     <>
                                         <Checkbox checked={isStack} onChange={(value) => setIsStack(value.target.checked)}>
@@ -183,7 +215,7 @@ export default function MyDashboard() {
 
                                         <Button type="link"
                                             hidden={chartCompany.length === 0 ? true : false}
-                                            //  onClick={() => ExportExcel(excelData && excelData)}
+                                            onClick={() => exportExcel(excelData && excelData)}
                                             title="Excel Export"
                                         >
                                             <img
@@ -211,7 +243,6 @@ export default function MyDashboard() {
                 <Row gutter={16} style={{ padding: "24px 24px 24px 24px" }}>
                     <Col span={12}>
                         <Table dataSource={statusbyCompany}>
-                            {/* <Column title="No" width="5%" dataIndex="Row" /> */}
                             <Column title="No"
                                 width="5%"
                                 render={(record, value, index) => {
@@ -222,15 +253,15 @@ export default function MyDashboard() {
                                     )
                                 }}
                             />
-                            <Column title="Company" width="55%" dataIndex="Company" />
-                            <Column title="MyTask" width="10%" dataIndex="MyTask" />
-                            <Column title="InProgress" width="10%" dataIndex="InProgress" />
-                            <Column title="Resolved" width="10%" dataIndex="Resolved" />
-                            <Column title="Cancel" width="10%" dataIndex="Cancel" />
+                            <Column title="Company" width="55%" dataIndex="company" />
+                            <Column title="MyTask" width="10%" dataIndex="mytask" />
+                            <Column title="InProgress" width="10%" dataIndex="inprogress" />
+                            <Column title="Resolved" width="10%" dataIndex="resolved" />
+                            <Column title="Cancel" width="10%" dataIndex="cancel" />
                         </Table>
                     </Col>
                     <Col span={12}>
-                        <Card title="Total By Company" bordered={true} style={{ width: "100%" }}>
+                        <Card title="Total By Company" bordered={true} className="card-dashboard" style={{ width: "100%" }}>
                             <Pie {...piechart_config}
                                 height={300}
                                 data={statusbyCompany}

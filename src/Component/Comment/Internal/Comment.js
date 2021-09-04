@@ -1,6 +1,6 @@
-import { Comment, Avatar, Form, Button, List, Row, Col, Divider, Modal, Popconfirm, Affix } from 'antd';
+import { Comment, Avatar, Form, Button, List, Row, Col, Divider, Modal, Popconfirm } from 'antd';
 import moment from 'moment';
-import React, { useState, useEffect, useRef, createElement } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Tabs } from 'antd';
 import Uploadfile from "../../../Component/UploadFile"
@@ -10,6 +10,7 @@ import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 import TextEditor from '../../TextEditor';
 import PreviewImg from '../../Dialog/Internal/modalPreviewImg';
 import _ from 'lodash'
+import { Icon } from '@iconify/react';
 
 
 const { TabPane } = Tabs;
@@ -187,15 +188,6 @@ export default function CommentBox() {
         loadCustomerComment()
     }, [])
 
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         loadCustomerComment()
-    //         setLoading(false)
-    //     }, 1000)
-
-    // }, [loading])
-
-
     return (
         <div>
             <List
@@ -205,41 +197,29 @@ export default function CommentBox() {
                 renderItem={item => (
                     <Comment
                         author={
-                            <p
-                                style={{ cursor: "pointer" }}
-                                onClick={() => {
-                                    let newKeys = [...divcollapse];
-                                    if (newKeys.includes(item.key)) {
-                                        newKeys = _.filter(newKeys, n => n !== item.key)
-                                    } else {
-                                        newKeys.push(item.key)
-                                    }
-                                    setDivcollapse(newKeys)
-                                }}
-                            ><b>{item.author}</b></p>
+                            <Row align="middle">
+                                <Col span={24}>
+                                    <label
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => {
+                                            let newKeys = [...divcollapse];
+                                            if (newKeys.includes(item.key)) {
+                                                newKeys = _.filter(newKeys, n => n !== item.key)
+                                            } else {
+                                                newKeys.push(item.key)
+                                            }
+                                            setDivcollapse(newKeys)
+                                        }}
+                                    ><b>{item.author}</b></label>
+                                </Col>
+                            </Row>
                         }
                         datetime={
                             <>
-                                <label
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => {
-                                        let newKeys = [...divcollapse];
-                                        if (newKeys.includes(item.key)) {
-                                            newKeys = _.filter(newKeys, n => n !== item.key)
-                                        } else {
-                                            newKeys.push(item.key)
-                                        }
-                                        setDivcollapse(newKeys)
-                                    }}
-                                >
-                                    {item.datetime}
-                                </label>
-
-                                {
-                                    divcollapse.includes(item.key) &&
-                                    (
+                                <Row align="middle">
+                                    <Col span={24}>
                                         <label
-                                            // style={{ cursor: "pointer",fontSize:20,color:"#C7C7C7" }}
+                                            //style={{ cursor: "pointer" }}
                                             onClick={() => {
                                                 let newKeys = [...divcollapse];
                                                 if (newKeys.includes(item.key)) {
@@ -250,12 +230,39 @@ export default function CommentBox() {
                                                 setDivcollapse(newKeys)
                                             }}
                                         >
-                                            {/* <EllipsisOutlined style={{ fontSize: 20,color:"#C7C7C7" }} /> */}
-
+                                            {item.datetime}
                                         </label>
-                                    )
-                                }
 
+                                        {
+                                            item.cntfile === 0 ? "" :
+                                                <Icon icon="teenyicons:attach-outline" style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
+                                                    onClick={() => {
+                                                        setCommentid(item.id);
+                                                        setModalfiledownload_visible(true);
+                                                    }}
+                                                />
+                                        }
+                                        {
+                                            divcollapse.includes(item.key) &&
+                                            (
+                                                <label
+                                                    style={{ cursor: "pointer", marginLeft: 10 }}
+                                                    onClick={() => {
+                                                        let newKeys = [...divcollapse];
+                                                        if (newKeys.includes(item.key)) {
+                                                            newKeys = _.filter(newKeys, n => n !== item.key)
+                                                        } else {
+                                                            newKeys.push(item.key)
+                                                        }
+                                                        setDivcollapse(newKeys)
+                                                    }}
+                                                >
+                                                    <Icon icon="fa-solid:ellipsis-h" />
+                                                </label>
+                                            )
+                                        }
+                                    </Col>
+                                </Row>
                             </>
                         }
                         avatar={
@@ -304,17 +311,15 @@ export default function CommentBox() {
                                                     <label
                                                         onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
                                                         className="text-link value-text">
-                                                        <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
-                                                </label>
+                                                        {/* <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile */}
+                                                    </label>
                                                 </Col>
                                             </Row>
                                         </div>
                                 }
                             </>
                         }
-
                     >
-
                     </Comment>
                 )}
             />
@@ -340,13 +345,13 @@ export default function CommentBox() {
                     >
                         <Form.Item name="customer_comment">
 
-                            <TextEditor ref={editorRef} ticket_id={match.params.id}/>
+                            <TextEditor ref={editorRef} ticket_id={match.params.id} />
                         </Form.Item>
                         <Form.Item name="customer_fileattach">
                             <Row>
                                 <Col span={2} style={{ display: "inline" }} >
                                     Attach :
-                </Col>
+                                </Col>
                                 <Col span={4} style={{ display: "inline" }} >
                                     <Uploadfile ref={uploadRef} />
                                 </Col>
@@ -362,7 +367,7 @@ export default function CommentBox() {
                                     >
                                         <Button htmlType="submit" type="primary" disabled={elementDisable}>
                                             Add Comment
-                        </Button>
+                                        </Button>
                                     </Popconfirm>
 
                                 </Col>

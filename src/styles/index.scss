@@ -1,9 +1,9 @@
-// .login-backgroundimg{
-//     background-image: url("/public/icon-background.png");
-//     background-repeat: no-repeat;
-//     background-position: center;
-//     height: 888;
-// }
+.login-backgroundimg{
+    background-image: url("/public/icon-background.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 888;
+}
 
 /// label
 label.header-text {
@@ -145,7 +145,7 @@ div.sticky-background {
 .issue-description {
     font-size: 12px !important;
     img {
-       max-width: 30%;
+       max-width: 20%;
     //    width: auto;
        height: auto;
        cursor: pointer;
@@ -154,7 +154,7 @@ div.sticky-background {
 .comment-description {
     font-size: 12px !important;
     img {
-       max-width: 50%;
+       max-width: 20%;
     //    width: auto;
        height: auto;
        cursor: pointer;

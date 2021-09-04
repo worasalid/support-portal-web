@@ -21,6 +21,7 @@ export default function MasterPage(props) {
             });
             dispatch({ type: 'Authen', payload: true });
             dispatch({ type: 'LOGIN', payload: result.data.usersdata });
+            localStorage.setItem("sites-color", result.data.usersdata.sites_color)
         } catch (error) {
 
             await Modal.error({
