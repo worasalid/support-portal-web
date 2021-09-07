@@ -241,7 +241,6 @@ export default function Dashboard2() {
                         </Card>
                         {/* </div> */}
                     </Col>
-
                 </Row>
                 <Row gutter={16} style={{ marginTop: "10px", padding: "10px 24px 24px 24px" }}>
                     <Col span={10}>

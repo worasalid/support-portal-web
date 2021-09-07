@@ -22,7 +22,7 @@ export default function MasterCompany() {
     const [listcompany, setListcompany] = useState([]);
 
     const [selectcompany, setSelectcompany] = useState(null);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([])
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     //product
     const [cusProduct, setCusProduct] = useState([]);
@@ -191,7 +191,8 @@ export default function MasterCompany() {
                     tel: param.tel,
                     address: param.address,
                     cost: param.cost,
-                    is_cloud: param.is_cloud
+                    is_cloud: param.is_cloud,
+                    sites_color: param.sites_color
                 }
             });
             await Axios({
@@ -242,9 +243,10 @@ export default function MasterCompany() {
     };
 
     const onFinish = async (values) => {
+        console.log("onFinish", values)
         try {
             const updatecompany = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/company-update",
+                url: process.env.REACT_APP_API_URL + "/master/company",
                 method: "PATCH",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -255,7 +257,8 @@ export default function MasterCompany() {
                     full_name_th: values.fullname_th,
                     full_name_en: values.fullname_en,
                     cost: values.cost,
-                    is_cloud: values.is_cloud
+                    is_cloud: values.is_cloud,
+                    sites_color: values.sites_color
                 }
             });
 
@@ -354,8 +357,11 @@ export default function MasterCompany() {
                         <Button type="primary" icon={<PlusOutlined />}
                             style={{ backgroundColor: "#00CC00" }}
                             onClick={() => {
-                                setModalAdd(true)
-                                setSelectedRowKeys([])
+                                formAdd.setFieldsValue({
+                                    sites_color: "#0074E0"
+                                });
+                                setSelectedRowKeys([]);
+                                setModalAdd(true);
                             }}
                         >
                             เพิ่มข้อมูล
@@ -386,7 +392,8 @@ export default function MasterCompany() {
                                                     fullname_th: record.FullNameTH,
                                                     fullname_en: record.FullNameEN,
                                                     cost: record.CostManday,
-                                                    is_cloud: record.IsCloudSite
+                                                    is_cloud: record.IsCloudSite,
+                                                    sites_color: record.SitesColor === null ? "#0074E0" : record.SitesColor
 
                                                 }),
                                                 setVisible(true)
@@ -401,7 +408,7 @@ export default function MasterCompany() {
                     />
                 </Table>
             </div>
-            
+
             {/* Add ข้อมูลบริษัท */}
             <Modal
                 visible={modalAdd}
@@ -473,6 +480,9 @@ export default function MasterCompany() {
                             <Radio value={0}>onPremise</Radio>
                         </Radio.Group>
                     </Form.Item>
+                    <Form.Item name="sites_color" label="site color">
+                        <Input type="color" style={{ width: "100px" }} />
+                    </Form.Item>
                 </Form>
                 <Row>
                     <Col span={24}>
@@ -504,7 +514,11 @@ export default function MasterCompany() {
                 onOk={() => { form.submit(); setLoadingEdit(true) }}
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okText="Save"
-                onCancel={() => { setVisible(false); form.resetFields(); setSelectcompany(null) }}
+                onCancel={() => {
+                    setVisible(false);
+                    form.resetFields();
+                    setSelectcompany(null);
+                }}
             >
                 <Spin spinning={loadingEdit}>
                     <Form form={form}
@@ -538,13 +552,19 @@ export default function MasterCompany() {
                                 <Radio value={false}>onPremise</Radio>
                             </Radio.Group>
                         </Form.Item>
+                        <Form.Item name="sites_color" label="site color">
+                            <Input type="color" style={{ width: "100px" }} />
+                        </Form.Item>
                     </Form>
 
                     <Row>
                         <Col span={24}>
                             <Button type="primary" icon={<PlusOutlined />}
                                 style={{ backgroundColor: "#00CC00" }}
-                                onClick={() => { return (setModalProduct(true), getMasterProduct()) }}
+                                onClick={() => {
+                                    setModalProduct(true);
+                                    getMasterProduct();
+                                }}
                             >
                                 Add Product
                             </Button>
@@ -571,8 +591,7 @@ export default function MasterCompany() {
                                                 </Button>
                                             </>
                                         )
-                                    }
-                                    }
+                                    }}
                                 />
                             </Table>
                         </Col>

@@ -2,14 +2,14 @@ import React, { useContext } from 'react'
 import { Card } from 'antd'
 import { useHistory } from "react-router-dom";
 import MasterPage from "./MasterPage"
-import AuthenContext from '../../../utility/authenContext';
+// import AuthenContext from '../../../utility/authenContext';  
 import { HomeOutlined, SendOutlined, CommentOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
 
 export default function Index() {
     const history = useHistory();
-    const { state, dispatch } = useContext(AuthenContext)
+    // const { state, dispatch } = useContext(AuthenContext)
 
     return (
         <MasterPage>

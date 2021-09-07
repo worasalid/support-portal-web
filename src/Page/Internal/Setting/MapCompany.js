@@ -119,6 +119,7 @@ export default function MapCompany() {
         }
     }
 
+
     const searchSupport = (param) => {
         let result = supportlist.filter(o =>
             Object.keys(o).some(k =>

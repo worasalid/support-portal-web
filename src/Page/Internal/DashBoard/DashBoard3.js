@@ -17,7 +17,7 @@ export default function Dashboard3() {
     const [product, setProduct] = useState(null);
     const [chartData, setChartData] = useState([]);
     const [tableData, setTableData] = useState([]);
-    const [excelData, setExcelData] = useState([])
+    const [excelData, setExcelData] = useState([]);
 
     // filter
     const [selectProduct, setSelectProduct] = useState([]);

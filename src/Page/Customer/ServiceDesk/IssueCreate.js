@@ -8,11 +8,9 @@ import Axios from 'axios';
 // import classNames from 'classnames'
 import AuthenContext from '../../../utility/authenContext';
 import { customerReducer, customerState } from '../../../utility/issueContext';
-import TextEditor from '../../../Component/TextEditor';
+// import TextEditor from '../../../Component/TextEditor';
 import { Editor } from '@tinymce/tinymce-react';
 
-const { TextArea } = Input;
-// const { Option } = Select;
 const { Meta } = Card;
 const layout = {
     labelCol: { span: 8 },

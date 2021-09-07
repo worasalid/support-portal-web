@@ -1,5 +1,5 @@
 import { DeleteOutlined, LeftCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, Checkbox, message, Tabs, Row, Col, Input, Spin } from 'antd';
+import { Button, Table, Modal, Checkbox, message, Row, Col, Input, Spin } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -7,7 +7,6 @@ import MasterPage from '../MasterPage'
 import _ from 'lodash'
 
 const { Column } = Table;
-const { TabPane } = Tabs;
 
 export default function SupportSiteConfig() {
     const match = useRouteMatch();
