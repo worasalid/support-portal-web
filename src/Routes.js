@@ -101,7 +101,7 @@ export default function Routes() {
                                 <Switch>
                                     <Route path="/" exact component={Login} />
                                     <Route path="/login" exact component={Login} />
-                                    <Route path="/line/register" exact component={LineRegister} />
+                                    <Route path="/line/register" component={LineRegister} />
                                     <Route path="/internal/user/profile" exact component={Profile} />
                                     <Route path="/internal/issue" exact component={MyTask} />
                                     <Route path="/internal/issue/unassign" exact component={UnAssign} />
