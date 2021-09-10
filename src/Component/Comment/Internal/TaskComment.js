@@ -10,7 +10,9 @@ import { DownloadOutlined } from '@ant-design/icons';
 import ModalFileDownload from '../../Dialog/Internal/modalFileDownload';
 import TextEditor from '../../TextEditor';
 import PreviewImg from '../../Dialog/Internal/modalPreviewImg';
-import _ from 'lodash'
+import _ from 'lodash';
+import { Icon } from '@iconify/react';
+
 
 
 const { TabPane } = Tabs;
@@ -187,26 +189,10 @@ export default function TaskComment({ loadingComment = false }) {
                         }
                         datetime={
                             <>
-                                <label
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => {
-                                        let newKeys = [...divcollapse];
-                                        if (newKeys.includes(item.key)) {
-                                            newKeys = _.filter(newKeys, n => n !== item.key)
-                                        } else {
-                                            newKeys.push(item.key)
-                                        }
-                                        setDivcollapse(newKeys)
-                                    }}
-                                >
-                                    {item.datetime}
-                                </label>
-
-                                {
-                                    divcollapse.includes(item.key) &&
-                                    (
+                                <Row align="middle">
+                                    <Col span={24}>
                                         <label
-                                            // style={{ cursor: "pointer",fontSize:20,color:"#C7C7C7" }}
+                                            //style={{ cursor: "pointer" }}
                                             onClick={() => {
                                                 let newKeys = [...divcollapse];
                                                 if (newKeys.includes(item.key)) {
@@ -217,12 +203,39 @@ export default function TaskComment({ loadingComment = false }) {
                                                 setDivcollapse(newKeys)
                                             }}
                                         >
-                                            {/* <EllipsisOutlined style={{ fontSize: 20,color:"#C7C7C7" }} /> */}
-
+                                            {item.datetime}
                                         </label>
-                                    )
-                                }
 
+                                        {
+                                            item.cntfile === 0 ? "" :
+                                                <Icon icon="teenyicons:attach-outline" style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
+                                                    onClick={() => {
+                                                        setCommentid(item.id);
+                                                        setModalfiledownload_visible(true);
+                                                    }}
+                                                />
+                                        }
+                                        {
+                                            divcollapse.includes(item.key) &&
+                                            (
+                                                <label
+                                                    style={{ cursor: "pointer", marginLeft: 10 }}
+                                                    onClick={() => {
+                                                        let newKeys = [...divcollapse];
+                                                        if (newKeys.includes(item.key)) {
+                                                            newKeys = _.filter(newKeys, n => n !== item.key)
+                                                        } else {
+                                                            newKeys.push(item.key)
+                                                        }
+                                                        setDivcollapse(newKeys)
+                                                    }}
+                                                >
+                                                    <Icon icon="fa-solid:ellipsis-h" />
+                                                </label>
+                                            )
+                                        }
+                                    </Col>
+                                </Row>
                             </>
                         }
                         avatar={
@@ -263,7 +276,7 @@ export default function TaskComment({ loadingComment = false }) {
                                 }
 
                                 <Divider style={{ margin: 0, marginBottom: 10 }} />
-                                {
+                                {/* {
                                     item.cntfile === 0 ? "" :
                                         <div>
                                             <Row>
@@ -276,7 +289,7 @@ export default function TaskComment({ loadingComment = false }) {
                                                 </Col>
                                             </Row>
                                         </div>
-                                }
+                                } */}
                             </>
 
                         }
@@ -300,13 +313,13 @@ export default function TaskComment({ loadingComment = false }) {
                     // onFinish={onFinish}
                     >
                         <Form.Item name="Internal_comment">
-                            <TextEditor ref={editorRef} ticket_id={match.params.id}/>
+                            <TextEditor ref={editorRef} ticket_id={match.params.id} />
                         </Form.Item>
                         <Form.Item name="Internal_fileattach">
                             <Row>
                                 <Col span={2} style={{ display: "inline" }} >
                                     Attach :
-                            </Col>
+                                </Col>
                                 <Col span={4} style={{ display: "inline" }} >
                                     <Uploadfile ref={uploadRef} />
                                 </Col>
