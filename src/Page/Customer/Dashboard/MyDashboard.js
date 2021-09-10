@@ -255,7 +255,7 @@ export default function MyDashboard() {
                                 title={
                                     <>
                                         <Row>
-                                            <Col span={16}>
+                                            <Col span={18}>
                                                 <label>จำนวน Issue</label>
                                             </Col>
                                             <Col span={6} hidden={cusProduct?.length > 1 ? false : true}>
@@ -272,6 +272,7 @@ export default function MyDashboard() {
                                                     options={cusProduct && cusProduct.map((n) => ({ value: n.ProductId, label: n.Name + ` (${n.FullName})` }))}
                                                 >
                                                 </Select>
+                                                &nbsp;
                                             </Col>
                                         </Row>
                                     </>
@@ -279,9 +280,8 @@ export default function MyDashboard() {
                                 extra={
                                     <>
                                         <Row align="middle">
-                                            <Col span={24}>
-
-                                                <Checkbox style={{ display: cusProduct?.length > 1 ? "block" : "none" }} onChange={(value) => setIsStack(value.target.checked)}>
+                                            <Col span={24} style={{marginLeft:10}}>
+                                                <Checkbox style={{ display: cusProduct?.length > 1 ? "inline-block" : "none" }} onChange={(value) => setIsStack(value.target.checked)}>
                                                     Is Stack
                                                 </Checkbox>
 

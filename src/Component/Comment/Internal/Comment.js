@@ -303,7 +303,7 @@ export default function CommentBox() {
                                 }
 
                                 <Divider style={{ margin: 0, marginBottom: 10 }} />
-                                {
+                                {/* {
                                     item.cntfile === 0 ? "" :
                                         <div>
                                             <Row>
@@ -311,12 +311,12 @@ export default function CommentBox() {
                                                     <label
                                                         onClick={() => { return (setCommentid(item.id), setModalfiledownload_visible(true)) }}
                                                         className="text-link value-text">
-                                                        {/* <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile */}
+                                                        <DownloadOutlined style={{ fontSize: 20 }} /> DownloadFile
                                                     </label>
                                                 </Col>
                                             </Row>
                                         </div>
-                                }
+                                } */}
                             </>
                         }
                     >

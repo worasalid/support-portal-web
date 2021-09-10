@@ -17,7 +17,6 @@ export default function MasterCompany() {
     const [modalProduct, setModalProduct] = useState(false);
 
     //data
-    const [masterCompany, setMasterCompany] = useState([]);
     const [filterCompany, setFilterCompany] = useState(null);
     const [listcompany, setListcompany] = useState([]);
 
@@ -30,7 +29,7 @@ export default function MasterCompany() {
     const [selectProduct, setSelectProduct] = useState([]);
 
     const [search, setSearch] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [loadingEdit, setLoadingEdit] = useState(false);
 
     const searchCompany = (param) => {
@@ -43,135 +42,97 @@ export default function MasterCompany() {
         );
         setFilterCompany(result);
     }
-    // Company
-    const GetMasterCompany = async (value) => {
-        const mastercompany = await Axios({
+    // // Company
+    const getCompany = async (value) => {
+        setLoading(true);
+        await Axios({
             url: process.env.REACT_APP_API_URL + "/master/company",
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
-        });
-        if (mastercompany.status === 200) {
-            setMasterCompany(mastercompany.data)
-        }
+            params: {
+                id: value
+            }
+        }).then((res) => {
+            setLoading(false);
+            setListcompany(res.data)
+        }).catch((error) => {
+
+        })
     }
 
-    const GetCompany = async (value) => {
-        try {
-            const company_all = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/company",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    id: filterCompany && filterCompany
-                }
-            });
-            if (company_all.status === 200) {
-                setTimeout(() => {
-                    setLoading(false);
-                    setSearch(false)
-                }, 1000)
-                setListcompany(company_all.data)
+    const getCompanyById = async (param) => {
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/company",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                id: param
             }
+        }).then((res) => {
+            setSelectcompany(res.data)
+        }).catch(() => {
 
-        } catch (error) {
-
-        }
-    }
-
-    const GetCompanyById = async (param) => {
-        try {
-            const companyby_id = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/company",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    id: param
-                }
-            });
-
-            if (companyby_id.status === 200) {
-
-                setSelectcompany(companyby_id.data)
-            }
-
-        } catch (error) {
-
-        }
+        })
     }
 
     // product
     const getCustomerProduct = async (param) => {
-        try {
-            const cusproduct = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/customer-products",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    company_id: param
-                }
-            });
-
-            if (cusproduct.status === 200) {
-                setCusProduct([...cusproduct.data])
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/customer-products",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                company_id: param
             }
-        } catch (error) {
+        }).then((res) => {
+            setCusProduct([...res.data])
+        }).catch(() => {
 
-        }
+        })
     }
 
     const getMasterProduct = async () => {
-        try {
-            const product = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/products",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                }
-            });
-            if (product.status === 200) {
-                setListProduct(product.data.filter((n) => !cusProduct.find((item) => item.ProductId === n.Id)).map((x) => {
-                    return {
-                        key: x.Id,
-                        Name: x.Name,
-                        FullName: x.FullName
-                    }
-                }));
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/products",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
-        } catch (error) {
+        }).then((res) => {
+            setListProduct(res.data.filter((n) => !cusProduct.find((item) => item.ProductId === n.Id)).map((x) => {
+                return {
+                    key: x.Id,
+                    Name: x.Name,
+                    FullName: x.FullName
+                }
+            }));
+        }).catch(() => {
 
-        }
+        })
     }
 
     const deleteProduct = async (param) => {
-        try {
-            const cusproduct = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/delete-customer-products",
-                method: "DELETE",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    company_id: param.CompanyId,
-                    product_id: param.ProductId
-                }
-            });
-
-            if (cusproduct === 200) {
-                getCustomerProduct(param.CompanyId);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/delete-customer-products",
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                company_id: param.CompanyId,
+                product_id: param.ProductId
             }
+        }).then(() => {
+            getCustomerProduct(param.CompanyId);
+        }).catch(() => {
 
-
-        } catch (error) {
-
-        }
+        })
     }
 
     // Save
@@ -192,7 +153,8 @@ export default function MasterCompany() {
                     address: param.address,
                     cost: param.cost,
                     is_cloud: param.is_cloud,
-                    sites_color: param.sites_color
+                    sites_color: param.sites_color,
+                    running_format: param.running_format
                 }
             });
             await Axios({
@@ -243,7 +205,7 @@ export default function MasterCompany() {
     };
 
     const onFinish = async (values) => {
-        console.log("onFinish", values)
+        setLoadingEdit(true);
         try {
             const updatecompany = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/company",
@@ -258,7 +220,8 @@ export default function MasterCompany() {
                     full_name_en: values.fullname_en,
                     cost: values.cost,
                     is_cloud: values.is_cloud,
-                    sites_color: values.sites_color
+                    sites_color: values.sites_color,
+                    running_format: values.running_format
                 }
             });
 
@@ -288,7 +251,6 @@ export default function MasterCompany() {
                     onOk() {
                         setVisible(false);
                         setLoading(true);
-                        window.location.reload(true);
                     },
                 });
             }
@@ -305,7 +267,6 @@ export default function MasterCompany() {
                 ),
                 okText: "Close",
                 onOk() {
-
                     setLoading(true);
                 },
             });
@@ -329,14 +290,8 @@ export default function MasterCompany() {
     };
 
     useEffect(() => {
-        GetMasterCompany();
-
+        getCompany()
     }, [])
-
-    useEffect(() => {
-        GetCompany()
-    }, [loading, search])
-
 
 
     return (
@@ -383,9 +338,8 @@ export default function MasterCompany() {
                                     <Button type="link"
                                         icon={<EditOutlined />}
                                         onClick={() => {
-                                            return (
-                                                GetCompanyById(record.Id),
-                                                getCustomerProduct(record.Id),
+                                                getCompanyById(record.Id);
+                                                getCustomerProduct(record.Id);
                                                 form.setFieldsValue({
                                                     code: record.Code,
                                                     name: record.Name,
@@ -393,11 +347,10 @@ export default function MasterCompany() {
                                                     fullname_en: record.FullNameEN,
                                                     cost: record.CostManday,
                                                     is_cloud: record.IsCloudSite,
-                                                    sites_color: record.SitesColor === null ? "#0074E0" : record.SitesColor
-
-                                                }),
+                                                    sites_color: record.SitesColor === null ? "#0074E0" : record.SitesColor,
+                                                    running_format: record.RunFormat
+                                                });
                                                 setVisible(true)
-                                            )
                                         }}
                                     >
                                         Edit
@@ -422,15 +375,15 @@ export default function MasterCompany() {
                 okText="Save"
                 onOk={() => {
                     formAdd.submit();
-                    setModalAdd(false);
-                }
-                }
+
+                }}
             >
                 <Form form={formAdd}
                     layout="horizontal"
                     name="form-companyAdd"
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
                     onFinish={onFinishAdd}
-
                 >
                     <Form.Item name="code" label="Code"
                         rules={[
@@ -465,7 +418,9 @@ export default function MasterCompany() {
                         <Input />
                     </Form.Item>
                     <Form.Item name="cost" label="Cost manday">
-                        <Input />
+                        <InputNumber
+                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        />
                     </Form.Item>
                     <Form.Item name="is_cloud" label="ประเภท Site"
                         rules={[
@@ -482,6 +437,17 @@ export default function MasterCompany() {
                     </Form.Item>
                     <Form.Item name="sites_color" label="site color">
                         <Input type="color" style={{ width: "100px" }} />
+                    </Form.Item>
+                    <Form.Item name="running_format" label="Running Format"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'กรุณา ระบุ format หมายเลข Issue',
+                            },
+                        ]}
+                    >
+                        <Input style={{ width: "20%" }} /> &nbsp;
+                        <label>Format ที่ใช้แสดงเลข Issue ในการแจ้งปัญหา</label>
                     </Form.Item>
                 </Form>
                 <Row>
@@ -511,8 +477,8 @@ export default function MasterCompany() {
                 visible={visible}
                 confirmLoading={loadingEdit}
                 width={800}
-                onOk={() => { form.submit(); setLoadingEdit(true) }}
-                okButtonProps={{ type: "primary", htmlType: "submit" }}
+                onOk={() => form.submit()}
+                //  okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okText="Save"
                 onCancel={() => {
                     setVisible(false);
@@ -524,8 +490,9 @@ export default function MasterCompany() {
                     <Form form={form}
                         layout="horizontal"
                         name="form-editcompany"
+                        labelCol={{ span: 4 }}
+                        wrapperCol={{ span: 20 }}
                         onFinish={onFinish}
-
                     >
                         <Form.Item name="code" label="Code">
                             <Input disabled={true} />
@@ -554,6 +521,11 @@ export default function MasterCompany() {
                         </Form.Item>
                         <Form.Item name="sites_color" label="site color">
                             <Input type="color" style={{ width: "100px" }} />
+                        </Form.Item>
+                        <Form.Item name="running_format" label="Running Format">
+                            <Input style={{ width: "20%" }} />
+
+                            {/* <label>Format ที่ใช้แสดงเลข Issue ในการแจ้งปัญหา</label> */}
                         </Form.Item>
                     </Form>
 
