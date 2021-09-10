@@ -10,6 +10,7 @@ import ModalFileDownload from '../../Dialog/Customer/modalFileDownload';
 import TextEditor from '../../TextEditor';
 import _ from 'lodash'
 import PreviewImg from '../../Dialog/Internal/modalPreviewImg';
+import { Icon } from '@iconify/react';
 
 
 const { TabPane } = Tabs;
@@ -163,26 +164,10 @@ export default function CommentBox() {
                         }
                         datetime={
                             <>
-                                <label
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => {
-                                        let newKeys = [...divcollapse];
-                                        if (newKeys.includes(item.key)) {
-                                            newKeys = _.filter(newKeys, n => n !== item.key)
-                                        } else {
-                                            newKeys.push(item.key)
-                                        }
-                                        setDivcollapse(newKeys)
-                                    }}
-                                >
-                                    {item.datetime}
-                                </label>
-
-                                {
-                                    divcollapse.includes(item.key) &&
-                                    (
+                                <Row align="middle">
+                                    <Col span={24}>
                                         <label
-                                            // style={{ cursor: "pointer",fontSize:20,color:"#C7C7C7" }}
+                                            //style={{ cursor: "pointer" }}
                                             onClick={() => {
                                                 let newKeys = [...divcollapse];
                                                 if (newKeys.includes(item.key)) {
@@ -193,12 +178,39 @@ export default function CommentBox() {
                                                 setDivcollapse(newKeys)
                                             }}
                                         >
-                                            {/* <EllipsisOutlined style={{ fontSize: 20,color:"#C7C7C7" }} /> */}
-
+                                            {item.datetime}
                                         </label>
-                                    )
-                                }
 
+                                        {
+                                            item.cntfile === 0 ? "" :
+                                                <Icon icon="teenyicons:attach-outline" style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
+                                                    onClick={() => {
+                                                        setCommentid(item.id);
+                                                        setModalfiledownload_visible(true);
+                                                    }}
+                                                />
+                                        }
+                                        {
+                                            divcollapse.includes(item.key) &&
+                                            (
+                                                <label
+                                                    style={{ cursor: "pointer", marginLeft: 10 }}
+                                                    onClick={() => {
+                                                        let newKeys = [...divcollapse];
+                                                        if (newKeys.includes(item.key)) {
+                                                            newKeys = _.filter(newKeys, n => n !== item.key)
+                                                        } else {
+                                                            newKeys.push(item.key)
+                                                        }
+                                                        setDivcollapse(newKeys)
+                                                    }}
+                                                >
+                                                    <Icon icon="fa-solid:ellipsis-h" />
+                                                </label>
+                                            )
+                                        }
+                                    </Col>
+                                </Row>
                             </>
                         }
                         avatar={
@@ -239,7 +251,7 @@ export default function CommentBox() {
                                 }
 
                                 <Divider style={{ margin: 0, marginBottom: 10 }} />
-                                {
+                                {/* {
                                     item.cntfile === 0 ? "" :
                                         <div>
                                             <Row>
@@ -252,7 +264,7 @@ export default function CommentBox() {
                                                 </Col>
                                             </Row>
                                         </div>
-                                }
+                                } */}
                             </>
                         }
 
