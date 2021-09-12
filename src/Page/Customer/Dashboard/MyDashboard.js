@@ -13,7 +13,7 @@ const { Meta } = Card;
 
 export default function MyDashboard() {
     const history = useHistory();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     //data
     const [cusProduct, setCusProduct] = useState(null)
@@ -52,49 +52,40 @@ export default function MyDashboard() {
     }
 
     const getProduct = async () => {
-        try {
-            const result = await Axios.get(process.env.REACT_APP_API_URL + "/master/customer-products", {
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-            });
+        await Axios.get(process.env.REACT_APP_API_URL + "/master/customer-products", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+        }).then((result) => {
+            setCusProduct(result.data)
+        }).catch((error) => {
 
-            if (result.status === 200) {
-                setCusProduct(result.data)
-            }
-
-        } catch (error) {
-
-        }
+        })
     }
 
     const getData = async (param) => {
-        try {
-            const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/dashboard/customer/mytask",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    product_id: selectCusProduct
-                }
-            });
-
-            if (result.status === 200) {
-                setLoading(false);
-                setDashboard(result.data.total);
-                setChartData(result.data.chartdata.map((n) => ({
-                    productcode: n.ProductCode,
-                    status: n.Status === "Resolved" ? "Waiting Deploy" : n.Status,
-                    value: n.Value
-                })));
-                setExcelData(result.data.exceldata)
+        setLoading(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/dashboard/customer/mytask",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                product_id: selectCusProduct
             }
-
-        } catch (error) {
-            setLoading(false)
-        }
+        }).then((result) => {
+            setLoading(false);
+            setDashboard(result.data.total[0]);
+            setChartData(result.data.chartdata.map((n) => ({
+                productcode: n.ProductCode,
+                status: n.Status === "Resolved" ? "Waiting Deploy" : n.Status,
+                value: n.Value
+            })));
+            setExcelData(result.data.exceldata)
+        }).catch(() => {
+            setLoading(false);
+        })
     }
 
     const ExportExcel = (json) => {
@@ -120,7 +111,6 @@ export default function MyDashboard() {
             xlsx.writeFile(wb, `My DashBoard - ${moment().format("YYMMDD_HHmm")}.xlsx`);
         }
     }
-
 
     useEffect(() => {
         getData();
@@ -149,7 +139,7 @@ export default function MyDashboard() {
                                     title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>MyTask</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[0]?.MyTask}
+                                            {dashboard?.MyTask}
                                         </label>
 
                                     }
@@ -167,7 +157,7 @@ export default function MyDashboard() {
                                     title={<label className="card-title-menu" style={{ color: "#87D068" }}>InProgress</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[0]?.InProgress}
+                                            {dashboard?.InProgress}
                                         </label>
 
                                     }
@@ -186,9 +176,8 @@ export default function MyDashboard() {
                                     title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Waiting Deploy</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[0]?.Resolved}
+                                            {dashboard?.Resolved}
                                         </label>
-
                                     }
                                 />
                             </Card>
@@ -204,7 +193,7 @@ export default function MyDashboard() {
                                     title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[0]?.Cancel}
+                                            {dashboard?.Cancel}
                                         </label>
                                     }
                                 />
@@ -221,9 +210,8 @@ export default function MyDashboard() {
                                     title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard[0]?.Complete}
+                                            {dashboard?.Complete}
                                         </label>
-
                                     }
                                 />
                             </Card>
@@ -234,14 +222,12 @@ export default function MyDashboard() {
                                     <label className="dashboard-card-status">
                                         Total
                                     </label>
-
                                 </div>
                                 <div>
                                     <label className="dashboard-card-value">
                                         {
-                                            dashboard[0]?.MyTask + dashboard[0]?.InProgress + dashboard[0]?.Resolved +
-                                            dashboard[0]?.Cancel + dashboard[0]?.Complete
-
+                                            dashboard?.MyTask + dashboard?.InProgress + dashboard?.Resolved +
+                                            dashboard?.Cancel + dashboard?.Complete
                                         }
                                     </label>
                                 </div>
@@ -280,7 +266,7 @@ export default function MyDashboard() {
                                 extra={
                                     <>
                                         <Row align="middle">
-                                            <Col span={24} style={{marginLeft:10}}>
+                                            <Col span={24} style={{ marginLeft: 10 }}>
                                                 <Checkbox style={{ display: cusProduct?.length > 1 ? "inline-block" : "none" }} onChange={(value) => setIsStack(value.target.checked)}>
                                                     Is Stack
                                                 </Checkbox>
