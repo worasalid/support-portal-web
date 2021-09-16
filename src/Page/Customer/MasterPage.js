@@ -41,7 +41,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       if (result.status === 200) {
         dispatch({ type: 'Authen', payload: true });
         dispatch({ type: 'LOGIN', payload: result.data.usersdata });
-        
+
         CountStatus();
       }
 
@@ -150,7 +150,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
           <Row>
             <Col span={12}>
               {/* <img
-                style={{ height: "35px" }}
+                style={{ height: "50px", width: "130px" }}
                 src={`${process.env.PUBLIC_URL}/logo-space.jpg`}
                 alt=""
               /> */}
@@ -234,7 +234,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             theme="light"
             mode="inline"
             defaultOpenKeys={["sub1"]}
-            // defaultSelectedKeys={["3"]}
             defaultSelectedKeys={activemenu}
           >
             <div style={{ padding: 16, paddingTop: 24 }}>

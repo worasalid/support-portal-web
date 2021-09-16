@@ -79,9 +79,8 @@ export default function IssueAll() {
             <Spin spinning={loading}>
                 <div style={{ padding: "24px 24px 24px 24px" }}>
                     <Row gutter={16}>
-                        <Col span={3}>
-
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
@@ -96,8 +95,8 @@ export default function IssueAll() {
                             </Card>
                         </Col>
 
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
@@ -112,8 +111,8 @@ export default function IssueAll() {
                             </Card>
                         </Col>
 
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
@@ -128,8 +127,8 @@ export default function IssueAll() {
                             </Card>
                         </Col>
 
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
@@ -144,8 +143,8 @@ export default function IssueAll() {
                             </Card>
                         </Col>
 
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
@@ -160,8 +159,8 @@ export default function IssueAll() {
                             </Card>
                         </Col>
 
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
@@ -176,8 +175,8 @@ export default function IssueAll() {
                             </Card>
                         </Col>
 
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                             >
                                 <Meta
@@ -192,7 +191,7 @@ export default function IssueAll() {
                             </Card>
                         </Col>
 
-                        <Col span={3}>
+                        <Col xs={24} sm={12} md={8} lg={6} xl={3}>
                             <Card bordered={true} style={{ width: "100%" }}>
                                 <Meta
                                     title={<label className="card-title-menu" style={{ color: "#87D068" }}>Total</label>}

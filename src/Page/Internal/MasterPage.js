@@ -381,6 +381,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
         <Sider theme="light"
           style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
           width={205}
+          //collapsed={true}
           collapsed={state.collapsed}
         //collapsed={localStorage.getItem("menu-collapsed")}
         >
