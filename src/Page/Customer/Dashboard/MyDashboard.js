@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Column } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, DatePicker, Tabs, Select, Checkbox, Button } from 'antd';
+import { Row, Col, Card, Spin, DatePicker, Tabs, Select, Checkbox, Button, Progress } from 'antd';
 import { FileOutlined } from '@ant-design/icons';
 import Axios from "axios";
 import { useHistory } from 'react-router-dom';
@@ -134,103 +134,127 @@ export default function MyDashboard() {
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/mytask" })}
                             >
-                                <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>MyTask</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard?.MyTask}
-                                        </label>
-
-                                    }
-                                />
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" percent={Math.round((dashboard?.MyTask * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12} style={{ textAlign: "center" }}>
+                                        <Meta
+                                            //avatar={<FileOutlined style={{ fontSize: 25 }} />}
+                                            title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>MyTask</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.MyTask}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
                             </Card>
                         </Col>
 
-                        <Col span={4}>
-                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/inprogress" })}
                             >
-                                <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>InProgress</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard?.InProgress}
-                                        </label>
-
-                                    }
-                                />
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" percent={Math.round((dashboard?.InProgress * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12} style={{ textAlign: "center" }}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#8CD170" }}>InProgress</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.InProgress}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
                             </Card>
                         </Col>
 
-                        <Col span={4}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={4}>
 
-                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/pass" })}
                             >
-                                <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Waiting Deploy</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard?.Resolved}
-                                        </label>
-                                    }
-                                />
+                                <Row>
+                                    <Col span={8}>
+                                        <Progress type="circle" percent={Math.round((dashboard?.Resolved * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={16} style={{ textAlign: "center" }}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Waiting Deploy</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Resolved}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
                             </Card>
                         </Col>
 
-                        <Col span={4}>
-                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/cancel" })}
                             >
-                                <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard?.Cancel}
-                                        </label>
-                                    }
-                                />
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" percent={Math.round((dashboard?.Cancel * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12} style={{ textAlign: "center" }}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Cancel}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
                             </Card>
                         </Col>
 
-                        <Col span={4}>
-                            <Card xs={24} sm={12} md={8} lg={8} xl={4} bordered hoverable
+                        <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+                            <Card bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/complete" })}
                             >
-                                <Meta
-                                    avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" percent={Math.round((dashboard?.Complete * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12} style={{ textAlign: "center" }}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Complete}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+                            <Card bordered={true} style={{ width: "100%" }}>
+                                <Meta style={{ textAlign: "center" }}
+                                    title={<label className="card-title-menu" >Total</label>}
                                     description={
                                         <label className="dashboard-card-value" >
-                                            {dashboard?.Complete}
+                                            {dashboard?.Total}
                                         </label>
                                     }
                                 />
-                            </Card>
-                        </Col>
-                        <Col span={4}>
-                            <Card bordered={true} style={{ width: "100%" }}>
-                                <div>
-                                    <label className="dashboard-card-status">
-                                        Total
-                                    </label>
-                                </div>
-                                <div>
-                                    <label className="dashboard-card-value">
-                                        {
-                                            dashboard?.MyTask + dashboard?.InProgress + dashboard?.Resolved +
-                                            dashboard?.Cancel + dashboard?.Complete
-                                        }
-                                    </label>
-                                </div>
                             </Card>
                         </Col>
                     </Row>
@@ -241,14 +265,16 @@ export default function MyDashboard() {
                                 title={
                                     <>
                                         <Row>
-                                            <Col span={18}>
+                                            <Col span={16}>
                                                 <label>จำนวน Issue</label>
                                             </Col>
-                                            <Col span={6} hidden={cusProduct?.length > 1 ? false : true}>
+                                            <Col span={8} hidden={cusProduct?.length > 1 ? false : true}>
                                                 <Select
                                                     placeholder="Select Product"
+                                                    mode="multiple"
                                                     showSearch
                                                     allowClear
+                                                    maxTagCount={1}
                                                     defaultActiveFirstOption
                                                     style={{ width: "100%" }}
                                                     filterOption={(input, option) =>
