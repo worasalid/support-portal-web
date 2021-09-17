@@ -101,7 +101,6 @@ export default function All() {
     loadIssue();
   }, [pageCurrent]);
 
-
   return (
     <IssueContext.Provider value={{ state: customerstate, dispatch: customerdispatch }}>
       <MasterPage>
@@ -279,7 +278,7 @@ export default function All() {
                           record.AssignIconDate === null ?
                             <label style={{ fontSize: 11, color: "red" }}>
                               ยังไม่ได้ส่งเรื่องให้ ICON
-                          </label> :
+                            </label> :
                             <label>
                               {moment(record.AssignIconDate).format("DD/MM/YYYY")}<br />
                               {moment(record.AssignIconDate).format("HH:mm")}
@@ -318,7 +317,7 @@ export default function All() {
                           }
                         >
                           DueDate ถูกเลื่อน
-                   </Tag> : ""
+                        </Tag> : ""
                       }
 
                     </>
@@ -336,7 +335,7 @@ export default function All() {
                     <>
                       <div hidden={record.GroupStatus === "Resolved" ? false : true}>
                         <label className="table-column-text11">{record.GroupStatus}</label>
-                        <br/>
+                        <br />
                         <label className="table-column-text11">
                           {moment(record.ResolvedDate).format("DD/MM/YYYY")}
                         </label>
@@ -351,7 +350,7 @@ export default function All() {
 
                       <div hidden={(record.GroupStatus === "Complete" || record.GroupStatus === "Completed") || record.GroupStatus === "Resolved" ? true : false}>
                         <label className="table-column-text11">{record.GroupStatus}</label>
-                        <br/>
+                        <br />
                         <label className="table-column-text11">
                           {record.ProgressStatus === null || record.ProgressStatus === record.GroupStatus ? "" : `(${record.ProgressStatus})`}
                         </label>
