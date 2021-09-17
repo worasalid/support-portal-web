@@ -136,7 +136,7 @@ export default function MyDashboard() {
                             >
                                 <Row>
                                     <Col span={12}>
-                                        <Progress type="circle" percent={Math.round((dashboard?.MyTask * 100) / dashboard?.Total)} width={60} />
+                                        <Progress type="circle" strokeColor="#5B8FF9" percent={Math.round((dashboard?.MyTask * 100) / dashboard?.Total)} width={60} />
                                     </Col>
                                     <Col span={12} style={{ textAlign: "center" }}>
                                         <Meta
@@ -160,7 +160,7 @@ export default function MyDashboard() {
                             >
                                 <Row>
                                     <Col span={12}>
-                                        <Progress type="circle" percent={Math.round((dashboard?.InProgress * 100) / dashboard?.Total)} width={60} />
+                                        <Progress type="circle" strokeColor="#8CD170" percent={Math.round((dashboard?.InProgress * 100) / dashboard?.Total)} width={60} />
                                     </Col>
                                     <Col span={12} style={{ textAlign: "center" }}>
                                         <Meta
@@ -177,14 +177,13 @@ export default function MyDashboard() {
                         </Col>
 
                         <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-
                             <Card bordered hoverable
                                 style={{ width: "100%" }}
                                 onClick={() => history.push({ pathname: "/customer/issue/pass" })}
                             >
                                 <Row>
                                     <Col span={8}>
-                                        <Progress type="circle" percent={Math.round((dashboard?.Resolved * 100) / dashboard?.Total)} width={60} />
+                                        <Progress type="circle" strokeColor="#FF5500" percent={Math.round((dashboard?.Resolved * 100) / dashboard?.Total)} width={60} />
                                     </Col>
                                     <Col span={16} style={{ textAlign: "center" }}>
                                         <Meta
@@ -207,7 +206,7 @@ export default function MyDashboard() {
                             >
                                 <Row>
                                     <Col span={12}>
-                                        <Progress type="circle" percent={Math.round((dashboard?.Cancel * 100) / dashboard?.Total)} width={60} />
+                                        <Progress type="circle" strokeColor="#CD201F" percent={Math.round((dashboard?.Cancel * 100) / dashboard?.Total)} width={60} />
                                     </Col>
                                     <Col span={12} style={{ textAlign: "center" }}>
                                         <Meta
@@ -230,7 +229,7 @@ export default function MyDashboard() {
                             >
                                 <Row>
                                     <Col span={12}>
-                                        <Progress type="circle" percent={Math.round((dashboard?.Complete * 100) / dashboard?.Total)} width={60} />
+                                        <Progress type="circle" strokeColor="#87D068" percent={Math.round((dashboard?.Complete * 100) / dashboard?.Total)} width={60} />
                                     </Col>
                                     <Col span={12} style={{ textAlign: "center" }}>
                                         <Meta
@@ -245,6 +244,7 @@ export default function MyDashboard() {
                                 </Row>
                             </Card>
                         </Col>
+
                         <Col xs={24} sm={12} md={8} lg={8} xl={4}>
                             <Card bordered={true} style={{ width: "100%" }}>
                                 <Meta style={{ textAlign: "center" }}
@@ -261,7 +261,7 @@ export default function MyDashboard() {
 
                     <Row gutter={16} style={{ marginTop: "30px" }}>
                         <Col span={24}>
-                            <Card bordered={true}
+                            <Card bordered={true} className="card-dashboard"
                                 title={
                                     <>
                                         <Row>
