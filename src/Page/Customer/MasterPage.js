@@ -167,9 +167,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                         <label style={{ fontSize: 24, fontWeight: "bold", marginLeft: 16 }}>คู่มือการใช้งาน</label><br />
                         <Row style={{ padding: 16 }}>
                           <Col span={24}>
-
-                            <UserManual type="customer" visible={visibleChange} />
-
+                            <UserManual type="customer" is_cloud_site={state?.usersdata?.is_cloud_site} visible={visibleChange} />
                           </Col>
                         </Row>
                       </div>
