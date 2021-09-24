@@ -336,7 +336,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
             <Tooltip title="User Profile">
               <Dropdown
-
                 placement="topCenter"
                 overlayStyle={{ width: 200, boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.31) 0px 0px 1px" }}
                 overlay={(
@@ -420,20 +419,19 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 All Task
               </Menu.Item>
 
-              <Menu.ItemGroup key="g1" title="In Box">
+              <Menu.ItemGroup key="g1" title={<label className="header-text">In Box</label>}>
                 <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
                   My Task
                   {
                     masterstate.toolbar.sider_menu.issue.mytask.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
-
                   }
                 </Menu.Item>
               </Menu.ItemGroup>
-              <Menu.ItemGroup key="g2" title="Out Box">
-                <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
 
+              <Menu.ItemGroup key="g2" title={<label className="header-text">Out Box</label>}>
+                <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
                   <Badge
                     //dot
                     style={{ color: "red" }}
@@ -449,9 +447,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                       masterstate.toolbar.sider_menu.issue.inprogress.count === 0
                         ? ""
                         : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
-
                     }
-
                   </Badge>
                   {/* <BellOutlined style={{
                   color: "red",
@@ -468,7 +464,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     masterstate.toolbar.sider_menu.issue.resolved.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.resolved.count})`}</span>
-
                   }
                 </Menu.Item>
                 <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
@@ -477,7 +472,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     masterstate.toolbar.sider_menu.issue.cancel.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
-
                   }
                 </Menu.Item>
                 <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>

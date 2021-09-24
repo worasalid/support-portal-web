@@ -280,7 +280,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               >
                 All Task
               </Menu.Item>
-              <Menu.ItemGroup key="g1" title="In Box">
+              <Menu.ItemGroup key="g1" title={<label className="header-text">In Box</label>}>
                 <Menu.Item
                   key="3"
                   onClick={() => history.push('/customer/issue/mytask')
@@ -296,11 +296,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
 
                   }
-
                 </Menu.Item>
               </Menu.ItemGroup>
 
-              <Menu.ItemGroup key="g2" title="Out Box">
+              <Menu.ItemGroup key="g2" title={<label className="header-text">Out Box</label>}>
                 <Menu.Item
                   key="4"
                   onClick={() =>
@@ -329,7 +328,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     masterstate.toolbar.sider_menu.issue.pass.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
-
                   }
                 </Menu.Item>
                 <Menu.Item

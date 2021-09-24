@@ -10,6 +10,7 @@ import AuthenContext from '../../../utility/authenContext';
 import { customerReducer, customerState } from '../../../utility/issueContext';
 // import TextEditor from '../../../Component/TextEditor';
 import { Editor } from '@tinymce/tinymce-react';
+import { Icon } from '@iconify/react';
 
 const { Meta } = Card;
 const layout = {
@@ -128,30 +129,27 @@ export default function IssueCreate() {
     ]
 
     const GetIssueType = async () => {
-        try {
-            const issuetype = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/issue-types",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                }
-            });
-            if (issuetype.status === 200) {
-                setIssueType(issuetype.data.map((value) => {
-                    return {
-                        id: value.Id,
-                        name: value.Name,
-                        description: value.Description
-                    }
-                }))
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/issue-types",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
-        } catch (error) {
+        }).then((result) => {
+            setIssueType(result.data.map((value) => {
+                return {
+                    id: value.Id,
+                    name: value.Name,
+                    description: value.Description
+                }
+            }))
+        }).catch((error) => {
 
-        }
+        })
     }
 
     const getproducts = async () => {
-        const products = await Axios({
+        await Axios({
             url: process.env.REACT_APP_API_URL + "/master/customer-products",
             method: "get",
             headers: {
@@ -160,15 +158,15 @@ export default function IssueCreate() {
             params: {
                 company_id: state?.usersdata?.users?.company_id
             }
-        });
-        if (products.status === 200) {
-            customerdispatch({ type: "LOAD_PRODUCT", payload: products.data })
-        }
+        }).then((result) => {
+            customerdispatch({ type: "LOAD_PRODUCT", payload: result.data })
+        }).catch((error) => {
 
+        })
     }
 
     const getmodule = async () => {
-        const module = await Axios({
+        await Axios({
             url: process.env.REACT_APP_API_URL + "/master/modules",
             method: "get",
             headers: {
@@ -177,19 +175,25 @@ export default function IssueCreate() {
             params: {
                 productId: customerstate.filter.productState
             }
-        });
-        customerdispatch({ type: "LOAD_MODULE", payload: module.data })
+        }).then((result) => {
+            customerdispatch({ type: "LOAD_MODULE", payload: result.data })
+        }).catch(() => {
+
+        })
     }
 
     const getpriority = async () => {
-        const priority = await Axios({
+        await Axios({
             url: process.env.REACT_APP_API_URL + "/master/priority",
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
-        });
-        customerdispatch({ type: "LOAD_PRIORITY", payload: priority.data })
+        }).then((result) => {
+            customerdispatch({ type: "LOAD_PRIORITY", payload: result.data })
+        }).catch((error) => {
+
+        })
     }
 
     const getMasterdata = () => {
@@ -280,18 +284,6 @@ export default function IssueCreate() {
 
     }, [title]);
 
-    // useEffect(() => {
-    //     if (!state.authen) {
-    //         getMasterdata();
-    //         getproducts();
-    //     }
-    //     if (state?.usersdata?.users === undefined) {
-    //         getMasterdata();
-    //         getproducts();
-    //     }
-
-    // }, [state.authen]);
-
     useEffect(() => {
         if (state?.usersdata?.users?.company_id) {
             getMasterdata();
@@ -308,7 +300,6 @@ export default function IssueCreate() {
         // if (fileList.length !== 0) {
         //     console.log("fileList", fileList)
         // }
-        console.log("fileList", fileList)
     }, [fileList.length]);
 
 
@@ -328,21 +319,17 @@ export default function IssueCreate() {
                                 >
                                     <HomeOutlined style={{ fontSize: 20 }} /> กลับสู่เมนูหลัก
                                 </Button>
-                                {/* <Button
-                                type="link"
-                                onClick={() => {
-                                    let result = [...fileList]
-                                    result.push({ id: 1, value: "A" })
-
-                                    setFileList(result)
-
-                                }}
-                            >
-                                Add
-                            </Button> */}
                             </Col>
                         </Row>
-
+                        <br />
+                        <Row hidden={match.params.id === "2" ? false : true}>
+                            <Col span={24}>
+                                <label className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1Zx51G_a_L7bsIhjkNBCWpvvPyRzyIp4I&export=download", "_blank")}>
+                                    Template CR Form&nbsp;
+                                    <Icon icon="ant-design:download-outlined" fontSize="18" />
+                                </label>
+                            </Col>
+                        </Row>
                     </div>
 
                     <Form
@@ -449,9 +436,7 @@ export default function IssueCreate() {
                                     </Menu>
 
                                 }
-
                                 trigger="click"
-
                             >
                                 <Card className="card-box issue-active" hoverable>
                                     <Meta
@@ -563,6 +548,15 @@ export default function IssueCreate() {
 
                             />
                         </Form.Item>
+                        <Row>
+                            <label hidden={match.params.id === "2" ? false : true}
+                                className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1Zx51G_a_L7bsIhjkNBCWpvvPyRzyIp4I&export=download", "_blank")}>
+                                Template CR Form&nbsp;
+                                <Icon icon="ant-design:download-outlined" fontSize="18" />
+                            </label>
+                        </Row>
+
+                        <br />
                         <Form.Item label="ไฟล์แนบ" name="attach">
                             <UploadFile ref={uploadRef} />
                         </Form.Item>
