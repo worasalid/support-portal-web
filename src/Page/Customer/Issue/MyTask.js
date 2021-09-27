@@ -1,7 +1,7 @@
 import { Button, Col, Row, Table, Tag, Divider, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
-import React, { useEffect, useState, useContext, useReducer } from "react";
+import React, { useEffect, useState, useContext, useReducer, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import ModalSendIssue from "../../../Component/Dialog/Customer/modalSendIssue";
 import IssueSearch from "../../../Component/Search/Customer/IssueSearch";
@@ -11,15 +11,15 @@ import Column from "antd/lib/table/Column";
 import { DownloadOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 // import IssueContext from "../../../utility/issueContext";
+import MasterContext from "../../../utility/masterContext";
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
-
-
-
+import Notification from "../../../Component/Notifications/Customer/Notification";
 
 export default function MyTask() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
+  const notiRef = useRef();
 
   // modal
   const [visible, setVisible] = useState(false);
@@ -29,6 +29,7 @@ export default function MyTask() {
   // data
   //const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const [customerstate, customerdispatch] = useReducer(customerReducer, customerState);
+  const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext)
   const { state, dispatch } = useContext(AuthenContext);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [pageCurrent, setPageCurrent] = useState(1);
@@ -84,28 +85,6 @@ export default function MyTask() {
       }
     });
   }
-
-  const updateCountNoti = async (param) => {
-    try {
-      const result = await Axios({
-        url: process.env.REACT_APP_API_URL + "/master/notification",
-        method: "PATCH",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-        params: {
-          ticket_id: param
-        }
-      });
-
-      if (result.status === 200) {
-
-      }
-    } catch (error) {
-
-    }
-  }
-
 
   useEffect(() => {
     if (customerstate.search === true) {
@@ -245,7 +224,7 @@ export default function MyTask() {
                           </label>
                         </Col>
                       </Row>
-                      
+
                       <Row hidden={record.IssueType === "ChangeRequest" || record.IssueType === "Memo" || record.IssueType === "Bug" ? false : true}
                         style={{ borderBottom: "1px dotted" }}>
                         <Col span={8}>
@@ -282,9 +261,7 @@ export default function MyTask() {
                             customerdispatch({ type: "SELECT_DATAROW", payload: record });
                             history.push({ pathname: "/customer/issue/subject/" + record.Id });
                             UpdateStatusMailbox(record.MailBoxId)
-                            updateCountNoti(record.Id);
-                            window.location.reload(true);
-
+                            notiRef.current.updateNoti(record.Id);
                           }}
 
                           className="table-column-detail">รายละเอียด</label>
@@ -439,7 +416,9 @@ export default function MyTask() {
 
         />
 
-
+        <div hidden={true}>
+          <Notification ref={notiRef} />
+        </div>
         {/* </Spin> */}
       </MasterPage >
     </IssueContext.Provider>

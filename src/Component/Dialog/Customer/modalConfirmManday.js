@@ -56,8 +56,10 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
                 data: {
                     ticketid: details.ticketid,
                     mailboxid: details.mailboxid,
-                    flowoutputid: details.flowoutputid
-
+                    flowoutputid: details.flowoutputid,
+                    value: {
+                        comment_text: editorRef.current.getValue()
+                    }
                 }
             });
 
@@ -161,7 +163,7 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
                 <label className="header-text">Remark</label>
                 <TextEditor ref={editorRef} />
                 <br />
-            AttachFile : <UploadFile ref={uploadRef} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
         </Modal>
     );
