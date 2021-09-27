@@ -1,7 +1,7 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag } from "antd";
 import moment from "moment";
 import Axios from "axios";
-import React, { useEffect, useState, useContext, useReducer } from "react";
+import React, { useEffect, useState, useContext, useReducer, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import IssueSearch from "../../../Component/Search/Customer/IssueSearch";
 import MasterPage from "../MasterPage";
@@ -11,11 +11,13 @@ import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { customerReducer, customerState } from "../../../utility/issueContext";
 import DuedateLog from "../../../Component/Dialog/Customer/duedateLog";
 import ModalFileDownload from "../../../Component/Dialog/Customer/modalFileDownload";
+import Notification from "../../../Component/Notifications/Customer/Notification";
 
 
 export default function InProgress() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
+  const notiRef = useRef();
 
   // modal
   const [visible, setVisible] = useState(false);
@@ -71,7 +73,6 @@ export default function InProgress() {
     }
   };
 
-
   useEffect(() => {
     if (customerstate.search === true) {
       if (pageCurrent !== 1) {
@@ -96,7 +97,7 @@ export default function InProgress() {
             <label style={{ fontSize: 20, verticalAlign: "top" }}>รายการแจ้งปัญหา</label>
           </Col>
         </Row>
-        <IssueSearch Version="show"/>
+        <IssueSearch Version="show" />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={customerstate.issuedata.data} loading={loading}
@@ -244,12 +245,12 @@ export default function InProgress() {
                       <div>
                         <label
                           onClick={() => {
-                            return (
-                              customerdispatch({ type: "SELECT_DATAROW", payload: record }),
-                              history.push({ pathname: "/customer/issue/subject/" + record.Id })
-                            )
-                          }
-                          }
+                            customerdispatch({ type: "SELECT_DATAROW", payload: record });
+                            history.push({ pathname: "/customer/issue/subject/" + record.Id });
+                            //updateCountNoti(record.Id);
+                            notiRef.current.updateNoti(record.Id);
+                          }}
+
                           className="table-column-detail">รายละเอียด</label>
                       </div>
 
@@ -297,7 +298,7 @@ export default function InProgress() {
                           }
                         >
                           DueDate ถูกเลื่อน
-                   </Tag> : ""
+                        </Tag> : ""
                       }
 
                     </>
@@ -371,6 +372,9 @@ export default function InProgress() {
 
         />
         {/* </Spin> */}
+        <div hidden={true}>
+          <Notification ref={notiRef} />
+        </div>
       </MasterPage >
     </IssueContext.Provider>
   );

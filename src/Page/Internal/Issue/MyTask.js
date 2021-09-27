@@ -1,14 +1,14 @@
 import { Button, Col, Row, Table, Tag, Tooltip, Modal } from "antd";
 import moment from "moment";
 import Axios from "axios";
-import React, { useEffect, useState, useContext, useReducer } from "react";
+import React, { useEffect, useState, useContext, useReducer, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined  } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -17,10 +17,12 @@ import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
+import Notification from "../../../Component/Notifications/Internal/Notification";
 
 export default function Mytask() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
+  const notiRef = useRef();
 
   //modal
   const [visible, setVisible] = useState(false);
@@ -326,8 +328,8 @@ export default function Mytask() {
                             onClick={() => {
                               history.push({ pathname: "/internal/issue/subject/" + record.Id });
                               UpdateStatusMailbox(record.MailBoxId);
-                              updateCountNoti(record.Id);
-                              window.location.reload(true);
+                              //updateCountNoti(record.Id);
+                              notiRef.current.updateNoti(record.Id);
                             }}
                             className="table-column-detail">
                             รายละเอียด
@@ -578,6 +580,9 @@ export default function Mytask() {
         />
 
         {/* </Spin> */}
+        <div hidden={true}>
+          <Notification ref={notiRef} />
+        </div>
       </MasterPage>
     </IssueContext.Provider>
   );

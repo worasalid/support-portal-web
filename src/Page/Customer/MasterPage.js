@@ -167,9 +167,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                         <label style={{ fontSize: 24, fontWeight: "bold", marginLeft: 16 }}>คู่มือการใช้งาน</label><br />
                         <Row style={{ padding: 16 }}>
                           <Col span={24}>
-
-                            <UserManual type="customer" visible={visibleChange} />
-
+                            <UserManual type="customer" is_cloud_site={state?.usersdata?.is_cloud_site} visible={visibleChange} />
                           </Col>
                         </Row>
                       </div>
@@ -282,7 +280,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               >
                 All Task
               </Menu.Item>
-              <Menu.ItemGroup key="g1" title="In Box">
+              <Menu.ItemGroup key="g1" title={<label className="header-text">In Box</label>}>
                 <Menu.Item
                   key="3"
                   onClick={() => history.push('/customer/issue/mytask')
@@ -298,11 +296,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
 
                   }
-
                 </Menu.Item>
               </Menu.ItemGroup>
 
-              <Menu.ItemGroup key="g2" title="Out Box">
+              <Menu.ItemGroup key="g2" title={<label className="header-text">Out Box</label>}>
                 <Menu.Item
                   key="4"
                   onClick={() =>
@@ -331,7 +328,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     masterstate.toolbar.sider_menu.issue.pass.count === 0
                       ? ""
                       : <span>{` (${masterstate.toolbar.sider_menu.issue.pass.count})`}</span>
-
                   }
                 </Menu.Item>
                 <Menu.Item
