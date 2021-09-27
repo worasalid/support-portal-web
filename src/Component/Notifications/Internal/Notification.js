@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom';
 import MasterContext from "../../../utility/masterContext";
 import { NotificationOutlined } from '@ant-design/icons';
 
-export default forwardRef (function Notifications(props, ref) {
+export default forwardRef(function Notifications(props, ref) {
     const history = useHistory();
     const [loading, setLoading] = useState(true);
     const { state: masterstate, dispatch: masterdispatch } = useContext(MasterContext);
@@ -14,52 +14,44 @@ export default forwardRef (function Notifications(props, ref) {
 
     useImperativeHandle(ref, () => ({
         getNoti: () => getNotification(),
-  
+        updateNoti: (props) => updateCountNoti(props)
+
     }));
 
     const getNotification = async () => {
-        try {
-            const countNoti = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/notification",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                }
-            });
-
-            if (countNoti.status === 200) {
-                masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/notification",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
-        } catch (error) {
+        }).then((result) => {
+            masterdispatch({ type: "COUNT_NOTI", payload: result.data.total });
+        }).catch(() => {
 
-        }
+        })
     }
 
     const updateCountNoti = async (param) => {
-        try {
-            const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/notification",
-                method: "PATCH",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    id: param
-                }
-            });
-
-            if (result.status === 200) {
-                console.log("Success");
-                window.location.reload(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/notification",
+            method: "PATCH",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                ticket_id: param
             }
-        } catch (error) {
+        }).then(() => {
+            getNotification();
+        }).catch(() => {
 
-        }
+        })
     }
 
     useEffect(() => {
         getNotification();
-    }, [])
+    }, [masterstate?.toolbar?.top_menu?.notification])
 
 
     return (

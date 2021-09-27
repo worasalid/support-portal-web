@@ -130,7 +130,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       });
 
       if (countNoti.status === 200) {
-        masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
+        //masterdispatch({ type: "COUNT_NOTI", payload: countNoti.data.total });
       }
     } catch (error) {
 
@@ -141,12 +141,14 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
     if (state.authen === false) {
       getuser();
       // getNotification();
+      notiRef.current.getNoti();
       CountStatus();
     } else {
       setInterval(() => {
-        getNotification();
+        //getNotification();
+        notiRef.current.getNoti();
         CountStatus();
-      }, 500000)
+      }, 60000)
     }
   }, [state.authen])
 
@@ -327,7 +329,6 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
 
                 <Button type="text" style={{ marginRight: 20, marginTop: 10 }} size="middle"
-
                 >
                   <Notification ref={notiRef} />
                 </Button>

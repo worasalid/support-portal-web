@@ -1,7 +1,7 @@
 import { Button, Col, Row, Table, Tag, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
-import React, { useEffect, useState, useContext, useReducer } from "react";
+import React, { useEffect, useState, useContext, useReducer, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
@@ -18,10 +18,12 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 // import Clock from "../../../utility/countdownTimer";
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
+import Notification from "../../../Component/Notifications/Internal/Notification";
 
 export default function InProgress() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
+  const notiRef = useRef();
 
   //modal
   const [visible, setVisible] = useState(false);
@@ -80,24 +82,20 @@ export default function InProgress() {
   };
 
   const updateCountNoti = async (param) => {
-    try {
-      const result = await Axios({
-        url: process.env.REACT_APP_API_URL + "/master/notification",
-        method: "PATCH",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-        params: {
-          ticket_id: param
-        }
-      });
-
-      if (result.status === 200) {
-
+    await Axios({
+      url: process.env.REACT_APP_API_URL + "/master/notification",
+      method: "PATCH",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        ticket_id: param
       }
-    } catch (error) {
+    }).then(() => {
+      // window.location.reload(true);
+    }).catch(() => {
 
-    }
+    })
   }
 
   function HandleChange(items) {
@@ -298,13 +296,14 @@ export default function InProgress() {
                       <div>
                         <label
                           onClick={() => {
-                            updateCountNoti(record.Id);
+                            //updateCountNoti(record.Id);
+                            notiRef.current.updateNoti(record.Id);
                             history.push({ pathname: "/internal/issue/subject/" + record.Id });
-                            window.location.reload(true);
+
                           }}
                           className="table-column-detail">
                           รายละเอียด
-                          </label>
+                        </label>
                       </div>
 
                     </>
@@ -331,7 +330,7 @@ export default function InProgress() {
                       </div>
                       <Tooltip title="Company">
                         <Tag color="#17a2b8" >
-                          <label style={{fontSize: 10}}>{record.CompanyName}</label>
+                          <label style={{ fontSize: 10 }}>{record.CompanyName}</label>
                         </Tag>
                       </Tooltip>
 
@@ -377,7 +376,7 @@ export default function InProgress() {
                           }}
                         >
                           เลื่อน Due
-                       </Tag>
+                        </Tag>
                       </div>
                     </>
                   )
@@ -412,7 +411,7 @@ export default function InProgress() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                      <ClockSLA
+                        <ClockSLA
                           start={moment(record.AssignIconDate)}
                           due={moment(record.SLA_DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
@@ -538,8 +537,13 @@ export default function InProgress() {
           }}
         />
 
+        <div hidden={true}>
+          <Notification ref={notiRef} />
+        </div>
         {/* </Spin> */}
       </MasterPage>
+
+
     </IssueContext.Provider>
   );
 }

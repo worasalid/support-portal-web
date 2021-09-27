@@ -17,37 +17,35 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
     //data
     const [listGroupFile, setListGroupFile] = useState([]);
     const [listfile, setListfile] = useState([]);
-    
+
 
     //div
     const [divcollapse, setDivcollapse] = useState("block")
     const [collapseicon, setCollapseicon] = useState(<UpCircleOutlined style={{ fontSize: 20, color: "#1890ff" }} />)
 
 
-    const GetDocument = async () => {
-        try {
-            const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/issue-document",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    refId: details.refId,
-                    //reftype: details.reftype
-                }
-            });
+    const getDocument = async () => {
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/tickets/issue-document",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                refId: details.refId,
+                //reftype: details.reftype
+            }
+        }).then((result) => {
             setListGroupFile(_.uniqBy(result.data, "GroupType"))
             setListfile(result.data)
+        }).catch(() => {
 
-        } catch (error) {
-
-        }
+        })
     }
 
     useEffect(() => {
         if (details.refId) {
-            GetDocument();
+            getDocument();
         }
     }, [details.refId])
 
