@@ -141,14 +141,14 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
     if (state.authen === false) {
       getuser();
       // getNotification();
-      notiRef.current.getNoti();
+      //notiRef.current.getNoti();
       CountStatus();
     } else {
       setInterval(() => {
         //getNotification();
-        notiRef.current.getNoti();
+        //notiRef.current.getNoti();
         CountStatus();
-      }, 60000)
+      }, 500000)
     }
   }, [state.authen])
 
