@@ -1,11 +1,9 @@
 import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Radio, Spin } from 'antd';
-
 import Column from 'antd/lib/table/Column';
 import Axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import MasterPage from '../MasterPage'
-import Draggable from 'react-draggable';
 
 export default function MasterCompany() {
     const [formAdd] = Form.useForm();
@@ -58,7 +56,7 @@ export default function MasterCompany() {
             setLoading(false);
             setListcompany(res.data)
         }).catch((error) => {
-
+            setLoading(false);
         })
     }
 
@@ -105,7 +103,7 @@ export default function MasterCompany() {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
         }).then((res) => {
-            setListProduct(res.data.filter((n) => !cusProduct.find((item) => item.ProductId === n.Id)).map((x) => {
+            setListProduct(res.data.filter((n) => !cusProduct.find((item) => (item.ProductId || item.Id) === n.Id)).map((x) => {
                 return {
                     key: x.Id,
                     Name: x.Name,
@@ -137,6 +135,7 @@ export default function MasterCompany() {
 
     // Save
     const onFinishAdd = async (param) => {
+        setLoading(true);
         try {
             const addcompany = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/add-company",
@@ -180,8 +179,9 @@ export default function MasterCompany() {
                     ),
                     okText: "Close",
                     onOk() {
-                        setLoading(true);
+                        setLoading(false);
                         formAdd.resetFields();
+                        getCompany();
                     },
                 });
             }
@@ -199,6 +199,7 @@ export default function MasterCompany() {
                 okText: "Close",
                 onOk() {
                     formAdd.resetFields();
+                    setLoading(false);
                 },
             });
         }
@@ -250,7 +251,6 @@ export default function MasterCompany() {
                     okText: "Close",
                     onOk() {
                         setVisible(false);
-                        setLoading(true);
                     },
                 });
             }
@@ -292,7 +292,6 @@ export default function MasterCompany() {
     useEffect(() => {
         getCompany()
     }, [])
-
 
     return (
         <MasterPage>
@@ -338,19 +337,19 @@ export default function MasterCompany() {
                                     <Button type="link"
                                         icon={<EditOutlined />}
                                         onClick={() => {
-                                                getCompanyById(record.Id);
-                                                getCustomerProduct(record.Id);
-                                                form.setFieldsValue({
-                                                    code: record.Code,
-                                                    name: record.Name,
-                                                    fullname_th: record.FullNameTH,
-                                                    fullname_en: record.FullNameEN,
-                                                    cost: record.CostManday,
-                                                    is_cloud: record.IsCloudSite,
-                                                    sites_color: record.SitesColor === null ? "#0074E0" : record.SitesColor,
-                                                    running_format: record.RunFormat
-                                                });
-                                                setVisible(true)
+                                            getCompanyById(record.Id);
+                                            getCustomerProduct(record.Id);
+                                            form.setFieldsValue({
+                                                code: record.Code,
+                                                name: record.Name,
+                                                fullname_th: record.FullNameTH,
+                                                fullname_en: record.FullNameEN,
+                                                cost: record.CostManday,
+                                                is_cloud: record.IsCloudSite,
+                                                sites_color: record.SitesColor === null ? "#0074E0" : record.SitesColor,
+                                                running_format: record.RunFormat
+                                            });
+                                            setVisible(true)
                                         }}
                                     >
                                         Edit
@@ -446,8 +445,7 @@ export default function MasterCompany() {
                             },
                         ]}
                     >
-                        <Input style={{ width: "20%" }} /> &nbsp;
-                        <label>Format ที่ใช้แสดงเลข Issue ในการแจ้งปัญหา</label>
+                        <Input style={{ width: "20%" }} />
                     </Form.Item>
                 </Form>
                 <Row>
@@ -581,10 +579,9 @@ export default function MasterCompany() {
                     setSelectedRowKeys([])
                 }}
                 onOk={() => {
-                    return (
-                        setCusProduct([...cusProduct, ...selectProduct]),
-                        setModalProduct(false)
-                    )
+                    setCusProduct([...cusProduct, ...selectProduct]);
+                    setModalProduct(false);
+                    setSelectedRowKeys([]);
                 }}
                 okText="Add"
             >

@@ -1,248 +1,487 @@
 import React, { useState, useEffect } from 'react';
 import { Column } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, DatePicker, Tabs } from 'antd';
+import { Row, Col, Card, Spin, DatePicker, Tabs, Select, Checkbox, Button, Progress, Table, Carousel } from 'antd';
 import { FileOutlined } from '@ant-design/icons';
 import Axios from "axios";
 import moment from 'moment';
+import xlsx from 'xlsx';
+import { Icon } from '@iconify/react';
 
 const { Meta } = Card;
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
 
-
 export default function IssueAll() {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+
+    //filter
+    const [selectCusProduct, setSelectCusProduct] = useState(null);
+    const [isStack, setIsStack] = useState(false);
+    const [cusProduct, setCusProduct] = useState(null);
+
+    //data
     const [dashboard, setDashboard] = useState([]);
-    const [dashboardType, setDashBoardType] = useState("total");
+    const [chartData, setChartData] = useState([]);
+    const [tableData, setTableData] = useState([]);
+    const [excelData, setExcelData] = useState([]);
 
-
+    // chart config
     const config = {
-        xField: 'Status',
-        yField: 'Value',
-        seriesField: 'Status',
+        xField: cusProduct?.length > 1 ? 'product_code' : 'status',
+        yField: 'value',
+        seriesField: 'status',
+        isStack: isStack,
+        isGroup: !isStack,
         label: {
             position: 'middle',
             content: function content(item) {
-                return item.Value.toFixed(0);
+                return item.value.toFixed(0);
             },
             style: { fill: '#fff' },
         },
-        columnWidthRatio: 0.4,
+        columnWidthRatio: isStack && selectCusProduct !== null ? 0.3 :
+            isStack && selectCusProduct === null ? 0.5 : 0.6,
         legend: {
             layout: 'horizontal',
             position: 'bottom'
         },
         color: function color(x) {
-            if (x.Status === "Open" || x.Status === "Hold") { return "gray" }
-            if (x.Status === "InProgress") { return "#5B8FF9" }
-            if (x.Status === "Resolved") { return "#FF5500" }
-            if (x.Status === "Cancel") { return "#CD201F" }
-            if (x.Status === "ReOpen") { return "#CD201F" }
-            if (x.Status === "Complete") { return "#87D068" }
-
+            if (x.status === "Open") { return "#5B8FF9" }
+            if (x.status === "InProgress") { return "#87D068" }
+            if (x.status === "Resolved") { return "#FF5500" }
+            if (x.status === "Deploy") { return "#FF5500" }
+            if (x.status === "Cancel") { return "#CD201F" }
+            if (x.status === "Hold") { return "#CD201F" }
+            if (x.status === "Complete") { return "#CD201F" }
         }
     }
 
-    const GetIssueTotal = async (param) => {
-        try {
-            const issuestatus = await Axios({
-                url: process.env.REACT_APP_API_URL + "/dashboard/all-issue-status",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    start_date: "",
-                    end_date: "",
-                    dash_board_type: dashboardType
-                }
+    const getData = async (param) => {
+        setLoading(true);
 
-            });
-            if (issuestatus.status === 200) {
-                setLoading(false);
-                setDashboard(issuestatus.data.data)
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/dashboard/customer/all",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                product_id: selectCusProduct,
+                start_date: "",
+                end_date: ""
             }
 
-        } catch (error) {
-            //setLoading(false)
+        }).then((result) => {
+            setLoading(false);
+            setDashboard(result.data.total[0]);
+            setChartData(result.data.chartdata.map((n) => {
+                return {
+                    product_code: n.ProductCode,
+                    status: n.Status,
+                    value: n.Value
+                }
+            }));
+            setTableData(result.data.tabledata);
+            setExcelData(result.data.exceldata);
+        }).catch(() => {
+
+        })
+    }
+
+    const getProduct = async () => {
+        await Axios.get(process.env.REACT_APP_API_URL + "/master/customer-products", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+        }).then((result) => {
+            setCusProduct(result.data)
+        }).catch((error) => {
+
+        })
+    }
+
+    const ExportExcel = (json) => {
+        if (json !== undefined) {
+            let ws = xlsx.utils.json_to_sheet(json.map((x) => (
+                {
+                    No: x.Row,
+                    Issue: x.Number,
+                    IssueType: x.IssueType,
+                    Priority: x.Priority,
+                    Title: x.Title,
+                    Status: x.GroupStatus,
+                    Progress: x.ProgressStatus,
+                    AssignDate: x.AssignIconDate,
+                    DueDate: x.DueDate,
+                    OverDue: x.OverDue
+
+                })
+            ));
+
+            let wb = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(wb, ws, 'Issue');
+            xlsx.writeFile(wb, `My DashBoard - ${moment().format("YYMMDD_HHmm")}.xlsx`);
         }
     }
 
     useEffect(() => {
-        GetIssueTotal();
+        getData();
+        getProduct();
     }, [])
+
+    useEffect(() => {
+        if (selectCusProduct !== null) {
+            getData();
+        }
+    }, [selectCusProduct])
 
 
     return (
         <MasterPage bgColor="#f0f2f5">
             <Spin spinning={loading}>
-                <div style={{ padding: "24px 24px 24px 24px" }}>
+                <div style={{ padding: "12px 24px 24px 24px" }}>
+                    {/* Dashboard */}
+
                     <Row gutter={16}>
-                        <Col span={3}>
-
-                            <Card className="card-box issue-active" bordered hoverable
-                                style={{ width: "100%" }}
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable
+                                style={{ width: "100%", height: "100px" }}
                             >
-                                <Meta
-                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#868686" }}>Open</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard[0]?.Value}
-                                        </label>
-                                    }
-                                />
-                            </Card>
-                        </Col>
-
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
-                                style={{ width: "100%" }}
-                            >
-                                <Meta
-                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#5B8FF9" }}>InProgress</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard[1]?.Value}
-                                        </label>
-                                    }
-                                />
-                            </Card>
-                        </Col>
-
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
-                                style={{ width: "100%" }}
-                            >
-                                <Meta
-                                    // avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Resolved</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard[2]?.Value}
-                                        </label>
-                                    }
-                                />
-                            </Card>
-                        </Col>
-
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
-                                style={{ width: "100%" }}
-                            >
-                                <Meta
-                                    // avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Waiting Deploy</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard[3]?.Value}
-                                        </label>
-                                    }
-                                />
-                            </Card>
-                        </Col>
-
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
-                                style={{ width: "100%" }}
-                            >
-                                <Meta
-                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard[4]?.Value}
-                                        </label>
-                                    }
-                                />
-                            </Card>
-                        </Col>
-
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
-                                style={{ width: "100%" }}
-                            >
-                                <Meta
-                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Hold</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard[5]?.Value}
-                                        </label>
-                                    }
-                                />
-                            </Card>
-                        </Col>
-
-                        <Col span={3}>
-                            <Card className="card-box issue-active" bordered hoverable
-                                style={{ width: "100%" }}
-                            >
-                                <Meta
-                                    //avatar={<FileOutlined style={{ fontSize: 25 }} />}
-                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {dashboard[6]?.Value}
-                                        </label>
-                                    }
-                                />
-                            </Card>
-                        </Col>
-
-                        <Col span={3}>
-                            <Card bordered={true} style={{ width: "100%" }}>
-                                <Meta
-                                    title={<label className="card-title-menu" style={{ color: "#87D068" }}>Total</label>}
-                                    description={
-                                        <label className="dashboard-card-value" >
-                                            {
-                                                dashboard[0]?.Value + dashboard[1]?.Value + dashboard[2]?.Value + dashboard[3]?.Value +
-                                                dashboard[4]?.Value + dashboard[5]?.Value + dashboard[6]?.Value
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" strokeColor="#868686" percent={Math.round((dashboard?.Open * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#868686" }}>Open</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Open}
+                                                </label>
                                             }
-                                        </label>
-                                    }
-                                />
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable
+                                style={{ width: "100%", height: "100px" }}
+                            >
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" strokeColor="#8CD170" percent={Math.round((dashboard?.InProgress * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#8CD170" }}>InProgress</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.InProgress}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable
+                                style={{ width: "100%", height: "100px" }}
+                            >
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" strokeColor="#FF5500" percent={Math.round((dashboard?.Resolved * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Resolved</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Resolved}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable
+                                style={{ width: "100%", height: "100px" }}
+                            >
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" strokeColor="#FF5500" percent={Math.round((dashboard?.Deploy * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#FF5500" }}>Waiting Deploy</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Deploy}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
                             </Card>
                         </Col>
                     </Row>
 
+                    <Row gutter={16} style={{ marginTop: 12 }}>
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable
+                                style={{ width: "100%", height: "100px" }}
+                            >
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" strokeColor="#CD201F" percent={Math.round((dashboard?.Cancel * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#CD201F" }}>Cancel</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Cancel}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
 
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable
+                                style={{ width: "100%", height: "100px" }}
+                            >
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" strokeColor="#868686" percent={Math.round((dashboard?.Hold * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#868686" }}>Hold</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Hold}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable
+                                style={{ width: "100%", height: "100px" }}
+                            >
+                                <Row>
+                                    <Col span={12}>
+                                        <Progress type="circle" strokeColor="#87D068" percent={Math.round((dashboard?.Complete * 100) / dashboard?.Total)} width={60} />
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" style={{ color: "#87D068" }}>Complete</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Complete}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6}>
+                            <Card bordered hoverable style={{ width: "100%", height: "100px" }}>
+                                <Row>
+                                    <Col span={12}>
+
+                                    </Col>
+                                    <Col span={12}>
+                                        <Meta
+                                            title={<label className="card-title-menu" >Total</label>}
+                                            description={
+                                                <label className="dashboard-card-value" >
+                                                    {dashboard?.Total}
+                                                </label>
+                                            }
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    {/* chart */}
                     <Row gutter={16} style={{ marginTop: "30px" }}>
-                        {/* <Col span={12}>
-                            {<DashBoard data={dashboard} />}
-                        </Col> */}
                         <Col span={24}>
-                            <div className="card-container">
-                                <Tabs type="card" defaultActiveKey="total" onChange={(x) => setDashBoardType(x)}>
-                                    <TabPane tab="Total" key="total">
+                            <Card bordered={true} className="card-dashboard"
+                                title={
+                                    <>
                                         <Row>
-                                            <Col span={24}>
-
+                                            <Col span={16}>
+                                                <label>จำนวน Issue</label>
+                                            </Col>
+                                            <Col span={8} hidden={cusProduct?.length > 1 ? false : true}>
+                                                <Select
+                                                    placeholder="Select Product"
+                                                    mode="multiple"
+                                                    showSearch
+                                                    allowClear
+                                                    maxTagCount={1}
+                                                    defaultActiveFirstOption
+                                                    style={{ width: "100%" }}
+                                                    filterOption={(input, option) =>
+                                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                    }
+                                                    onChange={(value) => setSelectCusProduct(value)}
+                                                    options={cusProduct && cusProduct.map((n) => ({ value: n.ProductId, label: n.Name + ` (${n.FullName})` }))}
+                                                >
+                                                </Select>
+                                                &nbsp;
                                             </Col>
                                         </Row>
-                                        <Column {...config}
-                                            tooltip="xxx"
-                                            style={{ height: 350 }}
-                                            // data={dashboard.filter((x) => x.Status !== "Total")}
-                                            data={dashboard}
-                                            xAxis={{
-                                                position: "bottom",
-                                            }}
-                                        />
+                                    </>
+                                }
+                                extra={
+                                    <>
+                                        <Row align="middle">
+                                            <Col span={24} style={{ marginLeft: 10 }}>
+                                                <Checkbox style={{ display: cusProduct?.length > 1 ? "inline-block" : "none" }} onChange={(value) => setIsStack(value.target.checked)}>
+                                                    Is Stack
+                                                </Checkbox>
 
-                                    </TabPane>
-
-
-                                </Tabs>
-                            </div>
-
+                                                <Button type="text"
+                                                    onClick={() => ExportExcel(excelData)}
+                                                    icon={
+                                                        <Icon icon="vscode-icons:file-type-excel2" fontSize="18px" />
+                                                    }
+                                                >
+                                                    <label style={{ fontSize: "16px", cursor: "pointer" }}> Export </label>
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </>
+                                }
+                            >
+                                <Column {...config}
+                                    // tooltip=""
+                                    style={{ height: 350 }}
+                                    data={chartData.filter((n) => n.value !== 0)}
+                                    xAxis={{
+                                        position: "bottom",
+                                    }}
+                                />
+                            </Card>
                         </Col>
                     </Row>
 
-
+                    {/* table */}
+                    <Row gutter={16} style={{ marginTop: "30px" }}>
+                        <Col span={24}>
+                            <Table dataSource={tableData}>
+                                <Column title="Product Code"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.ProductCode}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Product Name"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.ProductName}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Open" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.Open}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="InProgress" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.InProgress}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Resolved" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.Resolved}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Waiting Deploy" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.Deploy}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Cancel" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.Cancel}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Hold" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.Hold}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Complete" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.Complete}
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="Total" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                {record.Total}
+                                            </>
+                                        )
+                                    }}
+                                />
+                            </Table>
+                        </Col>
+                    </Row>
                 </div>
             </Spin>
         </MasterPage >

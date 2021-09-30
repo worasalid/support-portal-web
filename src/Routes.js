@@ -70,6 +70,7 @@ import ConfigEmailPatchVersion from './Page/Internal/Setting/System/ConfigEmail_
 import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCancel';
 import ConfigReasonReject from './Page/Internal/Setting/System/ConfigReasonReject';
 import UserManual from './Page/Internal/Setting/System/UserManual';
+import ConfigOrganize from './Page/Internal/Setting/System/ConfigOrganize';
 
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
@@ -126,11 +127,11 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/email_config" exact component={ConfigEmail} />
                                     <Route path="/internal/setting/system/email_config/reopen" exact component={ConfigReOpenEmail} />
                                     <Route path="/internal/setting/system/email_config/patch" exact component={ConfigEmailPatchVersion} />
-
                                     <Route path="/internal/setting/system/reason_cancel" exact component={ConfigReasonCancel} />
                                     <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
                                     <Route path="/internal/setting/system/user-manual" exact component={UserManual} />
-                                    
+                                    <Route path="/internal/setting/system/organize" component={ConfigOrganize} />
+
 
                                     {/* dashboard */}
                                     <Route path="/internal/mydashboard" exact component={MyDashboard} />

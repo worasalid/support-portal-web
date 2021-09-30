@@ -40,7 +40,7 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -50,7 +50,7 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
             }
