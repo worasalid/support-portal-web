@@ -8,12 +8,13 @@ import { useHistory } from 'react-router-dom';
 const { Meta } = Card;
 
 export default function SystemConfig() {
-    const history = useHistory(null)
+    const history = useHistory(null);
+
     return (
         <MasterPage bgColor="#f0f2f5">
             <div style={{ padding: "24px 24px 24px 24px" }}>
                 <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                    <Col hidden={true} xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/orgchart")}
@@ -36,6 +37,30 @@ export default function SystemConfig() {
                             />
                         </Card>
                     </Col>
+
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                            onClick={() => history.push("/internal/setting/system/organize")}
+                        >
+                            <Meta
+                                avatar={
+                                    <img
+                                        style={{ height: "40px", width: "40px" }}
+                                        src={`${process.env.PUBLIC_URL}/icons-organization-chart.png`}
+                                        alt=""
+                                    />
+                                }
+                                title={<label className="card-title-menu">Organize</label>}
+                                description={
+                                    <label className="value-text">
+                                        ตั้งค่า Organize
+                                    </label>
+                                }
+                            />
+                        </Card>
+                    </Col>
+
 
                     <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
@@ -226,6 +251,8 @@ export default function SystemConfig() {
                             />
                         </Card>
                     </Col>
+
+
                 </Row>
             </div>
 
