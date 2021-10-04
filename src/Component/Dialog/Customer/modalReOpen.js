@@ -19,26 +19,21 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
     const [loading, setLoading] = useState(false);
 
     const configData = async () => {
-        try {
-            const configData = await Axios({
-                url: process.env.REACT_APP_API_URL + "/master/config-data",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    groups: "ReOpen"
-                }
-
-            });
-
-            if (configData.status === 200) {
-                setReOpenData(configData.data)
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/master/config-data",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                groups: "ReOpen"
             }
 
-        } catch (error) {
+        }).then((res) => {
+            setReOpenData(res.data)
+        }).catch((error) => {
 
-        }
+        })
     }
 
     const SaveComment = async () => {
@@ -54,7 +49,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                         ticketid: details && details.ticketid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
 
@@ -135,13 +130,11 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
         FlowReOpen(param);
     };
 
-
     useEffect(() => {
         if (visible) {
             configData()
         }
     }, [visible])
-
 
     return (
         <Modal
@@ -150,7 +143,10 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
             onOk={() => form.submit()}
             okText="Send"
             okButtonProps={""}
-            onCancel={() => { return onCancel(), form.resetFields() }}
+            onCancel={() => {
+                onCancel();
+                form.resetFields()
+            }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -187,7 +183,7 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
                     >
                         <TextEditor ref={editorRef} />
                         <br />
-      AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form >
             </Spin>
