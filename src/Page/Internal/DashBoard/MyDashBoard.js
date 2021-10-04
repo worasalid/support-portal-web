@@ -36,7 +36,7 @@ export default function MyDashboard() {
         //     end: 2,
         //     maxLimit: 100,
         // },
-        columnWidthRatio: 0.1,
+        columnWidthRatio: 0.3,
         label: {
             position: 'middle',
             content: function content(item) {
@@ -44,6 +44,7 @@ export default function MyDashboard() {
             },
             style: { fill: '#fff' },
         },
+
         legend: {
             layout: 'horizontal',
             position: 'bottom'
@@ -116,8 +117,8 @@ export default function MyDashboard() {
                     Title: x.Title,
                     AssignDate: x.AssignIconDate,
                     DueDate: x.DueDate,
-                    OverDueAll: x.OverDueAll,
-                    OverDue: x.OverDue
+                    // OverDueAll: x.OverDueAll,
+                    // OverDue: x.OverDue
                 }
             }));
             let wb = xlsx.utils.book_new();
@@ -227,11 +228,34 @@ export default function MyDashboard() {
                                     </>
                                 }
                             >
-                                <Column {...chartCompany_config}
+                                <Column
+                                    // {...chartCompany_config}
                                     data={chartCompany.filter((n) => n.Value !== 0)}
                                     height={300}
-                                    //scrollbar="true"
+                                    xField="Company"
+                                    yField="Value"
+                                    seriesField="Status"
                                     xAxis={{ position: "bottom" }}
+                                    isStack={isStack}
+                                    isGroup={!isStack}
+                                    columnWidthRatio={0.3}
+                                    legend={{
+                                        layout: "horizontal",
+                                        position: "bottom"
+                                    }}
+                                    label={{
+                                        position: "middle",
+                                        style: { fill: '#fff' },
+                                        content: (item) => {
+                                            return item.Value.toFixed(0);
+                                        }
+                                    }}
+                                    color={(x) => {
+                                        if (x.Status === "MyTask") { return "#5B8FF9" }
+                                        if (x.Status === "InProgress") { return "#87D068" }
+                                        if (x.Status === "Resolved") { return "#FF5500" }
+                                        if (x.Status === "Cancel") { return "#CD201F" }
+                                    }}
                                 />
 
                             </Card>
