@@ -310,7 +310,7 @@ export default function UserManual() {
                 data: {
                     id: selectRowId,
                     description: param.docname,
-                    groups: "UserManual_Internal",
+                    groups: "Manual_Internal",
                 }
             });
 
