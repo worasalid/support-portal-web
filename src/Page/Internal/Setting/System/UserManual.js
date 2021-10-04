@@ -87,7 +87,7 @@ export default function UserManual() {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
-                groups: "UserManual_Internal",
+                groups: "Manual_Internal",
             }
         }).then((result) => {
             setInternalDocument(result.data);

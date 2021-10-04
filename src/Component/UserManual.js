@@ -4,7 +4,6 @@ import { ReadOutlined } from "@ant-design/icons";
 import Axios from "axios";
 
 export default function UserManual({ type, is_cloud_site, visible }) {
-    console.log("visible", visible)
     const [document, setDocument] = useState([]);
 
     const getDocument = async () => {
@@ -16,7 +15,7 @@ export default function UserManual({ type, is_cloud_site, visible }) {
             },
             params: {
                 groups: type === "customer" && is_cloud_site ? "Manual_CloudCustomer" :
-                    type === "customer" && !is_cloud_site ? "Manual_onPremisCustomer" : "UserManual_Internal"
+                    type === "customer" && !is_cloud_site ? "Manual_onPremisCustomer" : "Manual_Internal"
             }
 
         }).then((res) => {
@@ -52,7 +51,7 @@ export default function UserManual({ type, is_cloud_site, visible }) {
         if (visible) getDocument();
 
     }, [visible])
-    console.log("is_cloud_site", is_cloud_site)
+
     return (
         <>
             <div
