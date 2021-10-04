@@ -370,6 +370,8 @@ export default function MasterCompany() {
                     setModalAdd(false);
                     setSelectcompany(null);
                     formAdd.resetFields();
+                    setSelectProduct([]);
+                    setCusProduct([]);
                 }}
                 okText="Save"
                 onOk={() => {
@@ -575,8 +577,8 @@ export default function MasterCompany() {
                 title="ข้อมูล Product"
                 width={800}
                 onCancel={() => {
-                    setModalProduct(false)
-                    setSelectedRowKeys([])
+                    setModalProduct(false);
+                    setSelectedRowKeys([]);
                 }}
                 onOk={() => {
                     setCusProduct([...cusProduct, ...selectProduct]);
