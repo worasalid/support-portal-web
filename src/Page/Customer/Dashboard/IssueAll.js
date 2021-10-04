@@ -113,15 +113,15 @@ export default function IssueAll() {
                     Status: x.GroupStatus,
                     Progress: x.ProgressStatus,
                     AssignDate: x.AssignIconDate,
-                    DueDate: x.DueDate,
-                    OverDue: x.OverDue
+                    // DueDate: x.DueDate,
+                    // OverDue: x.OverDue
 
                 })
             ));
 
             let wb = xlsx.utils.book_new();
             xlsx.utils.book_append_sheet(wb, ws, 'Issue');
-            xlsx.writeFile(wb, `My DashBoard - ${moment().format("YYMMDD_HHmm")}.xlsx`);
+            xlsx.writeFile(wb, `All Issue - ${moment().format("YYMMDD_HHmm")}.xlsx`);
         }
     }
 
