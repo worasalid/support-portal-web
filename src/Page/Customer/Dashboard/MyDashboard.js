@@ -99,9 +99,9 @@ export default function MyDashboard() {
                     Title: x.Title,
                     Status: x.GroupStatus,
                     Progress: x.ProgressStatus,
-                    AssignDate: x.AssignIconDate,
-                    DueDate: x.DueDate,
-                    OverDue: x.OverDue
+                    AssignDate: x.AssignIconDate
+                    // DueDate: x.DueDate,
+                    // OverDue: x.OverDue
 
                 })
             ));
