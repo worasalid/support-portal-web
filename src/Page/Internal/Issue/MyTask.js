@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined, ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -127,12 +127,32 @@ export default function Mytask() {
     }
   }
 
-
   function HandleChange(items) {
     console.log("Menu", items.item.props.node)
     if (items.item.props.node === "support") { setVisible(true) }
     if (items.item.props.node === "developer_1") { setModaldeveloper_visible(true) }
     if (items.item.props.node === "qa" || items.item.props.node === "developer_2") { setModalQA_visible(true) }
+  }
+
+  function rederPriorityText(param) {
+    switch (param) {
+      case 'Critical':
+        return (
+          <label className="blinktext" style={{ fontSize: "10px", color: "#C0392B", fontWeight: "bold" }}>{param}</label>
+        )
+      case 'High':
+        return (
+          <label style={{ fontSize: "10px", color: "#E74C3C", fontWeight: "bold" }}>{param}</label>
+        )
+      case 'Medium':
+        return (
+          <label style={{ fontSize: "10px", color: "#DC7633" }}>{param}</label>
+        )
+      case 'Low':
+        return (
+          <label style={{ fontSize: "10px", color: "#27AE60" }}>{param}</label>
+        )
+    }
   }
 
   useEffect(() => {
@@ -250,11 +270,7 @@ export default function Mytask() {
                           </label>
                         </Col>
                         <Col span={14} >
-                          <label style={{ color: "#808080", fontSize: "10px" }}>
-                            {record.Priority}
-                          </label>
-                          {/* <hr style={{margin:"2px", border:"1px dotted #ccc"}} /> */}
-
+                          {rederPriorityText(record.Priority)}
                         </Col>
                       </Row>
                       <Row style={{ borderBottom: "1px dotted" }}>
