@@ -29,7 +29,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
             data: {
                 ticketid: details && details.ticketid,
                 taskid: details.taskid,
-                files: upload_quotation.current.getFiles().map((n) => n.response.id),
+                files: upload_quotation.current.getFiles().map((n) => n.response),
                 reftype: "Master_Ticket",
                 grouptype: "quotation"
             }
