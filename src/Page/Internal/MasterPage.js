@@ -409,7 +409,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 // setActive_submenu('0')
               }}
                 style={{
-                  display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" ? "block" : "none"
+                  display: state.usersdata?.organize.OrganizeCode === "support" ||
+                    state.usersdata?.organize.OrganizeCode === "consult" ||
+                    state.usersdata?.organize.OrganizeCode === "manage" ||
+                    state.usersdata?.users.code === "I0017" ? "block" : "none"
                 }}
               >
                 All Issue
@@ -587,14 +590,12 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.Item>
             </SubMenu>
 
-
+            {/* 
             <Menu.Item key="migrate" icon={<SettingOutlined />} onClick={() => history.push('/internal/migration')}
               hidden={state?.usersdata?.users?.code === "I0017" ? false : true}
             >
               Migration
-            </Menu.Item>
-
-
+            </Menu.Item> */}
           </Menu>
         </Sider>
 

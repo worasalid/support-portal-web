@@ -28,7 +28,10 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     productId: details.productid
                 }
             });
-            userdispatch({ type: "LOAD_MODULE", payload: module.data })
+            userdispatch({
+                type: "LOAD_MODULE",
+                payload: module.data.filter((n) => n.IsActive === true)
+            })
         } catch (error) {
 
         }
@@ -171,7 +174,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     </Form.Item>
                 </Form>
                 <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
         </Modal>
     )

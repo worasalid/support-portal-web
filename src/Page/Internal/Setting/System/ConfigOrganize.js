@@ -21,7 +21,8 @@ export default function ConfigOrganize() {
     //filter
     const [filterOrganizeUser, setFilterOrganizeUser] = useState(null);
     const [selectedRow, setSelectedRow] = useState([]);
-    const [selectUserId, setSelectUserId] = useState([])
+    const [selectUserId, setSelectUserId] = useState([]);
+    const [filterUser, setFilterUser] = useState(null);
 
     //data
     const [organizeId, setOrganizeId] = useState("1");
@@ -36,6 +37,17 @@ export default function ConfigOrganize() {
             setSelectedRow(selectedRowKeys);
         },
     };
+
+    const searchUser = (param) => {
+        let result = user.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterUser(result);
+    }
 
     const getOrganize = async () => {
         await Axios.get(process.env.REACT_APP_API_URL + "/master/organize/team", {
@@ -133,7 +145,6 @@ export default function ConfigOrganize() {
     }
 
     const editUserPosition = async () => {
-        console.log("selectedRow", selectedRow)
         setLoading(true);
         await Axios({
             url: process.env.REACT_APP_API_URL + "/master/organize/user",
@@ -281,13 +292,31 @@ export default function ConfigOrganize() {
                                                                 : ""
 
                                                         }
+                                                        {
+                                                            organizeId === "3" ?
+                                                                <Column title="Position" width="10%"
+                                                                    render={(value, record, index) => {
+                                                                        return (
+                                                                            <>
+                                                                                {
+                                                                                    record.PositionLevel === 0 ?
+                                                                                        <label style={{ color: "red" }}>H.QA</label> :
+                                                                                        <label style={{ color: "green" }}>QA</label>
+                                                                                }
+                                                                            </>
+                                                                        )
+                                                                    }}
+                                                                />
+                                                                : ""
+
+                                                        }
                                                         <Column width="10%" align="center"
                                                             key="UserId"
                                                             render={(value, record, index) => {
                                                                 return (
                                                                     <>
                                                                         {
-                                                                            organizeId === "2" ?
+                                                                            (organizeId === "2" || organizeId === "3") ?
                                                                                 <>
                                                                                     <EditOutlined style={{ cursor: "pointer", fontSize: 16 }}
                                                                                         onClick={() => {
@@ -340,7 +369,16 @@ export default function ConfigOrganize() {
                 cancelText="Cancel"
                 width={600}
             >
-                <Table dataSource={user}
+                <Row>
+                    <Col span={24}>
+                        <Input.Search placeholder="code / Name / FullName" allowClear
+                            enterButton
+                            onSearch={searchUser}
+                        />
+                    </Col>
+                </Row>
+                <br />
+                <Table dataSource={filterUser === null ? user : filterUser}
                     key="code"
                     pagination={{ pageSize: 6 }}
                     rowSelection={{
@@ -362,8 +400,13 @@ export default function ConfigOrganize() {
                 onOk={() => editUserPosition()}
             >
                 <Radio.Group onChange={(e) => setSelectPosition(e.target.value)} value={selectPosition === 0 ? 0 : 1}>
-                    <Radio value={0}>H.Developer</Radio>
-                    <Radio value={1}>Developer</Radio>
+                    <Radio value={0}>
+                        {organizeId === "2" ? "H.Developer" : organizeId === "3" ? "H.QA" : ""}
+                    </Radio>
+                    <Radio value={1}>
+                        {organizeId === "2" ? "Developer" : organizeId === "3" ? "QA" : ""}
+
+                    </Radio>
                 </Radio.Group>
             </Modal>
         </MasterPage >

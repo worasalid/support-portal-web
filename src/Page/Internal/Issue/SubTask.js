@@ -1046,7 +1046,7 @@ export default function SubTask() {
         <PreviewImg
           title="Preview"
           visible={modalPreview}
-          width={800}
+          width={1200}
           footer={null}
           onCancel={() => {
             setModalPreview(false);

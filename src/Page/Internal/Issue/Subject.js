@@ -236,26 +236,21 @@ export default function Subject() {
   }
 
   const getdetail = async () => {
-    try {
-      const ticket_detail = await Axios({
-        url: process.env.REACT_APP_API_URL + "/tickets/loaddetail",
-        method: "GET",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-        params: {
-          ticketId: match.params.id
-        }
-      });
-
-      if (ticket_detail.status === 200) {
-        setLoadingPage(false);
-        userdispatch({ type: "LOAD_ISSUEDETAIL", payload: ticket_detail.data })
-        // getflow_output(ticket_detail.data[0].TransId)
+    await Axios({
+      url: process.env.REACT_APP_API_URL + "/tickets/loaddetail",
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        ticketId: match.params.id
       }
-    } catch (error) {
+    }).then((res) => {
+      setLoadingPage(false);
+      userdispatch({ type: "LOAD_ISSUEDETAIL", payload: res.data })
+    }).catch(() => {
 
-    }
+    })
   }
 
   // Update ข้อมูล
@@ -271,8 +266,7 @@ export default function Subject() {
         typeid: value,
         transid: userstate?.mailbox[0]?.TransId
       }
-    });
-    if (issuetype.status === 200) {
+    }).then(() => {
       Modal.success({
         title: 'บันทึกข้อมูลเรียบร้อย',
         content: (
@@ -286,8 +280,12 @@ export default function Subject() {
           subTaskRef.current.GetTask();
         },
       });
-    }
-
+    }).catch(() => {
+      Modal.error({
+        title: "บันทึกไม่สำเร็จ",
+        okText: "Close"
+      })
+    })
   }
 
   const UpdatePriority = async (value, item) => {
@@ -840,6 +838,7 @@ export default function Subject() {
                   <Col span={24}
                     style={{
                       display: (userstate?.issuedata?.details[0]?.IssueType === "Bug" || userstate?.issuedata?.details[0]?.IssueType === "Use") &&
+                        state.usersdata?.organize.OrganizeCode === "support" &&
                         userstate?.mailbox[0]?.NodeName === "support" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
@@ -1540,7 +1539,7 @@ export default function Subject() {
           }}
         />
 
-      </Spin>
+      </Spin >
     </MasterPage >
   );
 }
