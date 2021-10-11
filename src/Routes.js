@@ -155,7 +155,7 @@ export default function Routes() {
                                     {/* Patch */}
                                     <Route path="/internal/patch/cut_of_patch" exact component={IssuePatch} />
                                     <Route path="/internal/patch/header" exact component={PatchHeader} />
-                                    <Route path="/internal/patch/details/id-:id?" exact component={PatchDetails} />
+                                    <Route path="/internal/patch/details/patch-:id?" exact component={PatchDetails} />
 
 
                                     <Route path="/internal/ricef/all" exact component={Ricef} />

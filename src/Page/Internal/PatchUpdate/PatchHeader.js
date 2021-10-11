@@ -1,81 +1,101 @@
 import React, { useEffect, useState, useReducer, useContext } from "react";
 import { useHistory } from "react-router-dom";
-import { Button, Col, Row, Table, Tooltip, Tag, Modal, Select } from "antd";
+import { Col, Row, Table, Input, Tag, Modal, Select } from "antd";
 import Column from "antd/lib/table/Column";
 import moment from "moment";
 import Axios from "axios";
 import MasterPage from "../MasterPage";
 import AuthenContext from "../../../utility/authenContext";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined, EyeOutlined } from "@ant-design/icons";
+import { Icon } from '@iconify/react';
 
 
 export default function PatchHeader() {
     const history = useHistory();
     const [loading, setLoading] = useState(false);
+    const [modal, setModal] = useState(false);
+
+    //data
+    const [product, setProduct] = useState([]);
+    const [filterProduct, setFilterProduct] = useState(4);
     const [patchHeader, setPatchHeader] = useState(null);
+    const [description, setDescription] = useState(null);
+    const [rowData, setRowData] = useState([]);
 
     const [pageCurrent, setPageCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [pageTotal, setPageTotal] = useState(0);
 
-    const getPatchData = async () => {
-        setLoading(true);
-        try {
-            const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/patch/list-header",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    pageCurrent: pageCurrent,
-                    pageSize: pageSize
-                }
-
-            });
-
-            if (result.status === 200) {
-                setLoading(false);
-                setPatchHeader(result.data.data);
-                setPageTotal(result.data.total);
-            }
-
-        } catch (error) {
-            setLoading(false);
-        }
-    }
-
-    const getGoogleFolder = async () => {
-        const result = await Axios({
-            url: process.env.REACT_APP_API_URL + "/patch/googleFolder",
-            method: "GET",
+    const getProduct = async () => {
+        await Axios.get(process.env.REACT_APP_API_URL + "/master/products", {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
-        });
+        }).then((res) => {
+            setProduct(res.data);
+        }).catch((error) => {
 
-        if (result.status === 200) {
-            console.log("getGoogleFolder",result.data.data, result.data.url)
-        }
+        })
+    }
+
+    const getPatch = async (param) => {
+        setLoading(true);
+        await Axios.get(process.env.REACT_APP_API_URL + "/patch/header", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                productId: filterProduct
+            }
+        }).then((result) => {
+            setLoading(false);
+            setPatchHeader(result.data.map((n, index) => {
+                return {
+                    key: index,
+                    productId: n.ProductId,
+                    version: n.Version,
+                    patch: n.Patch,
+                    description: n.Description,
+                    cut_off_date: n.CutOffDate,
+                    patch_folder: n.PatchFolder,
+                    issue: n.Issue
+                }
+            }));
+        }).catch(() => {
+
+        })
+    }
+
+    const cutOffPatch = async () => {
+        setLoading(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/patch/cutOffPatch",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                productId: rowData.productId,
+                version: rowData.version,
+                patch: rowData.patch,
+                description: description
+            }
+        }).then((res) => {
+            setLoading(false);
+            setModal(false);
+            getPatch();
+        }).catch((error) => {
+
+        })
     }
 
     useEffect(() => {
-        getPatchData();
-        getGoogleFolder();
+        getProduct();
+        getPatch();
     }, [])
 
     useEffect(() => {
-        getPatchData()
-    }, [pageCurrent])
-
-    useEffect(() => {
-        if (pageCurrent !== 1) {
-            setPageCurrent(1);
-            setPageSize(10);
-        } else {
-            getPatchData();
-        }
-    }, [])
+        getPatch();
+    }, [filterProduct])
 
     return (
         <MasterPage>
@@ -87,18 +107,47 @@ export default function PatchHeader() {
 
             <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
                 <Col span={24}>
-                    <Table dataSource={patchHeader} loading={loading}
-                        pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
-
-                        onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
+                    <Select
+                        showSearch
+                        style={{ width: 500 }}
+                        placeholder="Select Product"
+                        optionFilterProp="children"
+                        defaultValue={4}
+                        filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        options={product.map((n) => ({ value: n.Id, label: `${n.Name} - (${n.FullName})` }))}
+                        //onChange={(value) => getPatch(value)}
+                        onChange={(value) => setFilterProduct(value)}
                     >
-                        <Column title="Patch_Version" width="20%"
+
+                    </Select>
+                </Col>
+            </Row>
+
+            <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
+                <Col span={24}>
+                    <Table dataSource={patchHeader} loading={loading}>
+                        <Column title="Version" width="5%"
                             key="key"
-                            render={(record) => {
+                            render={(value, record, index) => {
                                 return (
                                     <>
-                                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                                            {record.Patch_Version}
+                                        <label>
+                                            {record.version}
+                                        </label>
+
+                                    </>
+                                )
+                            }}
+                        />
+                        <Column title="Patch" width="5%"
+                            key="key"
+                            render={(value, record, index) => {
+                                return (
+                                    <>
+                                        <label>
+                                            {record.patch}
                                         </label>
 
                                     </>
@@ -107,60 +156,107 @@ export default function PatchHeader() {
                         />
                         <Column title="Description" width="40%"
                             key="key"
-                            render={(record) => {
+                            render={(value, record, index) => {
                                 return (
                                     <>
-                                        <label className="table-column-text">
-
+                                        <label>
+                                            {record.description}
                                         </label>
 
                                     </>
                                 )
                             }}
                         />
-                        <Column title="Cut off Date" width="10%"
+                        <Column title=" Patch Folder" width="30%"
                             key="key"
-                            render={(record) => {
+                            render={(value, record, index) => {
+
                                 return (
                                     <>
-                                        <label className="table-column-text">
-                                            {moment(record.CreateDate).format("DD/MM/YYYY")}
+                                        <label className="text-link"
+                                            onClick={() => window.open(record.patch_folder, "_blank")}
+                                        >
+                                            {record.patch_folder}
                                         </label>
 
                                     </>
                                 )
+
                             }}
                         />
-                        <Column title="Update By" width="10%"
+                        <Column title="Cut off Date" width="10%" align="center"
                             key="key"
-                            render={(record) => {
+                            render={(value, record, index) => {
                                 return (
                                     <>
-                                        <label className="table-column-text">
-                                            {record.CreateByName}
-                                        </label>
+                                        {
+                                            record.cut_off_date === null ?
+                                                <Icon icon="clarity:update-line" color="green" width="36" height="36"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => {
+                                                        return (
+                                                            <>
+                                                                {
+                                                                    record.issue === 0
+                                                                        ? Modal.warning({
+                                                                            title: `ไม่มี Issue ใน Patch ${record.patch}`,
+                                                                            content: 'กรุณาเลือก Issue',
+                                                                            okText: "Close"
+                                                                        })
+                                                                        : setModal(true), setRowData(record)
+                                                                }
+                                                            </>
+                                                        )
+                                                    }}
+                                                />
+                                                :
+                                                <label>
+                                                    {moment(record.cut_off_date).format("DD/MM/YYYY HH:mm")}
+                                                </label>
+                                        }
+                                    </>
+                                )
+                            }}
+                        />
+                        <Column title="จำนวน Issue" width="10%"
+                            key="key"
+                            align="center"
+                            render={(value, record, index) => {
+                                return (
+                                    <>
+                                        {/* <Icon icon="carbon:view" color="#1890ff" width="24" height="24"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => history.push({ pathname: "/internal/patch/details/patch-" + record.patch })}
+                                        /> */}
+                                        <label className="text-link" style={{ fontSize: 16 }}
+                                            onClick={() => history.push({ pathname: "/internal/patch/details/patch-" + record.patch })}
+                                        > {`(${record.issue})`}</label>
 
                                     </>
                                 )
                             }}
                         />
-                        <Column title="" width="10%"
-                            key="key"
-                            render={(record) => {
-                                return (
-                                    <>
-                                        <Button type="link" icon={<EyeOutlined />}
-                                            onClick={() => history.push({ pathname: "/internal/patch/details/id-" + record.Id })}
-                                        />
-                                    </>
-                                )
-                            }}
-                        />
-
                     </Table>
                 </Col>
+
             </Row>
 
+            <Modal
+                visible={modal}
+                title="Cut Off Patch"
+                width={800}
+                okText="Save"
+                onOk={() => {
+                    cutOffPatch();
+                }}
+                onCancel={() => {
+                    setModal(false);
+                    setDescription(null);
+                }}
+            >
+                <label>Description</label><br />
+                <Input.TextArea rows={4} onChange={(e) => setDescription(e.target.value)} />
+            </Modal>
         </MasterPage>
     )
 }

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Button, Col, Row, Table, Tooltip, Tag, Modal, Select } from "antd";
+import { Button, Col, Row, Table, Tooltip, Tag, Modal, message } from "antd";
 import Column from "antd/lib/table/Column";
 import moment from "moment";
 import Axios from "axios";
 import MasterPage from "../MasterPage";
 import AuthenContext from "../../../utility/authenContext";
 import { LeftCircleOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
+import { Icon } from '@iconify/react';
 
 
 export default function PatchDetails() {
@@ -31,7 +32,7 @@ export default function PatchDetails() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    patch_id: match.params.id,
+                    patch: match.params.id,
                     pageCurrent: pageCurrent,
                     pageSize: pageSize
                 }
@@ -40,7 +41,7 @@ export default function PatchDetails() {
 
             if (result.status === 200) {
                 setLoading(false);
-                setPatchVersion(result.data.patch);
+
                 setPatchDetails(result.data.data);
                 setPageTotal(result.data.total);
             }
@@ -50,8 +51,37 @@ export default function PatchDetails() {
         }
     }
 
+    const deletePatch = async (param) => {
+        setLoading(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/patch/list-details",
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketId: param
+            },
+        }).then(() => {
+            setLoading(false);
+            message.success({
+                content: 'ลบข้อมูลสำเร็จ',
+                style: {
+                    marginTop: '15vh',
+                }
+            });
+            getPatchData();
+        }).catch((error) => {
+            Modal.error({
+                title: 'ลบข้อมูลไม่สำเร็จ',
+                content: error,
+            });
+        })
+    }
+
     useEffect(() => {
         getPatchData()
+        setPatchVersion(match.params.id);
     }, [])
 
     return (
@@ -72,7 +102,7 @@ export default function PatchDetails() {
             </Row>
 
             <Table dataSource={patchDetails} loading={loading}
-                style={{padding: "24px 24px 24px 24px" }}
+                style={{ padding: "24px 24px 24px 24px" }}
                 // footer={(x) => {
                 //     return (
                 //         <>
@@ -270,6 +300,23 @@ export default function PatchDetails() {
                                     </Tag>
                                 </Tooltip>
 
+                            </>
+                        )
+                    }}
+                />
+
+                <Column width="5%"
+                    key="key"
+                    align="center"
+                    render={(value, record, index) => {
+                        return (
+                            <>
+                                <div hidden={record.CutOffDate !== null ? true : false}>
+                                    <Icon icon="fluent:delete-20-regular" width="20" height="20"
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => deletePatch(record.Id)}
+                                    />
+                                </div>
                             </>
                         )
                     }}
