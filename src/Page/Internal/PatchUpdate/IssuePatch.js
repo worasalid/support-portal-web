@@ -72,27 +72,24 @@ export default function IssuePatch() {
     }
 
     const getIssue = async () => {
-        try {
-            const issue = await Axios({
-                url: process.env.REACT_APP_API_URL + "/patch/issue-patch",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    productId: filterProduct,
-                    start_date: "2021-01-01",
-                    end_date: "2021-12-31"
-                }
-            });
-
-            if (issue.status === 200) {
-                userdispatch({ type: "LOAD_ISSUE", payload: issue.data })
+        setLoadding(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/patch/issue-patch",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                productId: filterProduct,
+                // start_date: "2021-01-01",
+                // end_date: "2021-12-31"
             }
+        }).then((res) => {
+            setLoadding(false);
+            userdispatch({ type: "LOAD_ISSUE", payload: res.data })
+        }).catch((error) => {
 
-        } catch (error) {
-
-        }
+        })
     }
 
     const updatePatch = async () => {
@@ -142,15 +139,6 @@ export default function IssuePatch() {
             });
         }
     }
-
-    // Fuction 
-
-    // const handleChange = (e) => {
-    //     if (e.target.group === "product") {
-    //         console.log("product", e.target.value)
-    //         userdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
-    //     }
-    // }
 
     useEffect(() => {
         getVersion();
