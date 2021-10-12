@@ -81,7 +81,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                 },
                 data: {
                     ticketid: details && details.ticketid,
-                    files: uploadRef_testresult.current.getFiles().map((n) => n.response.id),
+                    files: uploadRef_testresult.current.getFiles().map((n) => n.response),
                     reftype: "Master_Ticket",
                     url: values.test_result_url,
                     grouptype: "testResult"
@@ -214,7 +214,7 @@ export default function ModalResolved({ visible = false, onOk, onCancel, datarow
                                 name="test_result_url"
                                 rules={[
                                     {
-                                        required: true,
+                                        required: false,
                                         message: 'กรุณาแนบ (ใบส่งมอบงาน)'
                                     },
                                 ]}

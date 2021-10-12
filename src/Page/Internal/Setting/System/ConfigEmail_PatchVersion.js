@@ -39,7 +39,6 @@ export default function ConfigEmailPatchVersion() {
     }
 
     const updateStatus = async (param) => {
-
         try {
             const result = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/config-data",
@@ -127,7 +126,7 @@ export default function ConfigEmailPatchVersion() {
                 <Table dataSource={dataReOpen} loading={loading}>
                     <Column title="No" width="5%" dataIndex="Sequence" />
                     <Column title="Email" dataIndex="Name" width="55%" />
-                    <Column title="สถานะ"
+                    <Column
                         align="center"
                         width="15%"
                         render={(record) => {

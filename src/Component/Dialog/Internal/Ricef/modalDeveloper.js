@@ -50,7 +50,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, detail
             },
             data: {
                 ricefid: details.ricefid,
-                files: uploadRef_unittest.current.getFiles().map((n) => n.response.id),
+                files: uploadRef_unittest.current.getFiles().map((n) => n.response),
                 reftype: "Master_Ricef",
                 grouptype: "unittest"
             }

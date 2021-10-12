@@ -14,14 +14,20 @@ export default function IssuePatch() {
     const history = useHistory();
     const [userstate, userdispatch] = useReducer(userReducer, userState);
     const { state, dispatch } = useContext(AuthenContext);
-
     const [loading, setLoadding] = useState(false);
+
+    //data
+    const [product, setProduct] = useState([]);
+    const [filterProduct, setFilterProduct] = useState(4);
+    const [version, setVersion] = useState("");
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
     const [pageCurrent, setPageCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [pageTotal, setPageTotal] = useState(0);
     const [recHover, setRecHover] = useState(-1);
 
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
 
     const rowIssueSelection = {
         selectedRowKeys: selectedRowKeys,
@@ -31,6 +37,25 @@ export default function IssuePatch() {
         },
     };
 
+    const getVersion = async () => {
+        await Axios.get(process.env.REACT_APP_API_URL + "/patch/version", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                productId: filterProduct
+            }
+        }).then((res) => {
+            let patchVersion = (res.data.patch_number).toString().length === 1 ? `${res.data.version}.00${res.data.patch_number}` :
+                (res.data.patch_number).toString().length === 2 ? `${res.data.version}.0${res.data.patch_number}` :
+                    (res.data.patch_number).toString().length === 3 ? `${res.data.version}.${res.data.patch_number}` : ""
+
+            setVersion(patchVersion)
+        }).catch((error) => {
+
+        })
+    }
+
     const getproducts = async () => {
         const products = await Axios({
             url: process.env.REACT_APP_API_URL + "/master/products",
@@ -38,31 +63,33 @@ export default function IssuePatch() {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             }
-        });
-        userdispatch({ type: "LOAD_PRODUCT", payload: products.data });
+        }).then((res) => {
+            setProduct(res.data)
+        }).catch((error) => {
+
+        })
+        // userdispatch({ type: "LOAD_PRODUCT", payload: products.data });
     }
 
     const getIssue = async () => {
-        try {
-            const issue = await Axios({
-                url: process.env.REACT_APP_API_URL + "/patch/issue-patch",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    start_date: "2021-01-01",
-                    end_date: "2021-12-31"
-                }
-            });
-
-            if (issue.status === 200) {
-                userdispatch({ type: "LOAD_ISSUE", payload: issue.data })
+        setLoadding(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/patch/issue-patch",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                productId: filterProduct,
+                // start_date: "2021-01-01",
+                // end_date: "2021-12-31"
             }
+        }).then((res) => {
+            setLoadding(false);
+            userdispatch({ type: "LOAD_ISSUE", payload: res.data })
+        }).catch((error) => {
 
-        } catch (error) {
-
-        }
+        })
     }
 
     const updatePatch = async () => {
@@ -75,8 +102,9 @@ export default function IssuePatch() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 data: {
+                    productId: filterProduct,
                     ticket_id: selectedRowKeys,
-                    version: "4.5" + moment().format(".YYMMDD")
+                    version: version
                 }
             });
 
@@ -112,19 +140,16 @@ export default function IssuePatch() {
         }
     }
 
-    // Fuction 
-
-    const handleChange = (e) => {
-        if (e.target.group === "product") {
-            console.log("product", e.target.value)
-            userdispatch({ type: "SELECT_PRODUCT", payload: e.target.value })
-        }
-    }
-
     useEffect(() => {
+        getVersion();
         getproducts();
         getIssue();
     }, []);
+
+    useEffect(() => {
+        getVersion();
+        getIssue();
+    }, [filterProduct])
 
     return (
         <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
@@ -134,36 +159,34 @@ export default function IssuePatch() {
                         <label style={{ fontSize: 20, verticalAlign: "top" }}>Cut Of Version</label>
                     </Col>
                 </Row>
-                <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
-                    <Col span={20}>
-                        <Col span={4}>
-
-
-                        </Col>
+                <Row style={{ padding: "24px 24px 24px 24px", textAlign: "right" }}>
+                    <Col span={24}>
+                        <label className="blinktext" style={{ fontSize: 24, verticalAlign: "top", color: "green", marginRight: 20 }}>
+                            Currunt Version:
+                        </label>
+                        <label style={{ fontSize: 24, verticalAlign: "top" }}>
+                            {version}
+                        </label>
                     </Col>
-                    <Col span={4}>
-                        <Col span={24}>
-                            <label style={{ fontSize: 14, verticalAlign: "top", color: "green", marginRight: 20 }}>
-                                Currunt Version:
-                            </label>
-                            <label style={{ fontSize: 14, verticalAlign: "top" }}>
-                                {"4.5" + moment().format(".YYMMDD")}
-                            </label>
-                        </Col>
-                        <Col span={24}>
-                            <label style={{ fontSize: 14, verticalAlign: "top", color: "red", marginRight: 20 }}>
-                                Cut Of Version:
-                            </label>
-                            <label style={{ fontSize: 14, verticalAlign: "top" }}>
-                                {"4.5" + moment().format(".YYMMDD")}
-                            </label>
-                        </Col>
-
-                    </Col>
-
                 </Row>
+
                 <Row style={{ padding: "24px 24px 24px 24px" }}>
-                    <Col span={12}>
+                    <Col span={12} >
+                        <Select
+                            showSearch
+                            style={{ width: 500 }}
+                            placeholder="Select Product"
+                            optionFilterProp="children"
+                            defaultValue={4}
+                            filterOption={(input, option) =>
+                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            options={product.map((n) => ({ value: n.Id, label: `${n.Name} - (${n.FullName})` }))}
+                            onChange={(value) => setFilterProduct(value)}
+                        />
+
+                    </Col>
+                    <Col span={12} style={{ textAlign: "right" }}>
                         <Button
                             type="primary"
                             onClick={() => {

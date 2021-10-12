@@ -3,13 +3,13 @@ import React from "react";
 import "antd/dist/antd.css";
 import "./styles/index.scss";
 import {
-  isBrowser,
+  //isBrowser,
   isMobile
 } from "react-device-detect";
 
 import Routes from "./Routes";
-// import MobileRouter
+import MobileRouter from "./mobileRouter";
 
 export default function App() {
-  return <Routes />;
+  return  isMobile === true ? <MobileRouter /> : <Routes />;
 }
