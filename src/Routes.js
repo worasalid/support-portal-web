@@ -102,7 +102,7 @@ export default function Routes() {
                                 <Switch>
                                     <Route path="/" exact component={Login} />
                                     <Route path="/login" exact component={Login} />
-                                    <Route path="/line/register" exact component={LineRegister} />
+                                    <Route path="/line/register" component={LineRegister} />
                                     <Route path="/internal/user/profile" exact component={Profile} />
                                     <Route path="/internal/issue" exact component={MyTask} />
                                     <Route path="/internal/issue/unassign" exact component={UnAssign} />
@@ -155,7 +155,7 @@ export default function Routes() {
                                     {/* Patch */}
                                     <Route path="/internal/patch/cut_of_patch" exact component={IssuePatch} />
                                     <Route path="/internal/patch/header" exact component={PatchHeader} />
-                                    <Route path="/internal/patch/details/id-:id?" exact component={PatchDetails} />
+                                    <Route path="/internal/patch/details/patch-:id?" exact component={PatchDetails} />
 
 
                                     <Route path="/internal/ricef/all" exact component={Ricef} />
