@@ -136,6 +136,8 @@ export default function Dashboard3() {
                     IssueType: x.IssueType,
                     Priority: x.Priority,
                     Status: x.GroupStatus,
+                    FlowStatus: x.FlowStatus,
+                    HandOver: x.NodeName,
                     Title: x.Title,
                     AssignDate: x.AssignIconDate,
                     DueDate: x.DueDate,

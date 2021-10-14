@@ -558,7 +558,6 @@ export default function SubTask() {
                 <Row style={{ marginTop: 36, marginRight: 24 }} >
                   <Col span={24} >
                     <label className="header-text">Activity</label>
-
                     {
                       <Tabs defaultActiveKey="1" size="small" >
                         <TabPane tab="Task Note" key="1" >
@@ -569,8 +568,6 @@ export default function SubTask() {
                         </TabPane>
                       </Tabs>
                     }
-
-
                   </Col>
                 </Row>
                 {/* </div> */}
@@ -701,7 +698,8 @@ export default function SubTask() {
                     {
                       (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center") &&
                         userstate.taskdata.data[0]?.MailType === "in" &&
-                        userstate?.taskdata?.data[0]?.Status === "Waiting Progress"
+                        (userstate?.taskdata?.data[0]?.Status === "Waiting Progress" || userstate?.taskdata?.data[0]?.Status === "InProgress") &&
+                        userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support"
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
