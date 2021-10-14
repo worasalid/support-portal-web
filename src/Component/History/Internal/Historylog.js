@@ -7,12 +7,9 @@ import { ClockCircleOutlined, SwapRightOutlined } from '@ant-design/icons';
 // import AuthenContext from "../../../utility/authenContext";
 
 export default function Historylog({ type = "Issue", subtype = "ticket" }) {
-
     const match = useRouteMatch();
-    // const { state, dispatch } = useContext(AuthenContext);
     const [loading, setLoading] = useState(true)
     const [historylog, setHistorylog] = useState([]);
-
 
     const GetHistoryLog = async () => {
         try {

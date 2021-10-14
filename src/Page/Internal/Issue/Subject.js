@@ -45,8 +45,8 @@ const { TabPane } = Tabs;
 export default function Subject() {
   const match = useRouteMatch();
   const history = useHistory();
-  const selectRef = useRef(null)
-  const subTaskRef = useRef(null)
+  const selectRef = useRef(null);
+  const subTaskRef = useRef(null);
 
   const { state, dispatch } = useContext(AuthenContext);
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
@@ -862,10 +862,6 @@ export default function Subject() {
                   <Col span={24}>
                     <ListSubTask
                       ticketId={match.params.id} ref={subTaskRef}
-                      //  ticketId={userstate?.issuedata?.details[0]?.Id}
-                      // ticketId={ticketTaskId}
-                      ref={subTaskRef}
-                    // mailtype={userstate?.mailbox[0]?.MailType}
                     />
                   </Col>
                 </Row>
@@ -1325,7 +1321,7 @@ export default function Subject() {
           onCancel={() => setModaladdtask(false)}
           onOk={() => {
             setModaladdtask(false);
-            subTaskRef.current.GetTask()
+            subTaskRef.current.GetTask();
           }}
           details={{
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
