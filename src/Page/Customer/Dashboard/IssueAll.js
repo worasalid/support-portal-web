@@ -113,7 +113,9 @@ export default function IssueAll() {
                     Status: x.GroupStatus,
                     Progress: x.ProgressStatus,
                     AssignDate: x.AssignIconDate,
-                    // DueDate: x.DueDate,
+                    DueDate: x.DueDate,
+                    ResolvedDate: x.ResolvedDate,
+                    CompleteDate: x.CompleteDate
                     // OverDue: x.OverDue
 
                 })
