@@ -86,7 +86,7 @@ export default function IssuePatch() {
             }
         }).then((res) => {
             setLoadding(false);
-            userdispatch({ type: "LOAD_ISSUE", payload: res.data })
+            userdispatch({ type: "LOAD_ISSUE", payload: res.data});
         }).catch((error) => {
 
         })
@@ -215,28 +215,6 @@ export default function IssuePatch() {
 
                 <Table dataSource={userstate?.issuedata?.data} loading={loading}
                     style={{ padding: "24px 24px 24px 24px" }}
-                    // footer={(x) => {
-                    //     return (
-                    //         <>
-                    //             <div style={{ textAlign: "right" }}>
-                    //                 <label>จำนวนเคส : </label>
-                    //                 <label>{pageTotal}</label>
-                    //             </div>
-                    //         </>
-                    //     )
-                    // }}
-                    pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
-
-                    // onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
-                    // onRow={(record, rowIndex) => {
-                    //     return {
-                    //         onClick: event => { }, // click row
-                    //         onDoubleClick: event => { }, // double click row
-                    //         onContextMenu: event => { }, // right button click row
-                    //         onMouseEnter: event => { setRecHover(rowIndex) }, // mouse enter row
-                    //         onMouseLeave: event => { setRecHover(-1) }, // mouse leave row
-                    //     };
-                    // }}
                     rowClassName={(record, index) => {
                         return (
                             (index === recHover ? "table-hover" : "")
