@@ -174,7 +174,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
       {...props}
     >
       <Spin spinning={loading} size="large" tip="Loading...">
-        <TextEditor ref={editorRef} />
+        <TextEditor ref={editorRef} ticket_id ={details.ticketid} />
         <br />
       AttachFile : <UploadFile ref={uploadRef} />
       </Spin>

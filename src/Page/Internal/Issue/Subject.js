@@ -838,8 +838,8 @@ export default function Subject() {
                   <Col span={24}
                     style={{
                       display: (userstate?.issuedata?.details[0]?.IssueType === "Bug" || userstate?.issuedata?.details[0]?.IssueType === "Use") &&
-                        state.usersdata?.organize.OrganizeCode === "support" &&
-                        userstate?.mailbox[0]?.NodeName === "support" &&
+                        (state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult") &&
+                        (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "consult") &&
                         userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
                         userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&

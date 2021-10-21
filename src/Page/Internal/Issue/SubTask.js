@@ -740,7 +740,7 @@ export default function SubTask() {
                   </Col>
                 </Row>
 
-                <Row
+                {/* <Row
                   style={{
                     marginBottom: 20,
                     display: userstate?.taskdata?.data[0]?.IssueType === "Bug" && userstate.taskdata.data[0]?.PatchUpdate !== null ? "block" : "none"
@@ -752,7 +752,7 @@ export default function SubTask() {
                       {userstate.taskdata.data[0]?.Version}
                     </label>
                   </Col>
-                </Row>
+                </Row> */}
 
                 <Row
                   style={{
