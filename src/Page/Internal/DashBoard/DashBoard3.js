@@ -138,6 +138,7 @@ export default function Dashboard3() {
                     Status: x.GroupStatus,
                     FlowStatus: x.FlowStatus,
                     HandOver: x.NodeName,
+                    User: x.DisplayAllName,
                     Title: x.Title,
                     AssignDate: x.AssignIconDate,
                     DueDate: x.DueDate,
