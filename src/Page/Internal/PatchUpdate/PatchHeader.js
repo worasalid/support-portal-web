@@ -363,12 +363,12 @@ export default function PatchHeader() {
                     wrapperCol={{ span: 20 }}
                 >
                     <Form.Item name="application" label="Application URL"
-                        rules={[{ required: true, message: 'กรุณาระบุ Link URL!' }]}
+                        rules={[{ required: false, message: 'กรุณาระบุ Link URL!' }]}
                     >
                         <Input.TextArea rows={4} />
                     </Form.Item>
                     <Form.Item name="sql" label="SQL Script URL"
-                        rules={[{ required: true, message: 'กรุณาระบุ Link URL!' }]}
+                        rules={[{ required: false, message: 'กรุณาระบุ Link URL!' }]}
                     >
                         <Input.TextArea rows={4} />
                     </Form.Item>
