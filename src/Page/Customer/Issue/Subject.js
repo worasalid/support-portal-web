@@ -514,7 +514,7 @@ export default function Subject() {
     }
   }, [customerstate?.issuedata?.details[0]?.Id])
 
-  console.log("issuedata", customerstate?.issuedata?.details[0]?.Id)
+
   return (
     <MasterPage>
 

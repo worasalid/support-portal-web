@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useReducer, useContext } from "react";
 import { useHistory } from "react-router-dom";
-import { Col, Row, Table, Input, Tag, Modal, Select } from "antd";
+import { Col, Row, Table, Input, Form, Modal, Select, message } from "antd";
 import Column from "antd/lib/table/Column";
 import moment from "moment";
 import Axios from "axios";
@@ -11,8 +11,10 @@ import { Icon } from '@iconify/react';
 
 export default function PatchHeader() {
     const history = useHistory();
+    const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [modal, setModal] = useState(false);
+    const [modalPatch, setModalPatch] = useState(false);
 
     //data
     const [product, setProduct] = useState([]);
@@ -57,6 +59,8 @@ export default function PatchHeader() {
                     description: n.Description,
                     cut_off_date: n.CutOffDate,
                     patch_folder: n.PatchFolder,
+                    application_path: n.ApplicationPath,
+                    sql_path: n.SQLPath,
                     issue: n.Issue
                 }
             }));
@@ -87,6 +91,49 @@ export default function PatchHeader() {
 
         })
     }
+
+    const editPatchURL = async (param) => {
+        console.log("param", param)
+        setLoading(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/patch/path-url",
+            method: "PATCH",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                patch: rowData.patch,
+                application_url: param.application,
+                sql_url: param.sql
+            }
+        }).then((res) => {
+            setLoading(false);
+            form.resetFields();
+            setModalPatch(false);
+
+            message.success({
+                content: 'บันทึกข้อมูลสำเร็จ',
+                className: 'custom-class',
+                style: {
+                    marginTop: '20vh',
+                },
+            });
+            getPatch();
+
+        }).catch((error) => {
+            setLoading(false);
+            setModalPatch(false);
+
+            Modal.error({
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                content: `${error.response.data}`,
+            });
+        })
+    }
+
+    const onFinish = (values) => {
+        editPatchURL(values);
+    };
 
     useEffect(() => {
         getProduct();
@@ -154,7 +201,7 @@ export default function PatchHeader() {
                                 )
                             }}
                         />
-                        <Column title="Description" width="40%"
+                        <Column title="Description" width="30%"
                             key="key"
                             render={(value, record, index) => {
                                 return (
@@ -167,18 +214,55 @@ export default function PatchHeader() {
                                 )
                             }}
                         />
-                        <Column title=" Patch Folder" width="30%"
+                        <Column title="Path URL" width="30%"
                             key="key"
                             render={(value, record, index) => {
 
                                 return (
                                     <>
-                                        <label className="text-link"
-                                            onClick={() => window.open(record.patch_folder, "_blank")}
-                                        >
-                                            {record.patch_folder}
-                                        </label>
+                                        <Row>
+                                            <Col>
+                                                <label>Application :   {record.application_path === null ? "-" : ""}</label> <br />
+                                                <label className="text-link"
+                                                    onClick={() => window.open(record.application_path, "_blank")}
+                                                >
+                                                    {record.application_path}
+                                                </label>
+                                            </Col>
+                                        </Row>
+                                  
+                                        <Row style={{marginTop:8}}>
+                                            <Col>
+                                                <label>SQL Script :  {record.sql_path === null ? "-" : ""}</label> <br />
+                                                <label className="text-link"
+                                                    onClick={() => window.open(record.sql_path, "_blank")}
+                                                >
+                                                    {record.sql_path}
+                                                </label>
+                                            </Col>
+                                        </Row>
 
+                                    </>
+                                )
+
+                            }}
+                        />
+                        <Column width="5%"
+                            key="key"
+                            render={(value, record, index) => {
+                                return (
+                                    <>
+                                        <Icon icon="ant-design:edit-outlined" width="25" height="25"
+                                            className="icon-hover"
+                                            onClick={() => {
+                                                setModalPatch(true);
+                                                setRowData(record);
+                                                form.setFieldsValue({
+                                                    application: record.application_path,
+                                                    sql: record.sql_path
+                                                })
+                                            }}
+                                        />
                                     </>
                                 )
 
@@ -211,7 +295,8 @@ export default function PatchHeader() {
                                                 />
                                                 :
                                                 <label>
-                                                    {moment(record.cut_off_date).format("DD/MM/YYYY HH:mm")}
+                                                    {moment(record.cut_off_date).format("DD/MM/YYYY")}<br/>
+                                                    {moment(record.cut_off_date).format("HH:mm")}
                                                 </label>
                                         }
                                     </>
@@ -241,6 +326,7 @@ export default function PatchHeader() {
 
             </Row>
 
+            {/* Modal */}
             <Modal
                 visible={modal}
                 title="Cut Off Patch"
@@ -256,6 +342,37 @@ export default function PatchHeader() {
             >
                 <label>Description</label><br />
                 <Input.TextArea rows={4} onChange={(e) => setDescription(e.target.value)} />
+            </Modal>
+
+            <Modal
+                visible={modalPatch}
+                confirmLoading={loading}
+                title="Path URL"
+                width={900}
+                okText="Save"
+                onOk={() => {
+                    form.submit();
+                }}
+                onCancel={() => {
+                    form.resetFields();
+                    setModalPatch(false);
+                }}
+            >
+                <Form form={form} name="control-hooks" onFinish={onFinish}
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
+                >
+                    <Form.Item name="application" label="Application URL"
+                        rules={[{ required: true, message: 'กรุณาระบุ Link URL!' }]}
+                    >
+                        <Input.TextArea rows={4} />
+                    </Form.Item>
+                    <Form.Item name="sql" label="SQL Script URL"
+                        rules={[{ required: true, message: 'กรุณาระบุ Link URL!' }]}
+                    >
+                        <Input.TextArea rows={4} />
+                    </Form.Item>
+                </Form>
             </Modal>
         </MasterPage>
     )
