@@ -51,6 +51,7 @@ label.text-link:hover {
     cursor: pointer;
 }
 
+
 label.noti-text-unread {
     font-size: 12px !important;
     font-weight: bold;
@@ -196,9 +197,15 @@ div.sticky-background {
     background-color: rgb(214, 211, 211);
     cursor: pointer;
    // box-shadow: 5px 10px 50px rgba(0,0,0,.2);
-
-    
 }
+
+.icon-hover:hover {
+    text-decoration: underline;
+    text-decoration-color: #1890ff;
+    color: #1890ff;
+    cursor: pointer;
+}
+
 
 // table
 .table-hover,
