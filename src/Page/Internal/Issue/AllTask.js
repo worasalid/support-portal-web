@@ -1,7 +1,7 @@
 import { Button, Col, Row, Table, Tag, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
-import React, { useEffect, useState, useContext, useReducer } from "react";
+import React, { useEffect, useState, useContext, useReducer,useRef } from "react";
 import { useHistory } from "react-router-dom";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
@@ -14,10 +14,12 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
+import Notification from "../../../Component/Notifications/Internal/Notification";
 
 export default function AllTask() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
+  const notiRef = useRef();
   //modal
   const [visible, setVisible] = useState(false);
   const [modaldeveloper_visible, setModaldeveloper_visible] = useState(false);
@@ -319,7 +321,8 @@ export default function AllTask() {
                             history.push({ pathname: "/internal/issue/subject/" + record.Id });
                             UpdateStatusMailbox(record.MailBoxId);
                             updateCountNoti(record.Id);
-                            window.location.reload(true);
+                            notiRef.current.updateNoti(record.Id);
+                            // window.location.reload(true);
                           }}
 
                           className="table-column-detail">
@@ -521,6 +524,9 @@ export default function AllTask() {
         />
 
         {/* </Spin> */}
+        <div hidden={true}>
+          <Notification ref={notiRef} />
+        </div>
       </MasterPage>
     </IssueContext.Provider>
   );

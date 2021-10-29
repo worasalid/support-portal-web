@@ -216,7 +216,7 @@ export default function CommentBox() {
                         }
                         datetime={
                             <>
-                                <Row align="middle">
+                                <Row align="middle" style={{marginTop:-2}}>
                                     <Col span={24}>
                                         <label
                                             //style={{ cursor: "pointer" }}
@@ -235,7 +235,8 @@ export default function CommentBox() {
 
                                         {
                                             item.cntfile === 0 ? "" :
-                                                <Icon icon="teenyicons:attach-outline" style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
+                                                <Icon icon="teenyicons:attach-outline" width="16" height="16"
+                                                    style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
                                                     onClick={() => {
                                                         setCommentid(item.id);
                                                         setModalfiledownload_visible(true);

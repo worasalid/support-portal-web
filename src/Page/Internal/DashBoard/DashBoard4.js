@@ -144,6 +144,7 @@ export default function Dashboard4() {
                     total: n.Total
                 })));
 
+                setExcelData(result.data.exceldata);
                 setLoading(false);
             }
 
@@ -156,15 +157,19 @@ export default function Dashboard4() {
 
     const ExportExcel = (json) => {
         if (json !== undefined) {
-            let ws = xlsx.utils.json_to_sheet(json.map((x) => {
+            let ws = xlsx.utils.json_to_sheet(json.map((x, index) => {
                 return {
-                    No: x.Row,
-                    Issue: x.Number,
+                    No: index + 1,
+                    Issue: x.TicketNumber,
                     Company: x.CompanyName,
                     IssueType: x.IssueType,
                     Priority: x.Priority,
-                    Status: x.GroupStatus,
+                    Company: x.Company,
                     Title: x.Title,
+                    UserName: x.UserName,
+                    Status: x.Status,
+                    ReceiveDate: x.ReceiveDate,
+                    FlowStatus: x.FlowStatus,
                     AssignDate: x.AssignIconDate,
                     DueDate: x.DueDate,
                     OverDue: x.OverDue
@@ -251,7 +256,7 @@ export default function Dashboard4() {
                                     >
                                         Is Stack
                                     </Checkbox>
-                                    {/* <Button type="link"
+                                    <Button type="link"
                                         hidden={selectOrganize === null ? true : false}
                                         onClick={() => ExportExcel(excelData && excelData)}
                                         title="Excel Export"
@@ -261,7 +266,7 @@ export default function Dashboard4() {
                                             src={`${process.env.PUBLIC_URL}/icons-excel.png`}
                                             alt="Excel Export"
                                         />
-                                    </Button> */}
+                                    </Button>
                                 </>
                             }
 
