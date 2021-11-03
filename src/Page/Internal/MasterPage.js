@@ -108,7 +108,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       });
       masterdispatch({ type: "COUNT_SLA_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_SLA_DueDate === 0).length });
       masterdispatch({ type: "COUNT_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_DueDate === 0).length });
-      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.Status !== "Send").length });
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" ).length });
       masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "Hold" || x.GroupStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Resolved" || x.GroupStatus === "Pass" || x.GroupStatus === "Deploy")).length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length });
