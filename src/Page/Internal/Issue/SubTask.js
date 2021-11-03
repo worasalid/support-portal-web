@@ -123,37 +123,75 @@ export default function SubTask() {
           setDivProgress("show")
         }
 
-        if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === true) {
-          userdispatch({
-            type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value === "SendQALeader" || x.value === "QAReject")
-          });
-        }
 
-        if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === false) {
-          userdispatch({
-            type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
-          });
-        }
-
-        if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "AssignTask") {
-          userdispatch({
-            type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value === "QAassign" || x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
-          });
-        }
-
-        if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "CheckResult") {
-          userdispatch({
-            type: "LOAD_ACTION_FLOW",
-            payload: flow_output.data.filter((x) => x.value === "RecheckPass" || x.value === "RequestVersion" || x.value === "RejectRecheck")
-          });
-        }
-
-        if (userstate?.mailbox[0]?.NodeName !== "qa" && userstate?.mailbox[0]?.NodeName !== "qa_leader") {
+        // เงื่อนไข flow ของ อื่นๆ ของทีมอื่น ที่ไม่ใช่ QA
+        if (userstate?.mailbox[0]?.NodeName !== "qa" || userstate?.mailbox[0]?.NodeName !== "qa_leader") {
           userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
         }
+
+        // เงื่อนไข flow ของ QA
+        if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.mailbox[0]?.NodeName !== "qa_leader") {
+          if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === true) {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.value === "SendQALeader" || x.value === "QAReject")
+            });
+          }
+
+          if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === false) {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
+            });
+          }
+
+          if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "AssignTask") {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.value === "QAassign" || x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
+            });
+          }
+
+          if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "CheckResult") {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.value === "RecheckPass" || x.value === "RequestVersion" || x.value === "RejectRecheck")
+            });
+          }
+        }
+
+        // เงื่อนไข flow ของ CR CENTER
+        if (userstate?.mailbox[0]?.NodeName === "cr_center") {
+          if (userstate?.mailbox[0]?.NodeName === "cr_center" && userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress") {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "RequestManday")
+            })
+          }
+
+          if (userstate?.mailbox[0]?.NodeName === "cr_center" && userstate?.taskdata?.data[0]?.FlowStatus === "Manday Estimated") {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "RejectManday")
+            })
+          }
+        }
+
+        if (userstate?.mailbox[0]?.NodeName === "support") {
+          if (userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress") {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "SendToDev")
+            })
+          }
+          if (userstate?.taskdata?.data[0]?.FlowStatus !== "Waiting Progress") {
+            userdispatch({
+              type: "LOAD_ACTION_FLOW",
+              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
+            })
+          }
+        }
+
       }
     } catch (error) {
 
@@ -271,7 +309,8 @@ export default function SubTask() {
         if (item.data.value === "SendManday") { setModalmanday_visible(true) }
         if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
-        if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject") {
+        if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject" ||
+          item.data.value === "RequestInfo") {
           setModalsendtask_visible(true)
         }
         if (item.data.value === "Deploy") {
@@ -315,19 +354,6 @@ export default function SubTask() {
     }
   }
 
-  function renderColorPriority(param) {
-    switch (param) {
-      case 'Critical':
-        return <ArrowUpOutlined style={{ fontSize: "16px", color: "#C0392B" }} />
-      case 'High':
-        return <ArrowUpOutlined style={{ fontSize: "16px", color: "#E74C3C" }} />
-      case 'Medium':
-        return <ArrowDownOutlined style={{ fontSize: "16px", color: "#DC7633" }} />
-      case 'Low':
-        return <ArrowDownOutlined style={{ fontSize: "16px", color: "#27AE60" }} />
-
-    }
-  }
 
   function onChange(value, item) {
 
@@ -583,7 +609,6 @@ export default function SubTask() {
                   <Col span={18}
                     style={{
                       marginTop: 10,
-                      //display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
                       display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length !== 0 ? "block" : "none"
                     }}
                   >
@@ -596,7 +621,6 @@ export default function SubTask() {
                   </Col>
                   <Col span={18}
                     style={{
-                      // display: userstate.taskdata.data[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
                       display: userstate?.mailbox[0]?.MailType === "in" && userstate?.actionflow?.length === 0 ? "block" : "none"
                     }}>
                     <label className="value-text">{userstate?.taskdata?.data[0]?.FlowStatus}</label>
@@ -699,7 +723,7 @@ export default function SubTask() {
                       (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center") &&
                         userstate.taskdata.data[0]?.MailType === "in" &&
                         (userstate?.taskdata?.data[0]?.Status === "Waiting Progress" || userstate?.taskdata?.data[0]?.Status === "InProgress") &&
-                        userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support"
+                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress")
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
