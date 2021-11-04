@@ -480,7 +480,7 @@ export default function IssueCreate() {
                             <Select
                                 placeholder="Scene"
                                 //mode="multiple"
-                                // defaultValue="None"
+                                defaultValue="None"
                                 showSearch
                                 allowClear
                                 filterOption={(input, option) =>
