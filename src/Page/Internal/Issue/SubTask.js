@@ -30,6 +30,7 @@ import ModalRequestInfoDev from "../../../Component/Dialog/Internal/Issue/modalR
 import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 import ModalDevSendVersion from "../../../Component/Dialog/Internal/Issue/modalDevSendVersion";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
+import ModalRequestInfoQA from "../../../Component/Dialog/Internal/Issue/modalRequestInfoQA";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -62,6 +63,7 @@ export default function SubTask() {
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalreject_visible, setModalreject_visible] = useState(false);
   const [modalRequestInfoDev, setModalRequestInfoDev] = useState(false);
+  const [modalRequestInfoQA, setModalRequestInfoQA] = useState(false);
   const [modalPreview, setModalPreview] = useState(false);
   const [modalDevSendVersion, setModalDevSendVersion] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
@@ -131,33 +133,42 @@ export default function SubTask() {
 
         // เงื่อนไข flow ของ QA
         if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.mailbox[0]?.NodeName !== "qa_leader") {
-          if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === true) {
+          if (userstate?.taskdata?.data[0]?.IssueType === "Use") {
             userdispatch({
               type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.value === "SendQALeader" || x.value === "QAReject")
-            });
+              payload: flow_output.data.filter((x) => x.value === "SendInfoToSupport")
+            })
+
+          } else {
+            if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === true) {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.value === "SendQALeader" || x.value === "QAReject")
+              });
+            }
+
+            if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === false) {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
+              });
+            }
+
+            if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "AssignTask") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.value === "QAassign" || x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
+              });
+            }
+
+            if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "CheckResult") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.value === "RecheckPass" || x.value === "RequestVersion" || x.value === "RejectRecheck")
+              });
+            }
           }
 
-          if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === false) {
-            userdispatch({
-              type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
-            });
-          }
-
-          if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "AssignTask") {
-            userdispatch({
-              type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.value === "QAassign" || x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
-            });
-          }
-
-          if (userstate?.mailbox[0]?.NodeName === "qa_leader" && userstate?.mailbox[0]?.NodeActionText === "CheckResult") {
-            userdispatch({
-              type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.value === "RecheckPass" || x.value === "RequestVersion" || x.value === "RejectRecheck")
-            });
-          }
         }
 
         // เงื่อนไข flow ของ CR CENTER
@@ -178,18 +189,45 @@ export default function SubTask() {
         }
 
         if (userstate?.mailbox[0]?.NodeName === "support") {
-          if (userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress") {
-            userdispatch({
-              type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "SendToDev")
-            })
+
+          /// Flow Bug
+          if (userstate?.taskdata?.data[0]?.IssueType === "Bug") {
+            if (userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "SendToDev")
+              })
+            }
+            if (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "SendToDev" || x.value === "ResolvedTask"))
+              })
+            }
+            if (userstate?.taskdata?.data[0]?.Status === "Resolved" || userstate?.taskdata?.data[0]?.Status === "Done") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
+              })
+            }
           }
-          if (userstate?.taskdata?.data[0]?.FlowStatus !== "Waiting Progress") {
-            userdispatch({
-              type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
-            })
+
+          /// Flow Use
+          if (userstate?.taskdata?.data[0]?.IssueType === "Use") {
+            if (userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RequestInfoDev" || x.value === "RequestInfoQA"))
+              })
+            }
+            if (userstate?.taskdata?.data[0]?.FlowStatus !== "Waiting Progress") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
+              })
+            }
           }
+
         }
 
       }
@@ -347,8 +385,12 @@ export default function SubTask() {
     if (userstate?.taskdata?.data[0]?.IssueType === "Use") {
       if (item.data.NodeName === "support") {
         if (item.data.value === "RequestInfoDev") { setModalRequestInfoDev(true) }
+        if (item.data.value === "RequestInfoQA") { setModalRequestInfoQA(true) }
       }
       if (item.data.NodeName === "developer_1") {
+        if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "qa") {
         if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
       }
     }
@@ -1006,6 +1048,27 @@ export default function SubTask() {
           }}
           onCancel={() => {
             setModalRequestInfoDev(false);
+
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
+
+        <ModalRequestInfoQA
+          title={ProgressStatus}
+          visible={modalRequestInfoQA}
+          onCancel={() => { return (setModalRequestInfoQA(false), setSelected(null)) }}
+          width={800}
+          onOk={() => {
+            setModalRequestInfoQA(false);
+          }}
+          onCancel={() => {
+            setModalRequestInfoQA(false);
 
           }}
           details={{
