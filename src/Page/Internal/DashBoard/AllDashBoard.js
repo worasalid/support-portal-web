@@ -34,6 +34,30 @@ export default function AllDashBoard() {
                 dashboard_name: "DashBoard By Team",
                 description: "ดูข้อมูล Issue ที่ค้างเป็นรายทีม",
                 url: "/internal/dashboard/dashboard4"
+            },
+            {
+                no: "5",
+                dashboard_name: "DashBoard Satisfaction",
+                description: "ดูข้อมูล ความพึงพอใจของลูกค้า",
+                url: "/internal/dashboard/dashboard5"
+            },
+            {
+                no: "6",
+                dashboard_name: "DashBoard CMMI1",
+                description: "สรุปจำนวนการให้บริการ รายปี",
+                url: "/internal/dashboard/cmmi/dashboard_cmmi1"
+            },
+            {
+                no: "7",
+                dashboard_name: "DashBoard CMMI2",
+                description: "สรุปจำนวนการให้บริการ แยกตามประเภท Priority รายปี",
+                url: "/internal/dashboard/cmmi/dashboard_cmmi2"
+            },
+            {
+                no: "8",
+                dashboard_name: "DashBoard CMMI3",
+                description: "รายงานสรุปและวิเคราะห์บริการ แยกตาม Product และ Priority",
+                url: "/internal/dashboard/cmmi/dashboard_cmmi3"
             }
         ]
 

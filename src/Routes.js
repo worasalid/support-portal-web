@@ -23,6 +23,10 @@ import Dashboard1 from './Page/Internal/DashBoard/DashBoard1';
 import Dashboard2 from './Page/Internal/DashBoard/Dashboard2';
 import DashBoard3 from './Page/Internal/DashBoard/DashBoard3';
 import DashBoard4 from './Page/Internal/DashBoard/DashBoard4';
+import DashBoard5 from './Page/Internal/DashBoard/DashBoard5';
+import DashBoard_CMMI1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI1';
+import DashBoard_CMMI2 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI2';
+import DashBoard_CMMI3 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI3';
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -140,6 +144,11 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/dashboard2" exact component={Dashboard2} />
                                     <Route path="/internal/dashboard/dashboard3" exact component={DashBoard3} />
                                     <Route path="/internal/dashboard/dashboard4" exact component={DashBoard4} />
+                                    <Route path="/internal/dashboard/dashboard5" exact component={DashBoard5} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi1" exact component={DashBoard_CMMI1} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi2" exact component={DashBoard_CMMI2} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi3" exact component={DashBoard_CMMI3} />
+                                    
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
