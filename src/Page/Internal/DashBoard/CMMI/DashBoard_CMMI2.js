@@ -30,7 +30,7 @@ export default function DashBoard_CMMI2() {
     var config = {
         xField: 'month',
         yField: 'total',
-        seriesField: 'product',
+        seriesField: 'priority',
         height: 500,
         yAxis: {
             label: {
@@ -107,6 +107,7 @@ export default function DashBoard_CMMI2() {
                 company: n.CompanyName,
                 product: n.Product,
                 month: n.Month.toString(),
+                priority: n.PriorityType,
                 total: n.Total
             })));
 
@@ -359,7 +360,7 @@ export default function DashBoard_CMMI2() {
                 cancelText="Close"
                 onCancel={() => setModalChart(false)}
             >
-                <Line {...config} data={chartData && chartData.filter((n) => n.company === selectRow.CompanyName)}
+                <Line {...config} data={chartData && chartData.filter((n) => n.company === selectRow.CompanyName && n.product === selectRow.Product)}
                     style={{ height: 500 }}
                 />
             </Modal>
