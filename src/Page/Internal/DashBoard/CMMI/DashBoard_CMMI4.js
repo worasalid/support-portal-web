@@ -10,7 +10,7 @@ import moment from "moment"
 const { Column, ColumnGroup } = Table;
 const { RangePicker } = DatePicker;
 
-export default function DashBoard_CMMI3() {
+export default function DashBoard_CMMI4() {
     const [loading, setLoading] = useState(false);
 
     const [tableData, setTableData] = useState([]);
@@ -69,7 +69,7 @@ export default function DashBoard_CMMI3() {
 
     const getData = async () => {
         setLoading(true);
-        await Axios.get(process.env.REACT_APP_API_URL + "/dashboard/cmmi/dashboard_cmmi3", {
+        await Axios.get(process.env.REACT_APP_API_URL + "/dashboard/cmmi/dashboard_cmmi4", {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
@@ -96,43 +96,34 @@ export default function DashBoard_CMMI3() {
             let ws = xlsx.utils.json_to_sheet(json.map((n, index) => {
                 return {
                     No: index + 1,
-                    บริษัท: n.CompanyFullName,
-                    GoLiveDate: "",
+                    Company: n.CompanyName,
+                    CompanyName: n.CompanyFullName,
                     Product: n.Product,
-                    Month1: n.Month1,
-                    Month2: n.Month2,
-                    Month3: n.Month3,
-                    Month4: n.Month4,
-                    Month5: n.Month5,
-                    Month6: n.Month6,
-                    Month7: n.Month7,
-                    Month8: n.Month8,
-                    Month9: n.Month9,
-                    Month10: n.Month10,
-                    Month11: n.Month11,
-                    Month12: n.Month12,
+                    Priority: n.Priority,
+                    จำนวน: n.Issue,
+                    จำนวนนาที: n.TotalMinute,
+                    เวลาเฉลี่ย: n.AVG_Minute,
+                    เวลาต่ำสุด: n.MinMinute,
+                    เวลาสูงสุด: n.MaxMinute
 
                 }
             }));
 
             let wb = xlsx.utils.book_new();
-            xlsx.utils.book_append_sheet(wb, ws, 'Issue_Company');
-            xlsx.writeFile(wb, `DashBoard CMMI 1 - ${moment().format("YYMMDD_HHmm")}.xlsx`);
+            xlsx.utils.book_append_sheet(wb, ws, 'sheet1');
+            xlsx.writeFile(wb, `DashBoard CMMI 4 - ${moment().format("YYMMDD_HHmm")}.xlsx`);
         }
     }
 
     useEffect(() => {
         getCompany();
+        getData();
         getPriority();
-       
     }, [])
 
     useEffect(() => {
-
-        if (selectCompany !== null && selectCompany.length !== 0) {
-            getData();
-            getProduct()
-        }
+        getData();
+        getProduct()
     }, [selectCompany, selectProduct, selectPriority, selectDate])
 
     return (
@@ -210,10 +201,11 @@ export default function DashBoard_CMMI3() {
                             <>
                                 <Row style={{ marginTop: 52 }}>
                                     <Col span={24}>
-                                        <RangePicker format="DD/MM/YYYY" style={{ width: "90%" }}
+                                        <RangePicker format="DD/MM/YYYY" style={{ width: "80%" }}
+                                            defaultValue={[moment('01/01/YYYY', "DD/MM/YYYY"), moment()]}
                                             onChange={(date, dateString) => setSelectDate(dateString)}
                                         />
-                                        {/* <Button type="link"
+                                        <Button type="link"
                                             onClick={() => exportExcel(tableData && tableData)}
                                             title="Excel Export"
                                         >
@@ -222,19 +214,31 @@ export default function DashBoard_CMMI3() {
                                                 src={`${process.env.PUBLIC_URL}/icons-excel.png`}
                                                 alt="Excel Export"
                                             />
-                                        </Button> */}
+                                        </Button>
                                     </Col>
                                 </Row>
                             </>
                         }
                     >
+                        <Row>
+                            <Col span={24} style={{ textAlign: "right" }}>
+                                <label>
+                                    ข้อมูล ณ วันที่ &nbsp;
+                                    {
+                                        selectDate[0] === undefined ?
+                                            `${moment().dayOfYear(1).format("DD/MM/YYYY")} - ${moment().format("DD/MM/YYYY")}` :
+                                            `${moment(selectDate[0], "DD/MM/YYYY").format("DD/MM/YYYY")} - ${moment(selectDate[1], "DD/MM/YYYY").format("DD/MM/YYYY")}`
+                                    }
+                                </label>
+                            </Col>
+                        </Row>
+
                         <Table dataSource={tableData} loading={loading} bordered
-                            scroll={{ x: 2500 }}
                         >
 
                             <Column title="Company" key="key"
                                 align="center"
-                                width="10%"
+                                width="20%"
                                 fixed="left"
                                 render={(record, row, index) => {
                                     return (
@@ -251,7 +255,7 @@ export default function DashBoard_CMMI3() {
 
                             <Column title="Product" key="key"
                                 align="center"
-                                width="10%"
+                                width="20%"
                                 fixed="left"
                                 render={(record, row, index) => {
                                     return (
@@ -267,7 +271,7 @@ export default function DashBoard_CMMI3() {
                             />
                             <Column title="Priority" key="key"
                                 align="left"
-                                width="5%"
+                                width="10%"
                                 render={(record, row, index) => {
                                     return (
                                         <Row>
@@ -280,67 +284,27 @@ export default function DashBoard_CMMI3() {
                                     )
                                 }}
                             />
-                            <ColumnGroup title="SLA" width="10%">
-                                <Column title="นาที" dataIndex="SLA" />
-                                <Column title="ระดับ บริการ" />
-                            </ColumnGroup>
-                            <ColumnGroup title="ประมาณการ" width="10%">
-                                <Column title="จำนวน" />
-                                <Column title="นาที" />
-                            </ColumnGroup>
-                            <ColumnGroup title="เกิดขึ้นจริง" width="10%">
-                                <Column title="จำนวน" dataIndex="IssueCnt" />
-                                <Column title="นาที" dataIndex="IssueAllMinute" />
-                                <Column title="เฉลี่ย (นาที)"
+                            <ColumnGroup title="สถิติการให้บริการ">
+                                <Column title="จำนวนครั้ง" className="table-column-text12" align="center" width="10%" dataIndex="Issue" />
+                                <Column title="จำนวน (นาที)" className="table-column-text12" align="center" width="10%" dataIndex="TotalMinute" />
+                                <Column title="เวลาเฉลี่ย (นาที)" align="center" width="10%"
                                     render={(value, record, index) => {
                                         return (
-                                            <>
-                                                <label className="table-column-text12">
-                                                    {parseFloat(record.IssueAllMinute / record.IssueCnt).toFixed(2)}
-                                                </label>
-                                            </>
+                                            <Row>
+                                                <Col span={24} style={{ textAlign: "center" }}>
+                                                    <label>
+                                                        {parseFloat(record.AVG_Minute).toFixed(2)}
+                                                    </label>
+                                                </Col>
+                                            </Row>
                                         )
                                     }}
                                 />
-                            </ColumnGroup>
-                            <ColumnGroup title="ผลต่าง" width="10%">
-                                <Column title="จำนวน" />
-                                <Column title="นาที" />
-                                <Column title="% (นาที)" />
+                                <Column title="เวลาต่ำสุด (นาที)" align="center" width="10%" dataIndex="MinMinute" />
+                                <Column title="เวลาสูงสุด (นาที)" align="center" width="10%" dataIndex="MaxMinute" />
                             </ColumnGroup>
 
-                            <ColumnGroup title="เปรียบเทียบกับSLA" width="20%">
-                                <ColumnGroup title="ภายใน SLA" >
-                                    <Column title="จำนวน" dataIndex="IssueNotOver"/>
-                                    <Column title="นาที" dataIndex="IssueNotOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" 
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label className="table-column-text12">
-                                                        {parseFloat(record.IssueNotOver_Minute / record.IssueNotOver).toFixed(2)}
-                                                    </label>
-                                                </>
-                                            )
-                                        }}
-                                    />
-                                </ColumnGroup>
-                                <ColumnGroup title="เกิน SLA">
-                                    <Column title="จำนวน" dataIndex="IssueOver" />
-                                    <Column title="นาที" dataIndex="IssueOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" 
-                                        render={(value, record, index) => {
-                                            return (
-                                                <>
-                                                    <label className="table-column-text12">
-                                                        {record.IssueOver_Minute === 0 ? 0 : parseFloat(record.IssueOver_Minute / record.IssueOver).toFixed(2)}
-                                                    </label>
-                                                </>
-                                            )
-                                        }}
-                                    />
-                                </ColumnGroup>
-                            </ColumnGroup>
+
 
                         </Table>
                     </Card>
