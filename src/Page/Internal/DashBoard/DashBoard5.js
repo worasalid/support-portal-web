@@ -81,11 +81,11 @@ export default function DashBoard5() {
                                 <Table dataSource={tableScore} loading={loading} size="small"
                                     pagination={{ pageSize: 5 }}
                                 >
-                                    <Column title="No"
+                                    <Column title="No" align="center"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
-                                                    <label className="table-column-text">{record.no}</label>
+                                                    <label className="table-column-text12">{record.no}</label>
                                                 </>
                                             )
                                         }}
@@ -93,22 +93,27 @@ export default function DashBoard5() {
                                     <Column title="Company" style={{ fontSize: 10, padding: 8 }}
                                         render={(value, record, index) => {
                                             return (
-                                                <>
-                                                    <label className="table-column-text">{record.company_name}</label>
-                                                </>
+                                                <label className="table-column-text12">{record.company_name}</label>
                                             )
                                         }}
                                     />
-                                    <Column title="Quantity"
+                                    <Column 
+                                        render={(value, record, index) => {
+                                            return (
+                                                <label className="table-column-text12">{record.company_fullname}</label>
+                                            )
+                                        }}
+                                    />
+                                    <Column title="Quantity" align="center"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
-                                                    <label className="table-column-text">{record.quantity}</label>
+                                                    <label className="table-column-text12">{record.quantity}</label>
                                                 </>
                                             )
                                         }}
                                     />
-                                    <Column title="Rate"
+                                    <Column title="Rate" align="center"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
@@ -118,11 +123,11 @@ export default function DashBoard5() {
                                             )
                                         }}
                                     />
-                                    <Column title="Score"
+                                    <Column title="Score" align="center"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
-                                                    <label className="table-column-text">{record.avg_totalscore}</label>
+                                                    <label className="table-column-text12">{record.avg_totalscore}</label>
                                                 </>
                                             )
                                         }}

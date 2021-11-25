@@ -124,7 +124,7 @@ export default function DashBoard_CMMI3() {
     useEffect(() => {
         getCompany();
         getPriority();
-       
+
     }, [])
 
     useEffect(() => {
@@ -228,7 +228,7 @@ export default function DashBoard_CMMI3() {
                             </>
                         }
                     >
-                        <Table dataSource={tableData} loading={loading} bordered
+                        <Table dataSource={tableData} loading={loading} bordered size="small"
                             scroll={{ x: 2500 }}
                         >
 
@@ -281,17 +281,17 @@ export default function DashBoard_CMMI3() {
                                 }}
                             />
                             <ColumnGroup title="SLA" width="10%">
-                                <Column title="นาที" dataIndex="SLA" />
-                                <Column title="ระดับ บริการ" />
+                                <Column title="นาที" align="center" dataIndex="SLA" />
+                                <Column title="ระดับ บริการ" align="center" />
                             </ColumnGroup>
                             <ColumnGroup title="ประมาณการ" width="10%">
-                                <Column title="จำนวน" />
-                                <Column title="นาที" />
+                                <Column title="จำนวน" align="center" />
+                                <Column title="นาที" align="center" />
                             </ColumnGroup>
                             <ColumnGroup title="เกิดขึ้นจริง" width="10%">
-                                <Column title="จำนวน" dataIndex="IssueCnt" />
-                                <Column title="นาที" dataIndex="IssueAllMinute" />
-                                <Column title="เฉลี่ย (นาที)"
+                                <Column title="จำนวน" align="center" dataIndex="IssueCnt" />
+                                <Column title="นาที" align="center" dataIndex="IssueAllMinute" />
+                                <Column title="เฉลี่ย (นาที)" align="center"
                                     render={(value, record, index) => {
                                         return (
                                             <>
@@ -304,16 +304,16 @@ export default function DashBoard_CMMI3() {
                                 />
                             </ColumnGroup>
                             <ColumnGroup title="ผลต่าง" width="10%">
-                                <Column title="จำนวน" />
-                                <Column title="นาที" />
-                                <Column title="% (นาที)" />
+                                <Column title="จำนวน" align="center" />
+                                <Column title="นาที" align="center" />
+                                <Column title="% (นาที)" align="center" />
                             </ColumnGroup>
 
                             <ColumnGroup title="เปรียบเทียบกับSLA" width="20%">
                                 <ColumnGroup title="ภายใน SLA" >
-                                    <Column title="จำนวน" dataIndex="IssueNotOver"/>
-                                    <Column title="นาที" dataIndex="IssueNotOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" 
+                                    <Column title="จำนวน" align="center" dataIndex="IssueNotOver" />
+                                    <Column title="นาที" align="center" dataIndex="IssueNotOver_Minute" />
+                                    <Column title="เฉลี่ย (นาที)" align="center"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
@@ -326,9 +326,9 @@ export default function DashBoard_CMMI3() {
                                     />
                                 </ColumnGroup>
                                 <ColumnGroup title="เกิน SLA">
-                                    <Column title="จำนวน" dataIndex="IssueOver" />
-                                    <Column title="นาที" dataIndex="IssueOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" 
+                                    <Column title="จำนวน" align="center" dataIndex="IssueOver" />
+                                    <Column title="นาที" align="center" dataIndex="IssueOver_Minute" />
+                                    <Column title="เฉลี่ย (นาที)" align="center"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
