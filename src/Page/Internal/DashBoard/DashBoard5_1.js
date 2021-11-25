@@ -946,7 +946,7 @@ export default function DashBoard5_1() {
                                 render={(value, record, index) => {
                                     return (
                                         <>
-                                            <Rate disabled allowHalf defaultValue={record.avg_totalscore} style={{ fontSize: 12 }} />
+                                            <Rate disabled allowHalf value={record.avg_totalscore} style={{ fontSize: 12 }} />
 
                                         </>
                                     )
