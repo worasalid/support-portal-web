@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Column } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, Table, Button } from 'antd';
+import { Row, Col, Input, Spin, Table, Button } from 'antd';
 import { PieChartOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 export default function AllDashBoard() {
     const history = useHistory();
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [filterDashBoard, setFilterDashBoard] = useState(null)
 
     const dashBoardData =
         [
@@ -58,8 +59,25 @@ export default function AllDashBoard() {
                 dashboard_name: "DashBoard CMMI3",
                 description: "รายงานสรุปและวิเคราะห์บริการ แยกตาม Product และ Priority",
                 url: "/internal/dashboard/cmmi/dashboard_cmmi3"
+            },
+            {
+                no: "9",
+                dashboard_name: "DashBoard CMMI4",
+                description: "รายงานสถิติการให้บริการ แยกตาม Product และ Priority",
+                url: "/internal/dashboard/cmmi/dashboard_cmmi4"
             }
         ]
+
+    const searchDashboard = (param) => {
+        let result = dashBoardData.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterDashBoard(result);
+    }
 
     useEffect(() => {
 
@@ -75,8 +93,18 @@ export default function AllDashBoard() {
 
                 </Row>
                 <Row gutter={16} style={{ padding: "10px 24px 24px 24px" }}>
+                    <Col span={16}>
+                    </Col>
+                    <Col span={8}>
+                        <Input.Search placeholder="ชื่อ dashboard , description" allowClear
+                            enterButton
+                            onSearch={searchDashboard}
+                        />
+                    </Col>
+                </Row>
+                <Row gutter={16} style={{ padding: "10px 24px 24px 24px" }}>
                     <Col span={24}>
-                        <Table dataSource={dashBoardData} >
+                        <Table dataSource={filterDashBoard === null ? dashBoardData : filterDashBoard} >
                             <Column title="No" align="left"
                                 width="5%"
                                 render={(record, row, index) => {

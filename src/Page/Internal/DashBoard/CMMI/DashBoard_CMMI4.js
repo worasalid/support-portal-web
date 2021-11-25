@@ -1,4 +1,3 @@
-// Dashboard สรุปจำนวนการให้บริการ รายปี
 import React, { useEffect, useState } from "react"
 import { Row, Col, Card, Spin, Table, Select, DatePicker, Modal, Button } from 'antd';
 import { Line } from '@ant-design/charts';
@@ -9,41 +8,24 @@ import MasterPage from "../../MasterPage";
 import moment from "moment"
 
 const { Column, ColumnGroup } = Table;
+const { RangePicker } = DatePicker;
 
-export default function DashBoard_CMMI2() {
-    const [loading, setLoading] = useState(true);
-    const [modalChart, setModalChart] = useState(false);
+export default function DashBoard_CMMI4() {
+    const [loading, setLoading] = useState(false);
 
     const [tableData, setTableData] = useState([]);
-    const [chartData, setChartData] = useState([]);
     const [company, setCompany] = useState([]);
     const [product, setProduct] = useState([]);
     const [priority, setPriority] = useState([]);
 
     // filter
     const [selectCompany, setSelectCompany] = useState(null);
-    const [selectRow, setSelectRow] = useState([]);
+    // const [selectRow, setSelectRow] = useState([]);
     const [selectProduct, setSelectProduct] = useState([]);
     const [selectPriority, setSelectPriority] = useState([]);
-    const [selectYear, setSelectYear] = useState(moment().format("YYYY"))
+    const [selectDate, setSelectDate] = useState([]);
 
-    var config = {
-        xField: 'month',
-        yField: 'total',
-        seriesField: 'priority',
-        height: 500,
-        yAxis: {
-            label: {
-                formatter: function formatter(v) {
-                    return ''.concat(v).replace(/\d{1,3}(?=(\d{3})+$)/g, function (s) {
-                        return ''.concat(s, ',');
-                    });
-                },
-            },
-        },
-        //color: ['#1979C9', '#D62A0D', '#FAA219'],
-
-    };
+    const [test, setTest] = useState("123")
 
     const getCompany = async () => {
         await Axios.get(process.env.REACT_APP_API_URL + "/master/company", {
@@ -87,7 +69,7 @@ export default function DashBoard_CMMI2() {
 
     const getData = async () => {
         setLoading(true);
-        await Axios.get(process.env.REACT_APP_API_URL + "/dashboard/cmmi/dashboard_cmmi2", {
+        await Axios.get(process.env.REACT_APP_API_URL + "/dashboard/cmmi/dashboard_cmmi4", {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
@@ -95,24 +77,17 @@ export default function DashBoard_CMMI2() {
                 companyId: selectCompany,
                 productId: selectProduct,
                 priorityId: selectPriority,
-                year: selectYear
+                startdate: (selectDate[0] === undefined || selectDate[0] === "") ? "" : moment(selectDate[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
+                enddate: (selectDate[1] === undefined || selectDate[1] === "") ? "" : moment(selectDate[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
+
             }
         }).then((res) => {
             setLoading(false);
-            console.log("chartdata", res.data.chartdata)
-            console.log("tabledata", res.data.tabledata)
             setTableData(res.data.tabledata)
 
-            setChartData(res.data.chartdata.map((n, index) => ({
-                company: n.CompanyName,
-                product: n.Product,
-                month: n.Month.toString(),
-                priority: n.PriorityType,
-                total: n.Total
-            })));
 
         }).catch((error) => {
-
+            setLoading(false);
         })
     }
 
@@ -121,28 +96,22 @@ export default function DashBoard_CMMI2() {
             let ws = xlsx.utils.json_to_sheet(json.map((n, index) => {
                 return {
                     No: index + 1,
-                    บริษัท: n.CompanyFullName,
-                    GoLiveDate: "",
+                    Company: n.CompanyName,
+                    CompanyName: n.CompanyFullName,
                     Product: n.Product,
-                    Month1: n.Month1,
-                    Month2: n.Month2,
-                    Month3: n.Month3,
-                    Month4: n.Month4,
-                    Month5: n.Month5,
-                    Month6: n.Month6,
-                    Month7: n.Month7,
-                    Month8: n.Month8,
-                    Month9: n.Month9,
-                    Month10: n.Month10,
-                    Month11: n.Month11,
-                    Month12: n.Month12,
+                    Priority: n.Priority,
+                    จำนวน: n.Issue,
+                    จำนวนนาที: n.TotalMinute,
+                    เวลาเฉลี่ย: n.AVG_Minute,
+                    เวลาต่ำสุด: n.MinMinute,
+                    เวลาสูงสุด: n.MaxMinute
 
                 }
             }));
 
             let wb = xlsx.utils.book_new();
-            xlsx.utils.book_append_sheet(wb, ws, 'Issue_Company');
-            xlsx.writeFile(wb, `DashBoard CMMI 1 - ${moment().format("YYMMDD_HHmm")}.xlsx`);
+            xlsx.utils.book_append_sheet(wb, ws, 'sheet1');
+            xlsx.writeFile(wb, `DashBoard CMMI 4 - ${moment().format("YYMMDD_HHmm")}.xlsx`);
         }
     }
 
@@ -154,10 +123,8 @@ export default function DashBoard_CMMI2() {
 
     useEffect(() => {
         getData();
-        if (selectCompany !== null) {
-            getProduct()
-        }
-    }, [selectCompany, selectProduct, selectPriority, selectYear])
+        getProduct()
+    }, [selectCompany, selectProduct, selectPriority, selectDate])
 
     return (
         <MasterPage bgColor="#f0f2f5">
@@ -169,7 +136,7 @@ export default function DashBoard_CMMI2() {
                             <>
                                 <Row>
                                     <Col span={24}>
-                                        <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard สรุปจำนวนการให้บริการ แยกตามประเภท Priority
+                                        <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard สรุปและวิเคราะห์บริการ แยกตาม Product และ Priority
                                     </Col>
                                 </Row>
                                 <Row style={{ marginTop: 24 }}>
@@ -234,7 +201,10 @@ export default function DashBoard_CMMI2() {
                             <>
                                 <Row style={{ marginTop: 52 }}>
                                     <Col span={24}>
-                                        <DatePicker onChange={(date, datestring) => setSelectYear(datestring)} defaultValue={moment()} picker="year" />
+                                        <RangePicker format="DD/MM/YYYY" style={{ width: "80%" }}
+                                            defaultValue={[moment('01/01/YYYY', "DD/MM/YYYY"), moment()]}
+                                            onChange={(date, dateString) => setSelectDate(dateString)}
+                                        />
                                         <Button type="link"
                                             onClick={() => exportExcel(tableData && tableData)}
                                             title="Excel Export"
@@ -250,120 +220,98 @@ export default function DashBoard_CMMI2() {
                             </>
                         }
                     >
-                        <Table dataSource={tableData} loading={loading} bordered size="small"
-                        // pagination={{ pageSize: 5 }}
+                        <Row>
+                            <Col span={24} style={{ textAlign: "right" }}>
+                                <label>
+                                    ข้อมูล ณ วันที่ &nbsp;
+                                    {
+                                        selectDate[0] === undefined ?
+                                            `${moment().dayOfYear(1).format("DD/MM/YYYY")} - ${moment().format("DD/MM/YYYY")}` :
+                                            `${moment(selectDate[0], "DD/MM/YYYY").format("DD/MM/YYYY")} - ${moment(selectDate[1], "DD/MM/YYYY").format("DD/MM/YYYY")}`
+                                    }
+                                </label>
+                            </Col>
+                        </Row>
+
+                        <Table dataSource={tableData} loading={loading} bordered
                         >
 
-                            <Column title="Company Code" key="key"
-                                align="left"
-                                width="15%"
+                            <Column title="Company" key="key"
+                                align="center"
+                                width="20%"
+                                fixed="left"
                                 render={(record, row, index) => {
                                     return (
-                                        <label className="table-column-text12">
-                                            {record.CompanyName}
-                                        </label>
+                                        <Row>
+                                            <Col span={24} style={{ textAlign: "left" }}>
+                                                <label className="table-column-text14" >
+                                                    {record.CompanyName}
+                                                </label>
+                                            </Col>
+                                        </Row>
                                     )
                                 }}
                             />
-                            <Column title="Company Name" key="key"
-                                align="left"
-                                //width="65%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <label className="table-column-text12">
-                                            {record.CompanyFullName}
-                                        </label>
-                                    )
-                                }}
-                            />
+
                             <Column title="Product" key="key"
-                                align="left"
-                                //width="65%"
+                                align="center"
+                                width="20%"
+                                fixed="left"
                                 render={(record, row, index) => {
                                     return (
-                                        <label className="table-column-text12">
-                                            {record.Product}
-                                        </label>
+                                        <Row>
+                                            <Col span={24} style={{ textAlign: "left" }}>
+                                                <label className="table-column-text14" >
+                                                    {record.Product}
+                                                </label>
+                                            </Col>
+                                        </Row>
                                     )
                                 }}
                             />
                             <Column title="Priority" key="key"
-                                align="left"
-                                //width="65%"
+                                align="center"
+                                width="10%"
                                 render={(record, row, index) => {
                                     return (
-                                        <label className="table-column-text12">
-                                            {record.PriorityType}
-                                        </label>
+                                        <Row>
+                                            <Col span={24} style={{ textAlign: "left" }}>
+                                                <label className="table-column-text14" >
+                                                    {record.Priority}
+                                                </label>
+                                            </Col>
+                                        </Row>
                                     )
                                 }}
                             />
-                            <ColumnGroup title="Month">
-                                <Column title="1" dataIndex="Month1" />
-                                <Column title="2" dataIndex="Month2" />
-                                <Column title="3" dataIndex="Month3" />
-                                <Column title="4" dataIndex="Month4" />
-                                <Column title="5" dataIndex="Month5" />
-                                <Column title="6" dataIndex="Month6" />
-                                <Column title="7" dataIndex="Month7" />
-                                <Column title="8" dataIndex="Month8" />
-                                <Column title="9" dataIndex="Month9" />
-                                <Column title="10" dataIndex="Month10" />
-                                <Column title="11" dataIndex="Month11" />
-                                <Column title="12" dataIndex="Month12" />
+                            <ColumnGroup title="สถิติการให้บริการ">
+                                <Column title="จำนวนครั้ง" className="table-column-text12" align="center" width="10%" dataIndex="Issue" />
+                                <Column title="จำนวน (นาที)" className="table-column-text12" align="center" width="10%" dataIndex="TotalMinute" />
+                                <Column title="เวลาเฉลี่ย (นาที)" align="center" width="10%"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <Row>
+                                                <Col span={24} style={{ textAlign: "center" }}>
+                                                    <label>
+                                                        {parseFloat(record.AVG_Minute).toFixed(2)}
+                                                    </label>
+                                                </Col>
+                                            </Row>
+                                        )
+                                    }}
+                                />
+                                <Column title="เวลาต่ำสุด (นาที)" align="center" width="10%" dataIndex="MinMinute" />
+                                <Column title="เวลาสูงสุด (นาที)" align="center" width="10%" dataIndex="MaxMinute" />
                             </ColumnGroup>
 
-                            <Column title="Total" key="key"
-                                align="left"
-                                //width="65%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <label className="table-column-text12">
-                                            {record.Total}
-                                        </label>
-                                    )
-                                }}
-                            />
 
-                            <Column title="" key="key"
-                                align="left"
-                                //width="65%"
-                                render={(value, record, index) => {
-                                    return (
-                                        <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }}
-                                            onClick={() => {
-                                                setSelectRow(record);
-                                                setModalChart(true);
-                                                console.log("cxx", record)
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
+
                         </Table>
-
                     </Card>
                     {/* </div> */}
                 </Col>
-
-            </Row>
-            <Row gutter={16} style={{ marginTop: "10px", padding: "10px 24px 24px 24px" }}>
-                <Col span={24}>
-
-                </Col>
             </Row>
 
-            <Modal title={selectRow.CompanyFullName}
-                visible={modalChart}
-                width={800}
-                okButtonProps={{ hidden: true }}
-                cancelText="Close"
-                onCancel={() => setModalChart(false)}
-            >
-                <Line {...config} data={chartData && chartData.filter((n) => n.company === selectRow.CompanyName && n.product === selectRow.Product)}
-                    style={{ height: 500 }}
-                />
-            </Modal>
         </MasterPage>
     )
 }

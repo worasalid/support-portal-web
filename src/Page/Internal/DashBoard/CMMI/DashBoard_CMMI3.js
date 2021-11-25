@@ -11,7 +11,7 @@ const { Column, ColumnGroup } = Table;
 const { RangePicker } = DatePicker;
 
 export default function DashBoard_CMMI3() {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const [tableData, setTableData] = useState([]);
     const [company, setCompany] = useState([]);
@@ -24,6 +24,8 @@ export default function DashBoard_CMMI3() {
     const [selectProduct, setSelectProduct] = useState([]);
     const [selectPriority, setSelectPriority] = useState([]);
     const [selectDate, setSelectDate] = useState([]);
+
+    const [test, setTest] = useState("123")
 
     const getCompany = async () => {
         await Axios.get(process.env.REACT_APP_API_URL + "/master/company", {
@@ -85,7 +87,7 @@ export default function DashBoard_CMMI3() {
 
 
         }).catch((error) => {
-
+            setLoading(false);
         })
     }
 
@@ -121,13 +123,14 @@ export default function DashBoard_CMMI3() {
 
     useEffect(() => {
         getCompany();
-        getData();
         getPriority();
+
     }, [])
 
     useEffect(() => {
-        getData();
-        if (selectCompany !== null) {
+
+        if (selectCompany !== null && selectCompany.length !== 0) {
+            getData();
             getProduct()
         }
     }, [selectCompany, selectProduct, selectPriority, selectDate])
@@ -225,13 +228,13 @@ export default function DashBoard_CMMI3() {
                             </>
                         }
                     >
-                        <Table dataSource={tableData} loading={loading} bordered
-                        //scroll={{ x: 1500, y: 0 }}
+                        <Table dataSource={tableData} loading={loading} bordered size="small"
+                            scroll={{ x: 2500 }}
                         >
 
                             <Column title="Company" key="key"
                                 align="center"
-                                width="15%"
+                                width="10%"
                                 fixed="left"
                                 render={(record, row, index) => {
                                     return (
@@ -264,7 +267,7 @@ export default function DashBoard_CMMI3() {
                             />
                             <Column title="Priority" key="key"
                                 align="left"
-                                width="10%"
+                                width="5%"
                                 render={(record, row, index) => {
                                     return (
                                         <Row>
@@ -277,45 +280,65 @@ export default function DashBoard_CMMI3() {
                                     )
                                 }}
                             />
-                            <ColumnGroup title="SLA">
-                                <Column title="นาที" dataIndex="SLA" />
-                                <Column title="ระดับ บริการ" />
+                            <ColumnGroup title="SLA" width="10%">
+                                <Column title="นาที" align="center" dataIndex="SLA" />
+                                <Column title="ระดับ บริการ" align="center" />
                             </ColumnGroup>
-                            <ColumnGroup title="ประมาณการ">
-                                <Column title="จำนวน" />
-                                <Column title="นาที" />
+                            <ColumnGroup title="ประมาณการ" width="10%">
+                                <Column title="จำนวน" align="center" />
+                                <Column title="นาที" align="center" />
                             </ColumnGroup>
-                            <ColumnGroup title="เกิดขึ้นจริง">
-                                <Column title="จำนวน" dataIndex="IssueCnt" />
-                                <Column title="นาที" dataIndex="IssueAllMinute" />
-                                <Column title="เฉลี่ย (นาที)"
+                            <ColumnGroup title="เกิดขึ้นจริง" width="10%">
+                                <Column title="จำนวน" align="center" dataIndex="IssueCnt" />
+                                <Column title="นาที" align="center" dataIndex="IssueAllMinute" />
+                                <Column title="เฉลี่ย (นาที)" align="center"
                                     render={(value, record, index) => {
                                         return (
                                             <>
                                                 <label className="table-column-text12">
-                                                    {parseFloat(record.IssueAllMinute / record.IssueCnt)}
+                                                    {parseFloat(record.IssueAllMinute / record.IssueCnt).toFixed(2)}
                                                 </label>
                                             </>
                                         )
                                     }}
                                 />
                             </ColumnGroup>
-                            <ColumnGroup title="ผลต่าง">
-                                <Column title="จำนวน" />
-                                <Column title="นาที" />
-                                <Column title="% (นาที)" />
+                            <ColumnGroup title="ผลต่าง" width="10%">
+                                <Column title="จำนวน" align="center" />
+                                <Column title="นาที" align="center" />
+                                <Column title="% (นาที)" align="center" />
                             </ColumnGroup>
 
-                            <ColumnGroup title="เปรียบเทียบกับSLA">
+                            <ColumnGroup title="เปรียบเทียบกับSLA" width="20%">
                                 <ColumnGroup title="ภายใน SLA" >
-                                    <Column title="จำนวน" dataIndex="IssueNotOver" />
-                                    <Column title="นาที" dataIndex="IssueNotOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" />
+                                    <Column title="จำนวน" align="center" dataIndex="IssueNotOver" />
+                                    <Column title="นาที" align="center" dataIndex="IssueNotOver_Minute" />
+                                    <Column title="เฉลี่ย (นาที)" align="center"
+                                        render={(value, record, index) => {
+                                            return (
+                                                <>
+                                                    <label className="table-column-text12">
+                                                        {parseFloat(record.IssueNotOver_Minute / record.IssueNotOver).toFixed(2)}
+                                                    </label>
+                                                </>
+                                            )
+                                        }}
+                                    />
                                 </ColumnGroup>
                                 <ColumnGroup title="เกิน SLA">
-                                    <Column title="จำนวน" dataIndex="IssueOver"/>
-                                    <Column title="นาที" dataIndex="IssueOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" />
+                                    <Column title="จำนวน" align="center" dataIndex="IssueOver" />
+                                    <Column title="นาที" align="center" dataIndex="IssueOver_Minute" />
+                                    <Column title="เฉลี่ย (นาที)" align="center"
+                                        render={(value, record, index) => {
+                                            return (
+                                                <>
+                                                    <label className="table-column-text12">
+                                                        {record.IssueOver_Minute === 0 ? 0 : parseFloat(record.IssueOver_Minute / record.IssueOver).toFixed(2)}
+                                                    </label>
+                                                </>
+                                            )
+                                        }}
+                                    />
                                 </ColumnGroup>
                             </ColumnGroup>
 
@@ -324,7 +347,7 @@ export default function DashBoard_CMMI3() {
                     {/* </div> */}
                 </Col>
             </Row>
-           
+
         </MasterPage>
     )
 }
