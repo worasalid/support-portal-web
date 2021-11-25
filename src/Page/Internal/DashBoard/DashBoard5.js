@@ -1,6 +1,6 @@
 // Dashboard แบบประเมินความพอใจของลูกค้า
 import React, { useEffect, useState } from "react"
-import { Row, Col, Card, Spin, Table, Rate, List, Avatar, Button } from 'antd';
+import { Row, Col, Card, Input, Table, Rate, List, Avatar, Button } from 'antd';
 import { Pie } from '@ant-design/charts';
 import { Icon } from '@iconify/react';
 import { EllipsisOutlined } from '@ant-design/icons';
@@ -17,6 +17,19 @@ export default function DashBoard5() {
     const [loading, setLoading] = useState(false);
     const [tableScore, setTableScore] = useState([]);
     const [dataComment, setDataComment] = useState([]);
+
+    const [filterCompany, setFilterCompany] = useState(null);
+
+    const searchTicket = (param) => {
+        let result = tableScore.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterCompany(result);
+    }
 
     const getData = async () => {
         setLoading(true);
@@ -69,7 +82,19 @@ export default function DashBoard5() {
                 <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                     <Card
                         className="card-dashboard"
-                        title="สรุปคะแนนความพึงพอใจ"
+                        title={
+                            <Row>
+                                <Col span={12}>
+                                    <label>สรุปคะแนนความพึงพอใจ</label>
+                                </Col>
+                                <Col span={12}>
+                                    <Input.Search placeholder="เลข Ticket" allowClear
+                                        enterButton
+                                        onSearch={searchTicket}
+                                    />
+                                </Col>
+                            </Row>
+                        }
                     >
                         <Row>
                             <Col xs={24} sm={24} md={24} lg={24} xl={24}>
@@ -78,7 +103,7 @@ export default function DashBoard5() {
                                     title="สรุปคะแนนความพึงพอใจ"
                                 > */}
 
-                                <Table dataSource={tableScore} loading={loading} size="small"
+                                <Table dataSource={filterCompany === null ? tableScore : filterCompany} loading={loading} size="small"
                                     pagination={{ pageSize: 5 }}
                                 >
                                     <Column title="No" align="center"
@@ -97,7 +122,7 @@ export default function DashBoard5() {
                                             )
                                         }}
                                     />
-                                    <Column 
+                                    <Column
                                         render={(value, record, index) => {
                                             return (
                                                 <label className="table-column-text12">{record.company_fullname}</label>
@@ -117,7 +142,7 @@ export default function DashBoard5() {
                                         render={(value, record, index) => {
                                             return (
                                                 <>
-                                                    <Rate disabled allowHalf defaultValue={record.avg_totalscore} />
+                                                    <Rate disabled allowHalf value={record.avg_totalscore} />
 
                                                 </>
                                             )
@@ -171,7 +196,7 @@ export default function DashBoard5() {
                                         title={item.username}
                                         description={
                                             <>
-                                                <Rate disabled allowHalf defaultValue={item.avg_totalscore} style={{ fontSize: 12 }} /> &nbsp;
+                                                <Rate disabled allowHalf value={item.avg_totalscore} style={{ fontSize: 12 }} /> &nbsp;
                                                 {moment(item.createdate).format("DD/MM/YYYY")} <br /><br />
                                                 <label>{item.suggestion}</label>
                                             </>
