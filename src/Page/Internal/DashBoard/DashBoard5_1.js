@@ -302,46 +302,47 @@ export default function DashBoard5_1() {
                         {/* Chart */}
                         <Row>
                             <Col span={24}>
-                                <div style={{ padding: "0px 24px 0px 24px" }}>
-                                    <Slider
-                                        dots={true}
-                                        infinite={true}
-                                        speed={500}
-                                        slidesToShow={1}
-                                        slidesToScroll={1}
-                                        swipeToSlide={true}
-                                        prevArrow={
-                                            <Icon icon="dashicons:arrow-left-alt2" color="gray" />
-                                        }
-                                        nextArrow={
-                                            <Icon icon="dashicons:arrow-right-alt2" color="gray" />
+                                <Spin spinning={loading}>
+                                    <div style={{ padding: "0px 24px 0px 24px" }}>
+                                        <Slider
+                                            dots={true}
+                                            infinite={true}
+                                            speed={500}
+                                            slidesToShow={1}
+                                            slidesToScroll={1}
+                                            swipeToSlide={true}
+                                            prevArrow={
+                                                <Icon icon="dashicons:arrow-left-alt2" color="gray" />
+                                            }
+                                            nextArrow={
+                                                <Icon icon="dashicons:arrow-right-alt2" color="gray" />
 
-                                        }
-                                    >
-                                        <div>
-                                            <Row>
-                                                <Col span={24} style={{ textAlign: "right" }}>
-                                                    <label style={{ color: "orange" }}>จำนวน Issue</label>
-                                                </Col>
-                                            </Row>
-                                            <Column {...chartData_config}
-                                                data={chartData && chartData}
-                                                height={300}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Row>
-                                                <Col span={24} style={{ textAlign: "right" }}>
-                                                    <label style={{ color: "orange" }}>ค่าเฉลี่ย คะแนน</label>
-                                                </Col>
-                                            </Row>
-                                            <Line {...chartData_config2} data={chartData && chartData}
-                                                style={{ height: 300 }}
-                                            />
-                                        </div>
-
-                                    </Slider>
-                                </div>
+                                            }
+                                        >
+                                            <div>
+                                                <Row>
+                                                    <Col span={24} style={{ textAlign: "right" }}>
+                                                        <label style={{ color: "orange" }}>จำนวน Issue</label>
+                                                    </Col>
+                                                </Row>
+                                                <Column {...chartData_config} loading={loading}
+                                                    data={chartData && chartData}
+                                                    height={300}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Row>
+                                                    <Col span={24} style={{ textAlign: "right" }}>
+                                                        <label style={{ color: "orange" }}>ค่าเฉลี่ย คะแนน</label>
+                                                    </Col>
+                                                </Row>
+                                                <Line {...chartData_config2} data={chartData && chartData} loading={loading}
+                                                    style={{ height: 300 }}
+                                                />
+                                            </div>
+                                        </Slider>
+                                    </div>
+                                </Spin>
                             </Col>
                         </Row>
 
@@ -789,14 +790,14 @@ export default function DashBoard5_1() {
                 </Col>
             </Row >
 
-            <Row gutter={16} style={{ padding: "10px 24px 0px 24px" }}>
+            <Row gutter={16} style={{ padding: "24px 24px 0px 24px" }}>
                 <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                     <Card
                         className="card-dashboard"
                         title={
                             <Row>
                                 <Col span={12}>
-                                    <label>"ข้อเสนอแนะ / ความคิดเห็น"</label>
+                                    <label>ข้อเสนอแนะ / ความคิดเห็น</label>
                                 </Col>
                                 <Col span={12}>
                                     <Input.Search placeholder="เลข Ticket" allowClear
@@ -827,7 +828,7 @@ export default function DashBoard5_1() {
                             <Column key="no" align="center" width="5%"
                                 title={
                                     <>
-                                        <label className="table-column-text1212">Product</label>
+                                        <label className="table-column-text12">Product</label>
                                     </>
                                 }
                                 render={(value, record, index) => {
@@ -840,13 +841,20 @@ export default function DashBoard5_1() {
                             />
 
                             <Column key="no" align="center" width="15%"
-                                title="เลข Ticket"
+                                title={
+                                    <>
+                                        <label className="table-column-text12">เลข Ticket</label>
+                                    </>
+                                }
                                 render={(value, record, index) => {
                                     return (
                                         <>
-                                            <label className="table-column-text12 text-link"
+                                            <label
+                                                className="table-column-text12 text-link"
                                                 onClick={() => history.push({ pathname: "/internal/issue/subject/" + record.ticket_id })}
-                                            >{record.ticket_number}</label>
+                                            >
+                                                {record.ticket_number}
+                                            </label>
                                         </>
                                     )
                                 }}
@@ -932,7 +940,7 @@ export default function DashBoard5_1() {
                             <Column key="no" align="center" width="12%"
                                 title={
                                     <>
-                                        <label className="table-column-text1212">Rate</label>
+                                        <label className="table-column-text12">Rate</label>
                                     </>
                                 }
                                 render={(value, record, index) => {

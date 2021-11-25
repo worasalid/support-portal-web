@@ -250,11 +250,11 @@ export default function DashBoard_CMMI2() {
                             </>
                         }
                     >
-                        <Table dataSource={tableData} loading={loading} bordered
+                        <Table dataSource={tableData} loading={loading} bordered size="small"
                         // pagination={{ pageSize: 5 }}
                         >
 
-                            <Column title="Company" key="key"
+                            <Column title="Company Code" key="key"
                                 align="left"
                                 width="15%"
                                 render={(record, row, index) => {
@@ -265,7 +265,7 @@ export default function DashBoard_CMMI2() {
                                     )
                                 }}
                             />
-                            <Column title="Company" key="key"
+                            <Column title="Company Name" key="key"
                                 align="left"
                                 //width="65%"
                                 render={(record, row, index) => {

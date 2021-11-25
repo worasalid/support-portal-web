@@ -244,7 +244,7 @@ export default function DashBoard_CMMI4() {
                                     return (
                                         <Row>
                                             <Col span={24} style={{ textAlign: "left" }}>
-                                                <label className="table-column-text12" >
+                                                <label className="table-column-text14" >
                                                     {record.CompanyName}
                                                 </label>
                                             </Col>
@@ -261,7 +261,7 @@ export default function DashBoard_CMMI4() {
                                     return (
                                         <Row>
                                             <Col span={24} style={{ textAlign: "left" }}>
-                                                <label className="table-column-text12" >
+                                                <label className="table-column-text14" >
                                                     {record.Product}
                                                 </label>
                                             </Col>
@@ -270,13 +270,13 @@ export default function DashBoard_CMMI4() {
                                 }}
                             />
                             <Column title="Priority" key="key"
-                                align="left"
+                                align="center"
                                 width="10%"
                                 render={(record, row, index) => {
                                     return (
                                         <Row>
                                             <Col span={24} style={{ textAlign: "left" }}>
-                                                <label className="table-column-text12" >
+                                                <label className="table-column-text14" >
                                                     {record.Priority}
                                                 </label>
                                             </Col>

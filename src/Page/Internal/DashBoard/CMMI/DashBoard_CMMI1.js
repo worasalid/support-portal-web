@@ -207,7 +207,7 @@ export default function DashBoard_CMMI1() {
                             </>
                         }
                     >
-                        <Table dataSource={tableData} loading={loading}
+                        <Table dataSource={tableData} loading={loading} bordered size="small"
                             pagination
                         // pagination={{ pageSize: 5 }}
                         >
@@ -246,30 +246,30 @@ export default function DashBoard_CMMI1() {
                                 }}
                             />
                             <ColumnGroup title="Month">
-                                <Column title="1" dataIndex="Month1" />
-                                <Column title="2" dataIndex="Month2" />
-                                <Column title="3" dataIndex="Month3" />
-                                <Column title="4" dataIndex="Month4" />
-                                <Column title="5" dataIndex="Month5" />
-                                <Column title="6" dataIndex="Month6" />
-                                <Column title="7" dataIndex="Month7" />
-                                <Column title="8" dataIndex="Month8" />
-                                <Column title="9" dataIndex="Month9" />
-                                <Column title="10" dataIndex="Month10" />
-                                <Column title="11" dataIndex="Month11" />
-                                <Column title="12" dataIndex="Month12" />
+                                <Column title="1" align="center" dataIndex="Month1" />
+                                <Column title="2" align="center" dataIndex="Month2" />
+                                <Column title="3" align="center" dataIndex="Month3" />
+                                <Column title="4" align="center" dataIndex="Month4" />
+                                <Column title="5" align="center" dataIndex="Month5" />
+                                <Column title="6" align="center" dataIndex="Month6" />
+                                <Column title="7" align="center" dataIndex="Month7" />
+                                <Column title="8" align="center" dataIndex="Month8" />
+                                <Column title="9" align="center" dataIndex="Month9" />
+                                <Column title="10" align="center" dataIndex="Month10" />
+                                <Column title="11" align="center" dataIndex="Month11" />
+                                <Column title="12" align="center" dataIndex="Month12" />
                             </ColumnGroup>
 
-                            <Column title="Total" key="key"
-                                align="left"
-                                //width="65%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <label className="table-column-text12">
-                                            {record.Total}
-                                        </label>
-                                    )
-                                }}
+                            <Column title="Total" key="key" dataIndex="Total"
+                                align="center"
+                            //width="65%"
+                            // render={(record, row, index) => {
+                            //     return (
+                            //         <label className="table-column-text12">
+                            //             {record.Total}
+                            //         </label>
+                            //     )
+                            // }}
                             />
 
 
