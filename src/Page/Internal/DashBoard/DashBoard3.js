@@ -136,6 +136,8 @@ export default function Dashboard3() {
                     IssueType: x.IssueType,
                     Priority: x.Priority,
                     Status: x.GroupStatus,
+                    Module: x.ModuleName,
+                    "Task Status": x.TaskStatus,
                     FlowStatus: x.FlowStatus,
                     HandOver: x.NodeName,
                     User: x.DisplayAllName,
