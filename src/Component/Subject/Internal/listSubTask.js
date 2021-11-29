@@ -81,7 +81,8 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     ),
                     okText: "Close",
                     onOk() {
-                        GetTask()
+                        GetTask();
+                        window.location.reload();
                     },
                 });
             }

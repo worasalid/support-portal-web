@@ -69,6 +69,7 @@ export default function ModalCreateTask({ visible = false, onOk, onCancel, datar
                     onOk() {
                         onOk();
                         form.resetFields();
+                        window.location.reload();
                     },
                 });
             }

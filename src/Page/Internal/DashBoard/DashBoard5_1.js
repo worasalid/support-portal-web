@@ -176,7 +176,7 @@ export default function DashBoard5_1() {
                     score: n.Score,
                     score2: n.Score2,
                     score3: n.Score3,
-                    score4: n.Score2,
+                    score4: n.Score4,
                     score5: n.Score5,
                     suggestion: n.Suggestion,
                     username: n.UserName,
