@@ -318,202 +318,206 @@ export default function AllIssue() {
                               notiRef.current.updateNoti(record.Id)
                             )
                           }}
-                          
+
                           className="table-column-detail">
-                        รายละเอียด
-                      </label>
-                    </div>
+                          รายละเอียด
+                        </label>
+                      </div>
 
                     </>
-            )
+                  )
                 }
                 }
               />
-            <Column title="Issue By"
-              align="center"
-              width="10%"
-              render={(record) => {
-                return (
-                  <>
+              <Column title="Issue By"
+                align="center"
+                width="10%"
+                render={(record) => {
+                  return (
+                    <>
 
-                    <div>
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                        {record.CreateBy}
-                      </label>
-                    </div>
+                      <div>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                          {record.CreateBy}
+                        </label>
+                      </div>
 
-                    <div>
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                        {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
-                      </label>
-                    </div>
-                    <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
-
-                  </>
-                )
-              }
-
-              }
-            />
-            <Column title="Due Date"
-              width="10%"
-              align="center"
-              render={(record) => {
-                return (
-                  <>
-                    <div style={{
-                      display: state?.usersdata?.organize?.OrganizeCode === "support" &&
-                        record.Is_DueDate === 0 ? "inline-block" : "none"
-                    }}>
-                      <label className="table-column-text" style={{ color: "red" }}>
-                        กรุณาแจ้ง DueDate ลูกค้า
-                      </label>
-                    </div>
-                    <div style={{
-                      display: state?.usersdata?.organize?.OrganizeCode === "cr_center" &&
-                        record.Is_SLA_DueDate === 0 ? "inline-block" : "none"
-                    }}>
-                      <label className="table-column-text" style={{ color: "red" }}>
-                        กรุณาระบุ DueDate
-                      </label>
-                    </div>
-
-                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                      {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}
-                    </label>
-                    <br />
-                    <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
-                      {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
-                    </label>
-                    <br />
-                    {record.cntDueDate >= 1 ?
-                      <Tag style={{ marginLeft: 16 }} color="warning"
-                        onClick={() => {
-                          userdispatch({ type: "SELECT_DATAROW", payload: record })
-                          setHistoryduedate_visible(true)
+                      <div>
+                        {
+                          record.AssignIconDate === null ?
+                            // <label style={{ fontSize: 12, color: "red" }}>
+                            <label style={{ color: "red" }} className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                              ยังไม่ได้ส่งเรื่องให้ ICON
+                            </label> :
+                            <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                              {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}<br />
+                            </label>
                         }
-                        }
-                      >
-                        เลื่อน Due
-                      </Tag> : ""
-                    }
-
-                  </>
-                )
-              }
-              }
-            />
-
-            <Column
-              title="ProgressStatus"
-              width="10%"
-              align="center"
-              render={(record) => {
-                return (
-                  <>
-
-                    <div>
-                      <label className="table-column-text">
-                        {record.InternalStatus === "Open" ? "Open" : record.GroupStatus}<br />
-                        {record.FlowStatus === null || record.GroupStatus === record.FlowStatus ? "" : `(${record.FlowStatus})`}
-                      </label>
-
-                    </div>
-                  </>
-                );
-
-              }}
-            />
-
-            <Column
-              title="Time Tracking"
-              align="center"
-              width="5%"
-              render={(record) => {
-                return (
-                  <>
-                    <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                      <ClockSLA
-                        start={moment(record.AssignIconDate)}
-                        due={moment(record.SLA_DueDate)}
-                        end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-                        type={record.Priority}
-                      />
-                    </div>
-                  </>
-                )
-              }
-              }
-            />
-
-            <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-              width="5%"
-              align="center"
-              render={(record) => {
-                return (
-                  <>
-                    <Button type="link"
-                      onClick={() => {
-                        userdispatch({ type: "SELECT_DATAROW", payload: record });
-                        setModalfiledownload_visible(true);
+                      </div>
+                      <Tooltip title="Company"><Tag color="#17a2b8">{record.CompanyName}</Tag></Tooltip>
+                    </>
+                  )
+                }}
+              />
+              <Column title="Due Date"
+                width="10%"
+                align="center"
+                render={(record) => {
+                  return (
+                    <>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "support" &&
+                          record.Is_DueDate === 0 ? "inline-block" : "none"
                       }}>
-                      {record.cntFile === 0 ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
-                    </Button>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาแจ้ง DueDate ลูกค้า
+                        </label>
+                      </div>
+                      <div style={{
+                        display: state?.usersdata?.organize?.OrganizeCode === "cr_center" &&
+                          record.Is_SLA_DueDate === 0 ? "inline-block" : "none"
+                      }}>
+                        <label className="table-column-text" style={{ color: "red" }}>
+                          กรุณาระบุ DueDate
+                        </label>
+                      </div>
+
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}
+                      </label>
+                      <br />
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
+                      </label>
+                      <br />
+                      {record.cntDueDate >= 1 ?
+                        <Tag style={{ marginLeft: 16 }} color="warning"
+                          onClick={() => {
+                            userdispatch({ type: "SELECT_DATAROW", payload: record })
+                            setHistoryduedate_visible(true)
+                          }
+                          }
+                        >
+                          เลื่อน Due
+                        </Tag> : ""
+                      }
+
+                    </>
+                  )
+                }
+                }
+              />
+
+              <Column
+                title="ProgressStatus"
+                width="10%"
+                align="center"
+                render={(record) => {
+                  return (
+                    <>
+
+                      <div>
+                        <label className="table-column-text">
+                          {record.InternalStatus === "Open" ? "Open" : record.GroupStatus}<br />
+                          {record.FlowStatus === null || record.GroupStatus === record.FlowStatus ? "" : `(${record.FlowStatus})`}
+                        </label>
+
+                      </div>
+                    </>
+                  );
+
+                }}
+              />
+
+              <Column
+                title="Time Tracking"
+                align="center"
+                width="5%"
+                render={(record) => {
+                  return (
+                    <>
+                      <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
+                        <ClockSLA
+                          start={moment(record.AssignIconDate)}
+                          due={moment(record.SLA_DueDate)}
+                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
+                          type={record.Priority}
+                        />
+                      </div>
+                    </>
+                  )
+                }
+                }
+              />
+
+              <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
+                width="5%"
+                align="center"
+                render={(record) => {
+                  return (
+                    <>
+                      <Button type="link"
+                        onClick={() => {
+                          userdispatch({ type: "SELECT_DATAROW", payload: record });
+                          setModalfiledownload_visible(true);
+                        }}>
+                        {record.cntFile === 0 ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                      </Button>
 
 
-                    {/* FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา*/}
-                    <Button type="link"
-                      hidden={record.FileUrl === "" ? true : false}
-                      icon={<DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
-                      onClick={() => {
-                        window.open(record.FileUrl)
-                      }}
-                    >
-                    </Button>
-                  </>
-                )
-              }
-              }
-            />
-          </Table>
-        </Col>
-      </Row>
+                      {/* FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา*/}
+                      <Button type="link"
+                        hidden={record.FileUrl === "" ? true : false}
+                        icon={<DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
+                        onClick={() => {
+                          window.open(record.FileUrl)
+                        }}
+                      >
+                      </Button>
+                    </>
+                  )
+                }
+                }
+              />
+            </Table>
+          </Col>
+        </Row>
 
 
-      <ModalFileDownload
-        title="File Download"
-        visible={modalfiledownload_visible}
-        onCancel={() => { return (setModalfiledownload_visible(false)) }}
-        width={600}
-        onOk={() => {
-          setModalfiledownload_visible(false);
+        <ModalFileDownload
+          title="File Download"
+          visible={modalfiledownload_visible}
+          onCancel={() => { return (setModalfiledownload_visible(false)) }}
+          width={600}
+          onOk={() => {
+            setModalfiledownload_visible(false);
 
-        }}
-        details={{
-          refId: userstate.issuedata.datarow.Id,
-          reftype: "Master_Ticket",
-          grouptype: "attachment"
-        }}
+          }}
+          details={{
+            refId: userstate.issuedata.datarow.Id,
+            reftype: "Master_Ticket",
+            grouptype: "attachment"
+          }}
 
 
 
-      />
-      <ModalTimetracking
-        title="Time Tracking"
-        width={600}
-        visible={modaltimetracking_visible}
-        onCancel={() => { return (setModaltimetracking_visible(false)) }}
-        details={{
-          transgroupId: userstate.issuedata.datarow.TransGroupId,
+        />
+        <ModalTimetracking
+          title="Time Tracking"
+          width={600}
+          visible={modaltimetracking_visible}
+          onCancel={() => { return (setModaltimetracking_visible(false)) }}
+          details={{
+            transgroupId: userstate.issuedata.datarow.TransGroupId,
 
-        }}
-      />
+          }}
+        />
 
-      {/* </Spin> */}
-      <div hidden={true}>
-        <Notification ref={notiRef} />
-      </div>
-    </MasterPage>
+        {/* </Spin> */}
+        <div hidden={true}>
+          <Notification ref={notiRef} />
+        </div>
+      </MasterPage>
     </IssueContext.Provider >
   );
 }

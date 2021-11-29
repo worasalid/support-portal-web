@@ -88,7 +88,7 @@ export default function DashBoard5() {
                                     <label>สรุปคะแนนความพึงพอใจ</label>
                                 </Col>
                                 <Col span={12}>
-                                    <Input.Search placeholder="เลข Ticket" allowClear
+                                    <Input.Search placeholder="ชื่อบริษัท" allowClear
                                         enterButton
                                         onSearch={searchTicket}
                                     />
