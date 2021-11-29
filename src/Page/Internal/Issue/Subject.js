@@ -1151,7 +1151,8 @@ export default function Subject() {
                   </Col>
                   <Col span={18} style={{ marginTop: 10 }}>
                     {
-                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue")
+                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue"
+                        && (userstate?.issuedata?.details[0]?.taskResolved === 0))
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
