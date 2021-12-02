@@ -581,8 +581,25 @@ export default function Subject() {
         if (item.data.value === "SendToSA") {
           setModalsendissue_visible(true);
         }
+
         if (item.data.value === "Resolved") {
-          setModalsendissue_visible(true);
+          if (userstate.issuedata.details[0]?.taskResolved > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่เสร็จ',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Resolved งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
+
+              }
+            });
+          }
+          if (userstate.issuedata.details[0]?.taskResolved === 0) {
+            setModalsendissue_visible(true);
+          }
         }
         if (item.data.value === "Cancel") {
           setModalCancel_visible(true);
