@@ -386,6 +386,7 @@ export default function SubTask() {
       if (item.data.NodeName === "support") {
         if (item.data.value === "RequestInfoDev") { setModalRequestInfoDev(true) }
         if (item.data.value === "RequestInfoQA") { setModalRequestInfoQA(true) }
+        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
       }
       if (item.data.NodeName === "developer_1") {
         if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
