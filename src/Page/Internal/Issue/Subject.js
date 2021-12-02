@@ -636,9 +636,7 @@ export default function Subject() {
         if (item.data.value === "SendToSA") {
           setModalsendissue_visible(true);
         }
-        // if (item.data.value === "Resolved") {
-        //   setModalsendissue_visible(true);
-        // }
+
         if (item.data.value === "Resolved") {
           if (userstate.issuedata.details[0]?.taskResolved > 0) {
             Modal.warning({
