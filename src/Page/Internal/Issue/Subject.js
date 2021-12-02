@@ -653,7 +653,7 @@ export default function Subject() {
             });
           }
           if (userstate.issuedata.details[0]?.taskResolved === 0) {
-            setModalresolved_visible(true);
+            setModalsendissue_visible(true);
           }
         }
         if (item.data.value === "Cancel") {
