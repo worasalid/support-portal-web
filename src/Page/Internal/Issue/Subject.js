@@ -183,6 +183,22 @@ export default function Subject() {
     }
   }
 
+  const getCustomerProduct = async (param) => {
+    await Axios.get(process.env.REACT_APP_API_URL + "/master/customer-products", {
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        company_id: param
+      }
+    }).then((res) => {
+      userdispatch({ type: "LOAD_CUS_PRODUCT", payload: res.data });
+    }).catch((error) => {
+
+    })
+  }
+
   // Load flow ที่จะใช้ในการ Action งาน
   const getflow_output = async (trans_id) => {
 
@@ -418,6 +434,45 @@ export default function Subject() {
     }
   }
 
+  const updateProduct = async (value, item) => {
+    await Axios({
+      url: process.env.REACT_APP_API_URL + "/tickets/customer-products",
+      method: "PATCH",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      data: {
+        ticketid: userstate?.issuedata?.details[0]?.Id,
+        productId: value,
+        history: {
+          value: userstate?.issuedata?.details[0]?.ProductName,
+          value2: item.label
+        }
+      }
+    }).then((res) => {
+      Modal.success({
+        title: 'บันทึกข้อมูลเรียบร้อย',
+        okText: "Close",
+        onOk() {
+          window.location.reload(true)
+        },
+      });
+
+    }).catch((error) => {
+      Modal.error({
+        title: 'บันทึกข้อมูล ไม่สำเร็จ',
+        content: (
+          <div>
+            <p>{error.messeage}</p>
+            <p>{error.respone.data}</p>
+          </div>
+        ),
+        okText: "Close",
+       
+      });
+    });
+  }
+
 
   // Fuction 
   function HandleChange(value, item) {
@@ -598,7 +653,7 @@ export default function Subject() {
             });
           }
           if (userstate.issuedata.details[0]?.taskResolved === 0) {
-            setModalsendissue_visible(true);
+            setModalresolved_visible(true);
           }
         }
         if (item.data.value === "Cancel") {
@@ -642,6 +697,9 @@ export default function Subject() {
           }
           if (item.type === "version") {
             updateVersion(value, item)
+          }
+          if (item.type === "product") {
+            updateProduct(value, item)
           }
         },
       });
@@ -1190,24 +1248,37 @@ export default function Subject() {
                   </Col>
                 </Row>
 
+                {/* Product */}
                 <Row style={{ marginBottom: 20 }}>
                   <Col span={18}>
                     <label className="header-text">Product</label>
-                    <br />
-                    <label className="value-text">{userstate.issuedata.details[0] && `${userstate.issuedata.details[0].ProductName} - (${userstate.issuedata.details[0].ProductFullName})`}</label>
+                  </Col>
+                  <Col span={18} style={{ marginTop: 10 }}>
+                    {
+                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue"
+                        && (userstate?.issuedata?.details[0]?.taskResolved === 0))
+                        ? <Select
+                          style={{ width: '100%' }}
+                          allowClear
+                          showSearch
+                          filterOption={(input, option) =>
+                            option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          onClick={() => getCustomerProduct(userstate?.issuedata?.details[0]?.CompanyId)}
+                          options={userstate?.masterdata?.cusProductState?.map((x) => ({ value: x.ProductId, label: x.Name, type: "product" }))}
+                          onChange={(value, item) => onChange(value, item)}
+                          value={`${userstate?.issuedata?.details[0]?.ProductName} - (${userstate?.issuedata?.details[0]?.ProductFullName})`}
+                        />
+                        :
+                        <label className="value-text">{userstate.issuedata.details[0] && `${userstate.issuedata.details[0].ProductName} - (${userstate.issuedata.details[0].ProductFullName})`}</label>
+                    }
                   </Col>
                 </Row>
-                {/* <Row style={{ marginBottom: 20 }}>
-                  <Col span={18}>
-                    <label className="header-text">Module</label>
-                    <br />
-                    <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].ModuleName}</label>
-                  </Col>
-                </Row> */}
                 <Row style={{ marginBottom: 20 }}>
                   <Col span={18}>
                     <label className="header-text">Scene</label>
-                    <br />
+                  </Col>
+                  <Col span={18} style={{ marginTop: 10 }}>
                     {
                       (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue")
                         ? <Select

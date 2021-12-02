@@ -329,7 +329,7 @@ export default function CommentBox() {
             <PreviewImg
                 title="Preview"
                 visible={modalPreview}
-                width={800}
+                width={1200}
                 footer={null}
                 onCancel={() => {
                     setModalPreview(false);
