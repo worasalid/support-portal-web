@@ -11,7 +11,8 @@ export const customerState = {
         issueTypeState: [],
         priorityState: [],
         versionState: [],
-        patchState: []
+        patchState: [],
+        cusProductState: []
     },
     filter: {
         productState: [],
@@ -54,7 +55,8 @@ export const userState = {
         moduleState: [],
         issueTypeState: [],
         priorityState: [],
-        versionState: []
+        versionState: [],
+        cusProductState: []
     },
     filter: {
         companyState: [],
@@ -103,7 +105,7 @@ export const customerReducer = createReducer(customerState, {
     SELECT_DATE: (state, { payload }) => { state.filter.date = payload },
     SELECT_PROGRESS: (state, { payload }) => { state.filter.progress = payload },
     SELECT_PATCH: (state, { payload }) => { state.filter.patchState = payload },
-    
+
     SELECT_SCENE: (state, { payload }) => { state.filter.scene = payload },
     SELECT_KEYWORD: (state, { payload }) => { state.filter.keyword = payload },
     CLEAR_FILTER: (state, { payload }) => { state.filter = payload },
@@ -123,6 +125,7 @@ export const customerReducer = createReducer(customerState, {
     LOAD_MAILBOX: (state, { payload }) => { state.mailbox = payload },
     LOAD_TASKDATA: (state, { payload }) => { state.taskdata.data = payload },
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
+    LOAD_CUS_PRODUCT: (state, { payload }) => { state.masterdata.cusProductState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
     LOAD_VERSION: (state, { payload }) => { state.masterdata.versionState = payload },
     LOAD_TYPE: (state, { payload }) => { state.masterdata.issueTypeState = payload },
@@ -155,6 +158,7 @@ export const userReducer = createReducer(userState, {
     LOAD_TASKDATA: (state, { payload }) => { state.taskdata.data = payload },
     LOAD_COMPANY: (state, { payload }) => { state.masterdata.companyState = payload },
     LOAD_PRODUCT: (state, { payload }) => { state.masterdata.productState = payload },
+    LOAD_CUS_PRODUCT: (state, { payload }) => { state.masterdata.cusProductState = payload },
     LOAD_MODULE: (state, { payload }) => { state.masterdata.moduleState = payload },
     LOAD_VERSION: (state, { payload }) => { state.masterdata.versionState = payload },
     LOAD_TYPE: (state, { payload }) => { state.masterdata.issueTypeState = payload },
