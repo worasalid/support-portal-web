@@ -17,6 +17,7 @@ export default function DashBoard_CMMI4() {
     const [company, setCompany] = useState([]);
     const [product, setProduct] = useState([]);
     const [priority, setPriority] = useState([]);
+    const [issueType, setIssueType] = useState([]);
 
     // filter
     const [selectCompany, setSelectCompany] = useState(null);
@@ -24,8 +25,7 @@ export default function DashBoard_CMMI4() {
     const [selectProduct, setSelectProduct] = useState([]);
     const [selectPriority, setSelectPriority] = useState([]);
     const [selectDate, setSelectDate] = useState([]);
-
-    const [test, setTest] = useState("123")
+    const [selectIssueType, setSelectIssueType] = useState([]);
 
     const getCompany = async () => {
         await Axios.get(process.env.REACT_APP_API_URL + "/master/company", {
@@ -67,6 +67,18 @@ export default function DashBoard_CMMI4() {
         })
     }
 
+    const getIssueType = async () => {
+        await Axios.get(process.env.REACT_APP_API_URL + "/master/issue-types", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+        }).then((res) => {
+            setIssueType(res.data);
+        }).catch(() => {
+
+        })
+    }
+
     const getData = async () => {
         setLoading(true);
         await Axios.get(process.env.REACT_APP_API_URL + "/dashboard/cmmi/dashboard_cmmi4", {
@@ -77,6 +89,7 @@ export default function DashBoard_CMMI4() {
                 companyId: selectCompany,
                 productId: selectProduct,
                 priorityId: selectPriority,
+                issueType: selectIssueType,
                 startdate: (selectDate[0] === undefined || selectDate[0] === "") ? "" : moment(selectDate[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
                 enddate: (selectDate[1] === undefined || selectDate[1] === "") ? "" : moment(selectDate[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
 
@@ -100,6 +113,7 @@ export default function DashBoard_CMMI4() {
                     CompanyName: n.CompanyFullName,
                     Product: n.Product,
                     Priority: n.Priority,
+                    IssueType: n.IssueType,
                     จำนวน: n.Issue,
                     จำนวนนาที: n.TotalMinute,
                     เวลาเฉลี่ย: n.AVG_Minute,
@@ -119,12 +133,13 @@ export default function DashBoard_CMMI4() {
         getCompany();
         getData();
         getPriority();
+        getIssueType();
     }, [])
 
     useEffect(() => {
         getData();
         getProduct()
-    }, [selectCompany, selectProduct, selectPriority, selectDate])
+    }, [selectCompany, selectProduct, selectPriority, selectDate, selectIssueType])
 
     return (
         <MasterPage bgColor="#f0f2f5">
@@ -140,10 +155,7 @@ export default function DashBoard_CMMI4() {
                                     </Col>
                                 </Row>
                                 <Row style={{ marginTop: 24 }}>
-                                    <Col span={4}>
-
-                                    </Col>
-                                    <Col span={8}>
+                                    <Col span={6}>
                                         <Select
                                             placeholder="Select Company"
                                             mode='multiple'
@@ -189,6 +201,22 @@ export default function DashBoard_CMMI4() {
                                             }
                                             onChange={(value) => setSelectPriority(value)}
                                             options={priority && priority.map((n) => ({ value: n.Id, label: n.Name }))}
+                                        >
+                                        </Select>
+                                    </Col>
+                                    <Col span={6}>
+                                        <Select
+                                            placeholder="Select IssueType"
+                                            mode='multiple'
+                                            showSearch
+                                            allowClear
+                                            maxTagCount={2}
+                                            style={{ width: "90%" }}
+                                            filterOption={(input, option) =>
+                                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            onChange={(value) => setSelectIssueType(value)}
+                                            options={issueType && issueType.map((n) => ({ value: n.Id, label: n.Name }))}
                                         >
                                         </Select>
                                     </Col>
@@ -278,6 +306,21 @@ export default function DashBoard_CMMI4() {
                                             <Col span={24} style={{ textAlign: "left" }}>
                                                 <label className="table-column-text14" >
                                                     {record.Priority}
+                                                </label>
+                                            </Col>
+                                        </Row>
+                                    )
+                                }}
+                            />
+                            <Column title="IssueType" key="key"
+                                align="center"
+                                width="10%"
+                                render={(record, row, index) => {
+                                    return (
+                                        <Row>
+                                            <Col span={24} style={{ textAlign: "left" }}>
+                                                <label className="table-column-text14" >
+                                                    {record.IssueType}
                                                 </label>
                                             </Col>
                                         </Row>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { EditOutlined, FileOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Table, Modal, Row, Col, Card } from 'antd';
 import Axios from 'axios';
 import MasterPage from '../../MasterPage';
 import { useHistory } from 'react-router-dom';
+import { Icon } from '@iconify/react';
 
 const { Meta } = Card;
 
@@ -245,6 +245,26 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         ตั้งค่า Upload คู่มือเพื่อใช้ในระบบ
+                                    </label>
+
+                                }
+                            />
+                        </Card>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                            onClick={() => history.push("/internal/setting/system/flow-approve")}
+                        >
+                            <Meta
+                                avatar={
+                                    <Icon icon="carbon:flow" width="48" height="48" />
+                                }
+                                title={<label className="card-title-menu"> ตั้งค่า Flow Approve</label>}
+                                description={
+                                    <label className="value-text">
+                                        ตั้งค่าการ Approve CR , Memo
                                     </label>
 
                                 }
