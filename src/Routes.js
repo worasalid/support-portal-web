@@ -60,6 +60,7 @@ import MapQA from './Page/Internal/Setting/MapQA';
 import ConfigQA from './Page/Internal/Setting/ConfigQA';
 import MapSA from './Page/Internal/Setting/MapSA';
 import ConfigSA from './Page/Internal/Setting/ConfigSA';
+import ConfigFlowApprove from './Page/Internal/Setting/System/ConfigFlowApprove';
 
 import Charts from './Page/Internal/Report/charts';
 import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
@@ -137,6 +138,7 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
                                     <Route path="/internal/setting/system/user-manual" exact component={UserManual} />
                                     <Route path="/internal/setting/system/organize" component={ConfigOrganize} />
+                                    <Route path="/internal/setting/system/flow-approve" component={ConfigFlowApprove} />
 
 
                                     {/* dashboard */}
@@ -152,7 +154,7 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi2" exact component={DashBoard_CMMI2} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi3" exact component={DashBoard_CMMI3} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi4" exact component={DashBoard_CMMI4} />
-                                    
+
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />

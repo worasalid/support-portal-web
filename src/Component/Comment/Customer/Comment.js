@@ -314,7 +314,7 @@ export default function CommentBox() {
                 title="File Download"
                 visible={modalfiledownload_visible}
                 onCancel={() => { return (setModalfiledownload_visible(false)) }}
-                width={600}
+                width={800}
                 onOk={() => {
                     setModalfiledownload_visible(false);
 
@@ -329,7 +329,7 @@ export default function CommentBox() {
             <PreviewImg
                 title="Preview"
                 visible={modalPreview}
-                width={1200}
+                width={1400}
                 footer={null}
                 onCancel={() => {
                     setModalPreview(false);

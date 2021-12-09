@@ -187,8 +187,6 @@ export default function MasterCompany() {
             }
 
         } catch (error) {
-            // console.log("error", error.response)
-            setModalAdd(false);
             Modal.error({
                 title: 'บันทึกข้อมูล ไม่สำเร็จ',
                 content: (
@@ -198,7 +196,6 @@ export default function MasterCompany() {
                 ),
                 okText: "Close",
                 onOk() {
-                    formAdd.resetFields();
                     setLoading(false);
                 },
             });
