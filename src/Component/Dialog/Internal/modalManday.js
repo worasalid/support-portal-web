@@ -16,7 +16,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     //data
     let [manday, setManday] = useState([])
     let [costmanday, setCostmanday] = useState(0)
-    let [totalcost, setTotalcost] = useState(0)
+    const [totalcost, setTotalcost] = useState(0)
     const [crCenterManday, setCrCenterManday] = useState(0)
     const [totalmanday, setTotalmanday] = useState(0)
     const [listdata, setListdata] = useState([]);
@@ -219,26 +219,24 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     useEffect(() => {
         if (visible) {
             GetTask();
+            setTotalcost(details && details.totalcost)
         }
     }, [visible])
 
-
-
-    // form.setFieldsValue({ manday: `${listdata[0]?.manday}` })
-    manday = manday.reduce(function (a, b) {
-        return a + b;
-    }, 0);
-
     useEffect(() => {
-        setTotalmanday(details.totalcost === 0 ? manday + parseFloat(crCenterManday) : details.totalcost)
+        //setTotalmanday(details.totalcost === 0 ? manday + parseFloat(crCenterManday) : details.totalcost)
     }, [])
 
     useEffect(() => {
+        manday = manday.reduce(function (a, b) {
+            return a + b;
+        }, 0);
+
         setTotalmanday(manday + parseFloat(crCenterManday))
         setTotalcost((manday + crCenterManday) * costmanday)
     }, [crCenterManday, costmanday, manday])
 
-    
+
 
     return (
         <Modal
@@ -296,13 +294,13 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                 >
                                     <Row>
                                         <Col span={24}>
-                                            <Radio.Group onChange={(e) => e.target.value}>
-                                                <Radio style={radioStyle} value={1} onChange={(x) => {setCostmanday(0); setTotalcost(0)}}>
+                                            <Radio.Group defaultValue={totalcost === 0 ? 1 : 2} onChange={(e) => e.target.value}>
+                                                <Radio style={radioStyle} value={1} onChange={(x) => { setCostmanday(0); setTotalcost(0) }}>
                                                     ไม่มีค่าใช้จ่าย (ฟรี)
-                                </Radio>
+                                                </Radio>
                                                 <Radio style={radioStyle} value={2} onChange={(x) => setCostmanday(details.costmanday)}>
                                                     มีค่าใช้จ่าย
-                               </Radio>
+                                                </Radio>
 
                                             </Radio.Group>
                                         </Col>
@@ -342,9 +340,10 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                 <Col span={10}>
                                     <InputNumber min={0} max={100} step={0.25} defaultValue={0} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
                                         onChange={(value) => {
-                                            setCrCenterManday(value)
-                                        }
-                                        } />
+                                            setCrCenterManday(value);
+                                            setCostmanday(details.costmanday)
+                                        }} />
+
                                 </Col>
                                 <Col span={4} style={{ textAlign: "right" }}>
                                     <label style={{ fontSize: 12 }}>Manday</label>
@@ -370,10 +369,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                 <Col span={10} style={{ textAlign: "right", borderBottom: "1px solid" }}>
                                     {/* <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label> */}
                                     <InputNumber min={0} value={totalcost} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
-                                        onChange={(value) => {
-                                            setTotalcost(value)
-                                        }
-                                        } />
+                                        onChange={(value) => setTotalcost(value)}
+                                    />
                                     <u></u>
                                 </Col>
                                 <Col span={4} style={{ textAlign: "right" }}>
@@ -389,7 +386,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                         <label>Remark :</label> <br />
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Col>
                 </Row>
             </Spin>
