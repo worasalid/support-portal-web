@@ -250,18 +250,22 @@ export default function Resolved() {
                   return (
                     <>
                       <div>
+
+
+                        <br />
                         <label className="table-column-text">
+                          <Tag color="#00CC00"
+                            visible={record.TaskCnt > 1 ? true : false}
+                            style={{ borderRadius: "25px", padding: -10, height: 18 }}
+                          >
+                            <label style={{ fontSize: 10 }} >
+                              {record.TaskCnt} Task
+                            </label>
+                          </Tag>
                           {record.Title}
                           {record.IsReOpen === true ? " (ReOpen)" : ""}
                         </label>
 
-                        <Tag color="#00CC00"
-                          style={{
-                            borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
-                            display: record.TaskCnt > 1 ? "inline-block" : "none"
-                          }}>
-                          <label style={{ fontSize: 10, alignContent: "center", verticalAlign: "center" }}>{record.TaskCnt} Task</label>
-                        </Tag>
                       </div>
                       <div>
                         <label
@@ -498,6 +502,6 @@ export default function Resolved() {
 
         {/* </Spin> */}
       </MasterPage>
-    </IssueContext.Provider>
+    </IssueContext.Provider >
   );
 }

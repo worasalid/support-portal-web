@@ -35,6 +35,7 @@ import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 import ModalCancel from "../../../Component/Dialog/Internal/Issue/modalCancel";
+import ModalApprover from "../../../Component/Dialog/Internal/Issue/modalApprover";
 
 
 const { Option } = Select;
@@ -72,6 +73,7 @@ export default function Subject() {
   const [modalPreview, setModalPreview] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
   const [modalCancel_visible, setModalCancel_visible] = useState(false);
+  const [modalApprover, setModalApprover] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -468,7 +470,7 @@ export default function Subject() {
           </div>
         ),
         okText: "Close",
-       
+
       });
     });
   }
@@ -575,12 +577,16 @@ export default function Subject() {
           }
         }
       }
+
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "SendToSA") {
           setModalsendissue_visible(true)
+        }
+        if (item.data.value === "RequestApprove") {
+          setModalApprover(true)
         }
         if (item.data.value === "SendManday") {
           setModalmanday_visible(true)
@@ -625,7 +631,14 @@ export default function Subject() {
           }
         }
       }
+
       if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
+
+      if (userstate?.mailbox[0]?.NodeName === "approver") {
+        if (item.data.value === "ApproveCR" || item.data.value === "NotApproveCR") {
+          setModalApprover(true)
+        }
+      }
     }
     // Use Flow
     if (userstate.issuedata.details[0]?.IssueType === "Use") {
@@ -675,7 +688,7 @@ export default function Subject() {
   function onChange(value, item) {
 
     if (item.type !== "progress") {
-      Modal.info({
+      Modal.warning({
         title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
         content: (
           <div>
@@ -1018,7 +1031,7 @@ export default function Subject() {
                           style={{ width: '100%' }} placeholder="None"
                           //onClick={() => getflow_output(userstate?.mailbox[0]?.TransId)}
                           onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
-                            Modal.info({
+                            Modal.warning({
                               title: 'กรุณา ระบุ Priority',
                               okText: "Close"
                             })
@@ -1297,6 +1310,24 @@ export default function Subject() {
 
                         : <label className="value-text">{userstate?.issuedata?.details[0]?.Scene}</label>
                     }
+                  </Col>
+                </Row>
+
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">IssueBy</label>
+                  </Col>
+                  <Col span={18} style={{ marginTop: 0 }}>
+                    <label className="value-text">
+                      {userstate?.issuedata?.details[0]?.IssueBy}
+                      {
+                        userstate?.issuedata?.details[0]?.OwnerTel === null ? "" :
+                          <>
+                            <Divider type="vertical" />
+                            <label>{`Tel. ${userstate?.issuedata?.details[0]?.OwnerTel}`}</label>
+                          </>
+                      }
+                    </label>
                   </Col>
                 </Row>
 
@@ -1615,6 +1646,22 @@ export default function Subject() {
           onCancel={() => setModalCancel_visible(false)}
           onOk={() => {
             setModalCancel_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            ticket_number: userstate?.issuedata?.details[0]?.Number,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
+
+        <ModalApprover
+          title={ProgressStatus}
+          visible={modalApprover}
+          width={800}
+          onCancel={() => setModalApprover(false)}
+          onOk={() => {
+            setModalApprover(false);
           }}
           details={{
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,

@@ -60,7 +60,8 @@ import MapQA from './Page/Internal/Setting/MapQA';
 import ConfigQA from './Page/Internal/Setting/ConfigQA';
 import MapSA from './Page/Internal/Setting/MapSA';
 import ConfigSA from './Page/Internal/Setting/ConfigSA';
-import ConfigFlowApprove from './Page/Internal/Setting/System/ConfigFlowApprove';
+
+import ConfigFlow from './Page/Internal/Setting/System/ConfigFlow/index';
 
 import Charts from './Page/Internal/Report/charts';
 import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
@@ -78,6 +79,8 @@ import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCance
 import ConfigReasonReject from './Page/Internal/Setting/System/ConfigReasonReject';
 import UserManual from './Page/Internal/Setting/System/UserManual';
 import ConfigOrganize from './Page/Internal/Setting/System/ConfigOrganize';
+import FlowApprove from './Page/Internal/Setting/System/ConfigFlow/FlowApprove';
+import FlowDeploy from './Page/Internal/Setting/System/ConfigFlow/FlowDeploy';
 
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
@@ -113,6 +116,8 @@ export default function Routes() {
                                     <Route path="/internal/user/profile" exact component={Profile} />
                                     <Route path="/internal/issue" exact component={MyTask} />
                                     <Route path="/internal/issue/unassign" exact component={UnAssign} />
+
+                                    {/* เมนูตั้งค่าระบบ */}
                                     <Route path="/internal/setting/mastercompany" exact component={MasterCompany} />
                                     <Route path="/internal/setting/mapcompany" exact component={MappingCompany} />
                                     <Route path="/internal/setting/support_site_config/userid-:id?" exact component={SupportSiteConfig} />
@@ -138,7 +143,9 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
                                     <Route path="/internal/setting/system/user-manual" exact component={UserManual} />
                                     <Route path="/internal/setting/system/organize" component={ConfigOrganize} />
-                                    <Route path="/internal/setting/system/flow-approve" component={ConfigFlowApprove} />
+                                    <Route path="/internal/setting/system/flow-config" exact component={ConfigFlow} />
+                                    <Route path="/internal/setting/system/flow-config/flow-deploy" component={FlowDeploy} />
+                                    <Route path="/internal/setting/system/flow-config/flow-approve" component={FlowApprove} />
 
 
                                     {/* dashboard */}
@@ -172,7 +179,7 @@ export default function Routes() {
                                     <Route path="/internal/patch/header" exact component={PatchHeader} />
                                     <Route path="/internal/patch/details/patch-:id?" exact component={PatchDetails} />
 
-
+                                    {/* Ricef */}
                                     <Route path="/internal/ricef/all" exact component={Ricef} />
                                     <Route path="/internal/ricef/comp-:compid?" exact component={RicefHeader} />
                                     <Route path="/internal/ricef/comp-:compid?/batch-:batchid?" exact component={RicefDetails} />
@@ -184,6 +191,7 @@ export default function Routes() {
                                     <Route path="/internal/migration" exact component={Migration} />
                                     <Route path="/internal/migration/sqlscript/comid-:id?" exact component={ScriptSQL} />
 
+                                    {/* Customer Page */}
                                     <Route path="/customer/login" exact component={Customerlogin} />
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />
                                     <Route path="/customer/servicedesk/issuemenu" exact component={IssueMenu} />

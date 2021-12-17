@@ -255,16 +255,16 @@ export default function SystemConfig() {
                     <Col xs={24} sm={24} md={12} lg={8} xl={6}>
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
-                            onClick={() => history.push("/internal/setting/system/flow-approve")}
+                            onClick={() => history.push("/internal/setting/system/flow-config")}
                         >
                             <Meta
                                 avatar={
                                     <Icon icon="carbon:flow" width="48" height="48" />
                                 }
-                                title={<label className="card-title-menu"> ตั้งค่า Flow Approve</label>}
+                                title={<label className="card-title-menu"> ตั้งค่า Flow</label>}
                                 description={
                                     <label className="value-text">
-                                        ตั้งค่าการ Approve CR , Memo
+                                        ตั้งค่า Flow
                                     </label>
 
                                 }
