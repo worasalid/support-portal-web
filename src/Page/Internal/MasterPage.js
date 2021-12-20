@@ -5,7 +5,7 @@ import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
 import {
   PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined,
-  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined
+  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined,PhoneOutlined
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
@@ -15,6 +15,7 @@ import NotificationDetails from '../../Component/Notifications/Internal/Notifica
 import StickyNote from '../../Component/StickyNote/Internal/StickyNote';
 import axios from 'axios';
 import UserManual from "../../Component/UserManual";
+import { Icon } from '@iconify/react';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -108,7 +109,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       });
       masterdispatch({ type: "COUNT_SLA_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_SLA_DueDate === 0).length });
       masterdispatch({ type: "COUNT_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_DueDate === 0).length });
-      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Cancel" ).length });
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Cancel").length });
       masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "Hold" || x.GroupStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Resolved" || x.GroupStatus === "Pass" || x.GroupStatus === "Deploy")).length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length });
@@ -483,6 +484,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 </Menu.Item>
               </Menu.ItemGroup>
             </SubMenu>
+
+            <Menu.Item key="callcenter" icon={<PhoneOutlined />} onClick={() => history.push('/internal/callcenter/case')}>
+              Call Center
+            </Menu.Item>
 
             <SubMenu key="patch"
               style={{
