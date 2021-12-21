@@ -217,12 +217,16 @@ export default function CommentBox({ loadingComment = false }) {
 
                                         {
                                             item.cntfile === 0 ? "" :
-                                                <Icon icon="teenyicons:attach-outline" style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
-                                                    onClick={() => {
-                                                        setCommentid(item.id);
-                                                        setModalfiledownload_visible(true);
-                                                    }}
-                                                />
+                                                <span onClick={() => {
+                                                    setCommentid(item.id);
+                                                    setModalfiledownload_visible(true);
+                                                }}
+                                                >
+                                                    <Icon icon="teenyicons:attach-outline"
+                                                        style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
+                                                    />
+                                                    <label style={{ cursor: "pointer", color: "#1890ff" }}>File Attach</label>
+                                                </span>
                                         }
                                         {
                                             divcollapse.includes(item.key) &&

@@ -574,7 +574,11 @@ export default function IssueCreate() {
                     </Form>
                 </Spin>
             </div>
-
+            <div style={{ position: "fixed", bottom: 20, right: 30 }}>
+                <label style={{ fontSize: 14, color: "gray" }}>
+                    Version {process.env.REACT_APP_ICON_SPACE_VERSION}
+                </label>
+            </div>
 
         </MasterPage>
     )

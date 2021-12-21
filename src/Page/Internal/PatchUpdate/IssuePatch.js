@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useReducer, useContext } from "react";
 import { useHistory } from "react-router-dom";
-import { Button, Col, Row, Table, Tooltip, Tag, Modal, Select } from "antd";
+import { Button, Col, Row, Table, Tooltip, Tag, Modal, Select, Input, Radio, Space } from "antd";
 import Column from "antd/lib/table/Column";
 import moment from "moment";
 import Axios from "axios";
@@ -15,19 +15,34 @@ export default function IssuePatch() {
     const [userstate, userdispatch] = useReducer(userReducer, userState);
     const { state, dispatch } = useContext(AuthenContext);
     const [loading, setLoadding] = useState(false);
+    const [modalVersion, setModalVersion] = useState(false);
 
     //data
     const [product, setProduct] = useState([]);
-    const [filterProduct, setFilterProduct] = useState(4);
     const [version, setVersion] = useState("");
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [listVersion, setListVersion] = useState([]);
+    const [selectVersion, setSelectVersion] = useState(null)
+
+    const [filterProduct, setFilterProduct] = useState(4);
+    const [filterIssue, setFilterIssue] = useState(null);
+    const [radioValue, setRadioValue] = useState(1);
 
     const [pageCurrent, setPageCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [pageTotal, setPageTotal] = useState(0);
     const [recHover, setRecHover] = useState(-1);
 
-
+    const searchIssue = (param) => {
+        let result = userstate?.issuedata?.data.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterIssue(result);
+    }
 
     const rowIssueSelection = {
         selectedRowKeys: selectedRowKeys,
@@ -51,6 +66,21 @@ export default function IssuePatch() {
                     (res.data.patch_number).toString().length === 3 ? `${res.data.version}.${res.data.patch_number}` : ""
 
             setVersion(patchVersion)
+        }).catch((error) => {
+
+        })
+    }
+
+    const getListVersion = async () => {
+        await Axios.get(`${process.env.REACT_APP_API_URL}/patch/list-version`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                productId: filterProduct
+            }
+        }).then((res) => {
+            setListVersion(res.data)
         }).catch((error) => {
 
         })
@@ -86,7 +116,7 @@ export default function IssuePatch() {
             }
         }).then((res) => {
             setLoadding(false);
-            userdispatch({ type: "LOAD_ISSUE", payload: res.data});
+            userdispatch({ type: "LOAD_ISSUE", payload: res.data });
         }).catch((error) => {
 
         })
@@ -104,12 +134,13 @@ export default function IssuePatch() {
                 data: {
                     productId: filterProduct,
                     ticket_id: selectedRowKeys,
-                    version: version
+                    version: selectVersion === null ? version : selectVersion
                 }
             });
 
             if (issue.status === 200) {
                 setLoadding(false);
+                setModalVersion(false);
                 Modal.success({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -151,6 +182,13 @@ export default function IssuePatch() {
         getIssue();
     }, [filterProduct])
 
+    useEffect(() => {
+        if (radioValue === 2) {
+            getListVersion();
+        }
+    }, [radioValue])
+
+
     return (
         <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
             <MasterPage>
@@ -171,10 +209,10 @@ export default function IssuePatch() {
                 </Row>
 
                 <Row style={{ padding: "24px 24px 24px 24px" }}>
-                    <Col span={12} >
+                    <Col span={10}>
                         <Select
                             showSearch
-                            style={{ width: 500 }}
+                            style={{ width: "50%" }}
                             placeholder="Select Product"
                             optionFilterProp="children"
                             defaultValue={4}
@@ -184,11 +222,21 @@ export default function IssuePatch() {
                             options={product.map((n) => ({ value: n.Id, label: `${n.Name} - (${n.FullName})` }))}
                             onChange={(value) => setFilterProduct(value)}
                         />
+                    </Col>
+                    <Col span={6} >
+
 
                     </Col>
-                    <Col span={12} style={{ textAlign: "right" }}>
+                    <Col span={6} style={{ textAlign: "right" }}>
+                        <Input.Search placeholder="เลข Issue / Subject" allowClear
+                            enterButton
+                            onSearch={searchIssue}
+                        />
+                    </Col>
+                    <Col span={2} style={{ textAlign: "right", color: "green" }}>
                         <Button
                             type="primary"
+                            style={{ backgroundColor: "#00CC00" }}
                             onClick={() => {
                                 if (selectedRowKeys.length === 0) {
                                     Modal.warning({
@@ -204,7 +252,8 @@ export default function IssuePatch() {
                                         }
                                     });
                                 } else {
-                                    updatePatch();
+                                    //updatePatch();
+                                    setModalVersion(true);
                                 }
                             }}
                         >
@@ -213,7 +262,7 @@ export default function IssuePatch() {
                     </Col>
                 </Row>
 
-                <Table dataSource={userstate?.issuedata?.data} loading={loading}
+                <Table dataSource={filterIssue === null ? userstate?.issuedata?.data : filterIssue} loading={loading}
                     style={{ padding: "24px 24px 24px 24px" }}
                     rowClassName={(record, index) => {
                         return (
@@ -364,8 +413,7 @@ export default function IssuePatch() {
                                     </Row>
                                 </>
                             )
-                        }
-                        }
+                        }}
                     />
 
                     <Column title="Issue By" width="10%"
@@ -471,10 +519,38 @@ export default function IssuePatch() {
 
                         }}
                     />
-
-
                 </Table>
             </MasterPage>
+
+            <Modal
+                title="ระบุ Version"
+                visible={modalVersion}
+                width={400}
+                okText="Save"
+                onOk={() => updatePatch()}
+                onCancel={() => { setRadioValue(1); setSelectVersion(null); setModalVersion(false) }}
+            >
+                <Radio.Group value={radioValue} onChange={(e) => { setRadioValue(e.target.value) }}>
+                    <Space direction="vertical">
+                        <Radio value={2}>Manual Version</Radio>
+                        <Radio value={1}>Current Version</Radio>
+
+                    </Space>
+                </Radio.Group>
+
+                <Select
+                    showSearch
+                    value={selectVersion}
+                    style={{ width: "50%", display: radioValue === 2 ? "inline-block" : "none" }}
+                    placeholder="Select Version"
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                    options={listVersion.map((n) => ({ value: n.Patch_Version, label: n.Patch_Version }))}
+                    onChange={(value) => setSelectVersion(value)}
+                />
+            </Modal>
         </IssueContext.Provider>
     )
 }

@@ -363,6 +363,11 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.Item>
             </SubMenu> */}
           </Menu>
+          {/* <div style={{ position: "fixed", bottom: 20, left: 60 }}>
+          <label style={{ fontSize: 14, color: "gray" }}>
+            Version {process.env.REACT_APP_ICON_SPACE_VERSION}
+          </label>
+        </div> */}
         </Sider>
 
 
