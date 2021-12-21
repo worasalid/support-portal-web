@@ -635,7 +635,7 @@ export default function Subject() {
       if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
 
       if (userstate?.mailbox[0]?.NodeName === "approver") {
-        if (item.data.value === "ApproveCR" || item.data.value === "NotApproveCR") {
+        if (item.data.value === "ApproveCR" || item.data.value === "NotApproveCR" || item.data.value === "ApproveMemo" || item.data.value === "NotApproveMemo") {
           setModalApprover(true)
         }
       }

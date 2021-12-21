@@ -85,10 +85,16 @@ import FlowDeploy from './Page/Internal/Setting/System/ConfigFlow/FlowDeploy';
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
 
-
+// Customer ServiceDesk
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
 import ServiceDesk from "./Page/Customer/ServiceDesk/Index";
 import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
+
+// Call Center Service
+import CallService from './Page/Internal/ServiceDesk/CallService';
+import Case from './Page/Internal/CallCenter/Case';
+
+
 import AuthenContext, { reducer, initState } from "./utility/authenContext";
 import MasterContext, { masterReducer, masterState } from "./utility/masterContext";
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
@@ -206,6 +212,11 @@ export default function Routes() {
                                     <Route path="/customer/issue/Subject/:id?" exact component={CustomerSubject} />
                                     <Route path="/customer/issue/complete" exact component={CustomerComplete} />
                                     <Route path="/customer/issue/cancel" exact component={CustomerCancel} />
+
+                                    {/* CallCenter Service */}
+                                    <Route path="/servicedesk/voxtron" exact component={CallService} />
+                                    <Route path="/internal/callcenter/case" exact component={Case} />
+
                                 </Switch>
                             </Router>
                         </CustomerContext.Provider>
