@@ -30,6 +30,8 @@ export default function Case() {
                 product_id: casestate.filter.productState,
                 scene: casestate.filter.scene,
                 users: casestate.filter.users,
+                startdate: casestate.filter.date.startdate === "" ? "" : moment(casestate.filter.date.startdate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+                enddate: casestate.filter.date.enddate === "" ? "" : moment(casestate.filter.date.enddate, "DD/MM/YYYY").format("YYYY-MM-DD"),
                 keyword: casestate.filter.keyword,
                 pageCurrent: pageCurrent,
                 pageSize: pageSize

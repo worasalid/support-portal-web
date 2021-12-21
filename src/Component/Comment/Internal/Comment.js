@@ -216,7 +216,7 @@ export default function CommentBox() {
                         }
                         datetime={
                             <>
-                                <Row align="middle" style={{marginTop:-2}}>
+                                <Row align="middle" style={{ marginTop: -2 }}>
                                     <Col span={24}>
                                         <label
                                             //style={{ cursor: "pointer" }}
@@ -235,13 +235,16 @@ export default function CommentBox() {
 
                                         {
                                             item.cntfile === 0 ? "" :
-                                                <Icon icon="teenyicons:attach-outline" width="16" height="16"
-                                                    style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
-                                                    onClick={() => {
-                                                        setCommentid(item.id);
-                                                        setModalfiledownload_visible(true);
-                                                    }}
-                                                />
+                                                <span onClick={() => {
+                                                    setCommentid(item.id);
+                                                    setModalfiledownload_visible(true);
+                                                }}
+                                                >
+                                                    <Icon icon="teenyicons:attach-outline"
+                                                        style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
+                                                    />
+                                                    <label style={{ cursor: "pointer", color: "#1890ff" }}>File Attach</label>
+                                                </span>
                                         }
                                         {
                                             divcollapse.includes(item.key) &&
@@ -268,7 +271,6 @@ export default function CommentBox() {
                         }
                         avatar={
                             <>
-                                &nbsp;&nbsp;
                                 <Avatar
                                     onClick={() => {
                                         let newKeys = [...divcollapse];
@@ -303,7 +305,7 @@ export default function CommentBox() {
                                         : ""
                                 }
 
-                                <Divider style={{ margin: 0, marginBottom: 10 }} />
+                                < Divider style={{ margin: 0, marginBottom: 10 }} />
                                 {/* {
                                     item.cntfile === 0 ? "" :
                                         <div>
@@ -321,7 +323,7 @@ export default function CommentBox() {
                             </>
                         }
                     >
-                    </Comment>
+                    </Comment >
                 )}
             />
 
@@ -410,7 +412,7 @@ export default function CommentBox() {
                 pathUrl={imgUrl}
             />
 
-        </div>
+        </div >
     );
 }
 

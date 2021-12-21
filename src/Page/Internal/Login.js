@@ -1,5 +1,5 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Alert, Spin, Modal } from "antd";
+import { Button, Form, Input, Spin, Modal } from "antd";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory } from "react-router-dom";
@@ -14,7 +14,7 @@ export default function NormalLoginForm() {
 
   const responseGoogle = (response) => {
     if (response.profileObj.email !== undefined && response.profileObj.email !== "" && response.profileObj.email !== null) {
-       //console.log("responseGoogle", response.profileObj);
+      //console.log("responseGoogle", response.profileObj);
       googleLogin(response.profileObj)
     }
   }
@@ -101,7 +101,13 @@ export default function NormalLoginForm() {
   };
 
   return (
-    <div style={{backgroundImage: `url(${process.env.PUBLIC_URL}/icon-background.png)`}}>
+    <div style={{
+      backgroundImage: `url(${process.env.PUBLIC_URL}/icon-background.png)`, backgroundRepeat: "no-repeat", backgroundPosition: "center",
+      backgroundSize: "cover",
+      backgroundAttachment: "fixed",
+      height: "100%",
+
+    }}>
       <Spin spinning={loading}>
         <div
           style={{
@@ -195,12 +201,17 @@ export default function NormalLoginForm() {
               />
             </div>
 
+
           </Form>
-
-
         </div>
-
+        <div style={{ position: "fixed", bottom: 30, right: 30 }}>
+          <label style={{ fontSize: 14, color: "white" }}>
+            Version {process.env.REACT_APP_ICON_SPACE_VERSION}
+          </label>
+        </div>
       </Spin>
+
+
     </div>
   );
 }

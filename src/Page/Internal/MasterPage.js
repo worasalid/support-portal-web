@@ -5,7 +5,7 @@ import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
 import {
   PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined,
-  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined,PhoneOutlined
+  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined, PhoneOutlined
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
@@ -497,7 +497,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               title="Version Patch"
             >
               <Menu.Item key="17"
-                hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
+                hidden={state.usersdata?.organize?.OrganizeCode !== "support" && state.usersdata?.users?.code !== "I0017" ? true : false}
                 onClick={() => history.push('/internal/patch/cut_of_patch')}>
                 Cut Off Patch
               </Menu.Item>
@@ -601,6 +601,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             >
               Migration
             </Menu.Item> */}
+
           </Menu>
         </Sider>
 
