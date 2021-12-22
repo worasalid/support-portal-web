@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { Row, Col, Card, Spin, Table, Select, DatePicker, Modal, Button } from 'antd';
-import { Line } from '@ant-design/charts';
-import { BarChartOutlined } from '@ant-design/icons';
+import { Row, Col, Card, Spin, Table, Select, DatePicker, Modal, Form, Input } from 'antd';
+import { BarChartOutlined, SettingOutlined } from '@ant-design/icons';
 import xlsx from 'xlsx';
 import Axios from "axios";
 import MasterPage from "../../MasterPage";
@@ -12,11 +11,14 @@ const { RangePicker } = DatePicker;
 
 export default function DashBoard_CMMI3() {
     const [loading, setLoading] = useState(false);
+    const [form] = Form.useForm();
 
     const [tableData, setTableData] = useState([]);
     const [company, setCompany] = useState([]);
     const [product, setProduct] = useState([]);
     const [priority, setPriority] = useState([]);
+    const [serviceRate, setServiceRate] = useState(0);
+    const [serviceQuantity, setServiceQuantity] = useState(null);
 
     // filter
     const [selectCompany, setSelectCompany] = useState(null);
@@ -25,7 +27,7 @@ export default function DashBoard_CMMI3() {
     const [selectPriority, setSelectPriority] = useState([]);
     const [selectDate, setSelectDate] = useState([]);
 
-    const [test, setTest] = useState("123")
+    const [modalSetting, setModalSetting] = useState(false);
 
     const getCompany = async () => {
         await Axios.get(process.env.REACT_APP_API_URL + "/master/company", {
@@ -83,11 +85,92 @@ export default function DashBoard_CMMI3() {
             }
         }).then((res) => {
             setLoading(false);
-            setTableData(res.data.tabledata)
+            getSetting();
+            setTableData(res.data.tabledata.map((n, index) => {
+                return {
+                    key: index,
+                    company_name: n.CompanyName,
+                    product: n.Product,
+                    priority: n.Priority,
+                    sla: n.SLA,
+                    service_rate: serviceRate,
+                    service_quantity: serviceQuantity,
+                    issue_cnt: n.IssueCnt,
+                    issue_all_minute: n.IssueAllMinute,
+                    issue_cnt: n.IssueCnt,
+                    issue_not_over: n.IssueNotOver,
+                    issue_not_over_minute: n.IssueNotOver_Minute,
+                    issue_over: n.IssueOver,
+                    issue_over_minute: n.IssueOver_Minute
+                }
+            }))
 
 
         }).catch((error) => {
             setLoading(false);
+        })
+    }
+
+    const getSetting = async () => {
+        await Axios.get(`${process.env.REACT_APP_API_URL}/dashboard/cmmi-setting`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            }
+        }).then((res) => {
+            setServiceRate(res.data.service_rate);
+            setServiceQuantity(res.data.service_quantity);
+
+            form.setFieldsValue({
+                service_rate: res.data.service_rate,
+                service_quantity: res.data.service_quantity
+            })
+        }).catch((error) => {
+
+        });
+    }
+
+    const updateSetting = async (param) => {
+        setLoading(true);
+        await Axios({
+            url: `${process.env.REACT_APP_API_URL}/dashboard/cmmi-setting`,
+            method: "PATCH",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                service_rate: param.service_rate,
+                service_quantity: param.service_quantity
+            }
+        }).then((res) => {
+            setLoading(false);
+            setModalSetting(false);
+            getSetting();
+            Modal.success({
+                title: 'บันทึกข้อมูลสำเร็จ',
+                content: (
+                    <div>
+
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
+
+                },
+            })
+        }).catch((error) => {
+            setLoading(false);
+            setModalSetting(false);
+            Modal.error({
+                title: 'บันทึกข้อมูล ไม่สำเร็จ',
+                content: (
+                    <div>
+                        <p>{error.response.data}</p>
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
+                },
+            });
         })
     }
 
@@ -121,9 +204,15 @@ export default function DashBoard_CMMI3() {
         }
     }
 
+    const onFinish = async (value) => {
+        console.log("onFinish", value)
+        updateSetting(value);
+    }
+
     useEffect(() => {
         getCompany();
         getPriority();
+        getSetting();
 
     }, [])
 
@@ -133,7 +222,7 @@ export default function DashBoard_CMMI3() {
             getData();
             getProduct()
         }
-    }, [selectCompany, selectProduct, selectPriority, selectDate])
+    }, [selectCompany, selectProduct, selectPriority, selectDate, serviceRate, serviceQuantity])
 
     return (
         <MasterPage bgColor="#f0f2f5">
@@ -144,9 +233,10 @@ export default function DashBoard_CMMI3() {
                         title={
                             <>
                                 <Row>
-                                    <Col span={24}>
+                                    <Col span={20}>
                                         <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard สรุปและวิเคราะห์บริการ แยกตาม Product และ Priority
                                     </Col>
+
                                 </Row>
                                 <Row style={{ marginTop: 24 }}>
                                     <Col span={4}>
@@ -208,8 +298,17 @@ export default function DashBoard_CMMI3() {
                         style={{ width: "100%" }} className="card-dashboard"
                         extra={
                             <>
-                                <Row style={{ marginTop: 52 }}>
-                                    <Col span={24}>
+                                <Row>
+                                    <Col span={24} style={{ textAlign: "right" }}>
+                                        <SettingOutlined style={{ fontSize: 18, color: "#5BC726" }} />
+                                        <label className="header-text text-hover"
+                                            onClick={() => { setModalSetting(true); getSetting() }}
+                                        > ตั้งค่าข้อมูล</label>
+
+                                    </Col>
+                                </Row>
+                                <Row style={{ marginTop: 30 }}>
+                                    <Col span={20}>
                                         <RangePicker format="DD/MM/YYYY" style={{ width: "90%" }}
                                             onChange={(date, dateString) => setSelectDate(dateString)}
                                         />
@@ -224,6 +323,7 @@ export default function DashBoard_CMMI3() {
                                             />
                                         </Button> */}
                                     </Col>
+
                                 </Row>
                             </>
                         }
@@ -241,7 +341,7 @@ export default function DashBoard_CMMI3() {
                                         <Row>
                                             <Col span={24} style={{ textAlign: "left" }}>
                                                 <label className="table-column-text12" >
-                                                    {record.CompanyName}
+                                                    {record.company_name}
                                                 </label>
                                             </Col>
                                         </Row>
@@ -251,14 +351,14 @@ export default function DashBoard_CMMI3() {
 
                             <Column title="Product" key="key"
                                 align="center"
-                                width="10%"
+                                width="8%"
                                 fixed="left"
                                 render={(record, row, index) => {
                                     return (
                                         <Row>
                                             <Col span={24} style={{ textAlign: "left" }}>
                                                 <label className="table-column-text12" >
-                                                    {record.Product}
+                                                    {record.product}
                                                 </label>
                                             </Col>
                                         </Row>
@@ -266,14 +366,14 @@ export default function DashBoard_CMMI3() {
                                 }}
                             />
                             <Column title="Priority" key="key"
-                                align="left"
+                                align="center"
                                 width="5%"
                                 render={(record, row, index) => {
                                     return (
                                         <Row>
                                             <Col span={24} style={{ textAlign: "left" }}>
                                                 <label className="table-column-text12" >
-                                                    {record.Priority}
+                                                    {record.priority}
                                                 </label>
                                             </Col>
                                         </Row>
@@ -281,22 +381,82 @@ export default function DashBoard_CMMI3() {
                                 }}
                             />
                             <ColumnGroup title="SLA" width="10%">
-                                <Column title="นาที" align="center" dataIndex="SLA" />
-                                <Column title="ระดับ บริการ" align="center" />
-                            </ColumnGroup>
-                            <ColumnGroup title="ประมาณการ" width="10%">
-                                <Column title="จำนวน" align="center" />
-                                <Column title="นาที" align="center" />
-                            </ColumnGroup>
-                            <ColumnGroup title="เกิดขึ้นจริง" width="10%">
-                                <Column title="จำนวน" align="center" dataIndex="IssueCnt" />
-                                <Column title="นาที" align="center" dataIndex="IssueAllMinute" />
-                                <Column title="เฉลี่ย (นาที)" align="center"
+                                <Column title="นาที" align="center" key="key"
                                     render={(value, record, index) => {
                                         return (
                                             <>
                                                 <label className="table-column-text12">
-                                                    {parseFloat(record.IssueAllMinute / record.IssueCnt).toFixed(2)}
+                                                    {record.sla}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="ระดับ บริการ" align="center" key="key"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {record.service_rate}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                            </ColumnGroup>
+                            <ColumnGroup title="ประมาณการ" width="10%" key="key">
+                                <Column title="จำนวน" key="key" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {record.service_quantity}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="นาที" key="key" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {record.sla * record.service_quantity}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                            </ColumnGroup>
+                            <ColumnGroup title="เกิดขึ้นจริง" key="key" width="10%">
+                                <Column title="จำนวน" key="key" align="center" dataIndex="issue_cnt"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {record.issue_cnt}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="นาที" key="key" align="center" dataIndex="issue_all_minute"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {record.issue_all_minute}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="เฉลี่ย (นาที)" key="key" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {parseFloat(record.issue_all_minute / record.issue_cnt).toFixed(2)}
                                                 </label>
                                             </>
                                         )
@@ -304,21 +464,71 @@ export default function DashBoard_CMMI3() {
                                 />
                             </ColumnGroup>
                             <ColumnGroup title="ผลต่าง" width="10%">
-                                <Column title="จำนวน" align="center" />
-                                <Column title="นาที" align="center" />
-                                <Column title="% (นาที)" align="center" />
+                                <Column title="จำนวน" key="key" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {record.issue_cnt - record.service_quantity}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="นาที" key="key" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {record.issue_all_minute - (record.sla * record.service_quantity)}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
+                                <Column title="% (นาที)" key="key" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {parseFloat(((record.issue_all_minute - (record.sla * record.service_quantity)) * 100) / (record.sla * record.service_quantity)).toFixed(2)}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                />
                             </ColumnGroup>
 
                             <ColumnGroup title="เปรียบเทียบกับSLA" width="20%">
                                 <ColumnGroup title="ภายใน SLA" >
-                                    <Column title="จำนวน" align="center" dataIndex="IssueNotOver" />
-                                    <Column title="นาที" align="center" dataIndex="IssueNotOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" align="center"
+                                    <Column title="จำนวน" align="center" key="key" dataIndex="issue_not_over"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
                                                     <label className="table-column-text12">
-                                                        {parseFloat(record.IssueNotOver_Minute / record.IssueNotOver).toFixed(2)}
+                                                        {record.issue_not_over}
+                                                    </label>
+                                                </>
+                                            )
+                                        }}
+                                    />
+                                    <Column title="นาที" align="center" key="key"
+                                        render={(value, record, index) => {
+                                            return (
+                                                <>
+                                                    <label className="table-column-text12">
+                                                        {record.issue_not_over_minute}
+                                                    </label>
+                                                </>
+                                            )
+                                        }}
+                                    />
+                                    <Column title="เฉลี่ย (นาที)" key="key" align="center"
+                                        render={(value, record, index) => {
+                                            return (
+                                                <>
+                                                    <label className="table-column-text12">
+                                                        {parseFloat(record.issue_not_over_minute / record.issue_not_over).toFixed(2)}
                                                     </label>
                                                 </>
                                             )
@@ -326,19 +536,52 @@ export default function DashBoard_CMMI3() {
                                     />
                                 </ColumnGroup>
                                 <ColumnGroup title="เกิน SLA">
-                                    <Column title="จำนวน" align="center" dataIndex="IssueOver" />
-                                    <Column title="นาที" align="center" dataIndex="IssueOver_Minute" />
-                                    <Column title="เฉลี่ย (นาที)" align="center"
+                                    <Column title="จำนวน" align="center" key="key" dataIndex="issue_over"
                                         render={(value, record, index) => {
                                             return (
                                                 <>
                                                     <label className="table-column-text12">
-                                                        {record.IssueOver_Minute === 0 ? 0 : parseFloat(record.IssueOver_Minute / record.IssueOver).toFixed(2)}
+                                                        {record.issue_over}
                                                     </label>
                                                 </>
                                             )
                                         }}
                                     />
+                                    <Column title="นาที" align="center" key="key" dataIndex="issue_over_minute"
+                                        render={(value, record, index) => {
+                                            return (
+                                                <>
+                                                    <label className="table-column-text12">
+                                                        {record.issue_over_minute}
+                                                    </label>
+                                                </>
+                                            )
+                                        }}
+                                    />
+                                    <Column title="เฉลี่ย (นาที)" align="center" key="key"
+                                        render={(value, record, index) => {
+                                            return (
+                                                <>
+                                                    <label className="table-column-text12">
+                                                        {record.issue_over_minute === 0 ? 0 : parseFloat(record.issue_over_minute / record.issue_over).toFixed(2)}
+                                                    </label>
+                                                </>
+                                            )
+                                        }}
+                                    />
+                                </ColumnGroup>
+                                <ColumnGroup title="ระดับบริการ %" align="center"
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <label className="table-column-text12">
+                                                    {parseFloat((record.issue_not_over * 100) / record.issue_cnt).toFixed(2)}
+                                                </label>
+                                            </>
+                                        )
+                                    }}
+                                >
+
                                 </ColumnGroup>
                             </ColumnGroup>
 
@@ -348,6 +591,37 @@ export default function DashBoard_CMMI3() {
                 </Col>
             </Row>
 
+            <Modal
+                title="ตั้งค่าข้อมูล"
+                visible={modalSetting}
+                confirmLoading={loading}
+                width={600}
+                okText="Save"
+                onOk={() => form.submit()}
+                onCancel={() => { setModalSetting(false); form.resetFields() }}
+            >
+                <Form
+                    name="setting"
+                    form={form}
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    onFinish={onFinish}
+                >
+                    <Form.Item
+                        label="ระดับบริการ %"
+                        name="service_rate"
+                    >
+                        <Input style={{ textAlign: "right" }} />
+                    </Form.Item>
+                    <Form.Item
+                        label="จำนวนครั้ง (ประมาณการ)"
+                        name="service_quantity"
+                    >
+                        <Input style={{ textAlign: "right" }} />
+                    </Form.Item>
+
+                </Form>
+            </Modal>
         </MasterPage>
     )
 }
