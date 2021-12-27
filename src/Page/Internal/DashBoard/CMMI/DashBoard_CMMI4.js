@@ -151,7 +151,7 @@ export default function DashBoard_CMMI4() {
                             <>
                                 <Row>
                                     <Col span={24}>
-                                        <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard สรุปและวิเคราะห์บริการ แยกตาม Product และ Priority
+                                        <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard สรุปสถิติการให้บริการ แยกตาม Product และ Priority
                                     </Col>
                                 </Row>
                                 <Row style={{ marginTop: 24 }}>
@@ -283,7 +283,7 @@ export default function DashBoard_CMMI4() {
 
                             <Column title="Product" key="key"
                                 align="center"
-                                width="20%"
+                                width="10%"
                                 fixed="left"
                                 render={(record, row, index) => {
                                     return (
