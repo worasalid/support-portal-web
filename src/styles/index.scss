@@ -157,6 +157,12 @@ div.sticky-background {
 
 
 //////////////////////////////////////////// Class ////////////////////////////////////////////
+.icon-link-hover:hover{
+    text-decoration: underline;
+    text-decoration-color: #1890ff;
+    color: red;
+    cursor: pointer;
+}
 
 .issue-description {
     font-size: 12px !important;
