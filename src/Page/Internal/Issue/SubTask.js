@@ -1,4 +1,4 @@
-import { Col, Row, Select, Typography, Button, Avatar, Tabs, Modal, Timeline, Skeleton, Checkbox, message, Spin } from "antd";
+import { Col, Row, Select, Typography, Button, Avatar, Tabs, Modal, Timeline, Skeleton, Checkbox, message, Spin, Divider, Tooltip } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -34,6 +34,8 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 import ModalRequestInfoQA from "../../../Component/Dialog/Internal/Issue/modalRequestInfoQA";
 import TrackingTimeDevelop from "../../../Component/Dialog/Internal/Issue/modalTimeDevelop";
 import { CalculateTime } from "../../../utility/calculateTime";
+import ModalChangeDueDateDev from "../../../Component/Dialog/Internal/Issue/modalChangeDueDateDev";
+import DuedateLog from "../../../Component/Dialog/Internal/Issue/modalTaskDueDateLog";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -72,6 +74,8 @@ export default function SubTask() {
   const [modalDevSendVersion, setModalDevSendVersion] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
   const [modalTimeDevelop, setModalTimeDevelop] = useState(false);
+  const [modalChangeDueDateDev, setModalChangeDueDateDev] = useState(false);
+  const [modalTaskDueDate, setModalTaskDueDate] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -514,7 +518,6 @@ export default function SubTask() {
       }
     }).then((res) => {
       setDuration(_.sum(res.data.map((n) => calculateTime.getMiniteDuration(n.start_date, n.end_date))))
-      console.log("resaaa", _.sum(res.data.map((n) => calculateTime.getMiniteDuration(n.start_date, n.end_date))))
     }).catch((error) => {
 
     })
@@ -719,8 +722,7 @@ export default function SubTask() {
 
                 <Row style={{
                   marginBottom: 20,
-                  display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" &&
-                    userstate.taskdata.data[0]?.DueDate !== null ? "inline-block" : "none"
+                  display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" ? "inline-block" : "none"
                 }}
                 >
                   <Col span={24} >
@@ -738,11 +740,46 @@ export default function SubTask() {
                 </Row>
 
                 <Row style={{ marginBottom: 20 }}>
+                  <Col span={24}>
+                    <label className="header-text">DueDate</label>
+
+                    &nbsp;   &nbsp;
+                    {
+                      userstate?.mailbox[0]?.NodeName === "developer_2" || userstate?.mailbox[0]?.NodeName === "developer_1" ?
+                        <label className="value-text text-link" onClick={() => setModalChangeDueDateDev(true)}>
+
+                          {
+                            userstate.taskdata.data[0]?.DueDate === null ? "None" : userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")
+                          }
+                        </label>
+                        :
+                        <label className="value-text">
+
+                          {
+                            userstate.taskdata.data[0]?.DueDate === null ? "None" : userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")
+                          }
+                        </label>
+                    }
+                    <span hidden={userstate.taskdata.data[0]?.cntDueDate === 0 ? true : false}>
+                      <Divider type="vertical" />
+                      <Tooltip title="ประวัติการเลื่อน Due">
+                        <ClockCircleOutlined className="icon-hover" style={{ fontSize: 18, color: "#1890ff" }}
+                          onClick={() => setModalTaskDueDate(true)}
+                        />
+                      </Tooltip>
+                    </span>
+                  </Col>
+                </Row>
+
+
+                <Row style={{ marginBottom: 20 }}
+                  hidden={userstate?.mailbox[0]?.NodeName !== "developer_1" && userstate?.mailbox[0]?.NodeName !== "developer_2" ? true : false}
+                >
                   <Col span={24} >
                     <label className="header-text">Develop Time</label>
                     {
                       duration !== 0 ?
-                        <span style={{
+                        <label className="value-text" style={{
                           marginLeft: 12,
                           textAlign: "right", marginRight: 16, color: "orange", cursor: "pointer"
                         }}
@@ -757,37 +794,12 @@ export default function SubTask() {
                               `${moment.duration(duration, 'minute')._data.minutes} นาที ` : ""
                           }
                           <Icon icon="carbon:time" width="18" height="18" />
-                        </span> : <label style={{ marginLeft: 12 }} className="text-link" onClick={() => setModalTimeDevelop(true)}>None</label>
+                        </label> : <label style={{ marginLeft: 12 }} className="text-link" onClick={() => setModalTimeDevelop(true)}>None</label>
                     }
                   </Col>
                 </Row>
 
-                <Row style={{ marginBottom: 20, display: userstate.taskdata.data[0]?.DueDate === null ? "none" : "block" }}>
-                  <Col span={24}>
-                    <label className="header-text">DueDate</label>
-                    <br />
-
-
-                    {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
-                    {/* {
-                    userstate?.mailbox[0]?.NodeName === "cr_center"
-                      ? <Button type="link"
-                        onClick={() => setModalduedate_visible(true)}
-                      >
-                        {userstate.taskdata.data[0] &&
-                          (userstate.taskdata.data[0].DueDate === null ? "None" : moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm"))}
-                      </Button>
-                      : <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
-                  }
-
-                  <Button type="link"
-                    icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
-                    onClick={() => { setHistoryduedate_visible(true) }}
-                  /> */}
-                    <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
-                  </Col>
-                </Row>
-
+               
                 <Row style={{ marginBottom: 20 }}>
                   <Col span={18}>
                     <label className="header-text">Company</label>
@@ -1241,7 +1253,27 @@ export default function SubTask() {
           }}
         />
 
-      </Spin>
+        <ModalChangeDueDateDev
+          visible={modalChangeDueDateDev}
+          onCancel={() => setModalChangeDueDateDev(false)}
+          onOk={() => setModalChangeDueDateDev(false)}
+          details={{
+            task_id: userstate?.taskdata?.data[0]?.TaskId,
+            duedate: userstate?.taskdata?.data[0]?.DueDate
+          }}
+        />
+
+        <DuedateLog
+          visible={modalTaskDueDate}
+          onCancel={() => setModalTaskDueDate(false)}
+          onOk={() => setModalTaskDueDate(false)}
+          details={{
+            ticketId: userstate?.taskdata?.data[0]?.TicketId,
+            taskId: userstate?.taskdata?.data[0]?.TaskId,
+          }}
+        />
+
+      </Spin >
     </MasterPage >
   );
 }
