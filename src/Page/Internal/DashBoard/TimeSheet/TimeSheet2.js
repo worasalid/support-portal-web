@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MasterPage from '../../MasterPage'
-import { Row, Col, Card, Space, Table, Select, DatePicker, Radio, Button, Tooltip } from 'antd';
+import { Row, Col, Card, Space, Table, Select, Input, Radio, Button, Tooltip } from 'antd';
 import { BarChartOutlined, SettingOutlined } from '@ant-design/icons';
 import moment from "moment";
 import axios from "axios";
@@ -15,12 +15,18 @@ export default function TimeSheet2() {
     const [product, setProduct] = useState([]);
     const [issueType, setIssueType] = useState([]);
     const [tableData, setTableData] = useState([]);
+    const [filterTableData, setFilterTableData] = useState(null);
 
     const [selectCompany, setSelectCompany] = useState(null);
     const [selectProduct, setSelectProduct] = useState(null);
     const [selectType, setSelectType] = useState(null);
     const [selectOwner, setSelectOwner] = useState([]);
+    const [mandayType, setMandayType] = useState(1)
     const [keyword, setKeyWord] = useState();
+
+    const convertTime = (time) => {
+        return `${moment.duration(time, 'minute')._data.hours}.${moment.duration(time, 'minute')._data.minutes}`
+    }
 
     const getCompany = async () => {
         await axios.get(process.env.REACT_APP_API_URL + "/master/company", {
@@ -59,6 +65,22 @@ export default function TimeSheet2() {
         })
     }
 
+    const getDeveloper = async () => {
+        await axios.get(process.env.REACT_APP_API_URL + "/master/organize/user", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                organize_id: 2
+            }
+        }).then((res) => {
+            setOwner(res.data);
+
+        }).catch((error) => {
+
+        })
+    }
+
     const getData = async () => {
         setLoading(true);
         await axios.get(`${process.env.REACT_APP_API_URL}/dashboard/timesheet/timesheet2`, {
@@ -84,8 +106,7 @@ export default function TimeSheet2() {
                     issue_type: n.IssueType,
                     owner: n.OwnerName,
                     ticket: n.Number,
-                    total: n.TotalTime
-
+                    total: mandayType === 1 ? n.TotalTime : convertTime(n.TotalTime)
                 }
             }));
             setLoading(false);
@@ -94,12 +115,29 @@ export default function TimeSheet2() {
         })
     }
 
+    const searchTicket = (param) => {
+        let result = tableData.filter(o =>
+            Object.keys(o).some(k =>
+                String(o[k])
+                    .toLowerCase()
+                    .includes(param.toLowerCase())
+            )
+        );
+        setFilterTableData(result);
+    }
 
     const exportExcel = (json) => {
         if (json !== undefined) {
             let ws = xlsx.utils.json_to_sheet(json.map((n, index) => {
                 return {
                     No: index + 1,
+                    "บริษัท": n.company,
+                    Product: n.product,
+                    "ประเภท": n.issue_type,
+                    "เลข Ticket": n.ticket,
+                    Owner: n.owner,
+                    "จำนวน": n.total
+
                 }
             }));
 
@@ -113,11 +151,12 @@ export default function TimeSheet2() {
         getCompany();
         getProduct();
         getIssueType();
+        getDeveloper();
     }, [])
 
     useEffect(() => {
         getData();
-    }, [selectCompany, selectType, selectProduct, selectOwner])
+    }, [selectCompany, selectType, selectProduct, selectOwner, mandayType, keyword])
 
 
     return (
@@ -135,9 +174,6 @@ export default function TimeSheet2() {
 
                                 </Row>
                                 <Row style={{ marginTop: 24 }}>
-                                    <Col span={2}>
-                                        {/* <DatePicker defaultValue={moment()} picker="year" onChange={(date, dateString) => setSelectYear(dateString)} /> */}
-                                    </Col>
                                     <Col span={4}>
                                         <Select
                                             placeholder="Select Company"
@@ -188,7 +224,7 @@ export default function TimeSheet2() {
                                         </Select>
                                     </Col>
 
-                                    <Col span={6}>
+                                    <Col span={4}>
                                         <Select
                                             placeholder="Owner"
                                             mode='multiple'
@@ -206,6 +242,20 @@ export default function TimeSheet2() {
                                     </Col>
 
                                     <Col span={4}>
+                                        <Input.Search placeholder="เลข Ticket" allowClear
+                                            style={{ width: "90%" }}
+                                            enterButton
+                                            onSearch={searchTicket}
+                                        />
+                                    </Col>
+
+                                    <Col span={4}>
+                                        <Radio.Group value={mandayType} onChange={(e) => setMandayType(e.target.value)}>
+                                            <Space direction="vertical">
+                                                <Radio value={1}>นาที</Radio>
+                                                <Radio value={2}>ชม. </Radio>
+                                            </Space>
+                                        </Radio.Group>
                                         <Button type="link"
                                             onClick={() => exportExcel(tableData && tableData)}
                                             title="Excel Export"
@@ -232,17 +282,7 @@ export default function TimeSheet2() {
                             </>
                         }
                     >
-                        <Table dataSource={tableData} loading={loading} bordered className="text-size">
-                            <Column title="Ticket" key="key"
-                                render={(value, record, index) => {
-                                    return (
-                                        <>
-                                            <label className="table-column-text12">{record.ticket}</label>
-                                        </>
-                                    )
-                                }}
-                            />
-
+                        <Table dataSource={filterTableData === null ? tableData : filterTableData} loading={loading} bordered className="text-size">
                             <Column title="Code" key="key"
                                 render={(value, record, index) => {
                                     return (
@@ -251,6 +291,16 @@ export default function TimeSheet2() {
                                                 <label className="table-column-text12">{record.code}</label>
                                             </Tooltip>
 
+                                        </>
+                                    )
+                                }}
+                            />
+
+                            <Column title="Ticket" key="key"
+                                render={(value, record, index) => {
+                                    return (
+                                        <>
+                                            <label className="table-column-text12">{record.ticket}</label>
                                         </>
                                     )
                                 }}
@@ -283,7 +333,7 @@ export default function TimeSheet2() {
                                     )
                                 }}
                             />
-                             <Column title="Total" key="key"
+                            <Column title="Total" key="key"
                                 render={(value, record, index) => {
                                     return (
                                         <>
