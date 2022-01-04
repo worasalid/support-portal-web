@@ -65,6 +65,18 @@ export default function AllDashBoard() {
                 dashboard_name: "DashBoard CMMI4",
                 description: "รายงานสถิติการให้บริการ แยกตาม Product และ Priority",
                 url: "/internal/dashboard/cmmi/dashboard_cmmi4"
+            },
+            {
+                no: "10",
+                dashboard_name: "DashBoard TimeSheet1",
+                description: "รายงานสรุปจำนวนวัน ที่ใช้แก้ไข และ พัฒนา ของทีม Developer",
+                url: "/internal/dashboard/timesheet/1"
+            },
+            {
+                no: "11",
+                dashboard_name: "DashBoard TimeSheet2",
+                description: "รายงานสรุป รายละเอียด เวลาที่ใช้พัฒนา ของทีม Developer",
+                url: "/internal/dashboard/timesheet/2"
             }
         ]
 

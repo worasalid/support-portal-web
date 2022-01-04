@@ -1204,6 +1204,13 @@ export default function Subject() {
                         {userstate.issuedata.details[0] &&
                           (userstate.issuedata.details[0].DueDate === null ? "None" : moment(userstate.issuedata.details[0].DueDate).format("DD/MM/YYYY HH:mm"))}
                       </label>
+
+                      <Tag hidden={userstate?.issuedata.details[0]?.cntDueDate >= 1 ? false : true}
+                        style={{ marginLeft: 12, cursor: "pointer" }}
+                        color="warning" onClick={() => setHistoryduedate_visible(true)}>
+                        DueDate ถูกเลื่อน
+                      </Tag>
+
                     </div>
                     <div
                       style={{
@@ -1214,14 +1221,11 @@ export default function Subject() {
                       <label className="value-text">
                         None
                       </label>
+
                     </div>
 
-                    {/* &nbsp; &nbsp; */}
-                    {userstate?.issuedata.details[0]?.cntDueDate >= 1 ?
-                      <Tag color="warning" onClick={() => setHistoryduedate_visible(true)}>
-                        DueDate ถูกเลื่อน
-                      </Tag> : ""
-                    }
+
+
                   </Col>
                 </Row>
 

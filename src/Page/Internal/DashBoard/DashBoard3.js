@@ -145,7 +145,10 @@ export default function Dashboard3() {
                     AssignDate: x.AssignIconDate,
                     DueDate: x.DueDate,
                     OverDueAll: x.OverDueAll,
-                    OverDue: x.OverDue
+                    OverDue: x.OverDue,
+                    "DueDate (Dev)": x.DueDate_Dev,
+                    "DueDate (Dev) ครั้งที่ 2": x.DueDate_Dev2,
+                    "DueDate (Dev) ครั้งที่ 3": x.DueDate_Dev3
 
                 }
             }));

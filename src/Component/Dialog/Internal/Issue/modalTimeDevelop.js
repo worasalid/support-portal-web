@@ -44,7 +44,7 @@ export default forwardRef(function TrackingTimeDevelop({ visible = false, onOk, 
                 task_id: details.taskId
             }
         }).then((res) => {
-            setTimeDevelop(res.data.map((n, index) => {
+            setTimeDevelop(_.sortBy(res.data, ['start_date', 'start_time']).map((n, index) => {
                 return {
                     item_id: n.item_id,
                     start_date: n.start_date,
@@ -137,11 +137,11 @@ export default forwardRef(function TrackingTimeDevelop({ visible = false, onOk, 
                 okButtonProps={{ hidden: true }}
                 okType="dashed"
                 cancelText="Close"
-                onCancel={() => { 
-                    onCancel(); 
+                onCancel={() => {
+                    onCancel();
                     setSelectDate(null);
                     form.resetFields();
-                 }}
+                }}
                 {...props}
             >
 
