@@ -1362,7 +1362,7 @@ export default function Subject() {
                   </Col>
                 </Row>
 
-                <Row style={{
+                {/* <Row style={{
                   marginBottom: 20,
                   display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
                     userstate.issuedata.details[0]?.IsAssessment !== 0 ? "block" : "none"
@@ -1371,7 +1371,7 @@ export default function Subject() {
                     <label className="header-text">ผลประเมินผลของ SA</label>
                     <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} />
                   </Col>
-                </Row>
+                </Row> */}
 
                 <Row style={{
                   marginBottom: 20,

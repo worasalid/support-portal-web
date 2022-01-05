@@ -485,7 +485,8 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.ItemGroup>
             </SubMenu>
 
-            <Menu.Item key="callcenter" icon={<PhoneOutlined />} onClick={() => history.push('/internal/callcenter/case')}>
+            <Menu.Item key="callcenter" hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
+              icon={<PhoneOutlined />} onClick={() => history.push('/internal/callcenter/case')}>
               Call Center
             </Menu.Item>
 

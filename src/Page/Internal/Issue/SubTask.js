@@ -7,7 +7,7 @@ import TaskComment from "../../../Component/Comment/Internal/TaskComment";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import InternalHistorylog from "../../../Component/History/Internal/Historylog";
 import MasterPage from "../MasterPage";
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, UserOutlined, LeftCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, ClockCircleOutlined, UserOutlined, LeftCircleOutlined } from "@ant-design/icons";
 import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
@@ -17,7 +17,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalLeaderQC from "../../../Component/Dialog/Internal/modalLeaderQC";
 import ModalLeaderAssign from "../../../Component/Dialog/Internal/modalLeaderAssign";
-import ClockSLA from "../../../utility/SLATime";
+// import ClockSLA from "../../../utility/SLATime";
 import { Icon } from '@iconify/react';
 import moment from "moment";
 import ModalqaAssign from "../../../Component/Dialog/Internal/modalqaAssign";
@@ -36,6 +36,8 @@ import TrackingTimeDevelop from "../../../Component/Dialog/Internal/Issue/modalT
 import { CalculateTime } from "../../../utility/calculateTime";
 import ModalChangeDueDateDev from "../../../Component/Dialog/Internal/Issue/modalChangeDueDateDev";
 import DuedateLog from "../../../Component/Dialog/Internal/Issue/modalTaskDueDateLog";
+import ModalSA from "../../../Component/Dialog/Internal/modalSA";
+import ModalSA_Assessment from "../../../Component/Dialog/Internal/modalSA_Assessment";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -76,6 +78,8 @@ export default function SubTask() {
   const [modalTimeDevelop, setModalTimeDevelop] = useState(false);
   const [modalChangeDueDateDev, setModalChangeDueDateDev] = useState(false);
   const [modalTaskDueDate, setModalTaskDueDate] = useState(false);
+  const [modalSA, setModalSA] = useState(false);
+  const [modalAssessment, setModalAssessment] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -140,6 +144,7 @@ export default function SubTask() {
         // เงื่อนไข flow ของ อื่นๆ ของทีมอื่น ที่ไม่ใช่ QA
         if (userstate?.mailbox[0]?.NodeName !== "qa" || userstate?.mailbox[0]?.NodeName !== "qa_leader") {
           userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
+          console.log("SA")
         }
 
         // เงื่อนไข flow ของ QA
@@ -187,7 +192,7 @@ export default function SubTask() {
           if (userstate?.mailbox[0]?.NodeName === "cr_center" && userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress") {
             userdispatch({
               type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "RequestManday")
+              payload: flow_output.data.filter((x) => x.Type === "Task")
             })
           }
 
@@ -349,8 +354,12 @@ export default function SubTask() {
         }
       }
       if (item.data.NodeName === "cr_center") {
-        if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate") { setModalsendtask_visible(true) }
-        if (item.data.value === "CheckManday" || item.data.value === "RejectManday") { setModalmanday_visible(true) }
+        if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate" || item.data.value === "SendToSA") {
+          setModalsendtask_visible(true);
+        }
+        if (item.data.value === "RejectManday" || item.data.value === "RejectMandaySA") {
+          setModalsendtask_visible(true)
+        }
         if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
         if (item.data.value === "RejectTask") { setModalsendtask_visible(true) }
       }
@@ -389,6 +398,14 @@ export default function SubTask() {
           setModalsendtask_visible(true)
         }
 
+      }
+      if (item.data.NodeName === "sa") {
+        if (item.data.value === "SendManday") {
+          setModalSA(true)
+        }
+        if (item.data.value === "RejectToCR") {
+          setModalsendtask_visible(true)
+        }
       }
     }
 
@@ -799,7 +816,7 @@ export default function SubTask() {
                   </Col>
                 </Row>
 
-               
+
                 <Row style={{ marginBottom: 20 }}>
                   <Col span={18}>
                     <label className="header-text">Company</label>
@@ -861,7 +878,16 @@ export default function SubTask() {
                     <label className="header-text">Manday</label>
                     <label style={{ marginLeft: 10 }} className="value-text">{userstate.taskdata.data[0]?.Manday}</label>
                   </Col>
+                </Row>
 
+                <Row
+                  hidden={userstate.taskdata.data[0]?.IsAssessment === 0 ? true : false}
+                  style={{ marginBottom: 20 }}
+                >
+                  <Col span={18}>
+                    <label className="header-text">ผลประเมินผลของ SA</label>
+                    <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment(true)} />
+                  </Col>
                 </Row>
 
                 <Row style={{ marginBottom: 20, }}>
@@ -1270,6 +1296,34 @@ export default function SubTask() {
           details={{
             ticketId: userstate?.taskdata?.data[0]?.TicketId,
             taskId: userstate?.taskdata?.data[0]?.TaskId,
+          }}
+        />
+
+        <ModalSA
+          title={ProgressStatus}
+          visible={modalSA}
+          width={800}
+          onCancel={() => setModalSA(false)}
+          onOk={() => {
+            setModalSA(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            product_code: userstate?.taskdata?.data[0]?.ProductName
+          }}
+        />
+
+        <ModalSA_Assessment
+          title="ข้อมูลประเมิน ผลกระทบ"
+          visible={modalAssessment}
+          width={600}
+          onCancel={() => setModalAssessment(false)}
+          details={{
+            ticketid: userstate?.taskdata?.data[0]?.TicketId,
+            taskid: userstate?.taskdata?.data[0]?.TaskId,
           }}
         />
 

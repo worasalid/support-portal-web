@@ -16,7 +16,9 @@ export default function ModalSA_Assessment({ visible = false, onOk, onCancel, de
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
-                ticketid: details.ticketid
+                ticketId: details.ticketid,
+                taskId: details.taskid
+
             }
         });
 
@@ -47,7 +49,7 @@ export default function ModalSA_Assessment({ visible = false, onOk, onCancel, de
                     <label className="value-text"> {assessment?.UserName} </label>
                 </Col>
             </Row>
-            <Row style={{marginTop: 12}}>
+            <Row style={{ marginTop: 12 }}>
                 <Col span={6}>
                     <label className="header-text">วันที่ประเมิน</label>
                 </Col>
@@ -55,7 +57,7 @@ export default function ModalSA_Assessment({ visible = false, onOk, onCancel, de
                     <label className="value-text">{moment(assessment?.CreateDate).format("DD/MM/YYYY HH:mm")}</label>
                 </Col>
             </Row>
-            <Row style={{marginTop: 12}}>
+            <Row style={{ marginTop: 12 }}>
                 <Col span={6}>
                     <label className="header-text">STD Version</label>
                 </Col>
@@ -63,7 +65,7 @@ export default function ModalSA_Assessment({ visible = false, onOk, onCancel, de
                     <label className="value-text">{assessment?.STD === true ? "อยู่ใน Version " + assessment?.Version : "ไม่อยู่ใน STD Version"}</label>
                 </Col>
             </Row>
-            <Row style={{marginTop: 12}}>
+            <Row style={{ marginTop: 12 }}>
                 <Col span={6}>
                     <label className="header-text">ผลกระทบ</label>
                 </Col>
