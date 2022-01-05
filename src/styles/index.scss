@@ -157,6 +157,12 @@ div.sticky-background {
 
 
 //////////////////////////////////////////// Class ////////////////////////////////////////////
+.icon-link-hover:hover{
+    text-decoration: underline;
+    text-decoration-color: #1890ff;
+    color: red;
+    cursor: pointer;
+}
 
 .issue-description {
     font-size: 12px !important;
@@ -221,6 +227,7 @@ div.sticky-background {
 .table-unread {
     font-weight: bold;
 }
+
 
 .sla-warning {
     color: #fa8c16;
@@ -290,3 +297,19 @@ div.sticky-background {
 .ant-input-number:hover{
     padding-right: 20px;
 }
+
+.header-custom .ant-table-thead > tr > th{
+    background-color: #CF1010;
+    color: white;
+  }
+
+// .text-size .ant-table-tbody > tr > td {
+//     font-size: 12px;
+//     padding: 2px, 2px;
+// }
+
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td {
+    font-size: 12px;
+    padding: 0px, 10px;
+}
+

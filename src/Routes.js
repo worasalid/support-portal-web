@@ -29,6 +29,8 @@ import DashBoard_CMMI1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI1';
 import DashBoard_CMMI2 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI2';
 import DashBoard_CMMI3 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI3';
 import DashBoard_CMMI4 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI4';
+import TimeSheet1 from './Page/Internal/DashBoard/TimeSheet/TimeSheet1';
+import TimeSheet2 from './Page/Internal/DashBoard/TimeSheet/TimeSheet2';
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -168,6 +170,9 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi3" exact component={DashBoard_CMMI3} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi4" exact component={DashBoard_CMMI4} />
 
+                                    <Route path="/internal/dashboard/timesheet/1" exact component={TimeSheet1} />
+                                    <Route path="/internal/dashboard/timesheet/2" exact component={TimeSheet2} />
+                                    
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
