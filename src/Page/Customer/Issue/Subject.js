@@ -921,7 +921,7 @@ export default function Subject() {
             <PreviewImg
               title="Preview"
               visible={modalPreview}
-              width={1400}
+              width={1200}
               footer={null}
               onCancel={() => {
                 setModalPreview(false);

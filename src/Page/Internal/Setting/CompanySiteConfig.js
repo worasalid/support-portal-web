@@ -220,7 +220,6 @@ export default function CompanySiteConfig() {
     }
 
     const getProductConfig = async (param) => {
-        console.log("getProductConfig", param)
         try {
             const productConfig = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/setting/support/site/product-config",
@@ -244,7 +243,6 @@ export default function CompanySiteConfig() {
     }
 
     const updateConfig = async (param) => {
-        console.log("updateConfig", param)
         try {
             const result = await Axios({
                 url: process.env.REACT_APP_API_URL + "/master/setting/support/site/product-config",

@@ -164,6 +164,14 @@ div.sticky-background {
     cursor: pointer;
 }
 
+.icon-link-delete:hover{
+    text-decoration: underline;
+    text-decoration-color: #1890ff;
+    color: red;
+    cursor: pointer;
+}
+
+
 .issue-description {
     font-size: 12px !important;
     img {

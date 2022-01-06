@@ -144,7 +144,6 @@ export default function SubTask() {
         // เงื่อนไข flow ของ อื่นๆ ของทีมอื่น ที่ไม่ใช่ QA
         if (userstate?.mailbox[0]?.NodeName !== "qa" || userstate?.mailbox[0]?.NodeName !== "qa_leader") {
           userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
-          console.log("SA")
         }
 
         // เงื่อนไข flow ของ QA
@@ -378,7 +377,9 @@ export default function SubTask() {
       }
       if (item.data.NodeName === "developer_1") {
         if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-        if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
+        if (item.data.value === "RejectToDevLeader" || item.data.value === "SendInfoToSA") {
+          setModalsendtask_visible(true);
+        }
       }
       if (item.data.NodeName === "qa_leader") {
         if (item.data.value === "QAassign") {
@@ -405,6 +406,9 @@ export default function SubTask() {
         }
         if (item.data.value === "RejectToCR") {
           setModalsendtask_visible(true)
+        }
+        if (item.data.value === "RequestInfoDev") {
+          setModalRequestInfoDev(true)
         }
       }
     }
