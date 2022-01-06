@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom';
-import { Button, Table, Modal, Row, Col, Card } from 'antd';
+import { Button, Table, Modal, Row, Col, message } from 'antd';
 import MasterPage from '../../../MasterPage';
-import { LeftCircleOutlined, CheckOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons';
+import { LeftCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Icon } from '@iconify/react';
 import axios from 'axios';
+import _ from "lodash";
 
 const { Column } = Table;
 
 export default function FlowApprove() {
     const history = useHistory(null);
     const [approver, setApprover] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const [users, setUser] = useState([]);
     const [selectUsers, setSelectUser] = useState([]);
@@ -49,19 +52,83 @@ export default function FlowApprove() {
                 organize: "manage",
             }
         }).then((res) => {
-            setUser(res.data.map((n, index) => {
+            setUser(res.data.filter((n) => !approver.find((x) => x.user_id === n.UserId)).map((n, index) => {
                 return {
-                    key: index,
+                    key: n.UserId,
                     no: index + 1,
                     user_id: n.UserId,
                     user_name: n.UserName
-
                 }
             }));
-
         }).catch((error) => {
             console.log(error.response.data)
         })
+    }
+
+    const addApprover = async () => {
+        setLoading(true);
+        await axios({
+            url: `${process.env.REACT_APP_API_URL}/config/flow/approve`,
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                user: selectedRowKeys
+            }
+        }).then((res) => {
+            setLoading(false);
+            setAddModal(false);
+            setSelectedRowKeys([]);
+            
+            message.success({
+                content: 'เพิ่มข้อมูลสำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
+            getApprover();
+        }).catch((error) => {
+            setLoading(false);
+            message.error({
+                content: 'เพิ่มข้อมูล ไม่สำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
+        });
+    }
+
+    const deleteApprover = async (config_id) => {
+        setLoading(true);
+        await axios({
+            url: `${process.env.REACT_APP_API_URL}/config/flow/approve`,
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                configId: config_id
+            }
+        }).then((res) => {
+            setLoading(false);
+
+            message.success({
+                content: 'ลบข้อมูลสำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
+            getApprover();
+        }).catch((error) => {
+            setLoading(false);
+            message.error({
+                content: 'ลบข้อมูล ไม่สำเร็จ',
+                style: {
+                    marginTop: '10vh',
+                },
+            });
+        });
     }
 
     const searchUser = (param) => {
@@ -73,15 +140,13 @@ export default function FlowApprove() {
             )
         );
         setFilterUser(result);
-
     }
 
     const userSelection = {
         selectedRowKeys: selectedRowKeys,
         onChange: (selectedRowKeys, selectedRows) => {
-            setSelectUser(selectedRowKeys);
+            setSelectUser(selectedRows)
             setSelectedRowKeys(selectedRowKeys);
-
         },
     };
 
@@ -124,14 +189,31 @@ export default function FlowApprove() {
 
                 <Table dataSource={approver}>
                     <Column title="No" key="key" width="5%" dataIndex="no" />
-                    <Column title="ผู้อนุมัติ" key="key" width="80%" dataIndex="user_name" />
+                    <Column title="ผู้อนุมัติ" key="key" width="90%" dataIndex="user_name" />
+                    <Column key="key"
+                        render={(value, record, index) => {
+                            return (
+                                <>
+                                    <Icon className='icon-link-delete' icon="fluent:delete-24-regular" width="24" height="24"
+                                        onClick={() => deleteApprover(record.config_id)}
+                                    />
+                                </>
+                            )
+                        }}
+                    />
                 </Table>
             </div>
 
             <Modal title="เพิ่มข้อมูล ผู้อนุมัติ"
                 visible={addModal}
                 width={600}
-                onCancel={() => setAddModal(false)}
+                onCancel={() => {
+                    setAddModal(false);
+                    setSelectedRowKeys([]);
+                }}
+                onOk={() => {
+                    addApprover();
+                }}
             >
                 <Table dataSource={users}
                     rowSelection={{

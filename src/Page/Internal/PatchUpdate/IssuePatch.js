@@ -48,7 +48,6 @@ export default function IssuePatch() {
         selectedRowKeys: selectedRowKeys,
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectedRowKeys(selectedRowKeys);
-
         },
     };
 
@@ -227,7 +226,7 @@ export default function IssuePatch() {
                     <Col span={12} >
                         <Input.Search placeholder="เลข Issue / Subject" allowClear
                             enterButton
-                            style={{width: "95%"}}
+                            style={{ width: "95%" }}
                             onSearch={searchIssue}
                         />
                     </Col>

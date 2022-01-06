@@ -48,7 +48,7 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
@@ -122,12 +122,9 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
     useEffect(() => {
         if (visible) {
             GetAssign();
-
         }
 
     }, [visible])
-
-
 
     return (
         <>
@@ -184,7 +181,7 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
                     {/* Remark : */}
                     <TextEditor ref={editorRef} />
                     <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                    AttachFile : <UploadFile ref={uploadRef} />
                 </Spin>
             </Modal>
         </>

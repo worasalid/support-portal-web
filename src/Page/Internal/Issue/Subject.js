@@ -1362,17 +1362,6 @@ export default function Subject() {
                   </Col>
                 </Row>
 
-                {/* <Row style={{
-                  marginBottom: 20,
-                  display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
-                    userstate.issuedata.details[0]?.IsAssessment !== 0 ? "block" : "none"
-                }}>
-                  <Col span={18}>
-                    <label className="header-text">ผลประเมินผลของ SA</label>
-                    <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} />
-                  </Col>
-                </Row> */}
-
                 <Row style={{
                   marginBottom: 20,
                   display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
@@ -1618,7 +1607,7 @@ export default function Subject() {
         <PreviewImg
           title="Preview"
           visible={modalPreview}
-          width={1400}
+          width={1200}
           footer={null}
           onCancel={() => {
             setModalPreview(false);
