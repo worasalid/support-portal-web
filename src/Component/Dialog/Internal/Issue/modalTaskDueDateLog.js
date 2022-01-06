@@ -6,7 +6,7 @@ import moment from 'moment';
 
 export default function DuedateLog({ visible = false, onOk, onCancel, details, ...props }) {
     const [history, setHistory] = useState([]);
-    const [taskDueDate, setTaskDueDate] = useState(null);
+    const [taskDueDate, setTaskDueDate] = useState([]);
 
     const getDueDateHistory = async () => {
         await Axios.get(`${process.env.REACT_APP_API_URL}/tickets/task-duedate`, {
@@ -48,7 +48,7 @@ export default function DuedateLog({ visible = false, onOk, onCancel, details, .
                         </label>
 
                         <label className="value-text" style={{ marginLeft: 20, fontWeight: "bold", }} >
-                            {history[0]?.due_date === undefined ? "None" : moment(taskDueDate?.due_date).format("DD/MM/YYYY HH:mm")}
+                            {history[0]?.due_date === undefined ? "None" : moment(taskDueDate[0]?.due_date).format("DD/MM/YYYY HH:mm")}
                             <ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em", marginLeft: 5 }} />
                         </label>
                      

@@ -45,8 +45,6 @@ export default function ModalChangeDueDateDev({ visible = false, onOk, onCancel,
     }
 
     const onFinish = (value) => {
-        console.log("value", value)
-        console.log("duedate", value.duedate)
         changeDueDate(value);
     }
 
