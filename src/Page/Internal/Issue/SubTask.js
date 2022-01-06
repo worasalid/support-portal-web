@@ -1,8 +1,8 @@
-import { Col, Row, Select, Typography, Button, Avatar, Tabs, Modal, Timeline, Skeleton, Checkbox, message, Spin } from "antd";
+import { Col, Row, Select, Typography, Button, Avatar, Tabs, Modal, Timeline, Skeleton, Checkbox, message, Spin, Divider, Tooltip } from "antd";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "../../../styles/index.scss";
 import { useHistory, useRouteMatch } from "react-router-dom";
-
+import _ from 'lodash'
 import TaskComment from "../../../Component/Comment/Internal/TaskComment";
 import ModalSupport from "../../../Component/Dialog/Internal/modalSupport";
 import InternalHistorylog from "../../../Component/History/Internal/Historylog";
@@ -18,6 +18,7 @@ import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalLeaderQC from "../../../Component/Dialog/Internal/modalLeaderQC";
 import ModalLeaderAssign from "../../../Component/Dialog/Internal/modalLeaderAssign";
 import ClockSLA from "../../../utility/SLATime";
+import { Icon } from '@iconify/react';
 import moment from "moment";
 import ModalqaAssign from "../../../Component/Dialog/Internal/modalqaAssign";
 import TabsDocument from "../../../Component/Subject/Internal/tabsDocument";
@@ -31,15 +32,20 @@ import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 import ModalDevSendVersion from "../../../Component/Dialog/Internal/Issue/modalDevSendVersion";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 import ModalRequestInfoQA from "../../../Component/Dialog/Internal/Issue/modalRequestInfoQA";
+import TrackingTimeDevelop from "../../../Component/Dialog/Internal/Issue/modalTimeDevelop";
+import { CalculateTime } from "../../../utility/calculateTime";
+import ModalChangeDueDateDev from "../../../Component/Dialog/Internal/Issue/modalChangeDueDateDev";
+import DuedateLog from "../../../Component/Dialog/Internal/Issue/modalTaskDueDateLog";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
-
+const calculateTime = new CalculateTime()
 
 export default function SubTask() {
   const match = useRouteMatch();
   const history = useHistory();
-  const selectRef = useRef(null)
+  const selectRef = useRef(null);
+  const trackingRef = useRef(null);
   // const { state, dispatch } = useContext(AuthenContext);
   const { state: userstate, dispatch: userdispatch } = useContext(IssueContext);
 
@@ -67,6 +73,9 @@ export default function SubTask() {
   const [modalPreview, setModalPreview] = useState(false);
   const [modalDevSendVersion, setModalDevSendVersion] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
+  const [modalTimeDevelop, setModalTimeDevelop] = useState(false);
+  const [modalChangeDueDateDev, setModalChangeDueDateDev] = useState(false);
+  const [modalTaskDueDate, setModalTaskDueDate] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -78,10 +87,12 @@ export default function SubTask() {
   // data
   const [ProgressStatus, setProgressStatus] = useState("");
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
-  const [selected, setSelected] = useState()
+  const [selected, setSelected] = useState();
+
   // const [SLA, setSLA] = useState(null);
   const [createddate, setCreateddate] = useState(null);
   const [resolveddate, setResolveddate] = useState(null);
+  const [duration, setDuration] = useState(null);
 
   // Load ข้อมูล Detail ของ Issue และ ข้อมูล mailbox ล่าสุด
   const getMailBox = async () => {
@@ -496,9 +507,26 @@ export default function SubTask() {
     }
   }
 
+  const getDevelopDuration = async () => {
+    await Axios.get(`${process.env.REACT_APP_API_URL}/tickets/time-develop`, {
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        ticket_id: userstate?.taskdata?.data[0]?.TicketId,
+        task_id: userstate?.taskdata?.data[0]?.TaskId
+      }
+    }).then((res) => {
+      setDuration(_.sum(res.data.map((n) => calculateTime.getMiniteDuration(n.start_date, n.end_date))))
+    }).catch((error) => {
+
+    })
+  }
+
   useEffect(() => {
     GetTaskDetail();
     getMailBox();
+
   }, [])
 
   useEffect(() => {
@@ -510,8 +538,15 @@ export default function SubTask() {
   useEffect(() => {
     if (userstate?.taskdata?.data[0] !== undefined) {
       getflow_output(userstate?.taskdata?.data[0]?.TransId)
+      getDevelopDuration();
     }
   }, [userstate?.taskdata?.data[0]?.TransId])
+
+  useEffect(() => {
+    if (!modalTimeDevelop) {
+      getDevelopDuration()
+    }
+  }, [modalTimeDevelop])
 
 
   return (
@@ -687,13 +722,9 @@ export default function SubTask() {
 
                 <Row style={{
                   marginBottom: 20,
-                  display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" &&
-                    userstate.taskdata.data[0]?.DueDate !== null ? "inline-block" : "none"
+                  display: userstate.taskdata.data[0]?.IssueType !== "ChangeRequest" ? "inline-block" : "none"
                 }}
                 >
-                  {/* <Col span={3} style={{ marginTop: "10px" }}>
-                  <label className="header-text">SLA</label>
-                </Col> */}
                   <Col span={24} >
                     <label className="header-text">Time Tracking</label>
                     {
@@ -708,32 +739,67 @@ export default function SubTask() {
                   </Col>
                 </Row>
 
-                <Row style={{ marginBottom: 20, display: userstate.taskdata.data[0]?.DueDate === null ? "none" : "block" }}>
+                <Row style={{ marginBottom: 20 }}>
                   <Col span={24}>
                     <label className="header-text">DueDate</label>
-                    <br />
 
+                    &nbsp;   &nbsp;
+                    {
+                      userstate?.mailbox[0]?.NodeName === "developer_2" || userstate?.mailbox[0]?.NodeName === "developer_1" ?
+                        <label className="value-text text-link" onClick={() => setModalChangeDueDateDev(true)}>
 
-                    {/* คลิกเปลี่ยน DueDate ได้เฉพาะ support */}
-                    {/* {
-                    userstate?.mailbox[0]?.NodeName === "cr_center"
-                      ? <Button type="link"
-                        onClick={() => setModalduedate_visible(true)}
-                      >
-                        {userstate.taskdata.data[0] &&
-                          (userstate.taskdata.data[0].DueDate === null ? "None" : moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm"))}
-                      </Button>
-                      : <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
-                  }
+                          {
+                            userstate.taskdata.data[0]?.DueDate === null ? "None" : userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")
+                          }
+                        </label>
+                        :
+                        <label className="value-text">
 
-                  <Button type="link"
-                    icon={<ClockCircleOutlined style={{ fontSize: 18 }} />}
-                    onClick={() => { setHistoryduedate_visible(true) }}
-                  /> */}
-                    <label className="value-text">&nbsp;&nbsp;{userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")}</label>
+                          {
+                            userstate.taskdata.data[0]?.DueDate === null ? "None" : userstate.taskdata.data[0] && moment(userstate.taskdata.data[0].DueDate).format("DD/MM/YYYY HH:mm")
+                          }
+                        </label>
+                    }
+                    <span hidden={userstate.taskdata.data[0]?.cntDueDate === 0 ? true : false}>
+                      <Divider type="vertical" />
+                      <Tooltip title="ประวัติการเลื่อน Due">
+                        <ClockCircleOutlined className="icon-hover" style={{ fontSize: 18, color: "#1890ff" }}
+                          onClick={() => setModalTaskDueDate(true)}
+                        />
+                      </Tooltip>
+                    </span>
                   </Col>
                 </Row>
 
+
+                <Row style={{ marginBottom: 20 }}
+                  hidden={userstate?.mailbox[0]?.NodeName !== "developer_1" && userstate?.mailbox[0]?.NodeName !== "developer_2" ? true : false}
+                >
+                  <Col span={24} >
+                    <label className="header-text">Develop Time</label>
+                    {
+                      duration !== 0 ?
+                        <label className="value-text" style={{
+                          marginLeft: 12,
+                          textAlign: "right", marginRight: 16, color: "orange", cursor: "pointer"
+                        }}
+                          onClick={() => setModalTimeDevelop(true)}>
+                          {
+                            moment.duration(duration, 'minute')._data.hours !== 0 ?
+                              `${moment.duration(duration, 'minute')._data.hours} ชม ` : ""
+                          }
+
+                          {
+                            moment.duration(duration, 'minute')._data.minutes !== 0 ?
+                              `${moment.duration(duration, 'minute')._data.minutes} นาที ` : ""
+                          }
+                          <Icon icon="carbon:time" width="18" height="18" />
+                        </label> : <label style={{ marginLeft: 12 }} className="text-link" onClick={() => setModalTimeDevelop(true)}>None</label>
+                    }
+                  </Col>
+                </Row>
+
+               
                 <Row style={{ marginBottom: 20 }}>
                   <Col span={18}>
                     <label className="header-text">Company</label>
@@ -1174,7 +1240,40 @@ export default function SubTask() {
           }}
         />
 
-      </Spin>
+        <TrackingTimeDevelop
+          title="Time Develop"
+          ref={trackingRef}
+          width={600}
+          visible={modalTimeDevelop}
+          onCancel={() => { return (setModalTimeDevelop(false)) }}
+          details={{
+            ticketId: userstate?.taskdata?.data[0]?.TicketId,
+            taskId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+
+          }}
+        />
+
+        <ModalChangeDueDateDev
+          visible={modalChangeDueDateDev}
+          onCancel={() => setModalChangeDueDateDev(false)}
+          onOk={() => setModalChangeDueDateDev(false)}
+          details={{
+            task_id: userstate?.taskdata?.data[0]?.TaskId,
+            duedate: userstate?.taskdata?.data[0]?.DueDate
+          }}
+        />
+
+        <DuedateLog
+          visible={modalTaskDueDate}
+          onCancel={() => setModalTaskDueDate(false)}
+          onOk={() => setModalTaskDueDate(false)}
+          details={{
+            ticketId: userstate?.taskdata?.data[0]?.TicketId,
+            taskId: userstate?.taskdata?.data[0]?.TaskId,
+          }}
+        />
+
+      </Spin >
     </MasterPage >
   );
 }
