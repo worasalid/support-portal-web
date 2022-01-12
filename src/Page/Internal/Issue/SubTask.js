@@ -348,10 +348,11 @@ export default function SubTask() {
     // Flow CR
     if (userstate?.taskdata?.data[0]?.IssueType === "ChangeRequest" || userstate?.taskdata?.data[0]?.IssueType === "Memo") {
       if (item.data.NodeName === "support") {
-        if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR" || item.data.value === "SendToDeploy") {
+        if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR" || item.data.value === "RequestDeploy") {
           setModalsendtask_visible(true)
         }
       }
+
       if (item.data.NodeName === "cr_center") {
         if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate" || item.data.value === "SendToSA") {
           setModalsendtask_visible(true);
@@ -359,9 +360,17 @@ export default function SubTask() {
         if (item.data.value === "RejectManday" || item.data.value === "RejectMandaySA") {
           setModalsendtask_visible(true)
         }
-        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
-        if (item.data.value === "RejectTask") { setModalsendtask_visible(true) }
+        if (item.data.value === "ResolvedTask") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "RejectTask") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "SendToDeploy" || item.data.value === "CheckDeploy") {
+          setModalsendtask_visible(true)
+        }
       }
+
       if (item.data.NodeName === "developer_2") {
         if (item.data.value === "SendManday") { setModalmanday_visible(true) }
         if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
@@ -375,12 +384,14 @@ export default function SubTask() {
         }
 
       }
+
       if (item.data.NodeName === "developer_1") {
         if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
         if (item.data.value === "RejectToDevLeader" || item.data.value === "SendInfoToSA") {
           setModalsendtask_visible(true);
         }
       }
+
       if (item.data.NodeName === "qa_leader") {
         if (item.data.value === "QAassign") {
           setModalQAassign_visible(true)
@@ -391,6 +402,7 @@ export default function SubTask() {
         if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
         if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
       }
+
       if (item.data.NodeName === "qa") {
         if (item.data.value === "QApass") {
           setModalQA_visible(true)
@@ -400,6 +412,7 @@ export default function SubTask() {
         }
 
       }
+
       if (item.data.NodeName === "sa") {
         if (item.data.value === "SendManday") {
           setModalSA(true)

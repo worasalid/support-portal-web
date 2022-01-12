@@ -35,6 +35,7 @@ import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 import ModalCancel from "../../../Component/Dialog/Internal/Issue/modalCancel";
+import ModalRequestApprove from "../../../Component/Dialog/Internal/Issue/modalRequestApprove";
 import ModalApprover from "../../../Component/Dialog/Internal/Issue/modalApprover";
 
 
@@ -73,6 +74,7 @@ export default function Subject() {
   const [modalPreview, setModalPreview] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
   const [modalCancel_visible, setModalCancel_visible] = useState(false);
+  const [modalReqApprover, setModalReqApprover] = useState(false);
   const [modalApprover, setModalApprover] = useState(false);
 
   //div
@@ -586,7 +588,7 @@ export default function Subject() {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "RequestApprove") {
-          setModalApprover(true)
+          setModalReqApprover(true)
         }
         if (item.data.value === "SendManday") {
           setModalmanday_visible(true)
@@ -1639,6 +1641,22 @@ export default function Subject() {
           onCancel={() => setModalCancel_visible(false)}
           onOk={() => {
             setModalCancel_visible(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            ticket_number: userstate?.issuedata?.details[0]?.Number,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data
+          }}
+        />
+
+        <ModalRequestApprove
+          title={ProgressStatus}
+          visible={modalReqApprover}
+          width={800}
+          onCancel={() => setModalReqApprover(false)}
+          onOk={() => {
+            setModalReqApprover(false);
           }}
           details={{
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,

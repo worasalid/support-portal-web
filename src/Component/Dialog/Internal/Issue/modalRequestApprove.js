@@ -1,30 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Row, Col, Select, Form, Input } from 'antd';
+import { Modal, Row, Col, Select, Form, Radio, Space, Input } from 'antd';
 import UploadFile from '../../../UploadFile'
 import axios from 'axios';
 import TextEditor from '../../../TextEditor';
 
-export default function ModalApprover({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+export default function ModalRequestApprove({ visible = false, onOk, onCancel, datarow, details, ...props }) {
     const history = useHistory();
     const uploadRef = useRef(null);
     const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
+    const [approver, setApprover] = useState([]);
+    const [selectApprover, setSelectApprover] = useState(null);
     const [form] = Form.useForm();
 
-    const getData = async () => {
-        await axios.get(`${process.env.REACT_APP_API_URL}/workflow/request-approve`, {
+    const getApprover = async () => {
+        await axios.get(`${process.env.REACT_APP_API_URL}/master/organize/user`, {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
-                ticketId: details.ticketid
+                organize_id: 10
             }
         }).then((res) => {
-            setData(res.data)
-            console.log("res.data", res.data)
-
+            setApprover(res.data);
 
         }).catch((error) => {
             console.log("error", error.response.data)
@@ -45,9 +44,10 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
                     mailboxid: details && details.mailboxid,
                     flowoutputid: details.flowoutput.FlowOutputId,
                     value: {
-                        description: param.description,
-                        approve_reason: param.approve_reason,
                         comment_text: editorRef.current.getValue(),
+                        approverId: param.approver,
+                        approveType: param.type,
+                        description: param.description
                     }
                 }
             });
@@ -109,13 +109,12 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
     }
 
     const onFinish = async (value) => {
-        console.log("onFinish", value)
         sendFlow(value);
     }
 
     useEffect(() => {
         if (visible) {
-            getData();
+            getApprover();
         }
     }, [visible])
 
@@ -125,7 +124,7 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
                 visible={visible}
                 confirmLoading={loading}
                 okText="Send"
-                onOk={() => form.submit()}
+                onOk={() => (details?.flowoutput?.NodeName === "approver" ? sendFlow(0) : form.submit())}
                 okButtonProps={{ type: "primary", htmlType: "submit" }}
                 okType="dashed"
                 onCancel={() => {
@@ -134,33 +133,39 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
                 }}
                 {...props}
             >
-                <Row>
-                    <Col span={2}>
-                        <b><label>ประเภท :</label></b>
-                    </Col>
-                    <Col span={22}>
-                        <label>{data?.approve_type === 1 ? "ขอฟรี" : "ขอลดราคา"}</label>
-                    </Col>
-                </Row>
-                <br />
+
                 <Row>
                     <Col span={24}>
-                        <b><label>เหตุผลในการขอ ขอนุมัติ :</label></b>
-                    </Col>
-                    <Col span={24}>
-                        <Input.TextArea disabled rows={5} value={data?.description} />
-                    </Col>
-                </Row>
-                <br />
-                <Row>
-                    <Col span={24}>
-                        <Form form={form}
+                        <Form form={form} hidden={details.flowoutput.NodeName === "approver" ? true : false}
                             name="control-hooks" layout="vertical" onFinish={onFinish} >
-                            <Form.Item name="approve_reason" label={<b><label>รายละเอียด การอนุมัติ :</label></b>}
-                                rules={[{ required: true, message: 'กรุณาระบุ รายละเอียด' }]}>
-                                <Input.TextArea rows={5} />
+                            <Form.Item name="approver" label="ผู้อนุมัติ" rules={[{ required: true, message: 'กรุณาเลือกผู้อนุมัติ' }]}>
+                                <Select style={{ width: '100%' }} placeholder="None"
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    onChange={(value, item) => setSelectApprover(item.value)}
+                                    options={
+                                        approver?.map((item) => ({
+                                            value: item.UserId,
+                                            label: item.DisplayName
+                                        }))
+                                    }
+                                >
+                                </Select>
+                            </Form.Item>
+                            <Form.Item name="type" label="ประเภท" rules={[{ required: true, message: 'กรุณาเลือกประเภท' }]}>
+                                <Radio.Group onChange={(e) => console.log("target", e.target.value)}>
+                                    <Space direction="vertical">
+                                        <Radio value={1}>ขอฟรี</Radio>
+                                        <Radio value={2}>ขอลดราคา</Radio>
+                                    </Space>
+                                </Radio.Group>
                             </Form.Item>
 
+                            <Form.Item name="description" label="เหตุผลในการขอ ขอนุมัติ">
+                                <Input.TextArea rows={5} />
+                            </Form.Item>
                         </Form>
                     </Col>
                 </Row>
