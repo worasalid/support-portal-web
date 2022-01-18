@@ -158,6 +158,7 @@ export default function Subject() {
   }
 
   const getflow_output = async (value, trans_id) => {
+    console.log("value.ProgressStatus",value.ProgressStatus)
     try {
       const flow_output = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
@@ -176,7 +177,8 @@ export default function Subject() {
         if (value.ProgressStatus === "Automatic Update Patch") {
           customerdispatch({
             type: "LOAD_ACTION_FLOW",
-            payload: result.filter((x) => x.value !== "SendToDeploy")
+           // payload: result.filter((x) => x.value !== "SendToDeploy")
+           payload: result
           })
         } else {
           customerdispatch({

@@ -400,23 +400,19 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     </Row>
                 </Form>
 
-                <Row style={{ marginTop: 50 }}>
+                <Row hidden={approveResult?.ApproveResultText === undefined ? true : false} style={{ marginTop: 50 }}>
                     <Col span={24}>
-                        <label className='header-text' >ผลการอนุมัติ :</label> {approveResult?.ApproveResultText}
+                        <label className='header-text' >ผลการอนุมัติ :</label>&nbsp;
+                        <label style={{ color: approveResult?.ApproveResultText === "อนุมัติ" ? "green" : "red" }}>{approveResult?.ApproveResultText}</label>
                     </Col>
-                   
-                </Row>
-
-                <Row style={{ marginTop: 20 }}>
-                    <Col span={24}>
+                    <Col span={24} style={{ marginTop: 10 }}>
                         <label className='header-text' >เหตุผลการอนุมัติ</label>
                     </Col>
-                </Row>
-                <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <Input.TextArea disabled rows={5} value={approveResult?.ApproveReason} />
                     </Col>
                 </Row>
+
 
                 <Row style={{ marginTop: 50 }}>
                     <Col span={24}>
