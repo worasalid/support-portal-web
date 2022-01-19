@@ -68,15 +68,33 @@ export default function AllDashBoard() {
             },
             {
                 no: "10",
-                dashboard_name: "DashBoard TimeSheet1",
-                description: "รายงานสรุปจำนวนวัน ที่ใช้แก้ไข และ พัฒนา ของทีม Developer",
-                url: "/internal/dashboard/timesheet/1"
+                dashboard_name: "DashBoard CMMI5",
+                description: "รายงานสรุปจำนวนการ Login เข้าใช้งานระบบ (Summary)",
+                url: "/internal/dashboard/cmmi/dashboard_cmmi5"
             },
             {
                 no: "11",
+                dashboard_name: "DashBoard CMMI5_1",
+                description: "รายงานสรุปจำนวนการ Login เข้าใช้งานระบบ (Detail)",
+                url: "/internal/dashboard/cmmi/dashboard_cmmi5_1"
+            },
+            {
+                no: "12",
+                dashboard_name: "DashBoard TimeSheet1",
+                description: "รายงานสรุปจำนวนวัน ที่ใช้แก้ไข และ พัฒนา ของทีม Developer",
+                url: "/internal/dashboard/timesheet1"
+            },
+            {
+                no: "13",
                 dashboard_name: "DashBoard TimeSheet2",
                 description: "รายงานสรุป รายละเอียด เวลาที่ใช้พัฒนา ของทีม Developer",
-                url: "/internal/dashboard/timesheet/2"
+                url: "/internal/dashboard/timesheet2"
+            },
+            {
+                no: "14",
+                dashboard_name: "DashBoard TimeSheet3",
+                description: "รายงานสรุป จำนวนเวลาที่ใช้พัฒนา ของทีม Developer (รายวัน)",
+                url: "/internal/dashboard/timesheet3"
             }
         ]
 
