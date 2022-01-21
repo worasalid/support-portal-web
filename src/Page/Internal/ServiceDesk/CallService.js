@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, Form, Input, Select, DatePicker, Dropdown, TimePicker, Row, Col, Modal, Spin } from "antd";
-import { PhoneOutlined, DatabaseOutlined, FileOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
+import { Button, Form, Input, Select, DatePicker, Dropdown, TimePicker, Row, Col, Modal, Spin, Checkbox, Divider } from "antd";
 import axios from 'axios';
-import { Icon } from '@iconify/react';
+//import { Icon } from '@iconify/react';
 import MasterPage from '../ServiceDesk/MasterPage';
 import { Editor } from '@tinymce/tinymce-react';
 import moment from "moment"
@@ -11,10 +10,10 @@ import { useHistory } from 'react-router-dom';
 export default function CallService() {
     const queryParams = new URLSearchParams(window.location.search);
     const tel = queryParams.get('tel');
+    const [loading, setLoading] = useState(false);
     const editorRef = useRef(null);
     const history = useHistory(null);
     const [form] = Form.useForm();
-    const [loading, setLoading] = useState(false);
 
     // data
     const [customer, setCustomer] = useState(null);
@@ -50,10 +49,13 @@ export default function CallService() {
 
     // selecter
     const [selectCompany, setSelectCompany] = useState(null);
+    const [checked, setChecked] = useState(false);
     const [description, setDescription] = useState(null);
     const [startTime, setStartTime] = useState(moment(moment(), "HH:mm"));
     const [endTime, setEndTime] = useState(null);
 
+
+    /////////////// function ///////////////
     const getCustomer = async () => {
         setLoading(true);
         await axios.get(`${process.env.REACT_APP_API_URL}/callcenter`, {
@@ -129,7 +131,9 @@ export default function CallService() {
             data: {
                 company_id: param.company,
                 product_id: param.product,
-                informer: param.informer,
+                informerId: param.informerId,
+                informer_name: param.informerName,
+                telephone: tel,
                 scene: param.scene,
                 title: param.subject,
                 description: description,
@@ -157,14 +161,9 @@ export default function CallService() {
     }
 
     const onFinish = (value) => {
-
         const result = {
             ...value, date: value.date === undefined ? "" : value.date.format("YYYY-MM-DD")
         };
-        console.log("result", result)
-        console.log("starttime", moment(startTime).format("HH:mm"))
-        console.log("endTime", moment(endTime).format("HH:mm"))
-
         saveData(value);
     }
 
@@ -182,9 +181,17 @@ export default function CallService() {
 
     useEffect(() => {
         if (customer !== null) {
-            form.setFieldsValue({ company: customer?.CompanyId, informer: customer?.CustomerId })
+            form.setFieldsValue({ company: customer?.CompanyId, informerId: customer?.CustomerId })
         }
     }, [customer])
+
+    useEffect(() => {
+        if (checked) {
+            form.setFieldsValue({ informerId: null })
+        } else {
+            form.setFieldsValue({ informerName: null })
+        }
+    }, [checked])
 
 
     return (
@@ -208,6 +215,7 @@ export default function CallService() {
                     >
                         <Select
                             showSearch
+                            disabled={customer !== null && customer !== ""}
                             style={{ width: "100%" }}
                             placeholder="เลือก บริษัท"
                             optionFilterProp="children"
@@ -224,26 +232,54 @@ export default function CallService() {
                         </Select>
                     </Form.Item>
 
-                    <Form.Item
-                        label="ผู้แจ้ง"
-                        name="informer"
-                        rules={[{ required: true, message: 'กรุณา ระบุ ผู้แจ้ง!' }]}
-                    >
-                        <Select
-                            showSearch
-                            // disabled={selectCompany === null || customer[0]?.CustomerId === null ? true : false}
-                            style={{ width: "100%" }}
-                            placeholder="ระบุชื่อ"
-                            optionFilterProp="children"
-                            filterOption={(input, option) =>
-                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            onClick={() => getListCustomer(selectCompany)}
-                            options={listCustomer.map((n) => ({ value: n.CustomerId, label: n.Customer }))}
-                        >
+                    {
+                        checked === true ?
+                            <Form.Item
+                                label={
+                                    <>
+                                        ผู้แจ้ง &nbsp;
+                                        <span>
+                                            <Divider type='vertical' />
+                                            <Checkbox checked={checked} onChange={(e) => setChecked(e.target.checked)} >ระบุเอง</Checkbox>
+                                        </span>
+                                    </>
+                                }
+                                name="informerName"
+                                rules={[{ required: true, message: 'กรุณา ระบุ ผู้แจ้ง!' }]}
+                            >
+                                <Input placeholder='ระบุชื่อ' />
+                            </Form.Item>
+                            :
+                            <Form.Item
+                                label={
+                                    <>
+                                        ผู้แจ้ง &nbsp;
+                                        <span hidden={customer !== null && customer !== "" ? true : false}>
+                                            <Divider type='vertical' />
+                                            <Checkbox onChange={(e) => setChecked(e.target.checked)} >ระบุเอง</Checkbox>
+                                        </span>
+                                    </>
 
-                        </Select>
-                    </Form.Item>
+                                }
+                                name="informerId"
+                                rules={[{ required: true, message: 'กรุณา ระบุ ผู้แจ้ง!' }]}
+                            >
+                                <Select
+                                    showSearch
+                                    disabled={customer !== null && customer !== "" ? true : false}
+                                    style={{ width: "100%" }}
+                                    placeholder="เลือกชื่อ"
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    onClick={() => getListCustomer(selectCompany)}
+                                    options={listCustomer.map((n) => ({ value: n.CustomerId, label: n.Customer }))}
+                                >
+
+                                </Select>
+                            </Form.Item>
+                    }
 
                     <Form.Item
                         label="Product"
@@ -360,8 +396,8 @@ export default function CallService() {
                         </Button>
                     </Col>
                 </Row>
-            </Spin>
+            </Spin >
 
-        </MasterPage>
+        </MasterPage >
     )
 }

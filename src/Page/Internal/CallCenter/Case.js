@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useContext, useReducer, useRef } from "react";
+import React, { useEffect, useState, useReducer } from "react";
+import { useHistory } from "react-router-dom";
 import MasterPage from "../MasterPage";
 import { Row, Col, Table, Tooltip, Tag } from "antd";
 import CaseSearch from "../../../Component/Search/Internal/CaseSearch";
@@ -9,7 +10,7 @@ import moment from "moment";
 const { Column } = Table;
 
 export default function Case() {
-
+    const history = useHistory();
     const [casestate, casedispatch] = useReducer(caseReducer, caseState);
     const [loading, setLoading] = useState(false);
     const [listcase, setListCase] = useState([]);
@@ -42,12 +43,14 @@ export default function Case() {
                 return {
                     key: index,
                     code: n.Code,
+                    caseId: n.CaseId,
                     number: n.Number,
                     product: n.Product,
                     title: n.Title,
                     scene: n.Scene,
                     description: n.Description,
                     informer_by: n.InformerBy,
+                    informer_tel: n.InformerTel,
                     create_by: n.CreateBy,
                     create_date: n.CreateDate,
                     call_start: n.CallStart,
@@ -176,7 +179,16 @@ export default function Case() {
                                 render={(value, record, index) => {
                                     return (
                                         <>
-                                            <label className="table-column-text">{record.title}</label>
+                                            <label className="table-column-text">{record.title}</label><br />
+                                            <label
+                                                onClick={() => {
+                                                    history.push({ pathname: "/internal/callcenter/case/subject/" + record.caseId });
+                                                }}
+                                                className="table-column-detail">
+                                                รายละเอียด
+                                            </label>
+
+
                                         </>
                                     )
                                 }}
@@ -186,6 +198,10 @@ export default function Case() {
                                     return (
                                         <>
                                             <label className="table-column-text">{record.informer_by}</label>
+                                            <br />
+                                            <label className="table-column-text" style={{ fontSize: 8 }}>
+                                                {record.informer_tel}
+                                            </label>
                                             <br />
                                             <Tooltip title="Company">
                                                 <Tag color="#17a2b8" style={{ fontSize: 8 }} >

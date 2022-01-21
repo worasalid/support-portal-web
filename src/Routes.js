@@ -98,6 +98,7 @@ import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
 // Call Center Service
 import CallService from './Page/Internal/ServiceDesk/CallService';
 import Case from './Page/Internal/CallCenter/Case';
+import CaseSubject from './Page/Internal/CallCenter/Subject';
 
 
 import AuthenContext, { reducer, initState } from "./utility/authenContext";
@@ -177,7 +178,7 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/timesheet1" exact component={TimeSheet1} />
                                     <Route path="/internal/dashboard/timesheet2" exact component={TimeSheet2} />
                                     <Route path="/internal/dashboard/timesheet3" exact component={TimeSheet3} />
-                                    
+
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
@@ -226,6 +227,7 @@ export default function Routes() {
                                     {/* CallCenter Service */}
                                     <Route path="/servicedesk/voxtron" exact component={CallService} />
                                     <Route path="/internal/callcenter/case" exact component={Case} />
+                                    <Route path="/internal/callcenter/case/subject/:caseid?" exact component={CaseSubject} />
 
                                 </Switch>
                             </Router>
