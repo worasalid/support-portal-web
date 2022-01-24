@@ -16,6 +16,7 @@ export default function CaseSubject() {
     const history = useHistory();
     const [form] = Form.useForm();
     const [loadingPage, setLoadingPage] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [caseDetails, setCaseDetails] = useState([]);
     const [issueType, setIssueType] = useState(null);
     const [caseHistory, setCaseHistory] = useState([]);
@@ -59,22 +60,8 @@ export default function CaseSubject() {
         });
     }
 
-    const getHistory = async () => {
-        await axios.get(`${process.env.REACT_APP_API_URL}/callcenter/case/historylog`, {
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            params: {
-                caseId: match.params.caseid
-            }
-        }).then((res) => {
-            setCaseHistory(res.data);
-        }).catch((error) => {
-
-        });
-    }
-
     const saveData = async (param) => {
+        setLoading(true);
         await axios({
             url: `${process.env.REACT_APP_API_URL}/callcenter/case/convert`,
             method: "POST",
@@ -85,6 +72,52 @@ export default function CaseSubject() {
                 caseId: match.params.caseid,
                 issueType: param.issueType
             }
+        }).then(() => {
+            setLoading(false);
+            Modal.success({
+                content: 'บันทึกข้อมูลสำเร็จ',
+                onOk() {
+                    history.push({ pathname: "/internal/callcenter/case" })
+                },
+            });
+        }).catch(() => {
+            setLoading(false);
+            Modal.error({
+                content: 'บันทึกข้อมูลไม่สำเร็จ',
+                onOk() {
+
+                },
+            });
+        })
+    }
+
+    const completeCase = async () => {
+        setLoading(true);
+        await axios({
+            url: `${process.env.REACT_APP_API_URL}/callcenter/case/complete`,
+            method: "PATCH",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                caseId: match.params.caseid,
+            }
+        }).then((res) => {
+            setLoading(false);
+            Modal.success({
+                content: 'บันทึกข้อมูลสำเร็จ',
+                onOk() {
+                    history.push({ pathname: "/internal/callcenter/case" })
+                },
+            });
+        }).catch((error) => {
+            setLoading(false);
+            Modal.error({
+                content: 'บันทึกข้อมูลไม่สำเร็จ',
+                onOk() {
+
+                },
+            });
         })
     }
 
@@ -244,7 +277,24 @@ export default function CaseSubject() {
                                                     // placeholder="คลิกเพื่อแจ้ง Issue"
                                                     style={{ width: "100%" }}
                                                     value={caseDetails.ProgressStatus}
-                                                    onChange={() => setModalSend(true)}
+                                                    onChange={(value) => {
+                                                        value === 1 ? setModalSend(true) :
+
+                                                            Modal.info({
+                                                                title: 'ปิด Complete',
+                                                                content: (
+                                                                    <div>
+                                                                        <p>เลข {caseDetails?.CaseNumber}</p>
+                                                                    </div>
+                                                                ),
+                                                                okCancel() {
+
+                                                                },
+                                                                onOk() {
+                                                                    completeCase();
+                                                                },
+                                                            });
+                                                    }}
                                                 >
                                                     <Option value={1}>แจ้ง Issue</Option>
                                                     <Option value={2}>ปิด Completed</Option>
@@ -350,10 +400,11 @@ export default function CaseSubject() {
                         </Row>
                     </div>
                 </Skeleton>
-            </Spin>
+            </Spin >
 
             <Modal
                 visible={modalSend}
+                confirmLoading={loading}
                 title="แจ้ง Issue"
                 width={600}
                 onCancel={() => setModalSend(false)}
@@ -362,6 +413,7 @@ export default function CaseSubject() {
             >
                 <Form
                     form={form}
+                    layout="vertical"
                     onFinish={onFinish}
                 >
                     <Form.Item

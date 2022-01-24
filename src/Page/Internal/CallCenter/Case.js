@@ -51,6 +51,7 @@ export default function Case() {
                     description: n.Description,
                     informer_by: n.InformerBy,
                     informer_tel: n.InformerTel,
+                    progress_status: n.ProgressStatus,
                     create_by: n.CreateBy,
                     create_date: n.CreateDate,
                     call_start: n.CallStart,
@@ -175,7 +176,7 @@ export default function Case() {
                                     )
                                 }}
                             />
-                            <Column title="Subject" key="key" width="40%"
+                            <Column title="Subject" key="key" width="30%"
                                 render={(value, record, index) => {
                                     return (
                                         <>
@@ -187,12 +188,21 @@ export default function Case() {
                                                 className="table-column-detail">
                                                 รายละเอียด
                                             </label>
-
-
                                         </>
                                     )
                                 }}
                             />
+
+                            <Column title="Status" key="key" align="center" width="5%"
+                                render={(value, record, index) => {
+                                    return (
+                                        <>
+                                            <label className="table-column-text">{record.progress_status}</label>
+                                        </>
+                                    )
+                                }}
+                            />
+
                             <Column title="ผู้แจ้ง" key="key" align="center" width="20%"
                                 render={(value, record, index) => {
                                     return (
@@ -214,7 +224,7 @@ export default function Case() {
                                     )
                                 }}
                             />
-                            <Column title="" key="key" align="center" width="15%"
+                            <Column title="" key="key" align="center" width="20%"
                                 render={(value, record, index) => {
                                     return (
                                         <>
