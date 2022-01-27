@@ -26,11 +26,11 @@ export default function TaskComment({ loadingComment = false }) {
     const [form] = Form.useForm();
 
     // data
-
     const [commentdata, setCommentdata] = useState([]);
     const [commentid, setCommentid] = useState(null);
     const [listmailbox, setListmailbox] = useState([]);
     const [imgUrl, setImgUrl] = useState(null);
+    const [hidden, setHidden] = useState(true);
 
     // Modal
     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
@@ -167,63 +167,34 @@ export default function TaskComment({ loadingComment = false }) {
 
     return (
         <>
-            <List
-                loading={loading}
-                itemLayout="horizontal"
-                dataSource={commentdata}
-                renderItem={item => (
-                    <Comment
-                        author={
-                            <p
-                                style={{ cursor: "pointer" }}
-                                onClick={() => {
-                                    let newKeys = [...divcollapse];
-                                    if (newKeys.includes(item.key)) {
-                                        newKeys = _.filter(newKeys, n => n !== item.key)
-                                    } else {
-                                        newKeys.push(item.key)
-                                    }
-                                    setDivcollapse(newKeys)
-                                }}
-                            ><b>{item.author}</b></p>
-                        }
-                        datetime={
-                            <>
-                                <Row align="middle">
-                                    <Col span={24}>
-                                        <label
-                                            //style={{ cursor: "pointer" }}
-                                            onClick={() => {
-                                                let newKeys = [...divcollapse];
-                                                if (newKeys.includes(item.key)) {
-                                                    newKeys = _.filter(newKeys, n => n !== item.key)
-                                                } else {
-                                                    newKeys.push(item.key)
-                                                }
-                                                setDivcollapse(newKeys)
-                                            }}
-                                        >
-                                            {item.datetime}
-                                        </label>
-
-                                        {
-                                            item.cntfile === 0 ? "" :
-                                                <span
-                                                    onClick={() => {
-                                                        setCommentid(item.id);
-                                                        setModalfiledownload_visible(true);
-                                                    }}
-                                                >
-                                                    <Icon icon="teenyicons:attach-outline" style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }} />
-                                                    <label style={{ cursor: "pointer", color: "#1890ff" }}>File Attach</label>
-                                                </span>
-                                        }
-
-                                        {
-                                            divcollapse.includes(item.key) &&
-                                            (
+            <Row align='middle' style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
+                <Col span={24}>
+                    <List
+                        loading={loading}
+                        itemLayout="horizontal"
+                        dataSource={commentdata}
+                        renderItem={item => (
+                            <Comment
+                                author={
+                                    <p
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => {
+                                            let newKeys = [...divcollapse];
+                                            if (newKeys.includes(item.key)) {
+                                                newKeys = _.filter(newKeys, n => n !== item.key)
+                                            } else {
+                                                newKeys.push(item.key)
+                                            }
+                                            setDivcollapse(newKeys)
+                                        }}
+                                    ><b>{item.author}</b></p>
+                                }
+                                datetime={
+                                    <>
+                                        <Row align="middle">
+                                            <Col span={24}>
                                                 <label
-                                                    style={{ cursor: "pointer", marginLeft: 10 }}
+                                                    //style={{ cursor: "pointer" }}
                                                     onClick={() => {
                                                         let newKeys = [...divcollapse];
                                                         if (newKeys.includes(item.key)) {
@@ -234,53 +205,84 @@ export default function TaskComment({ loadingComment = false }) {
                                                         setDivcollapse(newKeys)
                                                     }}
                                                 >
-                                                    <Icon icon="fa-solid:ellipsis-h" />
+                                                    {item.datetime}
                                                 </label>
-                                            )
-                                        }
-                                    </Col>
-                                </Row>
-                            </>
-                        }
-                        avatar={
-                            <>
-                                &nbsp;&nbsp;
-                                <Avatar
-                                    onClick={() => {
-                                        let newKeys = [...divcollapse];
-                                        if (newKeys.includes(item.key)) {
-                                            newKeys = _.filter(newKeys, n => n !== item.key)
-                                        } else {
-                                            newKeys.push(item.key)
-                                        }
-                                        setDivcollapse(newKeys)
-                                    }}
-                                    src={item.avatar}
-                                    icon={item.email.substring(0, 1).toLocaleUpperCase()}
-                                />
-                            </>
-                        }
-                        content={
-                            <>
-                                {
 
-                                    divcollapse.includes(item.key) === false ? (
-                                        <div className="comment-description" dangerouslySetInnerHTML={{ __html: item.content }}
-                                            style={{ display: divcollapse }}
-                                            onClick={e => {
-                                                if (e.target.tagName == "IMG") {
-                                                    setImgUrl(e.target.src);
-                                                    setModalPreview(true);
+                                                {
+                                                    item.cntfile === 0 ? "" :
+                                                        <span
+                                                            onClick={() => {
+                                                                setCommentid(item.id);
+                                                                setModalfiledownload_visible(true);
+                                                            }}
+                                                        >
+                                                            <Icon icon="teenyicons:attach-outline" style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }} />
+                                                            <label style={{ cursor: "pointer", color: "#1890ff" }}>File Attach</label>
+                                                        </span>
                                                 }
-                                            }}>
 
-                                        </div>
-                                    )
-                                        : ""
+                                                {
+                                                    divcollapse.includes(item.key) &&
+                                                    (
+                                                        <label
+                                                            style={{ cursor: "pointer", marginLeft: 10 }}
+                                                            onClick={() => {
+                                                                let newKeys = [...divcollapse];
+                                                                if (newKeys.includes(item.key)) {
+                                                                    newKeys = _.filter(newKeys, n => n !== item.key)
+                                                                } else {
+                                                                    newKeys.push(item.key)
+                                                                }
+                                                                setDivcollapse(newKeys)
+                                                            }}
+                                                        >
+                                                            <Icon icon="fa-solid:ellipsis-h" />
+                                                        </label>
+                                                    )
+                                                }
+                                            </Col>
+                                        </Row>
+                                    </>
                                 }
+                                avatar={
+                                    <>
+                                        &nbsp;&nbsp;
+                                        <Avatar
+                                            onClick={() => {
+                                                let newKeys = [...divcollapse];
+                                                if (newKeys.includes(item.key)) {
+                                                    newKeys = _.filter(newKeys, n => n !== item.key)
+                                                } else {
+                                                    newKeys.push(item.key)
+                                                }
+                                                setDivcollapse(newKeys)
+                                            }}
+                                            src={item.avatar}
+                                            icon={item.email.substring(0, 1).toLocaleUpperCase()}
+                                        />
+                                    </>
+                                }
+                                content={
+                                    <>
+                                        {
 
-                                <Divider style={{ margin: 0, marginBottom: 10 }} />
-                                {/* {
+                                            divcollapse.includes(item.key) === false ? (
+                                                <div className="comment-description" dangerouslySetInnerHTML={{ __html: item.content }}
+                                                    style={{ display: divcollapse }}
+                                                    onClick={e => {
+                                                        if (e.target.tagName == "IMG") {
+                                                            setImgUrl(e.target.src);
+                                                            setModalPreview(true);
+                                                        }
+                                                    }}>
+
+                                                </div>
+                                            )
+                                                : ""
+                                        }
+
+                                        <Divider style={{ margin: 0, marginBottom: 10 }} />
+                                        {/* {
                                     item.cntfile === 0 ? "" :
                                         <div>
                                             <Row>
@@ -294,21 +296,47 @@ export default function TaskComment({ loadingComment = false }) {
                                             </Row>
                                         </div>
                                 } */}
+                                    </>
+
+                                }
+                                actions={[
+
+                                ]
+                                }
+                            >
+
+                            </Comment>
+                        )}
+                    />
+                </Col>
+            </Row>
+
+            <Row align='middle' style={{ position: "sticky", bottom: 0, zIndex: 1, backgroundColor: "white" }}>
+                <Col span={24} className="task-active"
+                    style={{
+                        boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom: 0,
+                        height: 50, padding: "12px 12px 12px 12px"
+                    }}
+                    onClick={() => setHidden(!hidden)}
+                >
+                    <img
+                        style={{ height: "20px", width: "20px" }}
+                        src={`${process.env.PUBLIC_URL}/icons-doc-task.png`}
+                        alt=""
+                    />&nbsp;
+                    <label className={hidden === false ? 'header-text' : 'blinktext header-text'} style={{ color: "#17A2B8" }}>Comment</label> &nbsp;
+                    {
+                        hidden === true ?
+                            <>
+                                <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} />
+                                <label className='header-text'>Click</label>
                             </>
+                            : ""
+                    }
 
-                        }
-                        actions={[
 
-                        ]
-                        }
-                    >
-
-                    </Comment>
-                )}
-            />
-
-            <Tabs defaultActiveKey="1">
-                <TabPane tab="Task Note" key="1">
+                </Col>
+                <Col span={24}  hidden={hidden} style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
                     <Form
                         name="Internal"
                         initialValues={{
@@ -327,7 +355,15 @@ export default function TaskComment({ loadingComment = false }) {
                                 <Col span={4} style={{ display: "inline" }} >
                                     <Uploadfile ref={uploadRef} />
                                 </Col>
-                                <Col span={18} style={{ textAlign: "right" }}>
+                                <Col span={14} style={{ textAlign: "right" }}>
+                                    <Button type="primary"
+                                        style={{ backgroundColor: "gray" }}
+                                        onClick={() => setHidden(true)}
+                                    >
+                                        Close
+                                    </Button>
+                                </Col>
+                                <Col span={4} style={{ textAlign: "right" }}>
                                     <Button type="primary"
                                         onClick={() => {
                                             return (
@@ -344,8 +380,8 @@ export default function TaskComment({ loadingComment = false }) {
                             </Row>
                         </Form.Item>
                     </Form>
-                </TabPane>
-            </Tabs>
+                </Col>
+            </Row>
 
             {/* Modal */}
             <ModalFileDownload

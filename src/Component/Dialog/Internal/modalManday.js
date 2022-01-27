@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, InputNumber, Spin, List, Row, Col, Radio, Tag } from 'antd';
+import { Modal, Form, InputNumber, Spin, List, Row, Col, Radio, Tag, Input } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -20,6 +20,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     const [crCenterManday, setCrCenterManday] = useState(0)
     const [totalmanday, setTotalmanday] = useState(0)
     const [listdata, setListdata] = useState([]);
+    const [approveResult, setApproveResult] = useState(null);
+    const [approveHistory, setApproveHistory] = useState([]);
 
     const radioStyle = {
         display: 'block',
@@ -42,7 +44,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }
 
 
-    const GetTask = async () => {
+    const getTask = async () => {
         try {
             const task = await Axios({
                 url: process.env.REACT_APP_API_URL + "/tickets/load-task",
@@ -71,7 +73,23 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const SaveComment = async () => {
+    const getApproveReason = async () => {
+        await Axios.get(`${process.env.REACT_APP_API_URL}/workflow/result-approve`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                ticketId: details.ticketid
+            }
+        }).then((res) => {
+            setApproveResult(res.data.data[0]);
+            setApproveHistory(res.data.datalist)
+        }).catch((error) => {
+
+        })
+    }
+
+    const saveComment = async () => {
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
@@ -94,7 +112,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const SendFlowTask = async (values) => {
+    const sendFlowTask = async (values) => {
         setLoading(true);
         try {
             const sendflow = await Axios({
@@ -116,7 +134,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
             });
 
             if (sendflow.status === 200) {
-                SaveComment();
+                saveComment();
                 onOk();
                 setLoading(false);
                 await Modal.success({
@@ -152,7 +170,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const SendFlowIssue = async (values) => {
+    const sendFlowIssue = async (values) => {
         setLoading(true);
         try {
             const SendFlowIssue = await Axios({
@@ -175,7 +193,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
             });
 
             if (SendFlowIssue.status === 200) {
-                SaveComment();
+                saveComment();
                 onOk();
                 setLoading(false);
                 await Modal.success({
@@ -213,12 +231,13 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }
 
     const onFinish = (values) => {
-        details.flowoutput.Type === "Task" ? SendFlowTask(values) : SendFlowIssue(values)
+        details.flowoutput.Type === "Task" ? sendFlowTask(values) : sendFlowIssue(values)
     };
 
     useEffect(() => {
         if (visible) {
-            GetTask();
+            getTask();
+            getApproveReason();
             setTotalcost(details && details.totalcost)
         }
     }, [visible])
@@ -380,6 +399,20 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                         </Col>
                     </Row>
                 </Form>
+
+                <Row hidden={approveResult?.ApproveResultText === undefined ? true : false} style={{ marginTop: 50 }}>
+                    <Col span={24}>
+                        <label className='header-text' >ผลการอนุมัติ :</label>&nbsp;
+                        <label style={{ color: approveResult?.ApproveResultText === "อนุมัติ" ? "green" : "red" }}>{approveResult?.ApproveResultText}</label>
+                    </Col>
+                    <Col span={24} style={{ marginTop: 10 }}>
+                        <label className='header-text' >เหตุผลการอนุมัติ</label>
+                    </Col>
+                    <Col span={24}>
+                        <Input.TextArea disabled rows={5} value={approveResult?.ApproveReason} />
+                    </Col>
+                </Row>
+
 
                 <Row style={{ marginTop: 50 }}>
                     <Col span={24}>

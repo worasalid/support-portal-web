@@ -120,7 +120,7 @@ label.blinktext {
 
 @keyframes blinker {
     50% {
-      opacity: 0;
+      opacity: 0.1;
     }
   }
 
@@ -229,7 +229,7 @@ div.sticky-background {
 // table
 .table-hover,
 .table-hover > td  {
-     background-color:#c2dbff !important;
+     background-color:#EDEBEC !important;
 }
 
 .table-unread {
@@ -306,9 +306,18 @@ div.sticky-background {
     padding-right: 20px;
 }
 
+// .tab-sticky.ant-tabs {
+//     position: sticky;
+//     bottom: 0px;
+//     background-color: #00CC00;
+// }
+
 .header-custom .ant-table-thead > tr > th{
-    background-color: #CF1010;
-    color: white;
+    position: sticky;
+    top:0px;
+    background-color: #E0E0E0;
+    color: #595959;
+    z-index: 9999999;
   }
 
 // .text-size .ant-table-tbody > tr > td {
@@ -321,3 +330,41 @@ div.sticky-background {
     padding: 0px, 10px;
 }
 
+.ant-layout-sider-children {
+    cursor: pointer;
+}
+
+.ant-layout-sider-children  {
+    .btn-collapsed {
+        cursor: pointer;
+        visibility: hidden;
+        transition:  visibility 0s, opacity 0.5s linear;
+        opacity: 0;
+        border-radius: 30;
+        background-color: white;
+        position: absolute;
+    }
+}
+
+.ant-layout-sider-children:hover  {
+    .btn-collapsed {
+        visibility: visible;
+        opacity: 1;
+        cursor: pointer;
+        border-radius: 30;
+        background-color: white;
+        position: absolute;
+    }
+    .btn-collapsed:hover {
+        background-color:#BE1E2D;
+    }
+    // .btn-collapsed:hover {
+    //     background-color: #DEEBFF;
+    // }
+}
+
+.tag-custom-height.ant-tag {
+  background-color:#00CC00;
+   line-height: 10px;
+   color:#fff;
+}

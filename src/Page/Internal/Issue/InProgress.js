@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { ConsoleSqlOutlined, DownloadOutlined, TrademarkOutlined } from "@ant-design/icons";
+import { ConsoleSqlOutlined, DownloadOutlined, TrademarkOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -19,6 +19,7 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import Notification from "../../../Component/Notifications/Internal/Notification";
+import { CalculateTime } from "../../../utility/calculateTime";
 
 export default function InProgress() {
   const history = useHistory();
@@ -292,16 +293,14 @@ export default function InProgress() {
                   return (
                     <>
                       <div>
+                        <Tag hidden={record.TaskCnt > 1 ? false : true} className="tag-custom-height">
+                          <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
+                        </Tag>
+                      </div>
+                      <div>
                         <label className="table-column-text">
                           {record.Title}
                         </label>
-                        <Tag color="#00CC00"
-                          style={{
-                            borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
-                            display: record.TaskCnt > 1 ? "inline-block" : "none"
-                          }}>
-                          <label style={{ fontSize: 10, alignContent: "center", verticalAlign: "center" }}>{record.TaskCnt} Task</label>
-                        </Tag>
                       </div>
                       <div>
                         <label
@@ -421,18 +420,17 @@ export default function InProgress() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        <ClockSLA
+                        {/* <ClockSLA
                           start={moment(record.AssignIconDate)}
                           due={moment(record.SLA_DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
                           type={record.Priority}
-                        />
+                        /> */}
+                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} />
                       </div>
                     </>
-
                   )
-                }
-                }
+                }}
               />
 
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />} width="5%"
@@ -556,4 +554,49 @@ export default function InProgress() {
 
     </IssueContext.Provider>
   );
+}
+
+export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
+  const calculateTime = new CalculateTime();
+  return (
+    <Button
+      type="default"
+      className={
+        ticket_sla < sla ? "sla-warning" : "sla-overdue"
+      }
+      size="middle"
+      shape="round"
+      ghost={ticket_sla < sla ? true : false}
+    >
+      {ticket_sla < sla ?
+
+        <label className="value-text">
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+          }
+
+        </label>
+        :
+        <label className="value-text">
+          {"-"}
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+          }
+        </label>
+      }
+      < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+    </Button>
+  )
 }

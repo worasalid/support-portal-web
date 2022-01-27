@@ -158,6 +158,7 @@ export default function Subject() {
   }
 
   const getflow_output = async (value, trans_id) => {
+    console.log("value.ProgressStatus", value.ProgressStatus)
     try {
       const flow_output = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
@@ -176,7 +177,8 @@ export default function Subject() {
         if (value.ProgressStatus === "Automatic Update Patch") {
           customerdispatch({
             type: "LOAD_ACTION_FLOW",
-            payload: result.filter((x) => x.value !== "SendToDeploy")
+            // payload: result.filter((x) => x.value !== "SendToDeploy")
+            payload: result
           })
         } else {
           customerdispatch({
@@ -206,6 +208,21 @@ export default function Subject() {
     }).catch(() => {
 
     })
+  }
+
+  const getPriority = async () => {
+    await Axios({
+      url: process.env.REACT_APP_API_URL + "/master/priority",
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+    }).then((res) => {
+      customerdispatch({ type: "LOAD_PRIORITY", payload: res.data })
+
+    }).catch((error) => {
+
+    });
   }
 
   function HandleChange(value, item) {
@@ -333,6 +350,22 @@ export default function Subject() {
         },
         onOk() {
           updateScene(item)
+        },
+      });
+    }
+    if (item.group === "priority") {
+      Modal.info({
+        title: 'เปลียนข้อมูล priority',
+        content: (
+          <div>
+
+          </div>
+        ),
+        okCancel() {
+
+        },
+        onOk() {
+          updatePriority(item)
         },
       });
     }
@@ -499,6 +532,7 @@ export default function Subject() {
     if (state?.usersdata?.users?.company_id) {
       getIssueType();
       getproducts();
+      getPriority();
     }
   }, [state?.usersdata?.users?.company_id]);
 
@@ -514,7 +548,7 @@ export default function Subject() {
     }
   }, [customerstate?.issuedata?.details[0]?.Id])
 
-
+  console.log("customerstate", customerstate?.masterdata?.priorityState)
   return (
     <MasterPage>
 
@@ -687,15 +721,27 @@ export default function Subject() {
                           <label className="value-text">{customerstate.issuedata.details[0] && customerstate.issuedata.details[0].IssueType}</label>
                         </Col>
                       </Row>
+
                       <Row style={{ marginBottom: 20 }}>
                         <Col span={18}>
                           <label className="header-text">Priority</label>
                           <br />
-                          <label className="value-text">
-                            {renderColorPriority(customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority)}&nbsp;&nbsp;
 
-                            {customerstate.issuedata.details[0] && customerstate.issuedata.details[0].Priority}
-                          </label>
+                          {
+                            customerstate?.issuedata?.details[0]?.AssignIconDate !== null ?
+                              <label className="value-text">
+                                {renderColorPriority(customerstate?.issuedata?.details[0]?.Priority)}&nbsp;&nbsp;
+                                {customerstate?.issuedata?.details[0]?.Priority}
+                              </label>
+                              :
+                              <Select
+                                style={{ width: "100%", marginTop: 8 }}
+                                placeholder="None"
+                                onChange={onChange}
+                                value={customerstate?.issuedata?.details[0]?.Priority}
+                                options={customerstate?.masterdata?.priorityState.map((x) => ({ value: x.Id, label: x.Name, group: "priority" }))}
+                              />
+                          }
                         </Col>
                       </Row>
 
@@ -707,15 +753,9 @@ export default function Subject() {
                           <br />
                           <Select
                             style={{ width: "100%", marginTop: 8 }}
-
-                            placeholder="None"
                             onChange={onChange}
                             value={`${customerstate?.issuedata?.details[0]?.ProductName} (${customerstate?.issuedata?.details[0]?.ProductFullName})`}
                             options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: `${x.Name} - (${x.FullName})`, code: x.Name, group: "product" }))}
-                            disabled={
-                              // customerstate?.issuedata?.details[0]?.MailType === "out" ? true : false
-                              mailbox?.MailType === "in" ? false : true
-                            }
                           >
                           </Select>
                         </Col>
@@ -953,7 +993,7 @@ export default function Subject() {
               title="404"
               subTitle="Sorry, the page you visited does not exist."
               extra={
-                <Button type="primary" onClick={() => history.push({pathname: "/customer/issue/mytask"})}>Back Home</Button>
+                <Button type="primary" onClick={() => history.push({ pathname: "/customer/issue/mytask" })}>Back Home</Button>
               }
             />
           </Skeleton>

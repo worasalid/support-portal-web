@@ -32,6 +32,7 @@ export default function CommentBox() {
     const [commentid, setCommentid] = useState(null);
     const [divcollapse, setDivcollapse] = useState([])
     const [imgUrl, setImgUrl] = useState(null);
+    const [hidden, setHidden] = useState(true);
 
     // Modal
     const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
@@ -189,68 +190,39 @@ export default function CommentBox() {
     }, [])
 
     return (
-        <div>
-            <List
-                loading={loading}
-                itemLayout="horizontal"
-                dataSource={commentdata}
-                renderItem={item => (
-                    <Comment
-                        author={
-                            <Row align="middle">
-                                <Col span={24}>
-                                    <label
-                                        style={{ cursor: "pointer" }}
-                                        onClick={() => {
-                                            let newKeys = [...divcollapse];
-                                            if (newKeys.includes(item.key)) {
-                                                newKeys = _.filter(newKeys, n => n !== item.key)
-                                            } else {
-                                                newKeys.push(item.key)
-                                            }
-                                            setDivcollapse(newKeys)
-                                        }}
-                                    ><b>{item.author}</b></label>
-                                </Col>
-                            </Row>
-                        }
-                        datetime={
-                            <>
-                                <Row align="middle" style={{ marginTop: -2 }}>
-                                    <Col span={24}>
-                                        <label
-                                            //style={{ cursor: "pointer" }}
-                                            onClick={() => {
-                                                let newKeys = [...divcollapse];
-                                                if (newKeys.includes(item.key)) {
-                                                    newKeys = _.filter(newKeys, n => n !== item.key)
-                                                } else {
-                                                    newKeys.push(item.key)
-                                                }
-                                                setDivcollapse(newKeys)
-                                            }}
-                                        >
-                                            {item.datetime}
-                                        </label>
-
-                                        {
-                                            item.cntfile === 0 ? "" :
-                                                <span onClick={() => {
-                                                    setCommentid(item.id);
-                                                    setModalfiledownload_visible(true);
+        <>
+            <Row align='middle' style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
+                <Col span={24}>
+                    <List
+                        loading={loading}
+                        itemLayout="horizontal"
+                        dataSource={commentdata}
+                        renderItem={item => (
+                            <Comment
+                                author={
+                                    <Row align="middle">
+                                        <Col span={24}>
+                                            <label
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() => {
+                                                    let newKeys = [...divcollapse];
+                                                    if (newKeys.includes(item.key)) {
+                                                        newKeys = _.filter(newKeys, n => n !== item.key)
+                                                    } else {
+                                                        newKeys.push(item.key)
+                                                    }
+                                                    setDivcollapse(newKeys)
                                                 }}
-                                                >
-                                                    <Icon icon="teenyicons:attach-outline"
-                                                        style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
-                                                    />
-                                                    <label style={{ cursor: "pointer", color: "#1890ff" }}>File Attach</label>
-                                                </span>
-                                        }
-                                        {
-                                            divcollapse.includes(item.key) &&
-                                            (
+                                            ><b>{item.author}</b></label>
+                                        </Col>
+                                    </Row>
+                                }
+                                datetime={
+                                    <>
+                                        <Row align="middle" style={{ marginTop: -2 }}>
+                                            <Col span={24}>
                                                 <label
-                                                    style={{ cursor: "pointer", marginLeft: 10 }}
+                                                    //style={{ cursor: "pointer" }}
                                                     onClick={() => {
                                                         let newKeys = [...divcollapse];
                                                         if (newKeys.includes(item.key)) {
@@ -261,52 +233,83 @@ export default function CommentBox() {
                                                         setDivcollapse(newKeys)
                                                     }}
                                                 >
-                                                    <Icon icon="fa-solid:ellipsis-h" />
+                                                    {item.datetime}
                                                 </label>
-                                            )
-                                        }
-                                    </Col>
-                                </Row>
-                            </>
-                        }
-                        avatar={
-                            <>
-                                <Avatar
-                                    onClick={() => {
-                                        let newKeys = [...divcollapse];
-                                        if (newKeys.includes(item.key)) {
-                                            newKeys = _.filter(newKeys, n => n !== item.key)
-                                        } else {
-                                            newKeys.push(item.key)
-                                        }
-                                        setDivcollapse(newKeys)
-                                    }}
-                                    src={item.avatar === null ? <UserOutlined /> : item.avatar}
-                                    icon={item.email === null ? <UserOutlined /> : item.email.substring(0, 1).toLocaleUpperCase()}
-                                />
-                            </>
-                        }
-                        content={
-                            <>
-                                {
 
-                                    divcollapse.includes(item.key) === false ? (
-                                        <div className="comment-description" dangerouslySetInnerHTML={{ __html: item.content }}
-                                            style={{ display: divcollapse }}
-                                            onClick={e => {
-                                                if (e.target.tagName == "IMG") {
-                                                    setImgUrl(e.target.src);
-                                                    setModalPreview(true);
+                                                {
+                                                    item.cntfile === 0 ? "" :
+                                                        <span onClick={() => {
+                                                            setCommentid(item.id);
+                                                            setModalfiledownload_visible(true);
+                                                        }}
+                                                        >
+                                                            <Icon icon="teenyicons:attach-outline"
+                                                                style={{ cursor: "pointer", marginLeft: 10, color: "#1890ff" }}
+                                                            />
+                                                            <label style={{ cursor: "pointer", color: "#1890ff" }}>File Attach</label>
+                                                        </span>
                                                 }
-                                            }}>
-
-                                        </div>
-                                    )
-                                        : ""
+                                                {
+                                                    divcollapse.includes(item.key) &&
+                                                    (
+                                                        <label
+                                                            style={{ cursor: "pointer", marginLeft: 10 }}
+                                                            onClick={() => {
+                                                                let newKeys = [...divcollapse];
+                                                                if (newKeys.includes(item.key)) {
+                                                                    newKeys = _.filter(newKeys, n => n !== item.key)
+                                                                } else {
+                                                                    newKeys.push(item.key)
+                                                                }
+                                                                setDivcollapse(newKeys)
+                                                            }}
+                                                        >
+                                                            <Icon icon="fa-solid:ellipsis-h" />
+                                                        </label>
+                                                    )
+                                                }
+                                            </Col>
+                                        </Row>
+                                    </>
                                 }
+                                avatar={
+                                    <>
+                                        <Avatar
+                                            onClick={() => {
+                                                let newKeys = [...divcollapse];
+                                                if (newKeys.includes(item.key)) {
+                                                    newKeys = _.filter(newKeys, n => n !== item.key)
+                                                } else {
+                                                    newKeys.push(item.key)
+                                                }
+                                                setDivcollapse(newKeys)
+                                            }}
+                                            src={item.avatar === null ? <UserOutlined /> : item.avatar}
+                                            icon={item.email === null ? <UserOutlined /> : item.email.substring(0, 1).toLocaleUpperCase()}
+                                        />
+                                    </>
+                                }
+                                content={
+                                    <>
+                                        {
 
-                                < Divider style={{ margin: 0, marginBottom: 10 }} />
-                                {/* {
+                                            divcollapse.includes(item.key) === false ? (
+                                                <div className="comment-description" dangerouslySetInnerHTML={{ __html: item.content }}
+                                                    style={{ display: divcollapse }}
+                                                    onClick={e => {
+                                                        if (e.target.tagName == "IMG") {
+                                                            setImgUrl(e.target.src);
+                                                            setModalPreview(true);
+                                                        }
+                                                    }}>
+
+                                                </div>
+                                            )
+                                                : ""
+                                        }
+
+                                        < Divider style={{ margin: 0, marginBottom: 10 }} />
+                                        {/* {
                                     item.cntfile === 0 ? "" :
                                         <div>
                                             <Row>
@@ -320,21 +323,39 @@ export default function CommentBox() {
                                             </Row>
                                         </div>
                                 } */}
+                                    </>
+                                }
+                            >
+                            </Comment >
+                        )}
+                    />
+                </Col>
+            </Row>
+
+            <Row align='middle' style={{ position: "sticky", bottom: -25, zIndex: 1, backgroundColor: "white" }}>
+                <Col span={24} className="task-active"
+                    style={{
+                        boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom: 0,
+                        height: 50, padding: "12px 12px 12px 12px"
+                    }}
+                    onClick={() => setHidden(!hidden)}
+                >
+                    <img
+                        style={{ height: "20px", width: "20px" }}
+                        src={`${process.env.PUBLIC_URL}/icons-doc-task.png`}
+                        alt=""
+                    />&nbsp;
+                    <label className={hidden === false ? 'header-text' : 'blinktext header-text'} style={{ color: "#17A2B8" }}>Reply To Customer</label> &nbsp;
+                    {
+                        hidden === true ?
+                            <>
+                                <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} />
+                                <label className='header-text'>Click</label>
                             </>
-                        }
-                    >
-                    </Comment >
-                )}
-            />
-
-            {/* {
-                container && <Affix target={() => container}>
-                    
-                </Affix>
-            } */}
-
-            <Tabs defaultActiveKey="1">
-                <TabPane tab="Reply To Customer" key="1">
+                            : ""
+                    }
+                </Col>
+                <Col span={24} span={24} hidden={hidden} style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
                     <Form
                         form={form}
                         name="Customer"
@@ -347,7 +368,6 @@ export default function CommentBox() {
                         onFinish={onFinish}
                     >
                         <Form.Item name="customer_comment">
-
                             <TextEditor ref={editorRef} ticket_id={match.params.id} />
                         </Form.Item>
                         <Form.Item name="customer_fileattach">
@@ -358,7 +378,15 @@ export default function CommentBox() {
                                 <Col span={4} style={{ display: "inline" }} >
                                     <Uploadfile ref={uploadRef} />
                                 </Col>
-                                <Col span={18} style={{ textAlign: "right" }}>
+                                <Col span={14} style={{ textAlign: "right" }}>
+                                    <Button type="primary"
+                                        style={{ backgroundColor: "gray" }}
+                                        onClick={() => setHidden(true)}
+                                    >
+                                        Close
+                                    </Button>
+                                </Col>
+                                <Col span={4} style={{ textAlign: "right" }}>
                                     <Popconfirm title="Comment หาลูกค้า ใช่หรือไม่"
                                         okText="Yes" cancelText="No"
                                         onConfirm={() => {
@@ -378,9 +406,8 @@ export default function CommentBox() {
                             </Row>
                         </Form.Item>
                     </Form>
-                </TabPane>
-            </Tabs>
-
+                </Col>
+            </Row>
 
             {/* Modal */}
             <ModalFileDownload
@@ -412,7 +439,7 @@ export default function CommentBox() {
                 pathUrl={imgUrl}
             />
 
-        </div >
+        </>
     );
 }
 

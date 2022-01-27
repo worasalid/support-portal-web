@@ -29,8 +29,12 @@ import DashBoard_CMMI1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI1';
 import DashBoard_CMMI2 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI2';
 import DashBoard_CMMI3 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI3';
 import DashBoard_CMMI4 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI4';
+import DashBoard_CMMI5 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI5';
+import DashBoard_CMMI5_1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI5_1';
 import TimeSheet1 from './Page/Internal/DashBoard/TimeSheet/TimeSheet1';
 import TimeSheet2 from './Page/Internal/DashBoard/TimeSheet/TimeSheet2';
+import TimeSheet3 from './Page/Internal/DashBoard/TimeSheet/TimeSheet3';
+import DashBoard6 from './Page/Internal/DashBoard/DashBoard6';
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -95,6 +99,7 @@ import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
 // Call Center Service
 import CallService from './Page/Internal/ServiceDesk/CallService';
 import Case from './Page/Internal/CallCenter/Case';
+import CaseSubject from './Page/Internal/CallCenter/Subject';
 
 
 import AuthenContext, { reducer, initState } from "./utility/authenContext";
@@ -169,10 +174,13 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi2" exact component={DashBoard_CMMI2} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi3" exact component={DashBoard_CMMI3} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi4" exact component={DashBoard_CMMI4} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi5" exact component={DashBoard_CMMI5} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi5_1" exact component={DashBoard_CMMI5_1} />
+                                    <Route path="/internal/dashboard/timesheet1" exact component={TimeSheet1} />
+                                    <Route path="/internal/dashboard/timesheet2" exact component={TimeSheet2} />
+                                    <Route path="/internal/dashboard/timesheet3" exact component={TimeSheet3} />
+                                    <Route path="/internal/dashboard/dashboard6" exact component={DashBoard6} />
 
-                                    <Route path="/internal/dashboard/timesheet/1" exact component={TimeSheet1} />
-                                    <Route path="/internal/dashboard/timesheet/2" exact component={TimeSheet2} />
-                                    
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
@@ -221,6 +229,7 @@ export default function Routes() {
                                     {/* CallCenter Service */}
                                     <Route path="/servicedesk/voxtron" exact component={CallService} />
                                     <Route path="/internal/callcenter/case" exact component={Case} />
+                                    <Route path="/internal/callcenter/case/subject/:caseid?" exact component={CaseSubject} />
 
                                 </Switch>
                             </Router>

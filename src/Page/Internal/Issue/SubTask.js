@@ -38,6 +38,7 @@ import ModalChangeDueDateDev from "../../../Component/Dialog/Internal/Issue/moda
 import DuedateLog from "../../../Component/Dialog/Internal/Issue/modalTaskDueDateLog";
 import ModalSA from "../../../Component/Dialog/Internal/modalSA";
 import ModalSA_Assessment from "../../../Component/Dialog/Internal/modalSA_Assessment";
+import ModalChangeAssign from "../../../Component/Dialog/Internal/Issue/modalChangeAssign";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -66,7 +67,6 @@ export default function SubTask() {
   const [modalQAassign_visible, setModalQAassign_visible] = useState(false);
   const [modalQA_visible, setModalQA_visible] = useState(false);
   const [modalmanday_visible, setModalmanday_visible] = useState(false);
-
   const [modaltimetracking_visible, setModaltimetracking_visible] = useState(false);
   const [modalcomplete_visible, setModalcomplete_visible] = useState(false);
   const [modalreject_visible, setModalreject_visible] = useState(false);
@@ -80,6 +80,7 @@ export default function SubTask() {
   const [modalTaskDueDate, setModalTaskDueDate] = useState(false);
   const [modalSA, setModalSA] = useState(false);
   const [modalAssessment, setModalAssessment] = useState(false);
+  const [modalChangeAssign, setModalChangeAssign] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -92,13 +93,12 @@ export default function SubTask() {
   const [ProgressStatus, setProgressStatus] = useState("");
   const [history_duedate_data, setHistory_duedate_data] = useState([]);
   const [selected, setSelected] = useState();
-
-  // const [SLA, setSLA] = useState(null);
   const [createddate, setCreateddate] = useState(null);
   const [resolveddate, setResolveddate] = useState(null);
   const [duration, setDuration] = useState(null);
+  const [selectModule, setSelectModule] = useState(null)
 
-  // Load ข้อมูล Detail ของ Issue และ ข้อมูล mailbox ล่าสุด
+  //////////////////////////////////////////////// call Api ////////////////////////////////////////////////////////////////////////
   const getMailBox = async () => {
     try {
       const mailbox = await Axios({
@@ -158,14 +158,14 @@ export default function SubTask() {
             if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === true) {
               userdispatch({
                 type: "LOAD_ACTION_FLOW",
-                payload: flow_output.data.filter((x) => x.value === "SendQALeader" || x.value === "QAReject")
+                payload: flow_output.data.filter((x) => x.value === "SendQALeader" || x.value === "QAReject" || x.value === "QARejectDev")
               });
             }
 
             if (userstate?.mailbox[0]?.NodeName === "qa" && userstate?.taskdata?.data[0]?.QA_Recheck === false) {
               userdispatch({
                 type: "LOAD_ACTION_FLOW",
-                payload: flow_output.data.filter((x) => x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject")
+                payload: flow_output.data.filter((x) => x.value === "QApass" || x.value === "RequestVersion" || x.value === "QAReject" || x.value === "QARejectDev")
               });
             }
 
@@ -291,170 +291,6 @@ export default function SubTask() {
     }
   }
 
-  function HandleChange(value, item) {
-    setProgressStatus(item.label);
-    userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-
-    // Flow Bug
-    if (userstate?.taskdata?.data[0]?.IssueType === "Bug") {
-      if (item.data.NodeName === "support") {
-        if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
-        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
-        if (item.data.value === "RejectToQA") { setModalsendtask_visible(true) }
-        if (item.data.value === "SendToDeploy") { setModalsendtask_visible(true) }
-      }
-      if (item.data.NodeName === "developer_2") {
-        if (item.data.value === "LeaderAssign") {
-          setModalleaderassign_visible(true)
-        }
-        if (item.data.value === "SendUnitTest") {
-          setModaldeveloper_visible(true)
-        }
-        if (item.data.value === "LeaderQC" || item.data.value === "LeaderReject") {
-          setModalsendtask_visible(true)
-        }
-        if (item.data.value === "SendVersion") {
-          setModalDevSendVersion(true)
-        }
-        if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
-        if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
-      }
-      if (item.data.NodeName === "developer_1") {
-        if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-        if (item.data.value === "RejectToDevLeader") { setModalsendtask_visible(true) }
-      }
-      if (item.data.NodeName === "qa_leader") {
-        if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
-        if (item.data.value === "QApass" || item.data.value === "RequestVersion") {
-          setModalQA_visible(true)
-        }
-        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject" || item.data.value === "RecheckPass") {
-          setModalsendtask_visible(true)
-        }
-      }
-      if (item.data.NodeName === "qa") {
-        if (item.data.value === "SendQALeader") {
-          setModalQA_visible(true)
-        }
-        if (item.data.value === "QApass" || item.data.value === "RequestVersion") {
-          setModalQA_visible(true)
-        }
-        if (item.data.value === "QAReject") {
-          setModalsendtask_visible(true)
-        }
-      }
-
-    }
-    // Flow CR
-    if (userstate?.taskdata?.data[0]?.IssueType === "ChangeRequest" || userstate?.taskdata?.data[0]?.IssueType === "Memo") {
-      if (item.data.NodeName === "support") {
-        if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR" || item.data.value === "SendToDeploy") {
-          setModalsendtask_visible(true)
-        }
-      }
-      if (item.data.NodeName === "cr_center") {
-        if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate" || item.data.value === "SendToSA") {
-          setModalsendtask_visible(true);
-        }
-        if (item.data.value === "RejectManday" || item.data.value === "RejectMandaySA") {
-          setModalsendtask_visible(true)
-        }
-        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
-        if (item.data.value === "RejectTask") { setModalsendtask_visible(true) }
-      }
-      if (item.data.NodeName === "developer_2") {
-        if (item.data.value === "SendManday") { setModalmanday_visible(true) }
-        if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
-        if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
-        if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject" ||
-          item.data.value === "RequestInfo") {
-          setModalsendtask_visible(true)
-        }
-        if (item.data.value === "Deploy") {
-          setModalcomplete_visible(true)
-        }
-
-      }
-      if (item.data.NodeName === "developer_1") {
-        if (item.data.value === "SendUnitTest") { setModaldeveloper_visible(true) }
-        if (item.data.value === "RejectToDevLeader" || item.data.value === "SendInfoToSA") {
-          setModalsendtask_visible(true);
-        }
-      }
-      if (item.data.NodeName === "qa_leader") {
-        if (item.data.value === "QAassign") {
-          setModalQAassign_visible(true)
-        }
-        if (item.data.value === "QApass") {
-          setModalQA_visible(true)
-        }
-        if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
-        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject") { setModalsendtask_visible(true) }
-      }
-      if (item.data.NodeName === "qa") {
-        if (item.data.value === "QApass") {
-          setModalQA_visible(true)
-        }
-        if (item.data.value === "QAReject") {
-          setModalsendtask_visible(true)
-        }
-
-      }
-      if (item.data.NodeName === "sa") {
-        if (item.data.value === "SendManday") {
-          setModalSA(true)
-        }
-        if (item.data.value === "RejectToCR") {
-          setModalsendtask_visible(true)
-        }
-        if (item.data.value === "RequestInfoDev") {
-          setModalRequestInfoDev(true)
-        }
-      }
-    }
-
-    // Flow Use
-    if (userstate?.taskdata?.data[0]?.IssueType === "Use") {
-      if (item.data.NodeName === "support") {
-        if (item.data.value === "RequestInfoDev") { setModalRequestInfoDev(true) }
-        if (item.data.value === "RequestInfoQA") { setModalRequestInfoQA(true) }
-        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
-      }
-      if (item.data.NodeName === "developer_1") {
-        if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
-      }
-      if (item.data.NodeName === "qa") {
-        if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
-      }
-    }
-  }
-
-
-  function onChange(value, item) {
-
-    if (item.type === "module") {
-      Modal.info({
-        title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
-        content: (
-          <div>
-            <p></p>
-          </div>
-        ),
-        okCancel() {
-
-        },
-        onOk() {
-          updateModule(value, item)
-        },
-      });
-    }
-    if (item.type === "progress") {
-      alert()
-    }
-  }
-
-
-  //////////////////////////////////////////////// NEW ทำ subtask /////////////////////
   const GetTaskDetail = async () => {
     try {
       const task_detail = await Axios({
@@ -506,26 +342,22 @@ export default function SubTask() {
   }
 
   const updateModule = async (param) => {
-    try {
-      const result = await Axios({
-        url: process.env.REACT_APP_API_URL + "/workflow/module",
-        method: "PATCH",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-        },
-        data: {
-          task_id: match.params.task,
-          module_id: param
-        }
-      });
-
-      if (result.status === 200) {
-        window.location.reload(true);
+    await Axios({
+      url: process.env.REACT_APP_API_URL + "/workflow/module",
+      method: "PATCH",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      data: {
+        task_id: match.params.task,
+        module_id: param
       }
+    }).then(() => {
+      window.location.reload(true);
+    }).catch(() => {
 
-    } catch (error) {
+    });
 
-    }
   }
 
   const getDevelopDuration = async () => {
@@ -543,6 +375,214 @@ export default function SubTask() {
 
     })
   }
+
+  //////////////////////////////////////////////// function ////////////////////////////////////////////////
+  function HandleChange(value, item) {
+    setProgressStatus(item.label);
+    userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
+
+    // Flow Bug
+    if (userstate?.taskdata?.data[0]?.IssueType === "Bug") {
+      if (item.data.NodeName === "support") {
+        if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
+        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
+        if (item.data.value === "RejectToQA") { setModalsendtask_visible(true) }
+        if (item.data.value === "SendToDeploy") { setModalsendtask_visible(true) }
+      }
+
+      if (item.data.NodeName === "developer_2") {
+        if (item.data.value === "LeaderAssign") {
+          setModalleaderassign_visible(true)
+        }
+
+        if (item.data.value === "SendUnitTest") {
+          setModaldeveloper_visible(true)
+        }
+
+        if (item.data.value === "LeaderQC" || item.data.value === "LeaderReject") {
+          setModalsendtask_visible(true)
+        }
+
+        if (item.data.value === "SendVersion") {
+          setModalDevSendVersion(true)
+        }
+
+        if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
+        if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
+      }
+
+      if (item.data.NodeName === "developer_1") {
+        if (item.data.value === "SendUnitTest" || item.data.value === "SendToQA") {
+          setModaldeveloper_visible(true)
+        }
+        if (item.data.value === "RejectToDevLeader") {
+          setModalsendtask_visible(true)
+        }
+      }
+
+      if (item.data.NodeName === "qa_leader") {
+        if (item.data.value === "QAassign") { setModalQAassign_visible(true) }
+        if (item.data.value === "QApass" || item.data.value === "RequestVersion") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject" || item.data.value === "RecheckPass"
+          || item.data.value === "QARejectDev") {
+          setModalsendtask_visible(true)
+        }
+      }
+
+      if (item.data.NodeName === "qa") {
+        if (item.data.value === "SendQALeader") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "QApass" || item.data.value === "RequestVersion") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "QAReject" || item.data.value === "QARejectDev") {
+          setModalsendtask_visible(true)
+        }
+      }
+
+    }
+    // Flow CR
+    if (userstate?.taskdata?.data[0]?.IssueType === "ChangeRequest" || userstate?.taskdata?.data[0]?.IssueType === "Memo") {
+      if (item.data.NodeName === "support") {
+        if (item.data.value === "ResolvedTask" || item.data.value === "RejectToCR" || item.data.value === "RequestDeploy") {
+          setModalsendtask_visible(true)
+        }
+      }
+
+      if (item.data.NodeName === "cr_center") {
+        if (item.data.value === "RequestManday" || item.data.value === "RequestDueDate" || item.data.value === "SendToSA") {
+          setModalsendtask_visible(true);
+        }
+        if (item.data.value === "RejectManday" || item.data.value === "RejectMandaySA") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "ResolvedTask") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "RejectTask") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "SendToDeploy" || item.data.value === "CheckDeploy") {
+          setModalsendtask_visible(true)
+        }
+      }
+
+      if (item.data.NodeName === "developer_2") {
+        if (item.data.value === "SendManday") { setModalmanday_visible(true) }
+        if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
+        if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
+        if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject" ||
+          item.data.value === "RequestInfo") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "Deploy") {
+          setModalcomplete_visible(true)
+        }
+
+      }
+
+      if (item.data.NodeName === "developer_1") {
+        if (item.data.value === "SendUnitTest" || item.data.value === "SendToQA") {
+          setModaldeveloper_visible(true)
+        }
+        if (item.data.value === "RejectToDevLeader" || item.data.value === "SendInfoToSA") {
+          setModalsendtask_visible(true);
+        }
+      }
+
+      if (item.data.NodeName === "qa_leader") {
+        if (item.data.value === "QAassign") {
+          setModalQAassign_visible(true)
+        }
+        if (item.data.value === "QApass") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "RecheckPass") { setModalsendtask_visible(true) }
+        if (item.data.value === "LeaderReject" || item.data.value === "RejectRecheck" || item.data.value === "QAReject"
+          || item.data.value === "QARejectDev") {
+          setModalsendtask_visible(true)
+        }
+      }
+
+      if (item.data.NodeName === "qa") {
+        if (item.data.value === "QApass") {
+          setModalQA_visible(true)
+        }
+        if (item.data.value === "QAReject" || item.data.value === "QARejectDev") {
+          setModalsendtask_visible(true)
+        }
+
+      }
+
+      if (item.data.NodeName === "sa") {
+        if (item.data.value === "SendManday") {
+          setModalSA(true)
+        }
+        if (item.data.value === "RejectToCR") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "RequestInfoDev") {
+          setModalRequestInfoDev(true)
+        }
+      }
+    }
+
+    // Flow Use
+    if (userstate?.taskdata?.data[0]?.IssueType === "Use") {
+      if (item.data.NodeName === "support") {
+        if (item.data.value === "RequestInfoDev") { setModalRequestInfoDev(true) }
+        if (item.data.value === "RequestInfoQA") { setModalRequestInfoQA(true) }
+        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "developer_1") {
+        if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
+      }
+      if (item.data.NodeName === "qa") {
+        if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
+      }
+    }
+  }
+
+  function onChange(value, item) {
+    if (item.type === "module") {
+      if (userstate?.mailbox[0]?.NodeName === "developer_2") {
+        Modal.info({
+          title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okCancel() {
+
+          },
+          onOk() {
+            setSelectModule(item);
+            setModalChangeAssign(true);
+          },
+        });
+      } else {
+        Modal.info({
+          title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okCancel() {
+
+          },
+          onOk() {
+            updateModule(value, item)
+          },
+        });
+      }
+    }
+  }
+
 
   useEffect(() => {
     GetTaskDetail();
@@ -578,7 +618,6 @@ export default function SubTask() {
             <Row style={{ height: 'calc(100% - 0px)' }}>
               {/* Content */}
               <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
-
                 <Row style={{ textAlign: "left" }}>
                   <Col span={24} style={{ textAlign: "left" }}>
                     <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
@@ -594,6 +633,7 @@ export default function SubTask() {
                     </div>
                   </Col>
                 </Row>
+                
                 <Row style={{ marginTop: 30 }}>
                   <Col span={24}>
                     <label className="topic-text">
@@ -684,7 +724,7 @@ export default function SubTask() {
                   <Col span={24} >
                     <label className="header-text">Activity</label>
                     {
-                      <Tabs defaultActiveKey="1" size="small" >
+                      <Tabs defaultActiveKey="1" size="small" style={{ overflow: "visible" }}>
                         <TabPane tab="Task Note" key="1" >
                           <TaskComment />
                         </TabPane>
@@ -850,10 +890,10 @@ export default function SubTask() {
                     <label className="header-text">Module</label>
                     <br />
                     {
-                      (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center") &&
+                      (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "developer_2") &&
                         userstate.taskdata.data[0]?.MailType === "in" &&
                         (userstate?.taskdata?.data[0]?.Status === "Waiting Progress" || userstate?.taskdata?.data[0]?.Status === "InProgress") &&
-                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress")
+                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Wait H.Dev Assign")
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
@@ -936,6 +976,7 @@ export default function SubTask() {
             </Row>
           </div>
         </Skeleton>
+
         {/* Modal */}
         <Modal
           title="Preview"
@@ -996,7 +1037,7 @@ export default function SubTask() {
           title={ProgressStatus}
           visible={visible}
           width={800}
-          onCancel={() => { return (setVisible(false), setSelected(null)) }}
+          onCancel={() => { setVisible(false); setSelected(null) }}
           onOk={() => {
             setVisible(false);
           }}
@@ -1013,7 +1054,7 @@ export default function SubTask() {
           title={ProgressStatus}
           visible={modalmanday_visible}
           width={800}
-          onCancel={() => { return (setModalmanday_visible(false)) }}
+          onCancel={() => setModalmanday_visible(false)}
           onOk={() => {
             setModalmanday_visible(false);
           }}
@@ -1048,7 +1089,7 @@ export default function SubTask() {
         <ModalDeveloper
           title={ProgressStatus}
           visible={modaldeveloper_visible}
-          onCancel={() => { return (setModaldeveloper_visible(false), setSelected(null)) }}
+          onCancel={() => { setModaldeveloper_visible(false); setSelected(null) }}
           width={800}
           onOk={() => {
             setModaldeveloper_visible(false);
@@ -1065,7 +1106,7 @@ export default function SubTask() {
         <ModalLeaderQC
           title={ProgressStatus}
           visible={modalleaderqc_visible}
-          onCancel={() => { return (setModalleaderqc_visible(false), setSelected(null)) }}
+          onCancel={() => { setModalleaderqc_visible(false); setSelected(null) }}
           width={800}
           onOk={() => {
             setModalleaderqc_visible(false);
@@ -1085,7 +1126,7 @@ export default function SubTask() {
         <ModalReject
           title={ProgressStatus}
           visible={modalreject_visible}
-          onCancel={() => { return (setModalreject_visible(false)) }}
+          onCancel={() => setModalreject_visible(false)}
           width={800}
           onOk={() => {
             setModalreject_visible(false);
@@ -1122,7 +1163,7 @@ export default function SubTask() {
           title={ProgressStatus}
           visible={modalQAassign_visible}
           width={800}
-          onCancel={() => { return (setModalQAassign_visible(false)) }}
+          onCancel={() => setModalQAassign_visible(false)}
           onOk={() => {
             setModalQAassign_visible(false);
             // window.location.reload("false");
@@ -1138,7 +1179,7 @@ export default function SubTask() {
         <ModalRequestInfoDev
           title={ProgressStatus}
           visible={modalRequestInfoDev}
-          onCancel={() => { return (setModalRequestInfoDev(false), setSelected(null)) }}
+          onCancel={() => { setModalRequestInfoDev(false); setSelected(null) }}
           width={800}
           onOk={() => {
             setModalRequestInfoDev(false);
@@ -1159,7 +1200,7 @@ export default function SubTask() {
         <ModalRequestInfoQA
           title={ProgressStatus}
           visible={modalRequestInfoQA}
-          onCancel={() => { return (setModalRequestInfoQA(false), setSelected(null)) }}
+          onCancel={() => { setModalRequestInfoQA(false); setSelected(null) }}
           width={800}
           onOk={() => {
             setModalRequestInfoQA(false);
@@ -1180,7 +1221,7 @@ export default function SubTask() {
         <ModalQA
           title={ProgressStatus}
           visible={modalQA_visible}
-          onCancel={() => { return (setModalQA_visible(false), setSelected(null)) }}
+          onCancel={() => { setModalQA_visible(false); setSelected(null) }}
           width={900}
           onOk={() => {
             setModalQA_visible(false);
@@ -1201,7 +1242,7 @@ export default function SubTask() {
           title="Time Tracking"
           width={600}
           visible={modaltimetracking_visible}
-          onCancel={() => { return (setModaltimetracking_visible(false)) }}
+          onCancel={() => setModaltimetracking_visible(false)}
           details={{
             transgroupid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TransGroupId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
@@ -1241,7 +1282,7 @@ export default function SubTask() {
           title="Confirm Deploy File (Patch Version)"
           width={800}
           visible={modalDevSendVersion}
-          onCancel={() => { return (setModalDevSendVersion(false)) }}
+          onCancel={() => setModalDevSendVersion(false)}
           onOk={() => {
             setModalDevSendVersion(false);
           }}
@@ -1257,7 +1298,7 @@ export default function SubTask() {
         <ModalFileDownload
           title="File Download"
           visible={modalfiledownload_visible}
-          onCancel={() => { return (setModalfiledownload_visible(false)) }}
+          onCancel={() => setModalfiledownload_visible(false)}
           width={600}
           onOk={() => {
             setModalfiledownload_visible(false);
@@ -1275,7 +1316,7 @@ export default function SubTask() {
           ref={trackingRef}
           width={600}
           visible={modalTimeDevelop}
-          onCancel={() => { return (setModalTimeDevelop(false)) }}
+          onCancel={() => setModalTimeDevelop(false)}
           details={{
             ticketId: userstate?.taskdata?.data[0]?.TicketId,
             taskId: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
@@ -1328,6 +1369,23 @@ export default function SubTask() {
           details={{
             ticketid: userstate?.taskdata?.data[0]?.TicketId,
             taskid: userstate?.taskdata?.data[0]?.TaskId,
+          }}
+        />
+
+        <ModalChangeAssign
+          //title="เปลี่ยน Module"
+          visible={modalChangeAssign}
+          width={600}
+          onCancel={() => setModalChangeAssign(false)}
+          onOk={() => window.location.reload(true)}
+          details={{
+            ticketId: userstate?.taskdata?.data[0]?.TicketId,
+            taskId: userstate?.taskdata?.data[0]?.TaskId,
+            mailboxId: userstate?.taskdata?.data[0]?.MailboxId,
+            flowoutputId: userstate?.node.output_data?.FlowOutputId,
+            productCode: userstate?.taskdata?.data[0]?.ProductName,
+            oldModule: userstate?.taskdata?.data[0]?.ModuleName,
+            newModule: selectModule
           }}
         />
 

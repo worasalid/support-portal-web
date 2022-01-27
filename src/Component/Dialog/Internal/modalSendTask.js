@@ -76,12 +76,12 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
 
                         if (details.flowoutput.value === "SendTask" || details.flowoutput.value === "ResolvedTask" || details.flowoutput.value === "SendToDev") {
                             history.push({ pathname: "/internal/issue/subject/" + match.params.id });
-                            window.location.reload(true); 
+                            window.location.reload(true);
                         }
-                        else if (details.flowoutput.value === "SendToDeploy") {
+                        else if (details.flowoutput.value === "SendToDeploy" || details.flowoutput.value === "RequestDeploy" || details.flowoutput.value === "CheckDeploy") {
                             history.push({ pathname: "/internal/issue/resolved" });
                             window.location.reload(true);
-                           
+
                         }
                         else {
                             history.push({ pathname: "/internal/issue/inprogress" });
@@ -147,7 +147,7 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     >
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
             </Spin>
