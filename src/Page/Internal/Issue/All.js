@@ -297,17 +297,19 @@ export default function AllIssue() {
                   return (
                     <>
                       <div>
+                        <label
+                          hidden={record.TaskCnt > 1 ? false : true}
+                          style={{
+                            fontSize: 10, alignContent: "center", verticalAlign: "center", color: "#00CC00",
+                          }}
+                        >
+                          {record.TaskCnt} Task
+                        </label>
+                      </div>
+                      <div>
                         <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                           {record.Title}
                         </label>
-                        <Tag color="#00CC00"
-                          style={{
-                            borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
-                            display: record.TaskCnt > 1 ? "inline-block" : "none"
-                          }}
-                        >
-                          <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
-                        </Tag>
                       </div>
                       <div>
                         <label

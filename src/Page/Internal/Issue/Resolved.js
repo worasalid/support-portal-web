@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -17,6 +17,7 @@ import ModalQA from "../../../Component/Dialog/Internal/modalQA";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
+import { CalculateTime } from "../../../utility/calculateTime";
 
 export default function Resolved() {
   const history = useHistory();
@@ -373,14 +374,15 @@ export default function Resolved() {
                 render={(record) => {
                   return (
                     <>
-                      <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
+                      {/* <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
                         <ClockSLA
                           start={moment(record.AssignIconDate)}
                           due={moment(record.SLA_DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
                           type={record.Priority}
                         />
-                      </div>
+                      </div> */}
+                      <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} />
                     </>
                   )
                 }
@@ -504,4 +506,50 @@ export default function Resolved() {
       </MasterPage>
     </IssueContext.Provider >
   );
+}
+
+export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
+  const calculateTime = new CalculateTime();
+  console.log("countSLAOverDue", calculateTime.countSLAOverDue(480, 280470))
+  return (
+    <Button
+      type="default"
+      className={
+        ticket_sla < sla ? "sla-warning" : "sla-overdue"
+      }
+      size="middle"
+      shape="round"
+      ghost={ticket_sla < sla ? true : false}
+    >
+      {ticket_sla < sla ?
+
+        <label className="value-text">
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+          }
+
+        </label>
+        :
+        <label className="value-text">
+          {"-"}
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+          }
+        </label>
+      }
+      < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+    </Button>
+  )
 }

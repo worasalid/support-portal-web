@@ -158,7 +158,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
 
             }
 
-            <div style={{ display: divcollapse, marginTop: "16px" }}>
+            <div style={{ display: divcollapse, marginTop: "16px" , marginLeft:"10px" }}>
                 <List
                     itemLayout="horizontal"
                     dataSource={listdata}

@@ -618,7 +618,6 @@ export default function SubTask() {
             <Row style={{ height: 'calc(100% - 0px)' }}>
               {/* Content */}
               <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
-
                 <Row style={{ textAlign: "left" }}>
                   <Col span={24} style={{ textAlign: "left" }}>
                     <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
@@ -634,6 +633,7 @@ export default function SubTask() {
                     </div>
                   </Col>
                 </Row>
+                
                 <Row style={{ marginTop: 30 }}>
                   <Col span={24}>
                     <label className="topic-text">
@@ -724,7 +724,7 @@ export default function SubTask() {
                   <Col span={24} >
                     <label className="header-text">Activity</label>
                     {
-                      <Tabs defaultActiveKey="1" size="small" >
+                      <Tabs defaultActiveKey="1" size="small" style={{ overflow: "visible" }}>
                         <TabPane tab="Task Note" key="1" >
                           <TaskComment />
                         </TabPane>
