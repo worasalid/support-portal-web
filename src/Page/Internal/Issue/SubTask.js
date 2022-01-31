@@ -633,7 +633,7 @@ export default function SubTask() {
                     </div>
                   </Col>
                 </Row>
-                
+
                 <Row style={{ marginTop: 30 }}>
                   <Col span={24}>
                     <label className="topic-text">
@@ -724,8 +724,8 @@ export default function SubTask() {
                   <Col span={24} >
                     <label className="header-text">Activity</label>
                     {
-                      <Tabs defaultActiveKey="1" size="small" style={{ overflow: "visible" }}>
-                        <TabPane tab="Task Note" key="1" >
+                      <Tabs defaultActiveKey="1" size="small" style={{ overflow: "visible"}}>
+                        <TabPane tab="Task Note" key="1">
                           <TaskComment />
                         </TabPane>
                         <TabPane tab="History Log" key="2">
@@ -915,7 +915,7 @@ export default function SubTask() {
 
                 <Row style={{
                   marginBottom: 20,
-                  display: userstate.taskdata.data[0]?.IssueType === "ChangeRequest" &&
+                  display: (userstate.taskdata.data[0]?.IssueType === "ChangeRequest" || userstate.taskdata.data[0]?.IssueType === "Memo") &&
                     userstate.taskdata.data[0]?.Manday !== null ? "block" : "none"
                 }}>
                   <Col span={18}>

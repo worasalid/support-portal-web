@@ -229,7 +229,7 @@ div.sticky-background {
 // table
 .table-hover,
 .table-hover > td  {
-     background-color:#EDEBEC !important;
+     background-color:#FAFAFA !important;
 }
 
 .table-unread {
@@ -312,12 +312,13 @@ div.sticky-background {
 //     background-color: #00CC00;
 // }
 
-.header-custom .ant-table-thead > tr > th{
+.header-sticky .ant-table-thead > tr > th{
     position: sticky;
     top:0px;
-    background-color: #E0E0E0;
-    color: #595959;
-    z-index: 9999999;
+    //border-color: black;
+    background-color: #EDEBEC;
+   // color: #595959;
+    z-index: 1;
   }
 
 // .text-size .ant-table-tbody > tr > td {

@@ -167,7 +167,7 @@ export default function TaskComment({ loadingComment = false }) {
 
     return (
         <>
-            <Row align='middle' style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
+            <Row align='middle' style={{ position: "sticky", bottom: 0, zIndex: 1, backgroundColor: "white" }}>
                 <Col span={24}>
                     <List
                         loading={loading}
@@ -311,7 +311,7 @@ export default function TaskComment({ loadingComment = false }) {
                 </Col>
             </Row>
 
-            <Row align='middle' style={{ position: "sticky", bottom: 0, zIndex: 1, backgroundColor: "white" }}>
+            <Row align='middle' style={{ position: "sticky", bottom: -10, zIndex: 1, backgroundColor: "white" }}>
                 <Col span={24} className="task-active"
                     style={{
                         boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom: 0,
@@ -328,7 +328,7 @@ export default function TaskComment({ loadingComment = false }) {
                     {
                         hidden === true ?
                             <>
-                                <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} />
+                                {/* <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} /> */}
                                 <label className='header-text'>Click</label>
                             </>
                             : ""

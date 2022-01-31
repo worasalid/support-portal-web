@@ -183,9 +183,7 @@ export default function Mytask() {
         <IssueSearch />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={userstate?.issuedata?.data} loading={loading} className="header-custom"
-              scroll
-              //bordered
+            <Table dataSource={userstate?.issuedata?.data} loading={loading} className="header-sticky"
               style={{ padding: "5px 5px" }}
               footer={(x) => {
                 return (
