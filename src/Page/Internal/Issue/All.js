@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -14,6 +14,7 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import Notification from "../../../Component/Notifications/Internal/Notification";
+import { CalculateTime } from "../../../utility/calculateTime";
 
 export default function AllIssue() {
   const history = useHistory();
@@ -139,32 +140,11 @@ export default function AllIssue() {
         </Row>
 
         <IssueSearch Progress="show" />
-        {/* <Row style={{ textAlign: "left", marginTop:30 }}>
-       
-          <Col span={3} style={{ textAlign: "left" }}>
-            <Tag color="default">Open</Tag>:&nbsp;&nbsp;
-            {issueAllStatus?.open}
-          </Col>
-          <Col span={3} style={{ textAlign: "left" }}>
-            <Tag color="#FFA500">InProgress</Tag>:&nbsp;&nbsp;
-            {issueAllStatus?.inprogress}
-          </Col>
-          <Col span={3} style={{ textAlign: "left" }}>
-            <Tag color=" #87d068">Resolved</Tag>:&nbsp;&nbsp;
-            {issueAllStatus?.resolved}
-          </Col>
-          <Col span={3} style={{ textAlign: "left" }}>
-
-            <Tag color=" #87d068">Complete</Tag>:&nbsp;&nbsp;
-            {issueAllStatus?.complete}
-          </Col>
-        </Row> */}
-
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={userstate.issuedata.data} loading={loading}
+              className="header-sticky"
               pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
-              //scroll={{y:250}}
               style={{ padding: "5px 5px" }}
               onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
               footer={(x) => {
@@ -439,12 +419,13 @@ export default function AllIssue() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        <ClockSLA
+                        {/* <ClockSLA
                           start={moment(record.AssignIconDate)}
                           due={moment(record.SLA_DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
                           type={record.Priority}
-                        />
+                        /> */}
+                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} />
                       </div>
                     </>
                   )
@@ -523,3 +504,50 @@ export default function AllIssue() {
     </IssueContext.Provider >
   );
 }
+
+export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
+  const calculateTime = new CalculateTime();
+  return (
+    <Button
+      type="default"
+      className={
+        ticket_sla < sla ? "sla-warning" : "sla-overdue"
+      }
+      size="middle"
+      shape="round"
+      ghost={ticket_sla < sla ? true : false}
+    >
+      {ticket_sla < sla ?
+
+        <label className="value-text">
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+          }
+
+        </label>
+        :
+        <label className="value-text">
+          {"-"}
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+          }
+        </label>
+      }
+      < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+    </Button>
+  )
+}
+
+

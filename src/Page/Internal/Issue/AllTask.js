@@ -1,12 +1,12 @@
 import { Button, Col, Row, Table, Tag, Tooltip } from "antd";
 import moment from "moment";
 import Axios from "axios";
-import React, { useEffect, useState, useContext, useReducer,useRef } from "react";
+import React, { useEffect, useState, useContext, useReducer, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -15,6 +15,7 @@ import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import Notification from "../../../Component/Notifications/Internal/Notification";
+import { CalculateTime } from "../../../utility/calculateTime";
 
 export default function AllTask() {
   const history = useHistory();
@@ -167,8 +168,8 @@ export default function AllTask() {
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={userstate.issuedata.data} loading={loading}
+              className="header-sticky"
               pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
-              //scroll={{y:250}}
               style={{ padding: "5px 5px" }}
               onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
               footer={(x) => {
@@ -445,12 +446,13 @@ export default function AllTask() {
                           resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
                           onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
                         /> */}
-                        <ClockSLA
+                        {/* <ClockSLA
                           start={moment(record.AssignIconDate)}
                           due={moment(record.DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
 
-                        />
+                        /> */}
+                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} />
                       </div>
                     </>
                   )
@@ -531,3 +533,49 @@ export default function AllTask() {
     </IssueContext.Provider>
   );
 }
+
+export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
+  const calculateTime = new CalculateTime();
+  return (
+    <Button
+      type="default"
+      className={
+        ticket_sla < sla ? "sla-warning" : "sla-overdue"
+      }
+      size="middle"
+      shape="round"
+      ghost={ticket_sla < sla ? true : false}
+    >
+      {ticket_sla < sla ?
+
+        <label className="value-text">
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+          }
+
+        </label>
+        :
+        <label className="value-text">
+          {"-"}
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+          }
+          {
+            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+          }
+        </label>
+      }
+      < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+    </Button>
+  )
+}
+

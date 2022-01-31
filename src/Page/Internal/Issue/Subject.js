@@ -1027,7 +1027,7 @@ export default function Subject() {
                           state?.usersdata?.organize?.OrganizeCode === "consult"
                           ?
 
-                          <Tabs style={{ overflow: "visible" }} defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
+                          <Tabs style={{ overflow: "visible"}} defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
                             <TabPane tab="Comment" key="1">
                               <CommentBox />
                             </TabPane>
@@ -1042,7 +1042,7 @@ export default function Subject() {
                             </TabPane>
                           </Tabs>
                           :
-                          <Tabs style={{ overflow: "visible" }} defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
+                          <Tabs style={{ overflow: "visible"}} defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
                             <TabPane tab="Internal Note" key="1" >
                               {
                                 tabKey === "1" ? <InternalCommentBox /> : ""
