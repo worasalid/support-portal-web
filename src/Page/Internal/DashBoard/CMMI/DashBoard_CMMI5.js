@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { Row, Col, Card, Table, Select, DatePicker, Button } from 'antd';
 import { Column, Pie } from '@ant-design/charts';
-import { BarChartOutlined, SettingOutlined } from '@ant-design/icons';
+import { BarChartOutlined } from '@ant-design/icons';
+import { Icon } from '@iconify/react';
 import xlsx from 'xlsx';
 import axios from "axios";
 import MasterPage from "../../MasterPage";
 import moment from "moment"
-
+import { useHistory } from "react-router-dom";
 
 const { Option } = Select;
 
-
 export default function DashBoard_CMMI5() {
+    const history = useHistory(null);
     const [loading, setLoading] = useState(false);
     const [company, setCompany] = useState([]);
 
@@ -344,6 +345,17 @@ export default function DashBoard_CMMI5() {
                                                         record.Jul + record.Aug + record.Sep + record.Oct + record.Nov + record.Dec
                                                     }
                                                 </label>
+                                            </>
+                                        )
+                                    }} />
+                                <Column title=""
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="text"
+                                                    onClick={() => history.push({ pathname: "/internal/dashboard/cmmi/dashboard_cmmi5_1/id=" + record.CompanyId + "/year=" + selectYear })}
+                                                    icon={<Icon icon="ion:ellipsis-horizontal-sharp" fontSize={24} style={{ cursor: "pointer" }} />}
+                                                />
                                             </>
                                         )
                                     }} />
