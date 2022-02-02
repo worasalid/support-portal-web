@@ -351,7 +351,7 @@ export default function CommentBox({ loadingComment = false }) {
                         hidden === true ?
                             <>
                                 {/* <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} /> */}
-                                <label className='header-text'>Click</label>
+                                <label className='header-text'>(Click)</label>
                             </>
                             : ""
                     }
@@ -403,8 +403,6 @@ export default function CommentBox({ loadingComment = false }) {
                     {/* </div> */}
                 </Col>
             </Row>
-
-
 
             {/* Modal */}
             < ModalFileDownload

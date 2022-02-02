@@ -115,6 +115,7 @@ export default function ModalRequestApprove({ visible = false, onOk, onCancel, d
     useEffect(() => {
         if (visible) {
             getApprover();
+            console.log("details", details)
         }
     }, [visible])
 
@@ -133,6 +134,11 @@ export default function ModalRequestApprove({ visible = false, onOk, onCancel, d
                 }}
                 {...props}
             >
+                <Row style={{ marginBottom: 24 }}>
+                    <Col span={24}>
+                        <label className='header-text' >จำนวน Manday ที่ประเมิน</label> : {`(${details.manday} Manday)`}
+                    </Col>
+                </Row>
 
                 <Row>
                     <Col span={24}>

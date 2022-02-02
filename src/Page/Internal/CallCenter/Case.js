@@ -55,7 +55,8 @@ export default function Case() {
                     create_by: n.CreateBy,
                     create_date: n.CreateDate,
                     call_start: n.CallStart,
-                    call_end: n.CallEnd
+                    call_end: n.CallEnd,
+                    ticket_ref: n.TicketRef
                 }
             }));
             setLoading(false);
@@ -169,6 +170,20 @@ export default function Case() {
                                                         style={{ color: "#808080", fontSize: "10px" }}
                                                     >
                                                         {record.scene}
+                                                    </label>
+                                                </Col>
+                                            </Row>
+                                            <Row style={{ borderBottom: "1px dotted" }}>
+                                                <Col span={10}>
+                                                    <label className="table-column-text" style={{ color: "#808080", fontSize: "10px" }}>
+                                                        Ref :
+                                                    </label>
+                                                </Col>
+                                                <Col span={14}>
+                                                    <label
+                                                        style={{ color: "#808080", fontSize: "10px" }}
+                                                    >
+                                                        {record.ticket_ref}
                                                     </label>
                                                 </Col>
                                             </Row>

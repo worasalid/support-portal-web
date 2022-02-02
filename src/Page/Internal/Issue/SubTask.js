@@ -114,7 +114,8 @@ export default function SubTask() {
       });
 
       if (mailbox.status === 200) {
-        userdispatch({ type: "LOAD_MAILBOX", payload: mailbox.data })
+        userdispatch({ type: "LOAD_MAILBOX", payload: mailbox.data });
+        GetTaskDetail(mailbox.data[0]);
       }
     } catch (error) {
 
@@ -198,7 +199,7 @@ export default function SubTask() {
           if (userstate?.mailbox[0]?.NodeName === "cr_center" && userstate?.taskdata?.data[0]?.FlowStatus === "Manday Estimated") {
             userdispatch({
               type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "RejectManday")
+              payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RejectManday" || x.value === "RejectMandaySA"))
             })
           }
         }
@@ -291,7 +292,7 @@ export default function SubTask() {
     }
   }
 
-  const GetTaskDetail = async () => {
+  const GetTaskDetail = async (param) => {
     try {
       const task_detail = await Axios({
         url: process.env.REACT_APP_API_URL + "/tickets/load-taskdetail",
@@ -300,7 +301,8 @@ export default function SubTask() {
           "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
         },
         params: {
-          taskId: match.params.task
+          taskId: match.params.task,
+          node_name: param.NodeName
         }
       });
 
@@ -585,8 +587,9 @@ export default function SubTask() {
 
 
   useEffect(() => {
-    GetTaskDetail();
     getMailBox();
+    GetTaskDetail();
+
 
   }, [])
 
@@ -724,7 +727,7 @@ export default function SubTask() {
                   <Col span={24} >
                     <label className="header-text">Activity</label>
                     {
-                      <Tabs defaultActiveKey="1" size="small" style={{ overflow: "visible"}}>
+                      <Tabs defaultActiveKey="1" size="small" style={{ overflow: "visible" }}>
                         <TabPane tab="Task Note" key="1">
                           <TaskComment />
                         </TabPane>
@@ -1029,7 +1032,8 @@ export default function SubTask() {
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
             mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
             flowoutputid: userstate.node.output_data.FlowOutputId,
-            flowoutput: userstate.node.output_data
+            flowoutput: userstate.node.output_data,
+            task_remain: userstate?.taskdata?.data[0]?.TaskRemain
           }}
         />
 

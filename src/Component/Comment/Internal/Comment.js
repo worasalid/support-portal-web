@@ -191,7 +191,7 @@ export default function CommentBox() {
 
     return (
         <>
-            <Row align='middle' style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
+            <Row align='middle' style={{ position: "sticky", zIndex: 1, backgroundColor: "white" }}>
                 <Col span={24}>
                     <List
                         loading={loading}
@@ -332,10 +332,10 @@ export default function CommentBox() {
                 </Col>
             </Row>
 
-            <Row align='middle' style={{ position: "sticky", bottom: -25, zIndex: 1, backgroundColor: "white" }}>
+            <Row align='middle' style={{ position: "sticky", bottom: 10, zIndex: 1, backgroundColor: "white",marginBottom: 20 }}>
                 <Col span={24} className="task-active"
                     style={{
-                        boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px", marginBottom: 0,
+                        boxShadow: "rgba(9, 30, 66, 0.25) 0px 1px 10px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px",
                         height: 50, padding: "12px 12px 12px 12px"
                     }}
                     onClick={() => setHidden(!hidden)}
@@ -349,8 +349,8 @@ export default function CommentBox() {
                     {
                         hidden === true ?
                             <>
-                                <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} />
-                                <label className='header-text'>Click</label>
+                                {/* <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} /> */}
+                                <label className='header-text'>(Click)</label>
                             </>
                             : ""
                     }

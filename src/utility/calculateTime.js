@@ -29,6 +29,7 @@ export class CalculateTime extends Component {
         return moment.duration(end.diff(start)).as("minutes")
     }
 
+    // คำนวน SLA ที่เป็น Critical (เฉพาะ วลาทำการ 8 ชม)
     countDownSLA(sla, usetime) {
         const minute = Math.floor(Math.abs((sla-usetime)) % 60);
         const hours = parseInt(Math.floor((Math.abs((sla-usetime)) / 60) % 8));
@@ -45,6 +46,31 @@ export class CalculateTime extends Component {
         const minute = Math.floor(Math.abs((overtime-sla)) % 60);
         const hours = parseInt(Math.floor((Math.abs((overtime-sla)) / 60) % 8));
         const days = parseInt(Math.floor(Math.abs((overtime-sla)) / 60) / 8);
+
+        return {
+            en_0: { days: days, hours: hours, minute: minute },
+            en_1: { d: days, h: hours, m: minute },
+            th: { "วัน": days, "ชม.": hours, "นาที": minute },
+        }
+    }
+
+    // คำนวน SLA ที่เป็น Critical (นับรวมเวลาทำการ - นอกเวลาทำการ)
+    countSLACritical(sla, overtime) {
+        const minute = Math.floor(Math.abs((overtime-sla)) % 60);
+        const hours = parseInt(Math.floor((Math.abs((overtime-sla)) / 60) % 24));
+        const days = parseInt(Math.floor(Math.abs((overtime-sla)) / 60) / 24);
+
+        return {
+            en_0: { days: days, hours: hours, minute: minute },
+            en_1: { d: days, h: hours, m: minute },
+            th: { "วัน": days, "ชม.": hours, "นาที": minute },
+        }
+    }
+
+    countSLACriticalOverDue(sla, overtime) {
+        const minute = Math.floor(Math.abs((overtime-sla)) % 60);
+        const hours = parseInt(Math.floor((Math.abs((overtime-sla)) / 60) % 24));
+        const days = parseInt(Math.floor(Math.abs((overtime-sla)) / 60) / 24);
 
         return {
             en_0: { days: days, hours: hours, minute: minute },

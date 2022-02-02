@@ -243,7 +243,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }, [visible])
 
     useEffect(() => {
-        //setTotalmanday(details.totalcost === 0 ? manday + parseFloat(crCenterManday) : details.totalcost)
+        setTotalmanday(details.totalcost === 0 ? manday + parseFloat(crCenterManday) : details.totalcost)
+
     }, [])
 
     useEffect(() => {
@@ -402,6 +403,14 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
                 <Row hidden={approveResult?.ApproveResultText === undefined ? true : false} style={{ marginTop: 50 }}>
                     <Col span={24}>
+                        <label className='header-text' >ประเภท :</label>&nbsp;
+                        <label>{approveResult?.ApproveType === 1 ? "ขอฟรี" : "ขอลดราคา"}</label>
+                    </Col>
+                    <Col span={24}>
+                        <Input.TextArea disabled rows={5} value={approveResult?.Description} />
+                    </Col>
+
+                    <Col span={24} style={{ marginTop: 30 }}>
                         <label className='header-text' >ผลการอนุมัติ :</label>&nbsp;
                         <label style={{ color: approveResult?.ApproveResultText === "อนุมัติ" ? "green" : "red" }}>{approveResult?.ApproveResultText}</label>
                     </Col>

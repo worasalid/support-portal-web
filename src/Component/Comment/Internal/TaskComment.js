@@ -329,7 +329,7 @@ export default function TaskComment({ loadingComment = false }) {
                         hidden === true ?
                             <>
                                 {/* <Icon icon="icon-park-outline:index-finger" rotate={1} vFlip={true} /> */}
-                                <label className='header-text'>Click</label>
+                                <label className='header-text'>(Click)</label>
                             </>
                             : ""
                     }
