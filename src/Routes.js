@@ -175,7 +175,7 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi3" exact component={DashBoard_CMMI3} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi4" exact component={DashBoard_CMMI4} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi5" exact component={DashBoard_CMMI5} />
-                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi5_1" exact component={DashBoard_CMMI5_1} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi5_1/id=:id?/year=:year?" exact component={DashBoard_CMMI5_1} />
                                     <Route path="/internal/dashboard/timesheet1" exact component={TimeSheet1} />
                                     <Route path="/internal/dashboard/timesheet2" exact component={TimeSheet2} />
                                     <Route path="/internal/dashboard/timesheet3" exact component={TimeSheet3} />

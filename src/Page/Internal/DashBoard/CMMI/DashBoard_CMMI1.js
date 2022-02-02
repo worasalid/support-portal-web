@@ -84,8 +84,6 @@ export default function DashBoard_CMMI1() {
             }
         }).then((res) => {
             setLoading(false);
-            console.log("chartdata", res.data.chartdata)
-            console.log("tabledata", res.data.tabledata)
             setTableData(res.data.tabledata)
 
             setChartData(res.data.chartdata.map((n, index) => ({

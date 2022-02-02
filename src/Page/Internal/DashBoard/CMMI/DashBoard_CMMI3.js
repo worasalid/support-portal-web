@@ -205,7 +205,6 @@ export default function DashBoard_CMMI3() {
     }
 
     const onFinish = async (value) => {
-        console.log("onFinish", value)
         updateSetting(value);
     }
 

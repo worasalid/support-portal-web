@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { Row, Col, Card, Table, Select, DatePicker, Button } from 'antd';
 import { Column, Pie } from '@ant-design/charts';
-import { BarChartOutlined, SettingOutlined } from '@ant-design/icons';
+import { BarChartOutlined } from '@ant-design/icons';
+import { Icon } from '@iconify/react';
 import xlsx from 'xlsx';
 import axios from "axios";
 import MasterPage from "../../MasterPage";
 import moment from "moment"
-
+import { useHistory } from "react-router-dom";
 
 const { Option } = Select;
 
-
 export default function DashBoard_CMMI5() {
+    const history = useHistory(null);
     const [loading, setLoading] = useState(false);
     const [company, setCompany] = useState([]);
 
@@ -21,6 +22,8 @@ export default function DashBoard_CMMI5() {
 
     const [tableDataMonthly, setTableDataMonthly] = useState([]);
     const [tableDataDaily, setTableDataDaily] = useState([]);
+    const [excelDataMonthly, setExcelDataMonthly] = useState([]);
+    const [excelDataDaily, setExcelDataDaily] = useState([]);
 
     //filter
     const [selectCompany, setSelectCompany] = useState([]);
@@ -94,14 +97,90 @@ export default function DashBoard_CMMI5() {
         }).then((res) => {
             setChartDataMonthly(res.data.chartData);
             setTableDataMonthly(res.data.tableData);
+            setExcelDataMonthly(res.data.tableData);
 
             setChartDataDaily(res.data.chartData);
             setTableDataDaily(res.data.tableData);
+            setExcelDataDaily(res.data.tableData);
+
 
             setLoading(false);
         }).catch((error) => {
 
         });
+    }
+
+    const exportExcelDaily = (json) => {
+        if (json !== undefined) {
+            let ws = xlsx.utils.json_to_sheet(json.map((n, index) => {
+                return {
+                    No: index + 1,
+                    Company: n.Code,
+                    DAY1: n.DAY1,
+                    DAY2: n.DAY2,
+                    DAY3: n.DAY3,
+                    DAY4: n.DAY4,
+                    DAY5: n.DAY5,
+                    DAY6: n.DAY6,
+                    DAY7: n.DAY7,
+                    DAY8: n.DAY8,
+                    DAY9: n.DAY9,
+                    DAY10: n.DAY10,
+                    DAY11: n.DAY11,
+                    DAY12: n.DAY12,
+                    DAY13: n.DAY13,
+                    DAY14: n.DAY14,
+                    DAY15: n.DAY15,
+                    DAY16: n.DAY16,
+                    DAY17: n.DAY17,
+                    DAY18: n.DAY18,
+                    DAY19: n.DAY19,
+                    DAY20: n.DAY20,
+                    DAY21: n.DAY21,
+                    DAY22: n.DAY22,
+                    DAY23: n.DAY23,
+                    DAY24: n.DAY24,
+                    DAY25: n.DAY25,
+                    DAY26: n.DAY26,
+                    DAY27: n.DAY27,
+                    DAY28: n.DAY28,
+                    DAY29: n.DAY29,
+                    DAY30: n.DAY30,
+                    DAY31: n.DAY31,
+                }
+            }));
+
+            let wb = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(wb, ws, 'sheet1');
+            xlsx.writeFile(wb, `DashBoard CMMI 5 (Daily) - ${moment().format("YYMMDD_HHmm")}.xlsx`);
+        }
+    }
+
+    const exportExcelMonthly = (json) => {
+        if (json !== undefined) {
+            let ws = xlsx.utils.json_to_sheet(json.map((n, index) => {
+                return {
+                    No: index + 1,
+                    Company: n.Code,
+                    Jan: n.Jan,
+                    Feb: n.Feb,
+                    Mar: n.Mar,
+                    Apr: n.Apr,
+                    May: n.May,
+                    Jun: n.Jun,
+                    Jul: n.Jul,
+                    Aug: n.Aug,
+                    Sep: n.Sep,
+                    Oct: n.Oct,
+                    Nov: n.Nov,
+                    Dec: n.Dec
+                }
+            }));
+
+            let wb = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(wb, ws, 'sheet1');
+            xlsx.writeFile(wb, `DashBoard CMMI 5 (Monthly) - ${moment().format("YYMMDD_HHmm")}.xlsx`);
+        }
     }
 
     useEffect(() => {
@@ -127,7 +206,7 @@ export default function DashBoard_CMMI5() {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col span={10}>
+                                    <Col span={8}>
                                     </Col>
                                     <Col span={6}>
                                         <Select
@@ -145,7 +224,7 @@ export default function DashBoard_CMMI5() {
                                         >
                                         </Select>
                                     </Col>
-                                    <Col span={2}>
+                                    <Col span={3}>
                                         <Select
                                             defaultValue={selectType}
                                             style={{ width: "90%" }}
@@ -167,7 +246,10 @@ export default function DashBoard_CMMI5() {
                                             options={monthNameThai.map((n) => ({ value: n.value, label: n.name }))}
                                         />
                                         <Button type="link"
-                                            //onClick={() => exportExcel(tableData && tableData)}
+                                            onClick={() => selectType === 1 ?
+                                                exportExcelMonthly(excelDataMonthly && excelDataMonthly) :
+                                                exportExcelDaily(excelDataDaily && excelDataDaily)
+                                            }
                                             title="Excel Export"
                                         >
                                             <img
@@ -263,6 +345,17 @@ export default function DashBoard_CMMI5() {
                                                         record.Jul + record.Aug + record.Sep + record.Oct + record.Nov + record.Dec
                                                     }
                                                 </label>
+                                            </>
+                                        )
+                                    }} />
+                                <Column title=""
+                                    render={(value, record, index) => {
+                                        return (
+                                            <>
+                                                <Button type="text"
+                                                    onClick={() => history.push({ pathname: "/internal/dashboard/cmmi/dashboard_cmmi5_1/id=" + record.CompanyId + "/year=" + selectYear })}
+                                                    icon={<Icon icon="ion:ellipsis-horizontal-sharp" fontSize={24} style={{ cursor: "pointer" }} />}
+                                                />
                                             </>
                                         )
                                     }} />

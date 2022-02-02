@@ -55,7 +55,8 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
                     history: {
                         value: details.oldModule,
                         value2: details?.newModule?.label
-                    }
+                    },
+                    comment_text: editorRef.current.getValue()
                 }
             }).then((res) => {
                 saveComment();
@@ -111,7 +112,12 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
             >
                 <Form.Item
                     name="remark"
-
+                    label={
+                        <>
+                            <label style={{ color: "red" }}>*</label>&nbsp;
+                            <label>Remark</label>
+                        </>
+                    }
                 >
                     <TextEditor ref={editorRef} ticket_id={details.ticketId} />
                 </Form.Item>

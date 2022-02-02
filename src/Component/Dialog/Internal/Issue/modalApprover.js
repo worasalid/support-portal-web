@@ -135,6 +135,13 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
                 {...props}
             >
                 <Row>
+                    <Col span={24}>
+                        <label className='header-text' >จำนวน Manday ที่ประเมิน</label> : {`(${details.manday} Manday)`}
+                    </Col>
+                </Row>
+                <br />
+
+                <Row>
                     <Col span={2}>
                         <b><label>ประเภท :</label></b>
                     </Col>

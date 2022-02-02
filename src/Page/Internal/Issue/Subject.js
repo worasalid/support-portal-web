@@ -539,10 +539,45 @@ export default function Subject() {
     if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") {
       if (userstate?.mailbox[0]?.NodeName === "support") {
         if (item.data.value === "SendCR_Center") {
-          setModalsendissue_visible(true)
+          if (userstate.issuedata.details[0]?.IsWaitCustomerInfo === 1) {
+            Modal.warning({
+              title: 'Wait for info',
+              content: (
+                <>
+                  <label style={{ fontSize: 12 }}> มีการส่งขอข้อมูลแล้ว รอลูกค้าตอบกลับ  </label>
+                  <br />
+                  <br />
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรณี มีการส่งขอข้อมูลจาก Task งานอื่นๆเพิ่มเติม ให้แจ้งเพิ่มที่ comment  </label>
+                </>
+              ),
+              okText: "Close",
+              onOk() {
+              }
+            });
+          } else {
+            setModalsendissue_visible(true)
+          }
         }
         if (item.data.value === "RequestInfo") {
-          setModalsendissue_visible(true)
+          if (userstate.issuedata.details[0]?.IsWaitCustomerInfo === 1) {
+            Modal.warning({
+              title: 'Wait for info',
+              content: (
+                <>
+                  <label style={{ fontSize: 12 }}> มีการส่งขอข้อมูลแล้ว รอลูกค้าตอบกลับ  </label>
+                  <br />
+                  <br />
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรณี มีการส่งขอข้อมูลจาก Task งานอื่นๆเพิ่มเติม ให้แจ้งเพิ่มที่ comment  </label>
+                </>
+              ),
+              okText: "Close",
+              onOk() {
+              }
+            });
+          } else {
+            setModalsendissue_visible(true)
+          }
+
         }
         if (item.data.value === "Hold") {
           setModalsendissue_visible(true)
@@ -586,6 +621,7 @@ export default function Subject() {
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
           setModalsendissue_visible(true)
+
         }
 
         if (item.data.value === "SendToSA") {
@@ -674,6 +710,7 @@ export default function Subject() {
             setModalsendissue_visible(true);
           }
         }
+
       }
 
       if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
@@ -782,8 +819,9 @@ export default function Subject() {
 
   useEffect(() => {
     if (userstate?.issuedata?.details[0] !== undefined) {
-      getdetail();
       getMailBox();
+      getdetail();
+
     }
     if (userstate?.mailbox[0]?.NodeName === "support") {
       // setTabKey("1");
@@ -803,8 +841,9 @@ export default function Subject() {
 
   useEffect(() => {
     if (modalChangeduedate === false) {
-      getdetail();
       getMailBox();
+      getdetail();
+
     }
   }, [modalChangeduedate])
 
@@ -1027,7 +1066,7 @@ export default function Subject() {
                           state?.usersdata?.organize?.OrganizeCode === "consult"
                           ?
 
-                          <Tabs style={{ overflow: "visible"}} defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
+                          <Tabs style={{ overflow: "visible" }} defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
                             <TabPane tab="Comment" key="1">
                               <CommentBox />
                             </TabPane>
@@ -1042,7 +1081,7 @@ export default function Subject() {
                             </TabPane>
                           </Tabs>
                           :
-                          <Tabs style={{ overflow: "visible"}} defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
+                          <Tabs style={{ overflow: "visible" }} defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
                             <TabPane tab="Internal Note" key="1" >
                               {
                                 tabKey === "1" ? <InternalCommentBox /> : ""
@@ -1143,7 +1182,7 @@ export default function Subject() {
 
                   <Col span={24} style={{ marginTop: "10px", display: userstate?.issuedata?.details[0]?.IssueType === "Bug" ? "block" : "none" }}>
                     <label className="header-text">SLA</label>
-                    <RenderSLA sla={sla} ticket_sla={userstate?.issuedata?.details[0]?.TicketSLA} />
+                    <RenderSLA sla={sla} ticket_sla={userstate?.issuedata?.details[0]?.TicketSLA} priority={userstate?.issuedata?.details[0]?.InternalPriority} />
                     <label className="header-text">DueDate</label>
                     <label className="value-text" style={{ marginLeft: 10 }}>
                       {(userstate?.issuedata?.details[0]?.SLA_DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
@@ -1601,7 +1640,7 @@ export default function Subject() {
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
             flowoutput: userstate.node.output_data,
             costmanday: userstate.issuedata.details[0]?.CostPerManday,
-            totalcost: userstate.issuedata.details[0]?.Cost,
+            totalcost: userstate.issuedata.details[0]?.Cost
           }}
         />
 
@@ -1699,7 +1738,8 @@ export default function Subject() {
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
             ticket_number: userstate?.issuedata?.details[0]?.Number,
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
-            flowoutput: userstate.node.output_data
+            flowoutput: userstate.node.output_data,
+            manday: userstate?.issuedata?.details[0]?.cntManday
           }}
         />
 
@@ -1715,7 +1755,8 @@ export default function Subject() {
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
             ticket_number: userstate?.issuedata?.details[0]?.Number,
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
-            flowoutput: userstate.node.output_data
+            flowoutput: userstate.node.output_data,
+            manday: userstate?.issuedata?.details[0]?.cntManday
           }}
         />
 
@@ -1724,9 +1765,81 @@ export default function Subject() {
   );
 }
 
-export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
+export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
+
   const calculateTime = new CalculateTime();
-  console.log("countSLAOverDue", calculateTime.countSLAOverDue(480, 280470))
+  
+  function rederSLAPriority(sla, ticket_sla, priority) {
+    switch (priority) {
+      case 'Critical':
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countcountSLACriticalDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+      default:
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+    }
+  }
+
   return (
     <Button
       type="default"
@@ -1737,34 +1850,8 @@ export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
       shape="round"
       ghost={ticket_sla < sla ? true : false}
     >
-      {ticket_sla < sla ?
 
-        <label className="value-text">
-          {
-            calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
-          }
-          {
-            calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
-          }
-          {
-            calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
-          }
-
-        </label>
-        :
-        <label className="value-text">
-          {"-"}
-          {
-            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
-          }
-          {
-            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
-          }
-          {
-            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
-          }
-        </label>
-      }
+      {rederSLAPriority(sla, ticket_sla, priority)}
       < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
     </Button>
   )
