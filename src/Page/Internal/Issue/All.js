@@ -425,7 +425,7 @@ export default function AllIssue() {
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
                           type={record.Priority}
                         /> */}
-                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} />
+                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} />
                       </div>
                     </>
                   )
@@ -505,8 +505,81 @@ export default function AllIssue() {
   );
 }
 
-export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
+export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
+
   const calculateTime = new CalculateTime();
+  
+  function rederSLAPriority(sla, ticket_sla, priority) {
+    switch (priority) {
+      case 'Critical':
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countcountSLACriticalDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+      default:
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+    }
+  }
+
   return (
     <Button
       type="default"
@@ -517,37 +590,10 @@ export function RenderSLA({ sla = 0, ticket_sla = 0 }) {
       shape="round"
       ghost={ticket_sla < sla ? true : false}
     >
-      {ticket_sla < sla ?
 
-        <label className="value-text">
-          {
-            calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
-          }
-          {
-            calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
-          }
-          {
-            calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
-          }
-
-        </label>
-        :
-        <label className="value-text">
-          {"-"}
-          {
-            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
-          }
-          {
-            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
-          }
-          {
-            calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
-          }
-        </label>
-      }
+      {rederSLAPriority(sla, ticket_sla, priority)}
       < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
     </Button>
   )
 }
-
 

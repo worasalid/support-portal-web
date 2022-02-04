@@ -260,6 +260,7 @@ export default function IssuePatch() {
                 </Row>
 
                 <Table dataSource={filterIssue === null ? userstate?.issuedata?.data : filterIssue} loading={loading}
+                    className="header-sticky"
                     style={{ padding: "24px 24px 24px 24px" }}
                     rowClassName={(record, index) => {
                         return (

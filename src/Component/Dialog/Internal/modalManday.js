@@ -45,20 +45,19 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
 
     const getTask = async () => {
-        try {
-            const task = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/load-task",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    ticketId: details.ticketid,
-                    mailtype: "in"
-                }
-            });
-            setManday(task.data.map((x) => x.Manday))
-            setListdata(task.data.map((value) => {
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/tickets/load-task",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                ticketId: details.ticketid,
+                mailtype: "in"
+            }
+        }).then((res) => {
+            setManday(res.data.map((x) => x.Manday))
+            setListdata(res.data.filter((n) => n.Status === "InProgress").map((value) => {
                 return {
                     taskid: value.TaskId,
                     title: value.Title,
@@ -67,10 +66,9 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
                 }
             }));
+        }).catch((error) => {
 
-        } catch {
-
-        }
+        });
     }
 
     const getApproveReason = async () => {
@@ -255,8 +253,6 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         setTotalmanday(manday + parseFloat(crCenterManday))
         setTotalcost((manday + crCenterManday) * costmanday)
     }, [crCenterManday, costmanday, manday])
-
-
 
     return (
         <Modal
