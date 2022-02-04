@@ -174,7 +174,7 @@ export default function PatchHeader() {
 
             <Row style={{ padding: "24px 24px 24px 24px", textAlign: "left" }}>
                 <Col span={24}>
-                    <Table dataSource={patchHeader} loading={loading}>
+                    <Table dataSource={patchHeader} loading={loading} className="header-sticky">
                         <Column title="Version" width="5%"
                             key="key"
                             render={(value, record, index) => {
