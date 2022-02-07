@@ -5,7 +5,8 @@ import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
 import {
   PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined,
-  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined
+  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined, PhoneOutlined,
+  RightCircleOutlined, LeftCircleOutlined
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
@@ -15,6 +16,8 @@ import NotificationDetails from '../../Component/Notifications/Internal/Notifica
 import StickyNote from '../../Component/StickyNote/Internal/StickyNote';
 import axios from 'axios';
 import UserManual from "../../Component/UserManual";
+import { Icon } from '@iconify/react';
+import classNames from 'classnames'
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -108,7 +111,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       });
       masterdispatch({ type: "COUNT_SLA_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_SLA_DueDate === 0).length });
       masterdispatch({ type: "COUNT_DUEDATE_NOTI", payload: countstatus.data.filter((x) => x.MailType === "out" && x.GroupStatus === "InProgress" && x.Is_DueDate === 0).length });
-      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Cancel" ).length });
+      masterdispatch({ type: "COUNT_MYTASK", payload: countstatus.data.filter((x) => x.MailType === "in" && x.GroupStatus !== "Cancel").length });
       masterdispatch({ type: "COUNT_INPROGRESS", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "InProgress" || x.GroupStatus === "Hold" || x.GroupStatus === "ReOpen")).length });
       masterdispatch({ type: "COUNT_RESOLVED", payload: countstatus.data.filter((x) => x.MailType === "out" && (x.GroupStatus === "Resolved" || x.GroupStatus === "Pass" || x.GroupStatus === "Deploy")).length });
       masterdispatch({ type: "COUNT_CANCEL", payload: countstatus.data.filter((x) => x.InternalStatus === "Cancel").length });
@@ -381,17 +384,39 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
         <Sider theme="light"
           style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
           width={205}
-          //collapsed={true}
           collapsed={state.collapsed}
         //collapsed={localStorage.getItem("menu-collapsed")}
         >
 
           <Menu theme="light"
-            style={{ backgroundColor: "#edebec" }}
+            style={{ backgroundColor: "#edebec", marginTop: 24 }}
             mode="inline"
             defaultOpenKeys={state.collapsed ? [] : [match.path.split('/')[2]]}
             selectedKeys={[active_submenu]}
           >
+            {
+              state.collapsed ?
+                <Icon icon="cil:arrow-circle-right" width="24" height="24"
+                  className='btn-collapsed'
+                  style={{ position: "absolute", left: "65", top: "10", zIndex: 999, borderRadius: "20px" }}
+                  onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: false })}
+                />
+                :
+                <Icon icon="cil:arrow-circle-left" width="24" height="24"
+                  className='btn-collapsed'
+                  style={{ position: "absolute", left: "190", top: "10", zIndex: 999, borderRadius: "20px" }}
+                  onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: true })}
+                />
+            }
+
+
+            {/* <Menu.Item key="MENUCOLLAPSED"
+              icon={<Icon icon="fluent:text-column-one-20-filled" width="36" height="36"
+                style={{ marginLeft: -10 }}
+                onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: !state.collapsed })}
+              />}
+              style={{ marginTop: 16 }}>
+            </Menu.Item> */}
 
             <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{ marginTop: 16 }}>
               <Menu.Item key="20" onClick={() => history.push('/internal/mydashboard')}>
@@ -484,6 +509,11 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.ItemGroup>
             </SubMenu>
 
+            <Menu.Item key="callcenter" hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
+              icon={<PhoneOutlined />} onClick={() => history.push('/internal/callcenter/case')}>
+              Call Center
+            </Menu.Item>
+
             <SubMenu key="patch"
               style={{
                 display: state.usersdata?.organize?.ComCode !== "ERP" ? "block" : "none"
@@ -492,7 +522,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               title="Version Patch"
             >
               <Menu.Item key="17"
-                hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
+                hidden={state.usersdata?.organize?.OrganizeCode !== "support" && state.usersdata?.users?.code !== "I0017" ? true : false}
                 onClick={() => history.push('/internal/patch/cut_of_patch')}>
                 Cut Off Patch
               </Menu.Item>
@@ -596,6 +626,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             >
               Migration
             </Menu.Item> */}
+
           </Menu>
         </Sider>
 

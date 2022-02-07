@@ -152,6 +152,14 @@ export default function MyTask() {
                 render={(record) => {
                   return (
                     <>
+                      {
+                        record.ReadDate === null ?
+                          <label className="blinktext" style={{ fontSize: "10px", color: "#C0392B", fontWeight: "bold" }}>
+                            ! New
+                          </label>
+                          : ""
+                      }
+                      <br />
                       <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                         {record.Number}
                       </label>

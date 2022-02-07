@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, InputNumber, Spin, List, Row, Col, Radio, Tag } from 'antd';
+import { Modal, Form, InputNumber, Spin, List, Row, Col, Radio, Tag, Input } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -16,10 +16,12 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     //data
     let [manday, setManday] = useState([])
     let [costmanday, setCostmanday] = useState(0)
-    let [totalcost, setTotalcost] = useState(0)
+    const [totalcost, setTotalcost] = useState(0)
     const [crCenterManday, setCrCenterManday] = useState(0)
     const [totalmanday, setTotalmanday] = useState(0)
     const [listdata, setListdata] = useState([]);
+    const [approveResult, setApproveResult] = useState(null);
+    const [approveHistory, setApproveHistory] = useState([]);
 
     const radioStyle = {
         display: 'block',
@@ -42,21 +44,20 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }
 
 
-    const GetTask = async () => {
-        try {
-            const task = await Axios({
-                url: process.env.REACT_APP_API_URL + "/tickets/load-task",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    ticketId: details.ticketid,
-                    mailtype: "in"
-                }
-            });
-            setManday(task.data.map((x) => x.Manday))
-            setListdata(task.data.map((value) => {
+    const getTask = async () => {
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/tickets/load-task",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                ticketId: details.ticketid,
+                mailtype: "in"
+            }
+        }).then((res) => {
+            setManday(res.data.map((x) => x.Manday))
+            setListdata(res.data.filter((n) => n.Status === "InProgress").map((value) => {
                 return {
                     taskid: value.TaskId,
                     title: value.Title,
@@ -65,13 +66,28 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
                 }
             }));
+        }).catch((error) => {
 
-        } catch {
-
-        }
+        });
     }
 
-    const SaveComment = async () => {
+    const getApproveReason = async () => {
+        await Axios.get(`${process.env.REACT_APP_API_URL}/workflow/result-approve`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                ticketId: details.ticketid
+            }
+        }).then((res) => {
+            setApproveResult(res.data.data[0]);
+            setApproveHistory(res.data.datalist)
+        }).catch((error) => {
+
+        })
+    }
+
+    const saveComment = async () => {
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
@@ -94,7 +110,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const SendFlowTask = async (values) => {
+    const sendFlowTask = async (values) => {
         setLoading(true);
         try {
             const sendflow = await Axios({
@@ -116,7 +132,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
             });
 
             if (sendflow.status === 200) {
-                SaveComment();
+                saveComment();
                 onOk();
                 setLoading(false);
                 await Modal.success({
@@ -152,7 +168,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
         }
     }
 
-    const SendFlowIssue = async (values) => {
+    const sendFlowIssue = async (values) => {
         setLoading(true);
         try {
             const SendFlowIssue = await Axios({
@@ -175,7 +191,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
             });
 
             if (SendFlowIssue.status === 200) {
-                SaveComment();
+                saveComment();
                 onOk();
                 setLoading(false);
                 await Modal.success({
@@ -213,32 +229,30 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
     }
 
     const onFinish = (values) => {
-        details.flowoutput.Type === "Task" ? SendFlowTask(values) : SendFlowIssue(values)
+        details.flowoutput.Type === "Task" ? sendFlowTask(values) : sendFlowIssue(values)
     };
 
     useEffect(() => {
         if (visible) {
-            GetTask();
+            getTask();
+            getApproveReason();
+            setTotalcost(details && details.totalcost)
         }
     }, [visible])
 
-
-
-    // form.setFieldsValue({ manday: `${listdata[0]?.manday}` })
-    manday = manday.reduce(function (a, b) {
-        return a + b;
-    }, 0);
-
     useEffect(() => {
         setTotalmanday(details.totalcost === 0 ? manday + parseFloat(crCenterManday) : details.totalcost)
+
     }, [])
 
     useEffect(() => {
+        manday = manday.reduce(function (a, b) {
+            return a + b;
+        }, 0);
+
         setTotalmanday(manday + parseFloat(crCenterManday))
         setTotalcost((manday + crCenterManday) * costmanday)
     }, [crCenterManday, costmanday, manday])
-
-    
 
     return (
         <Modal
@@ -296,13 +310,13 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                 >
                                     <Row>
                                         <Col span={24}>
-                                            <Radio.Group onChange={(e) => e.target.value}>
-                                                <Radio style={radioStyle} value={1} onChange={(x) => {setCostmanday(0); setTotalcost(0)}}>
+                                            <Radio.Group defaultValue={totalcost === 0 ? 1 : 2} onChange={(e) => e.target.value}>
+                                                <Radio style={radioStyle} value={1} onChange={(x) => { setCostmanday(0); setTotalcost(0) }}>
                                                     ไม่มีค่าใช้จ่าย (ฟรี)
-                                </Radio>
+                                                </Radio>
                                                 <Radio style={radioStyle} value={2} onChange={(x) => setCostmanday(details.costmanday)}>
                                                     มีค่าใช้จ่าย
-                               </Radio>
+                                                </Radio>
 
                                             </Radio.Group>
                                         </Col>
@@ -342,9 +356,10 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                 <Col span={10}>
                                     <InputNumber min={0} max={100} step={0.25} defaultValue={0} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
                                         onChange={(value) => {
-                                            setCrCenterManday(value)
-                                        }
-                                        } />
+                                            setCrCenterManday(value);
+                                            setCostmanday(details.costmanday)
+                                        }} />
+
                                 </Col>
                                 <Col span={4} style={{ textAlign: "right" }}>
                                     <label style={{ fontSize: 12 }}>Manday</label>
@@ -370,10 +385,8 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                                 <Col span={10} style={{ textAlign: "right", borderBottom: "1px solid" }}>
                                     {/* <label style={{ marginRight: 12 }}>&nbsp;&nbsp;&nbsp;{totalcost}</label> */}
                                     <InputNumber min={0} value={totalcost} style={{ width: "100%", marginLeft: "0px", textAlign: "right" }}
-                                        onChange={(value) => {
-                                            setTotalcost(value)
-                                        }
-                                        } />
+                                        onChange={(value) => setTotalcost(value)}
+                                    />
                                     <u></u>
                                 </Col>
                                 <Col span={4} style={{ textAlign: "right" }}>
@@ -384,12 +397,34 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                     </Row>
                 </Form>
 
+                <Row hidden={approveResult?.ApproveResultText === undefined ? true : false} style={{ marginTop: 50 }}>
+                    <Col span={24}>
+                        <label className='header-text' >ประเภท :</label>&nbsp;
+                        <label>{approveResult?.ApproveType === 1 ? "ขอฟรี" : "ขอลดราคา"}</label>
+                    </Col>
+                    <Col span={24}>
+                        <Input.TextArea disabled rows={5} value={approveResult?.Description} />
+                    </Col>
+
+                    <Col span={24} style={{ marginTop: 30 }}>
+                        <label className='header-text' >ผลการอนุมัติ :</label>&nbsp;
+                        <label style={{ color: approveResult?.ApproveResultText === "อนุมัติ" ? "green" : "red" }}>{approveResult?.ApproveResultText}</label>
+                    </Col>
+                    <Col span={24} style={{ marginTop: 10 }}>
+                        <label className='header-text' >เหตุผลการอนุมัติ</label>
+                    </Col>
+                    <Col span={24}>
+                        <Input.TextArea disabled rows={5} value={approveResult?.ApproveReason} />
+                    </Col>
+                </Row>
+
+
                 <Row style={{ marginTop: 50 }}>
                     <Col span={24}>
                         <label>Remark :</label> <br />
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Col>
                 </Row>
             </Spin>

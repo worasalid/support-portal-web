@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { PhoneOutlined, DatabaseOutlined, FileOutlined, SendOutlined, BugOutlined, HomeOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Row,List } from 'antd'
+import { Button, Card, Col, Row, List } from 'antd'
 import { useHistory } from "react-router-dom";
 
 import MasterPage from "./MasterPage"
@@ -68,7 +68,7 @@ export default function IssueMenu() {
 
                 <div class="sd-page-topic">
                     <SendOutlined style={{ fontSize: 30 }} />&nbsp;&nbsp;&nbsp;
-                <label className="header-text">เลือกประเภทปัญหาการใช้งาน</label>
+                    <label className="header-text">เลือกประเภทปัญหาการใช้งาน</label>
                 </div>
 
                 <List
@@ -78,13 +78,13 @@ export default function IssueMenu() {
                         <Card className="card-box issue-active" bordered hoverable onClick={() => history.push({ pathname: "/customer/servicedesk/issuecreate/" + item.id })}>
                             <Meta
                                 avatar={
-                                   
-                                    item.name === "Bug" ?  <BugOutlined style={{ fontSize: 30 }} /> :
-                                    item.name === "ChangeRequest" ?  <FileOutlined style={{ fontSize: 30 }} /> :
-                                    item.name === "Memo" ?  <DatabaseOutlined style={{ fontSize: 30 }} /> : 
-                                    item.name === "Use" ?  <PhoneOutlined style={{ fontSize: 30 }} /> : 
-                                    item.name === "None" ?  <FileOutlined style={{ fontSize: 30 }} /> : ""
-                                   
+
+                                    item.name === "Bug" ? <BugOutlined style={{ fontSize: 30 }} /> :
+                                        item.name === "ChangeRequest" ? <FileOutlined style={{ fontSize: 30 }} /> :
+                                            item.name === "Memo" ? <DatabaseOutlined style={{ fontSize: 30 }} /> :
+                                                item.name === "Use" ? <PhoneOutlined style={{ fontSize: 30 }} /> :
+                                                    item.name === "None" ? <FileOutlined style={{ fontSize: 30 }} /> : ""
+
                                 }
                                 title={<label className="card-title-menu">{item.name}</label>}
                                 description={item.description}
@@ -92,6 +92,11 @@ export default function IssueMenu() {
                         </Card>
                     )}
                 />
+            </div>
+            <div style={{ position: "fixed", bottom: 20, right: 30 }}>
+                <label style={{ fontSize: 14, color: "gray" }}>
+                    Version {process.env.REACT_APP_ICON_SPACE_VERSION}
+                </label>
             </div>
         </MasterPage>
     )

@@ -20,7 +20,7 @@ export default function Index() {
                 </div>
                 <div className="sd-page-topic">
                     <SendOutlined style={{ fontSize: 30 }} />&nbsp;&nbsp;&nbsp;
-                <label className="header-text">Contact us about</label>
+                    <label className="header-text">Contact us about</label>
                 </div>
 
                 <Card className="card-box issue-active" bordered hoverable
@@ -49,6 +49,11 @@ export default function Index() {
                         description="เข้าสู่ หน้าหลัก / Home"
                     />
                 </Card>
+            </div>
+            <div style={{ position: "fixed", bottom: 30, right: 30 }}>
+                <label style={{ fontSize: 14, color: "gray" }}>
+                    Version {process.env.REACT_APP_ICON_SPACE_VERSION}
+                </label>
             </div>
         </MasterPage>
     )

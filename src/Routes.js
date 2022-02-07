@@ -34,6 +34,7 @@ import DashBoard_CMMI5_1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI5_1'
 import TimeSheet1 from './Page/Internal/DashBoard/TimeSheet/TimeSheet1';
 import TimeSheet2 from './Page/Internal/DashBoard/TimeSheet/TimeSheet2';
 import TimeSheet3 from './Page/Internal/DashBoard/TimeSheet/TimeSheet3';
+import DashBoard6 from './Page/Internal/DashBoard/DashBoard6';
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -66,6 +67,8 @@ import ConfigQA from './Page/Internal/Setting/ConfigQA';
 import MapSA from './Page/Internal/Setting/MapSA';
 import ConfigSA from './Page/Internal/Setting/ConfigSA';
 
+import ConfigFlow from './Page/Internal/Setting/System/ConfigFlow/index';
+
 import Charts from './Page/Internal/Report/charts';
 import SystemConfig from './Page/Internal/Setting/System/SystemConfig';
 import Organization from './Page/Internal/Setting/System/OrgChart';
@@ -82,14 +85,23 @@ import ConfigReasonCancel from './Page/Internal/Setting/System/ConfigReasonCance
 import ConfigReasonReject from './Page/Internal/Setting/System/ConfigReasonReject';
 import UserManual from './Page/Internal/Setting/System/UserManual';
 import ConfigOrganize from './Page/Internal/Setting/System/ConfigOrganize';
+import FlowApprove from './Page/Internal/Setting/System/ConfigFlow/FlowApprove';
+import FlowDeploy from './Page/Internal/Setting/System/ConfigFlow/FlowDeploy';
 
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
 
-
+// Customer ServiceDesk
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
 import ServiceDesk from "./Page/Customer/ServiceDesk/Index";
 import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
+
+// Call Center Service
+import CallService from './Page/Internal/ServiceDesk/CallService';
+import Case from './Page/Internal/CallCenter/Case';
+import CaseSubject from './Page/Internal/CallCenter/Subject';
+
+
 import AuthenContext, { reducer, initState } from "./utility/authenContext";
 import MasterContext, { masterReducer, masterState } from "./utility/masterContext";
 import CustomerContext, { customerReducer, customerState } from "./utility/issueContext";
@@ -117,6 +129,8 @@ export default function Routes() {
                                     <Route path="/internal/user/profile" exact component={Profile} />
                                     <Route path="/internal/issue" exact component={MyTask} />
                                     <Route path="/internal/issue/unassign" exact component={UnAssign} />
+
+                                    {/* เมนูตั้งค่าระบบ */}
                                     <Route path="/internal/setting/mastercompany" exact component={MasterCompany} />
                                     <Route path="/internal/setting/mapcompany" exact component={MappingCompany} />
                                     <Route path="/internal/setting/support_site_config/userid-:id?" exact component={SupportSiteConfig} />
@@ -142,6 +156,9 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/reason_reject" exact component={ConfigReasonReject} />
                                     <Route path="/internal/setting/system/user-manual" exact component={UserManual} />
                                     <Route path="/internal/setting/system/organize" component={ConfigOrganize} />
+                                    <Route path="/internal/setting/system/flow-config" exact component={ConfigFlow} />
+                                    <Route path="/internal/setting/system/flow-config/flow-deploy" component={FlowDeploy} />
+                                    <Route path="/internal/setting/system/flow-config/flow-approve" component={FlowApprove} />
 
 
                                     {/* dashboard */}
@@ -158,11 +175,12 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi3" exact component={DashBoard_CMMI3} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi4" exact component={DashBoard_CMMI4} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi5" exact component={DashBoard_CMMI5} />
-                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi5_1" exact component={DashBoard_CMMI5_1} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi5_1/id=:id?/year=:year?" exact component={DashBoard_CMMI5_1} />
                                     <Route path="/internal/dashboard/timesheet1" exact component={TimeSheet1} />
                                     <Route path="/internal/dashboard/timesheet2" exact component={TimeSheet2} />
                                     <Route path="/internal/dashboard/timesheet3" exact component={TimeSheet3} />
-                                    
+                                    <Route path="/internal/dashboard/dashboard6" exact component={DashBoard6} />
+
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
@@ -180,7 +198,7 @@ export default function Routes() {
                                     <Route path="/internal/patch/header" exact component={PatchHeader} />
                                     <Route path="/internal/patch/details/patch-:id?" exact component={PatchDetails} />
 
-
+                                    {/* Ricef */}
                                     <Route path="/internal/ricef/all" exact component={Ricef} />
                                     <Route path="/internal/ricef/comp-:compid?" exact component={RicefHeader} />
                                     <Route path="/internal/ricef/comp-:compid?/batch-:batchid?" exact component={RicefDetails} />
@@ -192,6 +210,7 @@ export default function Routes() {
                                     <Route path="/internal/migration" exact component={Migration} />
                                     <Route path="/internal/migration/sqlscript/comid-:id?" exact component={ScriptSQL} />
 
+                                    {/* Customer Page */}
                                     <Route path="/customer/login" exact component={Customerlogin} />
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />
                                     <Route path="/customer/servicedesk/issuemenu" exact component={IssueMenu} />
@@ -206,6 +225,12 @@ export default function Routes() {
                                     <Route path="/customer/issue/Subject/:id?" exact component={CustomerSubject} />
                                     <Route path="/customer/issue/complete" exact component={CustomerComplete} />
                                     <Route path="/customer/issue/cancel" exact component={CustomerCancel} />
+
+                                    {/* CallCenter Service */}
+                                    <Route path="/servicedesk/voxtron" exact component={CallService} />
+                                    <Route path="/internal/callcenter/case" exact component={Case} />
+                                    <Route path="/internal/callcenter/case/subject/:caseid?" exact component={CaseSubject} />
+
                                 </Switch>
                             </Router>
                         </CustomerContext.Provider>

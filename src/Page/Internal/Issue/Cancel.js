@@ -117,7 +117,7 @@ export default function Cancel() {
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
             <Table dataSource={userstate.issuedata.data} loading={userstate.loading}
-              // scroll={{y:350}}
+              className="header-sticky"
               pagination={{ pageSize: pageSize, total: pageTotal }}
               style={{ padding: "5px 5px" }}
               onChange={(x) => { return (setPageCurrent(x.current), setPageSize(x.pageSize)) }}
@@ -270,7 +270,7 @@ export default function Cancel() {
                           }}
                           className="table-column-detail">
                           รายละเอียด
-                          </label>
+                        </label>
                       </div>
 
                     </>
@@ -340,7 +340,7 @@ export default function Cancel() {
                           }}
                         >
                           เลื่อน Due
-                       </Tag>
+                        </Tag>
                       </div>
                     </>
                   )

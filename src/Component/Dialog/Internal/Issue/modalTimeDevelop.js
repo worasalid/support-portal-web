@@ -50,7 +50,8 @@ export default forwardRef(function TrackingTimeDevelop({ visible = false, onOk, 
                     start_date: n.start_date,
                     start_time: n.start_date,
                     end_time: n.end_date,
-                    duration: timeResult.getMiniteDuration(n.start_date, n.end_date)
+                    duration: timeResult.getMiniteDuration(n.start_date, n.end_date),
+                    owner: n.display_name
                 }
 
             }));
@@ -217,6 +218,15 @@ export default forwardRef(function TrackingTimeDevelop({ visible = false, onOk, 
 
                                     <Icon icon="carbon:time" width="18" height="18" />
                                 </div>
+                            )
+                        }}
+                    />
+                    <Column title="ผู้บันทึก"
+                        render={(value, record, index) => {
+                            return (
+                                <>
+                                    {record.owner}
+                                </>
                             )
                         }}
                     />

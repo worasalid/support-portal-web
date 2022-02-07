@@ -35,14 +35,16 @@ import DuedateLog from "../../../Component/Dialog/Internal/duedateLog";
 import PreviewImg from "../../../Component/Dialog/Internal/modalPreviewImg";
 import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownload";
 import ModalCancel from "../../../Component/Dialog/Internal/Issue/modalCancel";
-
+import ModalRequestApprove from "../../../Component/Dialog/Internal/Issue/modalRequestApprove";
+import ModalApprover from "../../../Component/Dialog/Internal/Issue/modalApprover";
+import { CalculateTime } from "../../../utility/calculateTime";
 
 const { Option } = Select;
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
 
-
 export default function Subject() {
+  // const calculateTime = new CalculateTime();
   const match = useRouteMatch();
   const history = useHistory();
   const selectRef = useRef(null);
@@ -72,6 +74,8 @@ export default function Subject() {
   const [modalPreview, setModalPreview] = useState(false);
   const [modalfiledownload_visible, setModalfiledownload_visible] = useState(false);
   const [modalCancel_visible, setModalCancel_visible] = useState(false);
+  const [modalReqApprover, setModalReqApprover] = useState(false);
+  const [modalApprover, setModalApprover] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -87,7 +91,8 @@ export default function Subject() {
   // data
   const [ProgressStatus, setProgressStatus] = useState("");
   const [history_loading, setHistory_loading] = useState(false);
-  const [duedateType, setDuedateType] = useState(null)
+  const [duedateType, setDuedateType] = useState(null);
+  const [sla, setSLA] = useState(0);
 
   const style = {
     height: 40,
@@ -263,7 +268,9 @@ export default function Subject() {
       }
     }).then((res) => {
       setLoadingPage(false);
-      userdispatch({ type: "LOAD_ISSUEDETAIL", payload: res.data })
+      userdispatch({ type: "LOAD_ISSUEDETAIL", payload: res.data });
+      setSLA(res.data[0].SLA);
+
     }).catch(() => {
 
     })
@@ -444,6 +451,7 @@ export default function Subject() {
       data: {
         ticketid: userstate?.issuedata?.details[0]?.Id,
         productId: value,
+        transId: userstate?.mailbox[0]?.TransId,
         history: {
           value: userstate?.issuedata?.details[0]?.ProductName,
           value2: item.label
@@ -532,10 +540,45 @@ export default function Subject() {
     if (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") {
       if (userstate?.mailbox[0]?.NodeName === "support") {
         if (item.data.value === "SendCR_Center") {
-          setModalsendissue_visible(true)
+          if (userstate.issuedata.details[0]?.IsWaitCustomerInfo === 1) {
+            Modal.warning({
+              title: 'Wait for info',
+              content: (
+                <>
+                  <label style={{ fontSize: 12 }}> มีการส่งขอข้อมูลแล้ว รอลูกค้าตอบกลับ  </label>
+                  <br />
+                  <br />
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรณี มีการส่งขอข้อมูลจาก Task งานอื่นๆเพิ่มเติม ให้แจ้งเพิ่มที่ comment  </label>
+                </>
+              ),
+              okText: "Close",
+              onOk() {
+              }
+            });
+          } else {
+            setModalsendissue_visible(true)
+          }
         }
         if (item.data.value === "RequestInfo") {
-          setModalsendissue_visible(true)
+          if (userstate.issuedata.details[0]?.IsWaitCustomerInfo === 1) {
+            Modal.warning({
+              title: 'Wait for info',
+              content: (
+                <>
+                  <label style={{ fontSize: 12 }}> มีการส่งขอข้อมูลแล้ว รอลูกค้าตอบกลับ  </label>
+                  <br />
+                  <br />
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรณี มีการส่งขอข้อมูลจาก Task งานอื่นๆเพิ่มเติม ให้แจ้งเพิ่มที่ comment  </label>
+                </>
+              ),
+              okText: "Close",
+              onOk() {
+              }
+            });
+          } else {
+            setModalsendissue_visible(true)
+          }
+
         }
         if (item.data.value === "Hold") {
           setModalsendissue_visible(true)
@@ -575,37 +618,81 @@ export default function Subject() {
           }
         }
       }
+
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
           setModalsendissue_visible(true)
+
         }
+
         if (item.data.value === "SendToSA") {
           setModalsendissue_visible(true)
         }
-        if (item.data.value === "SendManday") {
-          setModalmanday_visible(true)
+
+        if (item.data.value === "RequestApprove") {
+          setModalReqApprover(true)
         }
+
+        if (item.data.value === "SendManday") {
+          if (userstate.issuedata.details[0]?.IsValidateManday !== 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังประเมิน Manday',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา ประเมิน Manday</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
+
+              }
+            });
+          } else if (userstate.issuedata.details[0]?.IsCheckEstimate === 0) {
+            Modal.warning({
+              title: 'Wait for Info',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** รอข้อมูลเพิ่มเติม จากลูกค้า</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
+
+              }
+            });
+          } else {
+            setModalmanday_visible(true)
+          }
+        }
+
         if (item.data.value === "CheckManday") {
           setModalsendissue_visible(true)
         }
+
         if (item.data.value === "ApproveCR") {
           setModalsendissue_visible(true)
         }
+
         if (item.data.value === "SendPR") {
           setModalQuotation_visible(true)
         }
+
         if (item.data.value === "ConfirmPayment" || item.data.value === "RejectPO") {
           setModalsendissue_visible(true)
         }
+
         if (item.data.value === "RejectToSupport") {
           setModalsendissue_visible(true)
         }
+
         if (item.data.value === "RequestDueDate") {
           setModalduedate_visible(true)
         }
+
         if (item.data.value === "SendDueDate") {
           setModalduedate_visible(true)
         }
+
         if (item.data.value === "ResolvedToSupport") {
           if (userstate.issuedata.details[0]?.taskResolved > 0) {
             Modal.warning({
@@ -624,8 +711,16 @@ export default function Subject() {
             setModalsendissue_visible(true);
           }
         }
+
       }
+
       if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
+
+      if (userstate?.mailbox[0]?.NodeName === "approver") {
+        if (item.data.value === "ApproveCR" || item.data.value === "NotApproveCR" || item.data.value === "ApproveMemo" || item.data.value === "NotApproveMemo") {
+          setModalApprover(true)
+        }
+      }
     }
     // Use Flow
     if (userstate.issuedata.details[0]?.IssueType === "Use") {
@@ -675,7 +770,7 @@ export default function Subject() {
   function onChange(value, item) {
 
     if (item.type !== "progress") {
-      Modal.info({
+      Modal.warning({
         title: 'ต้องการเปลียนข้อมูล ใช่หรือไม่',
         content: (
           <div>
@@ -725,8 +820,9 @@ export default function Subject() {
 
   useEffect(() => {
     if (userstate?.issuedata?.details[0] !== undefined) {
-      getdetail();
       getMailBox();
+      getdetail();
+
     }
     if (userstate?.mailbox[0]?.NodeName === "support") {
       // setTabKey("1");
@@ -746,8 +842,9 @@ export default function Subject() {
 
   useEffect(() => {
     if (modalChangeduedate === false) {
-      getdetail();
       getMailBox();
+      getdetail();
+
     }
   }, [modalChangeduedate])
 
@@ -778,24 +875,25 @@ export default function Subject() {
           <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer}  >
             <Row style={{ height: 'calc(100% - 0px)' }}>
               {/* Content */}
-              <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
-                <Row style={{ textAlign: "left" }}>
-                  <Col span={24} style={{ textAlign: "left" }}>
-                    <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
-                      <Button
-                        type="link"
-                        icon={<LeftCircleOutlined />}
-                        // style={{zIndex:99}}
-                        style={{ fontSize: 18, padding: 0, backgroundColor: "white", width: "100%", textAlign: "left" }}
-                        onClick={() => history.goBack()}
-                      >
-                        Back
-                      </Button>
-                    </div>
+              <Col span={16} style={{ padding: "0px 24px 0px 24px", height: "100%", overflowY: "scroll" }}>
+                <Row style={{ textAlign: "left", zIndex: 1, backgroundColor: "white", position: 'sticky', top: "0px" }}>
+                  <Col span={24} style={{ textAlign: "left", backgroundColor: "white" }}>
+                    {/* <div  style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "100%",backgroundColor: "gray" }}> */}
+                    <Button
+                      type="link"
+                      icon={<LeftCircleOutlined />}
+                      // style={{zIndex:99}}
+                      style={{ fontSize: 18, padding: 0, backgroundColor: "white", width: "100%", textAlign: "left" }}
+                      onClick={() => history.goBack()}
+                    >
+                      Back
+                    </Button>
+                    {/* </div> */}
                   </Col>
                 </Row>
-                <Row style={{ marginTop: 30 }} align="middle">
-                  <Col span={24}>
+
+                <Row style={{ position: 'sticky', top: "30px", zIndex: 1, backgroundColor: "white" }} align="middle">
+                  <Col span={24} style={{ backgroundColor: "white", marginBottom: 0 }}>
                     <label className="topic-text">
                       {userstate?.issuedata?.details[0]?.Number}
                       {userstate?.issuedata?.details[0]?.IsReOpen === true ? " (ReOpen)" : ""}
@@ -893,12 +991,15 @@ export default function Subject() {
                     style={{
                       display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
                         userstate?.mailbox[0]?.NodeName === "cr_center" &&
-                        userstate?.mailbox[0]?.MailType === "in" &&
-                        userstate.issuedata.details[0]?.Manday === null &&
-                        userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
-                        userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
-                        userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&
-                        userstate?.mailbox[0]?.GroupStatus !== "Complete" ? "block" : "none"
+                        // userstate?.mailbox[0]?.MailType === "in" &&
+                        // userstate.issuedata.details[0]?.Manday === null &&
+                        (userstate?.mailbox[0]?.NodeActionText === "CheckManday" || userstate?.mailbox[0]?.NodeActionText === "CheckCR" || userstate?.mailbox[0]?.NodeActionText === "RequestDueDate"
+                          || userstate?.mailbox[0]?.NodeActionText === null) &&
+                        userstate?.mailbox[0]?.GroupStatus === "InProgress" ? "block" : "none"
+                      // userstate?.mailbox[0]?.GroupStatus !== "Resolved" &&
+                      // userstate?.mailbox[0]?.GroupStatus !== "Cancel" &&
+                      // userstate?.mailbox[0]?.GroupStatus !== "Waiting Deploy PRD" &&
+                      // userstate?.mailbox[0]?.GroupStatus !== "Complete"
                     }} >
 
                     <Button icon={<FileAddOutlined />}
@@ -966,7 +1067,7 @@ export default function Subject() {
                           state?.usersdata?.organize?.OrganizeCode === "consult"
                           ?
 
-                          <Tabs defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
+                          <Tabs style={{ overflow: "visible" }} defaultActiveKey={"1"} onChange={(key) => { setTabKey(key) }}>
                             <TabPane tab="Comment" key="1">
                               <CommentBox />
                             </TabPane>
@@ -981,7 +1082,7 @@ export default function Subject() {
                             </TabPane>
                           </Tabs>
                           :
-                          <Tabs defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
+                          <Tabs style={{ overflow: "visible" }} defaultActiveKey={"1"} onChange={(key) => setTabKey(key)}>
                             <TabPane tab="Internal Note" key="1" >
                               {
                                 tabKey === "1" ? <InternalCommentBox /> : ""
@@ -1018,7 +1119,7 @@ export default function Subject() {
                           style={{ width: '100%' }} placeholder="None"
                           //onClick={() => getflow_output(userstate?.mailbox[0]?.TransId)}
                           onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
-                            Modal.info({
+                            Modal.warning({
                               title: 'กรุณา ระบุ Priority',
                               okText: "Close"
                             })
@@ -1082,16 +1183,7 @@ export default function Subject() {
 
                   <Col span={24} style={{ marginTop: "10px", display: userstate?.issuedata?.details[0]?.IssueType === "Bug" ? "block" : "none" }}>
                     <label className="header-text">SLA</label>
-                    {
-                      userstate.issuedata.details[0] &&
-
-                      <ClockSLA
-                        start={moment(userstate?.issuedata?.details[0]?.AssignIconDate)}
-                        due={moment(userstate?.issuedata?.details[0]?.SLA_DueDate)}
-                        end={userstate?.issuedata?.details[0]?.ResolvedDate === null ? moment() : moment(userstate?.issuedata?.details[0]?.ResolvedDate)}
-                        type={userstate?.issuedata?.details[0]?.InternalPriority}
-                      />
-                    }
+                    <RenderSLA sla={sla} ticket_sla={userstate?.issuedata?.details[0]?.TicketSLA} priority={userstate?.issuedata?.details[0]?.InternalPriority} />
                     <label className="header-text">DueDate</label>
                     <label className="value-text" style={{ marginLeft: 10 }}>
                       {(userstate?.issuedata?.details[0]?.SLA_DueDate === null ? "None" : moment(userstate?.issuedata?.details[0]?.SLA_DueDate).format("DD/MM/YYYY HH:mm"))}
@@ -1269,7 +1361,10 @@ export default function Subject() {
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                           }
                           onClick={() => getCustomerProduct(userstate?.issuedata?.details[0]?.CompanyId)}
-                          options={userstate?.masterdata?.cusProductState?.map((x) => ({ value: x.ProductId, label: x.Name, type: "product" }))}
+                          options={
+                            userstate?.masterdata?.cusProductState.filter(n => n.ProductId !== userstate?.issuedata?.details[0]?.ProductId).map((x) => ({ value: x.ProductId, label: x.Name, type: "product" }))
+                            // userstate?.masterdata?.cusProductState?.map((x) => ({ value: x.ProductId, label: x.Name, type: "product" }))
+                          }
                           onChange={(value, item) => onChange(value, item)}
                           value={`${userstate?.issuedata?.details[0]?.ProductName} - (${userstate?.issuedata?.details[0]?.ProductFullName})`}
                         />
@@ -1304,6 +1399,24 @@ export default function Subject() {
                   </Col>
                 </Row>
 
+                <Row style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">IssueBy</label>
+                  </Col>
+                  <Col span={18} style={{ marginTop: 0 }}>
+                    <label className="value-text">
+                      {userstate?.issuedata?.details[0]?.IssueBy}
+                      {
+                        userstate?.issuedata?.details[0]?.OwnerTel === null ? "" :
+                          <>
+                            <Divider type="vertical" />
+                            <label>{`Tel. ${userstate?.issuedata?.details[0]?.OwnerTel}`}</label>
+                          </>
+                      }
+                    </label>
+                  </Col>
+                </Row>
+
                 <Row style={{ marginBottom: 20 }}
                   hidden={userstate?.mailbox[0]?.NodeName !== "cr_center" && userstate?.issuedata?.details[0]?.Version === null ? true : false}
                 >
@@ -1328,17 +1441,6 @@ export default function Subject() {
 
                         : <label className="value-text">{userstate?.issuedata?.details[0]?.Version}</label>
                     }
-                  </Col>
-                </Row>
-
-                <Row style={{
-                  marginBottom: 20,
-                  display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
-                    userstate.issuedata.details[0]?.IsAssessment !== 0 ? "block" : "none"
-                }}>
-                  <Col span={18}>
-                    <label className="header-text">ผลประเมินผลของ SA</label>
-                    <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} />
                   </Col>
                 </Row>
 
@@ -1542,7 +1644,7 @@ export default function Subject() {
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
             flowoutput: userstate.node.output_data,
             costmanday: userstate.issuedata.details[0]?.CostPerManday,
-            totalcost: userstate.issuedata.details[0]?.Cost,
+            totalcost: userstate.issuedata.details[0]?.Cost
           }}
         />
 
@@ -1587,7 +1689,7 @@ export default function Subject() {
         <PreviewImg
           title="Preview"
           visible={modalPreview}
-          width={1400}
+          width={1200}
           footer={null}
           onCancel={() => {
             setModalPreview(false);
@@ -1628,7 +1730,133 @@ export default function Subject() {
           }}
         />
 
+        <ModalRequestApprove
+          title={ProgressStatus}
+          visible={modalReqApprover}
+          width={800}
+          onCancel={() => setModalReqApprover(false)}
+          onOk={() => {
+            setModalReqApprover(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            ticket_number: userstate?.issuedata?.details[0]?.Number,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            manday: userstate?.issuedata?.details[0]?.cntManday
+          }}
+        />
+
+        <ModalApprover
+          title={ProgressStatus}
+          visible={modalApprover}
+          width={800}
+          onCancel={() => setModalApprover(false)}
+          onOk={() => {
+            setModalApprover(false);
+          }}
+          details={{
+            ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
+            ticket_number: userstate?.issuedata?.details[0]?.Number,
+            mailboxid: userstate?.mailbox[0]?.MailBoxId,
+            flowoutput: userstate.node.output_data,
+            manday: userstate?.issuedata?.details[0]?.cntManday
+          }}
+        />
+
       </Spin >
     </MasterPage >
   );
+}
+
+export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
+
+  const calculateTime = new CalculateTime();
+
+  function rederSLAPriority(sla, ticket_sla, priority) {
+    switch (priority) {
+      case 'Critical':
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countcountSLACriticalDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+      default:
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+    }
+  }
+
+  return (
+    <Button
+      type="default"
+      className={
+        ticket_sla < sla ? "sla-warning" : "sla-overdue"
+      }
+      size="middle"
+      shape="round"
+      ghost={ticket_sla < sla ? true : false}
+    >
+
+      {rederSLAPriority(sla, ticket_sla, priority)}
+      < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+    </Button>
+  )
 }

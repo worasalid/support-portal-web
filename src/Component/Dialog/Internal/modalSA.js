@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Modal, Form, Input, Spin, Radio, Select } from 'antd';
+import { Modal, Form, InputNumber, Spin, Radio, Select, Row, Col } from 'antd';
 import TextEditor from '../../TextEditor';
 import UploadFile from '../../UploadFile'
 import Axios from 'axios';
@@ -17,7 +17,6 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     const history = useHistory();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
-    const [textValue, setTextValue] = useState("");
     const [radiovalue, setRadiovalue] = useState(null);
     const [radiovalue2, setRadiovalue2] = useState(null);
     const [stdversion, setStdversion] = useState(null);
@@ -26,10 +25,6 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
 
     const editorRef = useRef(null)
 
-
-    const handleEditorChange = (content, editor) => {
-        setTextValue(content);
-    }
 
     const getVersion = async () => {
         try {
@@ -51,7 +46,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null) {
+            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
@@ -62,7 +57,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "internal",
+                        comment_type: "task",
                         files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
@@ -73,10 +68,11 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const SendFlow = async (values) => {
+        console.log("SendFlow", values)
         setLoading(true);
         try {
             const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
+                url: process.env.REACT_APP_API_URL + "/workflow/send",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -86,13 +82,13 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     mailboxid: details && details.mailboxid,
                     flowoutputid: details.flowoutput.FlowOutputId,
                     value: {
+                        manday: values.manday,
                         check_std: values.check_std,
                         std_version: stdversion,
                         check_effect: values.check_effect,
                         effect_description: values.description,
-                        comment_text: textValue
+                        comment_text: editorRef.current.getValue()
                     }
-
                 }
             });
 
@@ -104,7 +100,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
                         <div>
-                            <p>ประเมินผลกระทบส่งให้ CR Center</p>
+                            <p>ประเมิน Manday และ ผลกระทบส่งให้ CR Center</p>
                         </div>
                     ),
                     okText: "Close",
@@ -117,24 +113,79 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         } catch (error) {
             setLoading(false);
             await Modal.error({
-                title: 'บันทึกข้อมูลไม่สำเร็จ',
+                title: 'บันทึกข้อมูลไม่สำเร็จ นะ',
                 content: (
                     <div>
-                        <p>{error.response.data}</p>
+                        {/* <p>{error.response.data}</p> */}
                     </div>
                 ),
                 okText: "Close",
                 onOk() {
-                    editorRef.current.setvalue();
-                    onOk();
-                    history.push({ pathname: "/internal/issue/inprogress" })
+
                 },
             });
         }
     }
 
+    const sendFlow = async (values) => {
+        console.log("SendFlow", values)
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/send",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketid: details.ticketid,
+                taskid: details.taskid,
+                mailboxid: details && details.mailboxid,
+                flowoutputid: details.flowoutputid,
+                value: {
+                    manday: values.manday,
+                    check_std: values.check_std,
+                    std_version: stdversion,
+                    check_effect: values.check_effect,
+                    effect_description: values.description,
+                    comment_text: editorRef.current.getValue()
+                }
+            }
+        }).then((res) => {
+            SaveComment();
+            onOk();
+            setLoading(false);
+            Modal.success({
+                title: 'บันทึกข้อมูลสำเร็จ',
+                content: (
+                    <div>
+                        <p>ประเมิน Manday และ ผลกระทบส่งให้ CR Center</p>
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
+                    editorRef.current.setvalue();
+                    history.push({ pathname: "/internal/issue/inprogress" })
+                },
+            });
+        }).catch((error) => {
+            setLoading(false);
+            Modal.error({
+                title: 'บันทึกข้อมูลไม่สำเร็จ นะ',
+                content: (
+                    <div>
+                        {/* <p>{error.response.data}</p> */}
+                    </div>
+                ),
+                okText: "Close",
+                onOk() {
+
+                },
+            });
+        })
+    }
+
     const onFinish = (values) => {
-        SendFlow(values);
+        //console.log("onFinish",values)
+        sendFlow(values);
     };
 
     return (
@@ -142,22 +193,33 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
             visible={visible}
             confirmLoading={loading}
             okText="Send"
-            onOk={() => { return (form.submit()) }}
-            okButtonProps={{ type: "primary", htmlType: "submit" }}
-            okType="dashed"
+            onOk={() => form.submit()}
+            //okButtonProps={{ type: "primary", htmlType: "submit" }}
             onCancel={() => { form.resetFields(); setRadiovalue(null); setRadiovalue2(null); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
                 <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                    name="qa-test"
-                    layout="vertical"
+                    name="SA"
+                    //layout="vertical"
                     className="login-form"
                     initialValues={{
                         remember: true,
                     }}
                     onFinish={onFinish}
                 >
+                    <Form.Item
+                        name="manday"
+                        label="Manday (Devs)"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'กรุณาระบุ manday',
+                            },
+                        ]}
+                    >
+                        <InputNumber min={0.25} max={100} step={0.25} style={{ width: "30%" }} />
+                    </Form.Item>
 
                     <Form.Item
                         name="check_std"
@@ -182,9 +244,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                                     options={version && version.map((x) => ({
                                         value: x.Value,
                                         label: x.Name
-                                    }))
-                                    }
-
+                                    }))}
                                 >
                                 </Select>
                             </Radio>
@@ -228,9 +288,9 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                     <Form.Item
                         // style={{ minWidth: 300, maxWidth: 300 }}
                         name="remark"
-                        label="Remark :"
 
                     >
+                        <br />
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
                         AttachFile : <UploadFile ref={uploadRef} />

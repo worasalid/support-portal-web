@@ -95,6 +95,12 @@ export default function AllDashBoard() {
                 dashboard_name: "DashBoard TimeSheet3",
                 description: "รายงานสรุป จำนวนเวลาที่ใช้พัฒนา ของทีม Developer (รายวัน)",
                 url: "/internal/dashboard/timesheet3"
+            },
+            {
+                no: "15",
+                dashboard_name: "DashBoard CR CENTER",
+                description: "รายงานรายละเอียด ข้อมูล CR , Memo",
+                url: "/internal/dashboard/dashboard6"
             }
         ]
 

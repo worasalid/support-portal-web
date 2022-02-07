@@ -8,7 +8,7 @@ import ModalDeveloper from "../../../Component/Dialog/Internal/modalDeveloper";
 import IssueSearch from "../../../Component/Search/Internal/IssueSearch";
 import MasterPage from "../MasterPage";
 import Column from "antd/lib/table/Column";
-import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined, ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
+import { DownloadOutlined, TrademarkOutlined, ConsoleSqlOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import MasterContext from "../../../utility/masterContext";
@@ -18,6 +18,7 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import Notification from "../../../Component/Notifications/Internal/Notification";
+import { CalculateTime } from "../../../utility/calculateTime";
 
 export default function Mytask() {
   const history = useHistory();
@@ -42,7 +43,6 @@ export default function Mytask() {
   const [pageTotal, setPageTotal] = useState(0);
   const [recHover, setRecHover] = useState(-1);
 
-
   const loadIssue = async (value) => {
     setLoadding(true);
     try {
@@ -65,7 +65,7 @@ export default function Mytask() {
           is_release_note: userstate.filter.isReleaseNote,
           task: "mytask",
           pageCurrent: pageCurrent,
-          pageSize: pageSize
+          pageSize: pageSize,
         }
       });
 
@@ -183,9 +183,7 @@ export default function Mytask() {
         <IssueSearch />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={userstate?.issuedata?.data} loading={loading}
-              // scroll={{y:350}}
-              //bordered
+            <Table dataSource={userstate?.issuedata?.data} loading={loading} className="header-sticky"
               style={{ padding: "5px 5px" }}
               footer={(x) => {
                 return (
@@ -236,10 +234,17 @@ export default function Mytask() {
                         />
                       </Tooltip>
                       <br />
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text"}>
                         {record.Number}
                       </label>
-
+                      <br />
+                      {
+                        record.ReadDate === null ?
+                          <label className="blinktext" style={{ fontSize: "10px", color: "#C0392B", fontWeight: "bold" }}>
+                            ! New
+                          </label>
+                          : ""
+                      }
                     </>
                   )
                 }}
@@ -323,21 +328,18 @@ export default function Mytask() {
                       {/* <div> */}
                       <Row align="middle">
                         <Col span={24}>
+                          <Tag hidden={record.TaskCnt > 1 ? false : true} className="tag-custom-height">
+                            <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
+                          </Tag>
+                        </Col>
+                        <Col span={24}>
                           <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
                             {record.Title}
                             {record.IsReOpen === true ? " (ReOpen)" : ""}
                           </label>
-                          <Tag color="#00CC00"
-                            style={{
-                              borderRadius: "25px", width: "50px", height: 18, marginLeft: 10,
-                              display: record.TaskCnt > 1 ? "inline-block" : "none"
-                            }}
-                          >
-                            <label style={{ fontSize: 10 }}>{record.TaskCnt} Task</label>
-                          </Tag>
                         </Col>
-
                       </Row>
+
                       <Row>
                         <Col span={24}>
                           <label
@@ -363,18 +365,16 @@ export default function Mytask() {
                 render={(record) => {
                   return (
                     <>
-
                       <div>
                         <label
-                          //style={{ fontSize: "8px" }}
-                          className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}
+                          className={record.ReadDate !== null ? "table-column-text" : "table-column-text"}
                         >
                           {record.CreateBy}
                         </label>
                       </div>
 
                       <div>
-                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text"}>
                           {moment(record.AssignIconDate).format("DD/MM/YYYY HH:mm")}
                         </label>
                       </div>
@@ -414,11 +414,11 @@ export default function Mytask() {
                         </label>
                       </div>
 
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text"}>
                         {record.DueDate === null ? "" : moment(record.DueDate).format('DD/MM/YYYY')}
                       </label>
                       <br />
-                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                      <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text"}>
                         {record.DueDate === null ? "" : moment(record.DueDate).format('HH:mm')}
                       </label>
                       <br />
@@ -430,7 +430,7 @@ export default function Mytask() {
                           }
                           }
                         >
-                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                          <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text"}>
                             เลื่อน Due
                           </label>
                         </Tag>
@@ -448,7 +448,7 @@ export default function Mytask() {
                   return (
                     <>
                       <div>
-                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text-unread"}>
+                        <label className={record.ReadDate !== null ? "table-column-text" : "table-column-text"}>
                           {record.FlowStatus}
                         </label>
                         <label
@@ -459,7 +459,6 @@ export default function Mytask() {
                       </div>
                     </>
                   );
-
                 }}
               />
 
@@ -470,17 +469,18 @@ export default function Mytask() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        <ClockSLA
+                        {/* <ClockSLA
                           start={moment(record.AssignIconDate)}
                           due={moment(record.SLA_DueDate)}
                           end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
                           type={record.Priority}
-                        />
+                        /> */}
+                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} />
+
                       </div>
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />} width="5%"
@@ -495,15 +495,13 @@ export default function Mytask() {
                             userdispatch({ type: "SELECT_DATAROW", payload: record }),
                             setModalfiledownload_visible(true)
                           )
-                        }
-                        }
+                        }}
                       >
                         {record.cntFile === 0 ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
                       </Button>
                     </>
                   )
-                }
-                }
+                }}
               />
             </Table>
           </Col>
@@ -600,6 +598,98 @@ export default function Mytask() {
           <Notification ref={notiRef} />
         </div>
       </MasterPage>
-    </IssueContext.Provider>
+    </IssueContext.Provider >
   );
+}
+
+export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
+
+  const calculateTime = new CalculateTime();
+  
+  function rederSLAPriority(sla, ticket_sla, priority) {
+    switch (priority) {
+      case 'Critical':
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countcountSLACriticalDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+      default:
+        return (
+          <>
+            {ticket_sla < sla ?
+
+              <label className="value-text">
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countDownSLA(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countDownSLA(sla, ticket_sla).en_1.m}m `
+                }
+
+              </label>
+              :
+              <label className="value-text">
+                {"-"}
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.d}d `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.h}h `
+                }
+                {
+                  calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLAOverDue(sla, ticket_sla).en_1.m}m `
+                }
+              </label>
+            }
+          </>
+        )
+    }
+  }
+
+  return (
+    <Button
+      type="default"
+      className={
+        ticket_sla < sla ? "sla-warning" : "sla-overdue"
+      }
+      size="middle"
+      shape="round"
+      ghost={ticket_sla < sla ? true : false}
+    >
+
+      {rederSLAPriority(sla, ticket_sla, priority)}
+      < ClockCircleOutlined style={{ fontSize: 16, verticalAlign: "0.1em" }} />
+    </Button>
+  )
 }

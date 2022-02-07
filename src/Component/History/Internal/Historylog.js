@@ -108,6 +108,32 @@ export default function Historylog({ type = "Issue", subtype = "ticket" }) {
                 }
             }
 
+            if (type === "Case") {
+                await Axios.get(`${process.env.REACT_APP_API_URL}/callcenter/case/historylog`, {
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                    },
+                    params: {
+                        caseId: match.params.caseid
+                    }
+                }).then((res) => {
+                    setHistorylog(res.data.map((n) => {
+                        return {
+                            createname: n.CreateName,
+                            createdate: n.CreateDate,
+                            description: n.Description,
+                            value: n.Value,
+                            avatar: n.ProfileImage,
+                            email: n.Email
+                        }
+                    }));
+                    setLoading(false);
+
+                }).catch((error) => {
+
+                })
+            }
+
         } catch (error) {
 
         }

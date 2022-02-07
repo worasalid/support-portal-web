@@ -141,13 +141,13 @@ export default function Profile() {
     return (
 
         <MasterPage bgColor="#f0f2f5">
-            <Spin spinning={loading} tip="Loading..." style={{width: 1024, height: 1000}}>
-                <div style={{position: "absolute", top: 70,width:"100%",  padding: "0px 24px 0px 24px" }}>
+            <Spin spinning={loading} tip="Loading..." style={{ width: 1024, height: 1000 }}>
+                <div style={{ position: "absolute", top: 30, width: "100%", padding: "0px 24px 0px 24px" }}>
                     <img
-                        style={{ width: "100%", height: "100px",backgroundColor: "#FFFFFF" }}
+                        style={{ width: "100%", height: "100px", backgroundColor: "#FFFFFF" }}
                     />
                 </div>
-                <div style={{ position: "absolute", top: 100,padding: "0px 0px 24px 24px" }}>
+                <div style={{ position: "absolute", top: 60, padding: "0px 0px 24px 24px" }}>
                     <Upload
                         style={{ position: "absolute" }}
                         onChange={onChange}
@@ -181,9 +181,9 @@ export default function Profile() {
                 </div>
 
                 {/* ข้อมูลโปร์ไฟล์ */}
-                <div style={{ marginTop: 0, position: "absolute", top: 230, padding: "0px 0px 0px 24px" }}>
-                    <label className="header-text">ข้อมูลโปรไฟล์</label>
-                    <Card size="default" bordered
+                <div style={{ marginTop: 0, position: "absolute", top: 180, padding: "0px 0px 0px 24px" }}>
+                    {/* <label className="header-text">ข้อมูลโปรไฟล์</label> */}
+                    <Card size="default" title="ข้อมูลโปรไฟล์" className="card-dashboard" bordered
                         style={{
                             width: "500px",
                             marginTop: 20
@@ -248,9 +248,9 @@ export default function Profile() {
                 </div>
 
                 {/* ข้อมูลอื่นๆ */}
-                <div style={{ marginTop: 0, position: "absolute", top: 250, left: 800, width: "500px" }}>
-                    <label className="header-text">อื่นๆ</label>
-                    <Card size="default" bordered hoverable
+                <div style={{ marginTop: 0, position: "absolute", top: 150, left: 600, width: "500px" }}>
+                    {/* <label className="header-text">อื่นๆ</label> */}
+                    <Card size="default" title="การแจ้งเตือน" className="card-dashboard" bordered hoverable
                         style={{
                             width: "100%",
                             marginTop: 20
@@ -259,9 +259,9 @@ export default function Profile() {
                     </Card>
                 </div>
 
-                <div style={{ marginTop: 0, position: "absolute", top: 400, left: 800, width: "500px" }}>
-                    <label className="header-text">อื่นๆ</label>
-                    <Card size="default" bordered hoverable
+                <div style={{ marginTop: 0, position: "absolute", top: 400, left: 600, width: "500px" }}>
+                    {/* <label className="header-text">อื่นๆ</label> */}
+                    <Card size="default" title="อื่นๆ" className="card-dashboard" bordered hoverable
                         style={{
                             width: "100%",
                             marginTop: 20
