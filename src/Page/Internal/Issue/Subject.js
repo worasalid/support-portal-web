@@ -451,6 +451,7 @@ export default function Subject() {
       data: {
         ticketid: userstate?.issuedata?.details[0]?.Id,
         productId: value,
+        transId: userstate?.mailbox[0]?.TransId,
         history: {
           value: userstate?.issuedata?.details[0]?.ProductName,
           value2: item.label
@@ -1360,7 +1361,10 @@ export default function Subject() {
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                           }
                           onClick={() => getCustomerProduct(userstate?.issuedata?.details[0]?.CompanyId)}
-                          options={userstate?.masterdata?.cusProductState?.map((x) => ({ value: x.ProductId, label: x.Name, type: "product" }))}
+                          options={
+                            userstate?.masterdata?.cusProductState.filter(n => n.ProductId !== userstate?.issuedata?.details[0]?.ProductId).map((x) => ({ value: x.ProductId, label: x.Name, type: "product" }))
+                            // userstate?.masterdata?.cusProductState?.map((x) => ({ value: x.ProductId, label: x.Name, type: "product" }))
+                          }
                           onChange={(value, item) => onChange(value, item)}
                           value={`${userstate?.issuedata?.details[0]?.ProductName} - (${userstate?.issuedata?.details[0]?.ProductFullName})`}
                         />
@@ -1768,7 +1772,7 @@ export default function Subject() {
 export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
 
   const calculateTime = new CalculateTime();
-  
+
   function rederSLAPriority(sla, ticket_sla, priority) {
     switch (priority) {
       case 'Critical':
