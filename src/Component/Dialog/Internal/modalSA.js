@@ -67,12 +67,11 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const SendFlow = async (values) => {
-        console.log("SendFlow", values)
+    const sendIssueFlow = async (values) => {
         setLoading(true);
         try {
             const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send",
+                url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -113,7 +112,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         } catch (error) {
             setLoading(false);
             await Modal.error({
-                title: 'บันทึกข้อมูลไม่สำเร็จ นะ',
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         {/* <p>{error.response.data}</p> */}
@@ -127,8 +126,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const sendFlow = async (values) => {
-        console.log("SendFlow", values)
+    const sendTaskFlow = async (values) => {
         await Axios({
             url: process.env.REACT_APP_API_URL + "/workflow/send",
             method: "POST",
@@ -169,7 +167,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }).catch((error) => {
             setLoading(false);
             Modal.error({
-                title: 'บันทึกข้อมูลไม่สำเร็จ นะ',
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         {/* <p>{error.response.data}</p> */}
@@ -184,8 +182,11 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        //console.log("onFinish",values)
-        sendFlow(values);
+        if (details.flowoutput.value === "Assessment") {
+            sendIssueFlow(values);
+        } else {
+            sendTaskFlow(values);
+        }
     };
 
     return (
