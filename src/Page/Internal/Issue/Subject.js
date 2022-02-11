@@ -1467,6 +1467,17 @@ export default function Subject() {
                   </Col>
                 </Row>
 
+                <Row style={{
+                  marginBottom: 20,
+                  display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
+                    userstate.issuedata.details[0]?.IsAssessment !== 0 ? "block" : "none"
+                }}>
+                  <Col span={18}>
+                    <label className="header-text">ผลประเมินผลของ SA</label>
+                    <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} />
+                  </Col>
+                </Row>
+
               </Col>
               {/* SideBar */}
             </Row>
@@ -1609,7 +1620,7 @@ export default function Subject() {
           details={{
             ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
-            flowoutput: userstate.node.output_data,
+            flowoutput: userstate?.node.output_data,
             product_code: userstate?.issuedata?.details[0]?.ProductName
           }}
         />
