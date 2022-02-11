@@ -183,6 +183,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
+        console.log(details.flowoutput)
         if (details.flowoutput.value === "Assessment") {
             sendIssueFlow(values);
         } else {
