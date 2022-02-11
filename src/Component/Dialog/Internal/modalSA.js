@@ -127,6 +127,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const sendTaskFlow = async (values) => {
+        setLoading(true);
         await Axios({
             url: process.env.REACT_APP_API_URL + "/workflow/send",
             method: "POST",
