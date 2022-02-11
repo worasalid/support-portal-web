@@ -1361,6 +1361,7 @@ export default function SubTask() {
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
             mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
             flowoutputid: userstate.node.output_data.FlowOutputId,
+            flowoutput: userstate?.node.output_data,
             product_code: userstate?.taskdata?.data[0]?.ProductName
           }}
         />
