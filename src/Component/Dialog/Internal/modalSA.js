@@ -44,7 +44,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const SaveComment = async () => {
+    const SaveComment = async (type) => {
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
@@ -57,7 +57,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "task",
+                        comment_type: type,
                         files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
@@ -92,7 +92,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
             });
 
             if (sendflow.status === 200) {
-                SaveComment();
+                SaveComment("internal");
                 onOk();
                 setLoading(false);
                 await Modal.success({
@@ -149,7 +149,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                 }
             }
         }).then((res) => {
-            SaveComment();
+            SaveComment("task");
             onOk();
             setLoading(false);
             Modal.success({
