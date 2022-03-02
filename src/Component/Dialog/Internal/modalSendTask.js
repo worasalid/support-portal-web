@@ -81,6 +81,9 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                                 history.push({ pathname: "/internal/issue/resolved" });
                                 window.location.reload(true);
                             }
+                        } else if (details.flowoutput.value === "ResolvedTask") {
+                            history.push({ pathname: "/internal/issue/subject/" + match.params.id });
+                            window.location.reload(true);
                         } else {
                             if (details.task_remain > 1) {
                                 history.push({ pathname: "/internal/issue/subject/" + match.params.id });

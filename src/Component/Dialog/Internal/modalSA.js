@@ -44,7 +44,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const SaveComment = async () => {
+    const SaveComment = async (type) => {
         try {
             if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
                 await Axios({
@@ -57,7 +57,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                         ticketid: details && details.ticketid,
                         taskid: details.taskid,
                         comment_text: editorRef.current.getValue(),
-                        comment_type: "task",
+                        comment_type: type,
                         files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
@@ -67,12 +67,11 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const SendFlow = async (values) => {
-        console.log("SendFlow", values)
+    const sendIssueFlow = async (values) => {
         setLoading(true);
         try {
             const sendflow = await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/send",
+                url: process.env.REACT_APP_API_URL + "/workflow/send-issue",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -93,7 +92,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
             });
 
             if (sendflow.status === 200) {
-                SaveComment();
+                SaveComment("internal");
                 onOk();
                 setLoading(false);
                 await Modal.success({
@@ -113,7 +112,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         } catch (error) {
             setLoading(false);
             await Modal.error({
-                title: 'บันทึกข้อมูลไม่สำเร็จ นะ',
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         {/* <p>{error.response.data}</p> */}
@@ -127,8 +126,8 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }
     }
 
-    const sendFlow = async (values) => {
-        console.log("SendFlow", values)
+    const sendTaskFlow = async (values) => {
+        setLoading(true);
         await Axios({
             url: process.env.REACT_APP_API_URL + "/workflow/send",
             method: "POST",
@@ -150,7 +149,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
                 }
             }
         }).then((res) => {
-            SaveComment();
+            SaveComment("task");
             onOk();
             setLoading(false);
             Modal.success({
@@ -169,7 +168,7 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
         }).catch((error) => {
             setLoading(false);
             Modal.error({
-                title: 'บันทึกข้อมูลไม่สำเร็จ นะ',
+                title: 'บันทึกข้อมูลไม่สำเร็จ',
                 content: (
                     <div>
                         {/* <p>{error.response.data}</p> */}
@@ -184,8 +183,12 @@ export default function ModalSA({ visible = false, onOk, onCancel, datarow, deta
     }
 
     const onFinish = (values) => {
-        //console.log("onFinish",values)
-        sendFlow(values);
+        console.log(details.flowoutput)
+        if (details.flowoutput.value === "Assessment") {
+            sendIssueFlow(values);
+        } else {
+            sendTaskFlow(values);
+        }
     };
 
     return (

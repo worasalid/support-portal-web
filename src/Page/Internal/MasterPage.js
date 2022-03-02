@@ -437,7 +437,8 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                   display: state.usersdata?.organize.OrganizeCode === "support" ||
                     state.usersdata?.organize.OrganizeCode === "consult" ||
                     state.usersdata?.organize.OrganizeCode === "manage" ||
-                    state.usersdata?.users.code === "I0017" ? "block" : "none"
+                    state.usersdata?.users.code === "I0017" ||
+                    state.usersdata?.users.code === "I0005" ? "block" : "none"
                 }}
               >
                 All Issue
