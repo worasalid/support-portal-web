@@ -167,7 +167,7 @@ export default function TaskComment({ loadingComment = false }) {
 
     return (
         <>
-            <Row align='middle' style={{ position: "sticky", bottom: 0, zIndex: 1, backgroundColor: "white" }}>
+            <Row align='middle' style={{  zIndex: 1, backgroundColor: "white" }}>
                 <Col span={24}>
                     <List
                         loading={loading}

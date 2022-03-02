@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { Modal, Row, Col, Select, Form, Input } from 'antd';
+import { Modal, Row, Col, Radio, Form, Input } from 'antd';
 import UploadFile from '../../../UploadFile'
 import axios from 'axios';
 import TextEditor from '../../../TextEditor';
@@ -23,8 +23,6 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
             }
         }).then((res) => {
             setData(res.data)
-            console.log("res.data", res.data)
-
 
         }).catch((error) => {
             console.log("error", error.response.data)
@@ -46,6 +44,7 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
                     flowoutputid: details.flowoutput.FlowOutputId,
                     value: {
                         description: param.description,
+                        approve_result: param.approve_result,
                         approve_reason: param.approve_reason,
                         comment_text: editorRef.current.getValue(),
                     }
@@ -109,7 +108,6 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
     }
 
     const onFinish = async (value) => {
-        console.log("onFinish", value)
         sendFlow(value);
     }
 
@@ -163,10 +161,18 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
                     <Col span={24}>
                         <Form form={form}
                             name="control-hooks" layout="vertical" onFinish={onFinish} >
+                            <Form.Item name="approve_result" rules={[{ required: true, message: 'กรุณาระบุ ผลอนุมัติ' }]}>
+                                <Radio.Group>
+                                    <Radio value={1}>อนุมัติ</Radio>
+                                    <Radio value={0}>ไม่อนุมัติ</Radio>
+                                </Radio.Group>
+                            </Form.Item>
+
                             <Form.Item name="approve_reason" label={<b><label>รายละเอียด การอนุมัติ :</label></b>}
                                 rules={[{ required: true, message: 'กรุณาระบุ รายละเอียด' }]}>
                                 <Input.TextArea rows={5} />
                             </Form.Item>
+
 
                         </Form>
                     </Col>

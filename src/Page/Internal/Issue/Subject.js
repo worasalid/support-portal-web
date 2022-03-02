@@ -38,6 +38,7 @@ import ModalCancel from "../../../Component/Dialog/Internal/Issue/modalCancel";
 import ModalRequestApprove from "../../../Component/Dialog/Internal/Issue/modalRequestApprove";
 import ModalApprover from "../../../Component/Dialog/Internal/Issue/modalApprover";
 import { CalculateTime } from "../../../utility/calculateTime";
+import ModalTicketApproveLog from "../../../Component/Dialog/Internal/Issue/modalTicketApproveLog";
 
 const { Option } = Select;
 const { SubMenu } = Menu;
@@ -76,6 +77,7 @@ export default function Subject() {
   const [modalCancel_visible, setModalCancel_visible] = useState(false);
   const [modalReqApprover, setModalReqApprover] = useState(false);
   const [modalApprover, setModalApprover] = useState(false);
+  const [modalTicketApproveLog, setModalTicketApproveLog] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -94,16 +96,8 @@ export default function Subject() {
   const [duedateType, setDuedateType] = useState(null);
   const [sla, setSLA] = useState(0);
 
-  const style = {
-    height: 40,
-    width: 40,
-    lineHeight: '40px',
-    borderRadius: 4,
-    backgroundColor: '#1088e9',
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 14,
-  };
+  const [btnBackTop, setBtnBackTop] = useState(false);
+  const scrollRef = useRef(null);
 
   const issueScene = [
     {
@@ -818,6 +812,22 @@ export default function Subject() {
     }
   }
 
+  // This function will scroll the window to the top 
+  const scrollToTop = () => {
+    scrollRef.current.scrollTo({
+      top: 0,
+      behavior: 'smooth' // for smoothly scrolling
+    });
+  };
+
+  const scrollBarPosition = () => {
+    if (scrollRef?.current?.scrollTop > 300) {
+      setBtnBackTop(true)
+    } else {
+      setBtnBackTop(false)
+    }
+  }
+
   useEffect(() => {
     if (userstate?.issuedata?.details[0] !== undefined) {
       getMailBox();
@@ -830,7 +840,6 @@ export default function Subject() {
         setTabKey("4")
       }
     }
-
   }, [])
 
 
@@ -872,10 +881,12 @@ export default function Subject() {
     <MasterPage>
       <Spin spinning={loadingPage} tip="Loading..." style={{ height: "100vh" }}>
         <Skeleton loading={loadingPage}>
-          <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer}  >
+          <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer}>
             <Row style={{ height: 'calc(100% - 0px)' }}>
               {/* Content */}
-              <Col span={16} style={{ padding: "0px 24px 0px 24px", height: "100%", overflowY: "scroll" }}>
+              <Col ref={scrollRef} span={16} style={{ padding: "0px 24px 0px 24px", height: "100%", overflowY: "scroll" }}
+                onScroll={(e) => scrollBarPosition()}
+              >
                 <Row style={{ textAlign: "left", zIndex: 1, backgroundColor: "white", position: 'sticky', top: "0px" }}>
                   <Col span={24} style={{ textAlign: "left", backgroundColor: "white" }}>
                     {/* <div  style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "100%",backgroundColor: "gray" }}> */}
@@ -1097,6 +1108,14 @@ export default function Subject() {
                   </Col>
                 </Row>
 
+                <div style={{ textAlign: "right", position:"sticky", bottom:150 }}>
+                  {btnBackTop && (
+                    <button onClick={() => scrollToTop()} className="back-to-top">
+                      &#8679;
+                    </button>
+                  )}
+                </div>
+
               </Col>
               {/* Content */}
 
@@ -1289,7 +1308,6 @@ export default function Subject() {
                         color="warning" onClick={() => setHistoryduedate_visible(true)}>
                         DueDate ถูกเลื่อน
                       </Tag>
-
                     </div>
                     <div
                       style={{
@@ -1300,11 +1318,7 @@ export default function Subject() {
                       <label className="value-text">
                         None
                       </label>
-
                     </div>
-
-
-
                   </Col>
                 </Row>
 
@@ -1373,6 +1387,7 @@ export default function Subject() {
                     }
                   </Col>
                 </Row>
+
                 <Row style={{ marginBottom: 20 }}>
                   <Col span={18}>
                     <label className="header-text">Scene</label>
@@ -1467,14 +1482,40 @@ export default function Subject() {
                   </Col>
                 </Row>
 
-                <Row style={{
-                  marginBottom: 20,
-                  display: (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
-                    userstate.issuedata.details[0]?.IsAssessment !== 0 ? "block" : "none"
-                }}>
+                <Row
+                  hidden={
+                    (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
+                      userstate.issuedata.details[0]?.IsAssessment !== 0 ? false : true
+                  }
+                  style={{ marginBottom: 20 }}>
                   <Col span={18}>
                     <label className="header-text">ผลประเมินผลของ SA</label>
                     <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalAssessment_visible(true)} />
+                  </Col>
+                </Row>
+
+                {/* ผลการอนุมัติ */}
+                <Row
+                  hidden={
+                    (userstate.issuedata.details[0]?.IssueType === "ChangeRequest" || userstate.issuedata.details[0]?.IssueType === "Memo") &&
+                      (userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "approver") &&
+                      userstate.issuedata.details[0]?.IsTicketApprove !== 0 ? false : true
+                  }
+                  style={{ marginBottom: 20 }}>
+                  <Col span={18}>
+                    <label className="header-text">
+                      ผลการอนุมัติ
+                    </label>
+                    <Divider type="vertical" />
+                    <label className="header-text"
+                      style={{
+                        color: userstate.issuedata.details[0]?.ApproveResultText === "รออนุมัติ" ? "orange" :
+                          userstate.issuedata.details[0]?.ApproveResultText === "อนุมัติ" ? "#00CC00" : "#FF4D4F"
+                      }}
+                    >
+                      {userstate.issuedata.details[0]?.ApproveResultText}
+                    </label>
+                    <Button icon={<InfoCircleOutlined />} type="link" onClick={() => setModalTicketApproveLog(true)} />
                   </Col>
                 </Row>
 
@@ -1771,6 +1812,20 @@ export default function Subject() {
             ticket_number: userstate?.issuedata?.details[0]?.Number,
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
             flowoutput: userstate.node.output_data,
+            manday: userstate?.issuedata?.details[0]?.cntManday
+          }}
+        />
+
+        <ModalTicketApproveLog
+          title="ผลการอนุมัติ"
+          visible={modalTicketApproveLog}
+          width={800}
+          onCancel={() => setModalTicketApproveLog(false)}
+          onOk={() => {
+            setModalTicketApproveLog(false);
+          }}
+          details={{
+            ticketId: userstate?.issuedata?.details[0]?.Id,
             manday: userstate?.issuedata?.details[0]?.cntManday
           }}
         />
