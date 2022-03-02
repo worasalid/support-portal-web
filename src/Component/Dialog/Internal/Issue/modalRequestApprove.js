@@ -47,7 +47,8 @@ export default function ModalRequestApprove({ visible = false, onOk, onCancel, d
                         comment_text: editorRef.current.getValue(),
                         approverId: param.approver,
                         approveType: param.type,
-                        description: param.description
+                        description: param.description,
+                        manday: details?.manday
                     }
                 }
             });

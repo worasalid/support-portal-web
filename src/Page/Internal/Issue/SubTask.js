@@ -96,7 +96,10 @@ export default function SubTask() {
   const [createddate, setCreateddate] = useState(null);
   const [resolveddate, setResolveddate] = useState(null);
   const [duration, setDuration] = useState(null);
-  const [selectModule, setSelectModule] = useState(null)
+  const [selectModule, setSelectModule] = useState(null);
+
+  const [btnBackTop, setBtnBackTop] = useState(false);
+  const scrollRef = useRef(null);
 
   //////////////////////////////////////////////// call Api ////////////////////////////////////////////////////////////////////////
   const getMailBox = async () => {
@@ -585,12 +588,28 @@ export default function SubTask() {
     }
   }
 
+  // This function will scroll the window to the top 
+  const scrollToTop = () => {
+    scrollRef.current.scrollTo({
+      top: 0,
+      behavior: 'smooth' // for smoothly scrolling
+    });
+
+  };
+
+  const scrollBarPosition = () => {
+    if (scrollRef?.current?.scrollTop > 100) {
+      setBtnBackTop(true);
+      console.log("scrollRef",scrollRef?.current?.scrollTop)
+    } else {
+      console.log("scrollRef",scrollRef?.current?.scrollTop)
+      setBtnBackTop(false)
+    }
+  }
 
   useEffect(() => {
     getMailBox();
     GetTaskDetail();
-
-
   }, [])
 
   useEffect(() => {
@@ -613,6 +632,8 @@ export default function SubTask() {
   }, [modalTimeDevelop])
 
 
+
+
   return (
     <MasterPage>
       <Spin spinning={pageLoading} tip="Loading">
@@ -620,7 +641,9 @@ export default function SubTask() {
           <div style={{ height: "100%", overflowY: 'hidden' }} ref={setContainer} >
             <Row style={{ height: 'calc(100% - 0px)' }}>
               {/* Content */}
-              <Col span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}>
+              <Col ref={scrollRef} span={16} style={{ padding: "0px 24px 24px 24px", height: "100%", overflowY: "scroll" }}
+                onScroll={(e) => scrollBarPosition()}
+              >
                 <Row style={{ textAlign: "left" }}>
                   <Col span={24} style={{ textAlign: "left" }}>
                     <div offsetTop={10} style={{ zIndex: 100, overflow: "hidden", position: "fixed", width: "400px" }}>
@@ -738,6 +761,14 @@ export default function SubTask() {
                     }
                   </Col>
                 </Row>
+
+                <div style={{ textAlign: "right", position: "sticky", bottom: 150 }}>
+                  {btnBackTop && (
+                    <button onClick={() => scrollToTop()} className="back-to-top">
+                      &#8679;
+                    </button>
+                  )}
+                </div>
                 {/* </div> */}
               </Col>
               {/* Content */}

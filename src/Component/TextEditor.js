@@ -57,7 +57,7 @@ export default forwardRef(function TextEditor(props = null, ref) {
 
         formData = new FormData();
         formData.append("file", blobInfo.blob(), blobInfo.filename());
-        formData.append("ticket",props.ticket_id);
+        formData.append("ticket", props.ticket_id);
 
         xhr.send(formData);
     };
@@ -85,7 +85,7 @@ export default forwardRef(function TextEditor(props = null, ref) {
                     toolbar2: (props?.init?.toolbar2 === undefined ?
                         'alignleft aligncenter alignright alignjustify bullist numlist preview' : props?.init?.toolbar2[0]),
                 }}
-                onEditorChange={(content, editor) => { setValue(content); console.log("content", content) }}
+                onEditorChange={(content, editor) => setValue(content)}
             // onEditorChange={(content, editor) => { return (console.log("onEditorChange", content), setValue(content)) }}
             />
         </>
