@@ -481,6 +481,8 @@ export default function MasterCompany() {
                     setVisible(false);
                     form.resetFields();
                     setSelectcompany(null);
+                    setSelectProduct([]);
+                    setCusProduct([]);
                 }}
             >
                 <Spin spinning={loadingEdit}>
