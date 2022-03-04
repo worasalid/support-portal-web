@@ -480,7 +480,7 @@ export default function SubTask() {
         if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
         if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject" ||
-          item.data.value === "RequestInfo") {
+          item.data.value === "RequestInfo" || item.data.value === "SendInfoToSA") {
           setModalsendtask_visible(true)
         }
         if (item.data.value === "Deploy") {
@@ -600,9 +600,7 @@ export default function SubTask() {
   const scrollBarPosition = () => {
     if (scrollRef?.current?.scrollTop > 100) {
       setBtnBackTop(true);
-      console.log("scrollRef",scrollRef?.current?.scrollTop)
     } else {
-      console.log("scrollRef",scrollRef?.current?.scrollTop)
       setBtnBackTop(false)
     }
   }
