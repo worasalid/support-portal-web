@@ -354,22 +354,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 </Menu.Item>
               </Menu.ItemGroup>
             </SubMenu>
-            {/* <SubMenu key="sub2" icon={<BarChartOutlined />} title="Report">
-              <Menu.Item key="10" onClick={() => history.push('/customer/report/charts')}>
-                - Report
-                  <Badge count={1}>
-                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                </Badge>
-              </Menu.Item>
-            </SubMenu> */}
+            <Menu.Item key="menu-item1" icon={<FileOutlined />}
+              onClick={() => history.push({ pathname: "/customer/system/setting" })}
+            >
+              Setting
+            </Menu.Item>
           </Menu>
-          {/* <div style={{ position: "fixed", bottom: 20, left: 60 }}>
-          <label style={{ fontSize: 14, color: "gray" }}>
-            Version {process.env.REACT_APP_ICON_SPACE_VERSION}
-          </label>
-        </div> */}
         </Sider>
-
 
         <Content
           style={{

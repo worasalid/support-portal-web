@@ -158,7 +158,6 @@ export default function Subject() {
   }
 
   const getflow_output = async (value, trans_id) => {
-    console.log("value.ProgressStatus", value.ProgressStatus)
     try {
       const flow_output = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
@@ -548,7 +547,7 @@ export default function Subject() {
     }
   }, [customerstate?.issuedata?.details[0]?.Id])
 
-  console.log("customerstate", customerstate?.masterdata?.priorityState)
+  console.log("customerstate", state?.usersdata?.permission?.send_flow_to_icon)
   return (
     <MasterPage>
 
@@ -683,7 +682,7 @@ export default function Subject() {
                             value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                             options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                             disabled={
-                              mailbox?.MailType === "in" ? false : true
+                              (mailbox?.MailType === "in" && state?.usersdata?.permission?.send_flow_to_icon) ? false : true
                             }
                           >
                           </Select>
