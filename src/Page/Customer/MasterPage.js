@@ -355,6 +355,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               </Menu.ItemGroup>
             </SubMenu>
             <Menu.Item key="menu-item1" icon={<FileOutlined />}
+              hidden={state?.usersdata?.permission?.menu?.setting ? false : true}
               onClick={() => history.push({ pathname: "/customer/system/setting" })}
             >
               Setting

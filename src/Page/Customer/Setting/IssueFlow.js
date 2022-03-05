@@ -24,6 +24,14 @@ export default function IssueFlow() {
     const [email, setEmail] = useState([]);
     const [ccEmail, setCCEmail] = useState([]);
 
+    const validateMessages = {
+        required: 'กรุณาระบุ ${label}',
+        types: {
+            email: 'ระบุ ${label} ไม่ถูกต้อง !',
+        },
+
+    };
+
     const getFlowAssign = async () => {
         await axios.get(`${process.env.REACT_APP_API_URL}/config/customer/setting/issue-flow`, {
             headers: {
@@ -226,13 +234,55 @@ export default function IssueFlow() {
         });
     }
 
-    const validateMessages = {
-        required: 'กรุณาระบุ ${label}',
-        types: {
-            email: 'ระบุ ${label} ไม่ถูกต้อง !',
-        },
+    const deleteEmail = async (params) => {
+        if (params.type === "create") {
+            setLoadingMail(true);
+        } else {
+            setLoadingCCMail(true);
+        }
 
-    };
+        await axios({
+            url: `${process.env.REACT_APP_API_URL}/config/customer/setting/email`,
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                item_id: params.itemId
+            }
+        }).then((res) => {
+
+            Modal.success({
+                title: "ลบข้อมูล สำเร็จ",
+                okText: "Close",
+                okButtonProps: { type: "default" },
+                onOk: () => {
+                    if (params.type === "create") {
+                        setLoadingMail(false);
+                        getEmail();
+                    } else {
+                        setLoadingCCMail(false);
+                        getCCEmail();
+                    }
+                },
+            });
+        }).catch((error) => {
+            Modal.success({
+                title: "ลบข้อมูล ไม่สำเร็จ",
+                okText: "Close",
+                okButtonProps: { type: "default" },
+                onOk: () => {
+                    if (params.type === "create") {
+                        setLoadingMail(false);
+                        getEmail();
+                    } else {
+                        setLoadingCCMail(false);
+                        getCCEmail();
+                    }
+                },
+            });
+        });
+    }
 
     const onFinishForm = async (params) => {
         const value = {
@@ -247,7 +297,6 @@ export default function IssueFlow() {
         getEmail();
         getCCEmail();
     }, [])
-
 
     return (
         <MasterPage>
@@ -269,12 +318,12 @@ export default function IssueFlow() {
 
                 <Card>
                     <label className="header-text">Assign to ICON</label> &nbsp;&nbsp;
-                    <Checkbox checked={isAdmin}
+                    <Checkbox checked={isAdmin && isAdmin}
                         onChange={(e) => { setIsAdmin(e.target.checked); updateFlowAssign({ is_admin: e.target.checked, is_user: isUser }) }}
                     >
                         Admin
                     </Checkbox>
-                    <Checkbox checked={isUser}
+                    <Checkbox checked={isUser && isUser}
                         onChange={(e) => { setIsUser(e.target.checked); updateFlowAssign({ is_admin: isAdmin, is_user: e.target.checked }) }}
                     >
                         User
@@ -318,11 +367,13 @@ export default function IssueFlow() {
                                             )
                                         }}
                                     />
-                                    <Column
-                                        render={() => {
+                                    <Column dataIndex="item_id"
+                                        render={(value) => {
                                             return (
                                                 <>
-                                                    <Icon className="icon-link-delete" icon="fluent:delete-28-regular" width="18" height="18" />
+                                                    <Icon className="icon-link-delete" icon="fluent:delete-28-regular" width="18" height="18"
+                                                        onClick={() => deleteEmail({ itemId: value, type: "create" })}
+                                                    />
                                                 </>
                                             )
                                         }}
@@ -368,6 +419,17 @@ export default function IssueFlow() {
                                             )
                                         }}
                                     />
+                                    <Column dataIndex="item_id"
+                                        render={(value) => {
+                                            return (
+                                                <>
+                                                    <Icon className="icon-link-delete" icon="fluent:delete-28-regular" width="18" height="18"
+                                                        onClick={() => deleteEmail({ itemId: value, type: "cc" })}
+                                                    />
+                                                </>
+                                            )
+                                        }}
+                                    />
                                 </Table>
                             </Card>
                         </Skeleton>
@@ -382,7 +444,10 @@ export default function IssueFlow() {
                 width={600}
                 okText="Save"
                 onOk={() => formMail.submit()}
-                onCancel={() => setModalMail(false)}
+                onCancel={() => {
+                    setModalMail(false);
+                    formMail.resetFields();
+                }}
             >
                 <Form form={formMail} name="addmail" validateMessages={validateMessages}
                     onFinish={(value) => onFinishForm({ type: "create", formValue: value })}
@@ -399,7 +464,10 @@ export default function IssueFlow() {
                 width={600}
                 okText="Save"
                 onOk={() => formCCMail.submit()}
-                onCancel={() => setModalCCMail(false)}
+                onCancel={() => {
+                    setModalCCMail(false);
+                    formCCMail.resetFields();
+                }}
             >
                 <Form form={formCCMail} name="addCCmail" validateMessages={validateMessages}
                     onFinish={(value) => onFinishForm({ type: "cc", formValue: value })}

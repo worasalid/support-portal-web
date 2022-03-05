@@ -57,6 +57,7 @@ export default function Subject() {
   //const [issueType, setIssueType] = useState([]);
   const [ProgressStatus, setProgressStatus] = useState("");
   const [imgUrl, setImgUrl] = useState(null);
+  const [permission, setPermission] = useState({})
 
   const cusScene = [
     {
@@ -532,6 +533,8 @@ export default function Subject() {
       getIssueType();
       getproducts();
       getPriority();
+
+      setPermission(state?.usersdata?.permission)
     }
   }, [state?.usersdata?.users?.company_id]);
 
@@ -547,7 +550,7 @@ export default function Subject() {
     }
   }, [customerstate?.issuedata?.details[0]?.Id])
 
-  console.log("customerstate", state?.usersdata?.permission?.send_flow_to_icon)
+
   return (
     <MasterPage>
 
@@ -682,7 +685,8 @@ export default function Subject() {
                             value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                             options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                             disabled={
-                              (mailbox?.MailType === "in" && state?.usersdata?.permission?.send_flow_to_icon) ? false : true
+                              mailbox?.MailType === "in" && permission.send_flow_to_icon ? false :
+                                (mailbox?.MailType === "in" && permission.send_flow_to_icon === false && permission.config_assign.is_user) ? false : true
                             }
                           >
                           </Select>
