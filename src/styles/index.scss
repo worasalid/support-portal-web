@@ -347,9 +347,6 @@ div.sticky-background {
     .btn-collapsed:hover {
         background-color: #be1e2d;
     }
-    // .btn-collapsed:hover {
-    //     background-color: #DEEBFF;
-    // }
 }
 
 .tag-custom-height.ant-tag {
@@ -360,11 +357,11 @@ div.sticky-background {
 
 .back-to-top {
     position: absolute;
-    // bottom: 10px;
-    right: 20px;
+    //bottom: 100px;
+    right: -20px;
     text-align: right;
     font-size: 50px;
-    background: #17A2B8;
+    background: #17a2b8;
     color: white;
     cursor: pointer;
     border-radius: 100px;
@@ -372,9 +369,28 @@ div.sticky-background {
     box-shadow: 0 5px 10px #ccc;
     height: 10;
     width: 10;
-    z-index: 9999;
 }
 
 .back-to-top:hover {
     background: orange;
+}
+
+.sider-menu-scrollbar::-webkit-scrollbar {
+    position: absolute;
+    width: 7px;
+   // height: 7px;
+    padding: 0%;
+   border: 1px solid transparent;
+   opacity: 0.75;
+}
+
+.sider-menu-scrollbar::-webkit-scrollbar-track {
+    border-radius: 100px;
+    background-color: transparent;
+}
+
+.sider-menu-scrollbar::-webkit-scrollbar-thumb {
+    //border-radius: 100px;
+    border: 1.3px solid transparent;
+    background: #c1c1c1;
 }
