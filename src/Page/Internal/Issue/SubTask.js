@@ -473,6 +473,9 @@ export default function SubTask() {
         if (item.data.value === "SendToDeploy" || item.data.value === "CheckDeploy") {
           setModalsendtask_visible(true)
         }
+        if (item.data.value === "CancelTask") {
+          setModalsendtask_visible(true)
+        }
       }
 
       if (item.data.NodeName === "developer_2") {
@@ -1144,7 +1147,6 @@ export default function SubTask() {
           onOk={() => {
             setModalleaderqc_visible(false);
           }}
-         
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
