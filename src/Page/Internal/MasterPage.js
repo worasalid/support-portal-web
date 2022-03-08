@@ -17,7 +17,7 @@ import StickyNote from '../../Component/StickyNote/Internal/StickyNote';
 import axios from 'axios';
 import UserManual from "../../Component/UserManual";
 import { Icon } from '@iconify/react';
-import classNames from 'classnames'
+import classNames from 'classnames';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -240,7 +240,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
 
   return (
-    <Layout style={{ height: "100vh" }}>
+    <Layout style={{ height: "100vh", overflowY: "hidden" }}>
       {/* <Header style={{ backgroundColor: "#be1e2d" }}> */}
       {/* <Menu theme="light" mode="horizontal" defaultSelectedKeys={['0']} style={{ backgroundColor: "#0099FF" }}> */}
       <Menu theme="light" mode="horizontal"
@@ -381,255 +381,254 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       {/* </Header> */}
 
       <Layout style={{ backgroundColor: "#" }}>
-        <Sider theme="light"
-          style={{ textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5", backgroundColor: "#edebec" }}
-          width={205}
+        <Sider theme='light'
           collapsed={state.collapsed}
-        //collapsed={localStorage.getItem("menu-collapsed")}
+          width={205}
+          style={{ backgroundColor: "#edebec" }}
         >
-
-          <Menu theme="light"
-            style={{ backgroundColor: "#edebec", marginTop: 24 }}
-            mode="inline"
-            defaultOpenKeys={state.collapsed ? [] : [match.path.split('/')[2]]}
-            selectedKeys={[active_submenu]}
-          >
+          <div style={{ backgroundColor: "#edebec", marginBottom: 0 }}>
             {
               state.collapsed ?
                 <Icon icon="cil:arrow-circle-right" width="24" height="24"
                   className='btn-collapsed'
-                  style={{ position: "absolute", left: "65", top: "10", zIndex: 999, borderRadius: "20px" }}
+                  style={{ position: "absolute", left: "65", top: "10", borderRadius: "20px" }}
                   onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: false })}
                 />
                 :
                 <Icon icon="cil:arrow-circle-left" width="24" height="24"
                   className='btn-collapsed'
-                  style={{ position: "absolute", left: "190", top: "10", zIndex: 999, borderRadius: "20px" }}
+                  style={{ position: "absolute", left: "190", top: "20", borderRadius: "20px" }}
                   onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: true })}
                 />
             }
-
-
-            {/* <Menu.Item key="MENUCOLLAPSED"
-              icon={<Icon icon="fluent:text-column-one-20-filled" width="36" height="36"
-                style={{ marginLeft: -10 }}
-                onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: !state.collapsed })}
-              />}
-              style={{ marginTop: 16 }}>
-            </Menu.Item> */}
-
-            <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{ marginTop: 16 }}>
-              <Menu.Item key="20" onClick={() => history.push('/internal/mydashboard')}>
-                My DashBoard
-              </Menu.Item>
-              <Menu.Item key="21" onClick={() => history.push('/internal/dashboard')}>
-                All DashBoard
-              </Menu.Item>
-            </SubMenu>
-
-            <SubMenu key="issue" icon={<FileOutlined />} title="Issue" >
-              <Menu.Item key="0" onClick={() => {
-                history.push({ pathname: '/internal/issue/other' });
-                // setActivemenu('sub0');
-                // setActive_submenu('0')
-              }}
-                style={{
-                  display: state.usersdata?.organize.OrganizeCode === "support" ||
-                    state.usersdata?.organize.OrganizeCode === "consult" ||
-                    state.usersdata?.organize.OrganizeCode === "manage" ||
-                    state.usersdata?.users.code === "I0017" ||
-                    state.usersdata?.users.code === "I0005" ? "block" : "none"
-                }}
-              >
-                All Issue
-
-              </Menu.Item>
-              <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
-                {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
-                All Task
-              </Menu.Item>
-
-              <Menu.ItemGroup key="g1" title={<label className="header-text">In Box</label>}>
-                <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
-                  My Task
-                  {
-                    masterstate.toolbar.sider_menu.issue.mytask.count === 0
-                      ? ""
-                      : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
-                  }
+          </div>
+          <div
+            className='sider-menu-scrollbar'
+            style={{
+              textAlign: "center", height: "100%", borderRight: "1px solid", borderColor: "#CBC6C5",
+              backgroundColor: "#edebec",
+              overflowY: "auto",
+              overflowX: "hidden"
+            }}
+          >
+            <Menu theme="light"
+              style={{ backgroundColor: "#edebec" }}
+              mode="inline"
+              defaultOpenKeys={state.collapsed ? [] : [match.path.split('/')[2]]}
+              selectedKeys={[active_submenu]}
+            >
+              <SubMenu key="dashboard" icon={<PieChartOutlined />} title="DashBoard" style={{ marginTop: 16 }}>
+                <Menu.Item key="20" onClick={() => history.push('/internal/mydashboard')}>
+                  My DashBoard
                 </Menu.Item>
-              </Menu.ItemGroup>
+                <Menu.Item key="21" onClick={() => history.push('/internal/dashboard')}>
+                  All DashBoard
+                </Menu.Item>
+              </SubMenu>
 
-              <Menu.ItemGroup key="g2" title={<label className="header-text">Out Box</label>}>
-                <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
-                  <Badge
-                    //dot
-                    style={{ color: "red" }}
-                    offset={[20, 0]}
-                    count={
-                      (state.usersdata?.organize.OrganizeCode === "support" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? <BellOutlined /> : 0) ||
-                      (state.usersdata?.organize.OrganizeCode === "cr_center" && masterstate.toolbar.sider_menu.issue.sla_duedate_noti > 0 ? <BellOutlined /> : 0) ||
-                      (state.usersdata?.organize.OrganizeCode === "consult" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? <BellOutlined /> : 0)
-                    }
-                  >
-                    In progress
+              <SubMenu key="issue" icon={<FileOutlined />} title="Issue" >
+                <Menu.Item key="0" onClick={() => {
+                  history.push({ pathname: '/internal/issue/other' });
+                  // setActivemenu('sub0');
+                  // setActive_submenu('0')
+                }}
+                  style={{
+                    display: state.usersdata?.organize.OrganizeCode === "support" ||
+                      state.usersdata?.organize.OrganizeCode === "consult" ||
+                      state.usersdata?.organize.OrganizeCode === "manage" ||
+                      state.usersdata?.users.code === "I0017" ||
+                      state.usersdata?.users.code === "I0005" ? "block" : "none"
+                  }}
+                >
+                  All Issue
+
+                </Menu.Item>
+                <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
+                  {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
+                  All Task
+                </Menu.Item>
+
+                <Menu.ItemGroup key="g1" title={<label className="header-text">In Box</label>}>
+                  <Menu.Item key="2" onClick={() => history.push('/internal/issue/mytask')} >
+                    My Task
                     {
-                      masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                      masterstate.toolbar.sider_menu.issue.mytask.count === 0
                         ? ""
-                        : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+                        : <span>{` (${masterstate.toolbar.sider_menu.issue.mytask.count})`}</span>
                     }
-                  </Badge>
-                  {/* <BellOutlined style={{
+                  </Menu.Item>
+                </Menu.ItemGroup>
+
+                <Menu.ItemGroup key="g2" title={<label className="header-text">Out Box</label>}>
+                  <Menu.Item key="3" onClick={() => history.push('/internal/issue/inprogress')} >
+                    <Badge
+                      //dot
+                      style={{ color: "red" }}
+                      offset={[20, 0]}
+                      count={
+                        (state.usersdata?.organize.OrganizeCode === "support" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? <BellOutlined /> : 0) ||
+                        (state.usersdata?.organize.OrganizeCode === "cr_center" && masterstate.toolbar.sider_menu.issue.sla_duedate_noti > 0 ? <BellOutlined /> : 0) ||
+                        (state.usersdata?.organize.OrganizeCode === "consult" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? <BellOutlined /> : 0)
+                      }
+                    >
+                      In progress
+                      {
+                        masterstate.toolbar.sider_menu.issue.inprogress.count === 0
+                          ? ""
+                          : <span>{` (${masterstate.toolbar.sider_menu.issue.inprogress.count})`}</span>
+                      }
+                    </Badge>
+                    {/* <BellOutlined style={{
                   color: "red",
                   display: (state.usersdata?.organize.OrganizeCode === "support" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? "inline-block" : "block") ||
                     (state.usersdata?.organize.OrganizeCode === "cr_center" && masterstate.toolbar.sider_menu.issue.sla_duedate_noti > 0 ? "inline-block" : "none") ||
                     (state.usersdata?.organize.OrganizeCode === "consult" && masterstate.toolbar.sider_menu.issue.duedate_noti > 0 ? "inline-block" : "none")
                 }} /> */}
 
-                </Menu.Item>
+                  </Menu.Item>
 
-                <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
-                  Resolved
-                  {
-                    masterstate.toolbar.sider_menu.issue.resolved.count === 0
-                      ? ""
-                      : <span>{` (${masterstate.toolbar.sider_menu.issue.resolved.count})`}</span>
-                  }
-                </Menu.Item>
-                <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
-                  Cancel
-                  {
-                    masterstate.toolbar.sider_menu.issue.cancel.count === 0
-                      ? ""
-                      : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
-                  }
-                </Menu.Item>
-                <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
-                  <span >Complete</span>
-                </Menu.Item>
-              </Menu.ItemGroup>
-            </SubMenu>
+                  <Menu.Item key="4" onClick={() => history.push('/internal/issue/resolved')} >
+                    Resolved
+                    {
+                      masterstate.toolbar.sider_menu.issue.resolved.count === 0
+                        ? ""
+                        : <span>{` (${masterstate.toolbar.sider_menu.issue.resolved.count})`}</span>
+                    }
+                  </Menu.Item>
+                  <Menu.Item key="5" onClick={() => history.push('/internal/issue/cancel')} >
+                    Cancel
+                    {
+                      masterstate.toolbar.sider_menu.issue.cancel.count === 0
+                        ? ""
+                        : <span>{` (${masterstate.toolbar.sider_menu.issue.cancel.count})`}</span>
+                    }
+                  </Menu.Item>
+                  <Menu.Item key="6" onClick={() => history.push('/internal/issue/complete')}>
+                    <span >Complete</span>
+                  </Menu.Item>
+                </Menu.ItemGroup>
+              </SubMenu>
 
-            <Menu.Item key="callcenter" hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
-              icon={<PhoneOutlined />} onClick={() => history.push('/internal/callcenter/case')}>
-              Call Center
-            </Menu.Item>
+              <Menu.Item key="callcenter" hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
+                icon={<PhoneOutlined />} onClick={() => history.push('/internal/callcenter/case')}>
+                Call Center
+              </Menu.Item>
 
-            <SubMenu key="patch"
-              style={{
-                display: state.usersdata?.organize?.ComCode !== "ERP" ? "block" : "none"
-              }}
-              icon={<AuditOutlined />}
-              title="Version Patch"
-            >
-              <Menu.Item key="17"
-                hidden={state.usersdata?.organize?.OrganizeCode !== "support" && state.usersdata?.users?.code !== "I0017" ? true : false}
-                onClick={() => history.push('/internal/patch/cut_of_patch')}>
-                Cut Off Patch
-              </Menu.Item>
-              <Menu.Item key="18" onClick={() => history.push('/internal/patch/header')}>
-                Patch Detail
-                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-              </Menu.Item>
-            </SubMenu>
-
-            <SubMenu key="ricef"
-              style={{
-                display: state.usersdata?.organize?.OrganizeCode === "consult" ||
-                  state.usersdata?.users?.code === "I0017" ||
-                  state.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
-              }}
-              icon={<AuditOutlined />} title="RICEF">
-              <Menu.Item key="7" onClick={() => history.push('/internal/ricef/all')}>
-                - All Task
-                {/* <Badge count={1}> */}
-                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                {/* </Badge> */}
-              </Menu.Item>
-              <Menu.Item key="8" onClick={() => history.push('/internal/ricef/mytask')}>
-                - My Task
-                {/* <Badge count={1}> */}
-                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                {/* </Badge> */}
-              </Menu.Item>
-              <Menu.Item key="9" onClick={() => history.push('/internal/ricef/inprogress')}>
-                - InProgress
-                {/* <Badge count={1}> */}
-                <span style={{ marginLeft: 60, textAlign: "right" }}></span>
-                {/* </Badge> */}
-              </Menu.Item>
-            </SubMenu>
-
-            <SubMenu key="setting" icon={<SettingOutlined />} title="Setting"
-            // style={{display: state.usersdata?.users.code !== "I0017" ? "block" : "none"}}
-            >
-              <Menu.Item key="11"
+              <SubMenu key="patch"
                 style={{
-                  display: state.usersdata?.organize.OrganizeCode === "support" ||
-                    state.usersdata?.organize.OrganizeCode === "cr_center" ||
-                    state.usersdata?.organize.OrganizeCode === "consult" ||
-                    state.usersdata?.organize?.ComCode === "ERP" ||
-                    state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  display: state.usersdata?.organize?.ComCode !== "ERP" ? "block" : "none"
                 }}
-                onClick={() => {
-                  history.push('/internal/setting/mastercompany');
-                }}>
-                - ข้อมูลบริษัท
-              </Menu.Item>
-              <Menu.Item key="12"
-                style={{
-                  display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" || state.usersdata?.users.code === "I0017" ? "block" : "none"
-                }}
-                onClick={() => {
-                  history.push('/internal/setting/mapcompany');
-                }}
-
+                icon={<AuditOutlined />}
+                title="Version Patch"
               >
-                - Support Site
-              </Menu.Item>
-              <Menu.Item key="13"
-                style={{
-                  display: state.usersdata?.organize.OrganizeCode === "dev" ||
-                    state.usersdata?.organize?.ComCode === "ERP" ||
-                    state.usersdata?.users?.code === "I0017" ? "block" : "none"
+                <Menu.Item key="17"
+                  hidden={state.usersdata?.organize?.OrganizeCode !== "support" && state.usersdata?.users?.code !== "I0017" ? true : false}
+                  onClick={() => history.push('/internal/patch/cut_of_patch')}>
+                  Cut Off Patch
+                </Menu.Item>
+                <Menu.Item key="18" onClick={() => history.push('/internal/patch/header')}>
+                  Patch Detail
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                </Menu.Item>
+              </SubMenu>
 
-                }}
-                onClick={() => history.push('/internal/setting/mapdeveloper')}
-              >
-                - Developer Module
-              </Menu.Item>
-              <Menu.Item key="14" onClick={() => history.push('/internal/setting/mapqa')}
+              <SubMenu key="ricef"
                 style={{
-                  display: state.usersdata?.organize.OrganizeCode === "qa" ||
-                    state.usersdata?.organize?.ComCode === "ERP" ||
-                    state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  display: state.usersdata?.organize?.OrganizeCode === "consult" ||
+                    state.usersdata?.users?.code === "I0017" ||
+                    state.usersdata?.organize?.OrganizeCode === "dev" ? "block" : "none"
                 }}
-              >
-                - QA Site
-              </Menu.Item>
-              <Menu.Item key="15" onClick={() => history.push('/internal/setting/mapsa')}
-                style={{
-                  display: state.usersdata?.organize.OrganizeCode === "sa" ||
-                    state.usersdata?.organize?.ComCode === "ERP" ||
-                    state.usersdata?.users.code === "I0017" ? "block" : "none"
-                }}
-              >
-                - SA Site
-              </Menu.Item>
-              <Menu.Item key="16" onClick={() => history.push('/internal/setting/system')}>
-                - ตั้งค่าข้อมูลระบบ
-              </Menu.Item>
-            </SubMenu>
+                icon={<AuditOutlined />} title="RICEF">
+                <Menu.Item key="7" onClick={() => history.push('/internal/ricef/all')}>
+                  - All Task
+                  {/* <Badge count={1}> */}
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                  {/* </Badge> */}
+                </Menu.Item>
+                <Menu.Item key="8" onClick={() => history.push('/internal/ricef/mytask')}>
+                  - My Task
+                  {/* <Badge count={1}> */}
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                  {/* </Badge> */}
+                </Menu.Item>
+                <Menu.Item key="9" onClick={() => history.push('/internal/ricef/inprogress')}>
+                  - InProgress
+                  {/* <Badge count={1}> */}
+                  <span style={{ marginLeft: 60, textAlign: "right" }}></span>
+                  {/* </Badge> */}
+                </Menu.Item>
+              </SubMenu>
 
-            {/* 
+              <SubMenu key="setting" icon={<SettingOutlined />} title="Setting" >
+                <Menu.Item key="11"
+                  style={{
+                    display: state.usersdata?.organize.OrganizeCode === "support" ||
+                      state.usersdata?.organize.OrganizeCode === "cr_center" ||
+                      state.usersdata?.organize.OrganizeCode === "consult" ||
+                      state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  }}
+                  onClick={() => {
+                    history.push('/internal/setting/mastercompany');
+                  }}>
+                  - ข้อมูลบริษัท
+                </Menu.Item>
+                <Menu.Item key="12"
+                  style={{
+                    display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" || state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  }}
+                  onClick={() => {
+                    history.push('/internal/setting/mapcompany');
+                  }}
+
+                >
+                  - Support Site
+                </Menu.Item>
+                <Menu.Item key="13"
+                  style={{
+                    display: state.usersdata?.organize.OrganizeCode === "dev" ||
+                      state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.users?.code === "I0017" ? "block" : "none"
+
+                  }}
+                  onClick={() => history.push('/internal/setting/mapdeveloper')}
+                >
+                  - Developer Module
+                </Menu.Item>
+                <Menu.Item key="14" onClick={() => history.push('/internal/setting/mapqa')}
+                  style={{
+                    display: state.usersdata?.organize.OrganizeCode === "qa" ||
+                      state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  }}
+                >
+                  - QA Site
+                </Menu.Item>
+                <Menu.Item key="15" onClick={() => history.push('/internal/setting/mapsa')}
+                  style={{
+                    display: state.usersdata?.organize.OrganizeCode === "sa" ||
+                      state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.users.code === "I0017" ? "block" : "none"
+                  }}
+                >
+                  - SA Site
+                </Menu.Item>
+                <Menu.Item key="16" onClick={() => history.push('/internal/setting/system')}>
+                  - ตั้งค่าข้อมูลระบบ
+                </Menu.Item>
+              </SubMenu>
+
+              {/* 
             <Menu.Item key="migrate" icon={<SettingOutlined />} onClick={() => history.push('/internal/migration')}
               hidden={state?.usersdata?.users?.code === "I0017" ? false : true}
             >
               Migration
             </Menu.Item> */}
 
-          </Menu>
+            </Menu>
+          </div>
         </Sider>
+
 
         <Content
           className="site-layout-background"
