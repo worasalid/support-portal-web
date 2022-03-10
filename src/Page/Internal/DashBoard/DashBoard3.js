@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Column, Pie } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button } from 'antd';
+import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Tabs, Empty } from 'antd';
 import moment from "moment"
 import Axios from "axios";
 import xlsx from 'xlsx'
 import { BarChartOutlined } from '@ant-design/icons';
+import { Icon } from '@iconify/react';
+import _ from "lodash";
+import Slider from "react-slick";
 
 const { RangePicker } = DatePicker;
 
-
 export default function Dashboard3() {
     const [loading, setLoading] = useState(true);
+    const [slickCount, setSlickCount] = useState(0);
 
     //data
     const [product, setProduct] = useState(null);
     const [chartData, setChartData] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [excelData, setExcelData] = useState([]);
+    const [tabProduct, setTabProduct] = useState([]);
 
     // filter
     const [selectProduct, setSelectProduct] = useState([]);
     const [selectDate, setSelectDate] = useState([]);
-    const [isStack, setIsStack] = useState(false)
+    const [isStack, setIsStack] = useState(false);
+    const [tabSelect, setTabSelect] = useState("")
 
     const chartData_config = {
         xField: 'CompanyName',
@@ -97,58 +102,67 @@ export default function Dashboard3() {
 
     const getData = async () => {
         setLoading(true);
-        try {
-            const result = await Axios({
-                url: process.env.REACT_APP_API_URL + "/dashboard/dashboard3",
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                params: {
-                    product_id: selectProduct?.value,
-                    startdate: (selectDate[0] === undefined || selectDate[0] === "") ? "" : moment(selectDate[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
-                    enddate: (selectDate[1] === undefined || selectDate[1] === "") ? "" : moment(selectDate[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
-                }
-            });
 
-            if (result.status === 200) {
-                setChartData(result.data.chartdata);
-                setTableData(result.data.tabledata);
-                setExcelData(result.data.exceldata);
-
-                setLoading(false);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/dashboard/dashboard3",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                product_id: selectProduct,
+                startdate: (selectDate[0] === undefined || selectDate[0] === "") ? "" : moment(selectDate[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
+                enddate: (selectDate[1] === undefined || selectDate[1] === "") ? "" : moment(selectDate[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
             }
+        }).then((res) => {
 
-        } catch (error) {
+            setTabProduct(_.uniqBy(res.data.chartdata, 'Product').map((n) => {
+                return {
+                    product: n.Product
+                }
+            }));
+            setSlickCount(Math.ceil(res.data.chartdata.length / 10))
+            setChartData(res.data.chartdata.map((o, index) => {
+                return {
+                    no: index + 1,
+                    CompanyName: o.CompanyName,
+                    GroupStatus: o.GroupStatus,
+                    Product: o.Product,
+                    Value: o.Value
+                }
+            }));
+            setTableData(res.data.tabledata);
+            setExcelData(res.data.exceldata);
             setLoading(false);
-        }
-
-
+        }).catch(() => {
+            setLoading(false);
+        })
     }
 
     const ExportExcel = (json) => {
         if (json !== undefined) {
-            let ws = xlsx.utils.json_to_sheet(json.map((x) => {
+            let ws = xlsx.utils.json_to_sheet(json.map((o, index) => {
                 return {
-                    No: x.Row,
-                    Issue: x.Number,
-                    Company: x.CompanyName,
-                    IssueType: x.IssueType,
-                    Priority: x.Priority,
-                    Status: x.GroupStatus,
-                    Module: x.ModuleName,
-                    "Task Status": x.TaskStatus,
-                    FlowStatus: x.FlowStatus,
-                    HandOver: x.NodeName,
-                    User: x.DisplayAllName,
-                    Title: x.Title,
-                    AssignDate: x.AssignIconDate,
-                    DueDate: x.DueDate,
-                    OverDueAll: x.OverDueAll,
-                    OverDue: x.OverDue,
-                    "DueDate (Dev)": x.DueDate_Dev,
-                    "DueDate (Dev) ครั้งที่ 2": x.DueDate_Dev2,
-                    "DueDate (Dev) ครั้งที่ 3": x.DueDate_Dev3
+                    No: index + 1,
+                    Issue: o.Number,
+                    Company: o.CompanyName,
+                    IssueType: o.IssueType,
+                    Priority: o.Priority,
+                    Status: o.GroupStatus,
+                    Product: o.Product,
+                    Module: o.ModuleName,
+                    "Task Status": o.TaskStatus,
+                    FlowStatus: o.FlowStatus,
+                    HandOver: o.NodeName,
+                    User: o.DisplayAllName,
+                    Title: o.Title,
+                    AssignDate: o.AssignIconDate,
+                    DueDate: o.DueDate,
+                    OverDueAll: o.OverDueAll,
+                    OverDue: o.OverDue,
+                    "DueDate (Dev)": o.DueDate_Dev,
+                    "DueDate (Dev) ครั้งที่ 2": o.DueDate_Dev2,
+                    "DueDate (Dev) ครั้งที่ 3": o.DueDate_Dev3
 
                 }
             }));
@@ -158,31 +172,22 @@ export default function Dashboard3() {
         }
     }
 
-
     useEffect(() => {
         getProduct();
     }, [])
 
     useEffect(() => {
-        getData();
-    }, [selectProduct?.value, selectDate && selectDate[0], isStack]);
+        if (selectProduct.length !== 0) {
+            getData();
+        }
+    }, [selectProduct.length, selectDate && selectDate[0], isStack]);
 
 
     return (
         <MasterPage bgColor="#f0f2f5">
             <Spin spinning={loading}>
-                {/* <Row gutter={16} style={{ marginTop: "0px", padding: "10px 24px 0px 0px" }}>
-                    <Col span={24} style={{ textAlign: "right" }}>
-                        <label
-                            style={{ fontSize: 10 }}
-                            hidden={selectProduct.length === 0 ? true : false}
-                        >ข้อมูลล่าสุดเมื่อ : {moment().format("DD/MM/YYYY HH:mm:ss")}</label>
-                    </Col>
-                </Row> */}
-
                 <Row gutter={16} style={{ padding: "10px 24px 0px 24px" }}>
                     <Col span={24}>
-                        {/* <div > */}
                         <Card
                             title={
                                 <Row>
@@ -193,13 +198,15 @@ export default function Dashboard3() {
                                     <Col span={8}>
                                         <Select
                                             placeholder="Select Product"
+                                            mode='multiple'
+                                            maxTagCount={1}
                                             showSearch
                                             style={{ width: "90%" }}
                                             filterOption={(input, option) =>
                                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                             }
-                                            onChange={(value, item) => setSelectProduct(item)}
-                                            options={product && product.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})` }))}
+                                            options={product && product.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})`, code: x.Name }))}
+                                            onChange={(value, item) => { setSelectProduct(value) }}
                                         >
                                         </Select>
                                     </Col>
@@ -233,93 +240,149 @@ export default function Dashboard3() {
                                     </Button>
                                 </>
                             }
-
                         >
-                            <Column {...chartData_config}
-                                data={chartData && chartData}
-                                height={300}
-                                xAxis={{ position: "bottom" }}
-                            />
+                            {
+                                selectProduct.length === 0 ? <Empty /> :
+                                    <>
+                                        <Row>
+                                            {
+                                                tabProduct.map((n, index) => (
+                                                    <Col span={2}
+                                                        onClick={(value) => { setTabSelect(n.product); console.log("product", n.product) }}
+                                                    >
+                                                        <Button
+                                                            type={
+                                                                (tabSelect === "" ? tabProduct[0]?.product : tabSelect) === n.product ? 'primary' : 'default'
+                                                            }
+                                                            shape='round'>
+                                                            <label>{n.product}</label>
+                                                        </Button>
+
+                                                    </Col>
+
+                                                ))
+                                            }
+                                        </Row>
+                                        <div style={{ padding: "24px 24px 0px 24px" }}>
+                                            <Slider
+                                                dots={true}
+                                                infinite={true}
+                                                speed={500}
+
+                                                slidesToShow={1}
+                                                slidesToScroll={1}
+                                                swipeToSlide={true}
+                                                prevArrow={
+                                                    <Icon icon="dashicons:arrow-left-alt2" color="gray" />
+                                                }
+                                                nextArrow={
+                                                    <Icon icon="dashicons:arrow-right-alt2" color="gray" />
+
+                                                }
+                                            >
+
+                                                {
+                                                    Array.from(Array(slickCount), (e, index) => {
+                                                        return (
+                                                            <div>
+                                                                <Column {...chartData_config}
+                                                                    data={
+                                                                        chartData.filter((o) => o.Product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)
+                                                                            && (o.no > (index) * 10) && (o.no <= (index + 1) * 10))
+                                                                    }
+                                                                    height={300}
+                                                                    xAxis={{ position: "bottom" }}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </Slider>
+                                        </div>
+
+                                        <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
+
+                                            <Col span={10}>
+                                                <Card className="card-dashboard" title="">
+                                                    <Table dataSource={tabSelect === "" ? tableData : _.filter(tableData, { Product: tabSelect })} loading={loading}>
+                                                        <Column title="No" align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {index + 1}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="Company"
+                                                            align="left"
+                                                            width="65%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.CompanyName}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="InProgress"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.InProgress}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="ReOpen"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.ReOpen}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="Total"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <>
+                                                                        {record.Total}
+                                                                    </>
+                                                                )
+                                                            }}
+                                                        />
+                                                    </Table>
+                                                </Card>
+                                            </Col>
+                                            <Col span={14}>
+                                                <Card title="Issue Total" bordered={true} style={{ width: "100%" }} loading={loading} className="card-dashboard">
+                                                    <Pie {...piechart_config}
+                                                        data={tabSelect === "" ? tableData : _.filter(tableData, { Product: tabSelect })}
+                                                        height={300}
+                                                    />
+                                                </Card>
+
+                                            </Col>
+
+                                        </Row>
+                                    </>
+                            }
                         </Card>
-                        {/* </div> */}
                     </Col>
-
-                </Row>
-                <Row gutter={16} style={{ marginTop: "10px", padding: "10px 24px 24px 24px" }}>
-                    <Col span={10}>
-                        <Table dataSource={tableData} loading={loading}>
-                            <Column title="No" align="center"
-                                width="10%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <label className="table-column-text12">
-                                            {index + 1}
-                                        </label>
-                                    )
-                                }}
-                            />
-
-                            <Column title="Company"
-                                align="left"
-                                width="65%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <label className="table-column-text12">
-                                            {record.CompanyName}
-                                        </label>
-                                    )
-                                }}
-                            />
-
-                            <Column title="InProgress"
-                                align="center"
-                                width="10%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <label className="table-column-text12">
-                                            {record.InProgress}
-                                        </label>
-                                    )
-                                }}
-                            />
-
-                            <Column title="ReOpen"
-                                align="center"
-                                width="10%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <label className="table-column-text12">
-                                            {record.ReOpen}
-                                        </label>
-                                    )
-                                }}
-                            />
-
-                            <Column title="Total"
-                                align="center"
-                                width="10%"
-                                render={(record, row, index) => {
-                                    return (
-                                        <>
-                                            {record.Total}
-                                        </>
-                                    )
-                                }}
-                            />
-
-
-                        </Table>
-                    </Col>
-                    <Col span={14}>
-                        <Card title="Issue Total" bordered={true} style={{ width: "100%" }} loading={loading} className="card-dashboard">
-                            <Pie {...piechart_config}
-                                data={tableData}
-                                height={300}
-                            />
-                        </Card>
-                    </Col>
-                </Row>
-            </Spin>
-        </MasterPage>
+                </Row >
+            </Spin >
+        </MasterPage >
     )
 }
