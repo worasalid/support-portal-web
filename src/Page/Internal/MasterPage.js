@@ -391,13 +391,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
               state.collapsed ?
                 <Icon icon="cil:arrow-circle-right" width="24" height="24"
                   className='btn-collapsed'
-                  style={{ position: "absolute", left: "65", top: "10", borderRadius: "20px" }}
+                  style={{ position: "absolute", left: "65", top: "5", borderRadius: "20px" }}
                   onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: false })}
                 />
                 :
                 <Icon icon="cil:arrow-circle-left" width="24" height="24"
                   className='btn-collapsed'
-                  style={{ position: "absolute", left: "190", top: "20", borderRadius: "20px" }}
+                  style={{ position: "absolute", left: "190", top: "5", borderRadius: "20px" }}
                   onClick={() => dispatch({ type: 'MENUCOLLAPSED', payload: true })}
                 />
             }
@@ -412,7 +412,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             }}
           >
             <Menu theme="light"
-              style={{ backgroundColor: "#edebec" }}
+              style={{ backgroundColor: "#edebec",marginTop: 16 }}
               mode="inline"
               defaultOpenKeys={state.collapsed ? [] : [match.path.split('/')[2]]}
               selectedKeys={[active_submenu]}
