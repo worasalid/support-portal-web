@@ -164,21 +164,21 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                 content: (
                     <div>
                         <p>{error.response.data}</p>
+                        <label style={{ color: "red" }}>*** กรุณา แจ้งทีม QA เพื่อตั้งค่าในการรับ Issue</label>
                     </div>
                 ),
                 okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
-
                 },
             });
         }
     }
 
     const onFinish = (values) => {
-       // console.log(values)
-         SendFlow(values);
+        // console.log(values)
+        SendFlow(values);
     };
 
 
@@ -291,7 +291,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                     </Form.Item>
 
                 </Form>
-                <TextEditor ref={editorRef} ticket_id={details.ticketid}/>
+                <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                 <br />
                 AttachFile : <UploadFile ref={uploadRef} />
             </Spin>

@@ -42,7 +42,7 @@ export default function ConfigQA() {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectProduct(selectedRowKeys);
             setSelectedRowKeys(selectedRowKeys);
-            console.log("sss",selectedRowKeys)
+            console.log("sss", selectedRowKeys)
 
         },
     };
@@ -87,6 +87,7 @@ export default function ConfigQA() {
                 },
                 params: {
                     userId: match.params.id,
+                    company_id: match.params.comid,
                     keyword: filterProduct
                 }
             });
@@ -108,7 +109,8 @@ export default function ConfigQA() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    user_id: match.params.id
+                    user_id: match.params.id,
+                    company_id: match.params.comid,
                 }
             });
             if (products.status === 200) {
@@ -118,7 +120,6 @@ export default function ConfigQA() {
         } catch (error) {
 
         }
-
     }
 
     const addProductOwner = async () => {
@@ -132,6 +133,7 @@ export default function ConfigQA() {
                 },
                 data: {
                     user_id: match.params.id,
+                    company_id: match.params.comid,
                     product_id: selectProduct && selectProduct
                 }
             });
@@ -170,6 +172,7 @@ export default function ConfigQA() {
                 },
                 data: {
                     user_id: match.params.id,
+                    company_id: match.params.comid,
                     product_id: param
                 }
             });
@@ -225,6 +228,7 @@ export default function ConfigQA() {
                 },
                 params: {
                     user_id: match.params.id,
+                    company_id: match.params.comid,
                     product_id: param
                 }
             });
@@ -250,6 +254,7 @@ export default function ConfigQA() {
                 },
                 data: {
                     user_id: match.params.id,
+                    company_id: match.params.comid,
                     product_id: selectProductRow?.ProductId,
                     module_id: selectModule && selectModule
                 }
@@ -288,6 +293,7 @@ export default function ConfigQA() {
                 },
                 data: {
                     user_id: param.UserId,
+                    company_id: match.params.comid,
                     product_id: param.ProductId,
                     module_id: param.ModuleId
                 }
@@ -361,9 +367,9 @@ export default function ConfigQA() {
                                 onClick={() => history.goBack()}
                             >
                                 Back
-                               </Button>
+                            </Button>
                         </Col>
-                   &nbsp; &nbsp;
+                        &nbsp; &nbsp;
 
                     </Row>
                     <Row>
@@ -384,7 +390,7 @@ export default function ConfigQA() {
                                 }}
                             >
                                 Add Product
-                    </Button>
+                            </Button>
                         </Col>
                     </Row>
 
@@ -506,7 +512,7 @@ export default function ConfigQA() {
                                                         }}
                                                     >
                                                         Add Module
-                                       </Button>
+                                                    </Button>
                                                 </Col>
                                             </Row>
 

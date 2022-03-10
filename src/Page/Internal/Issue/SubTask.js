@@ -473,6 +473,9 @@ export default function SubTask() {
         if (item.data.value === "SendToDeploy" || item.data.value === "CheckDeploy") {
           setModalsendtask_visible(true)
         }
+        if (item.data.value === "CancelTask") {
+          setModalsendtask_visible(true)
+        }
       }
 
       if (item.data.NodeName === "developer_2") {
@@ -1144,10 +1147,6 @@ export default function SubTask() {
           onOk={() => {
             setModalleaderqc_visible(false);
           }}
-          onCancel={() => {
-            setModalleaderqc_visible(false);
-            // window.location.reload("false");
-          }}
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
@@ -1217,10 +1216,6 @@ export default function SubTask() {
           onOk={() => {
             setModalRequestInfoDev(false);
           }}
-          onCancel={() => {
-            setModalRequestInfoDev(false);
-
-          }}
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
@@ -1238,10 +1233,6 @@ export default function SubTask() {
           onOk={() => {
             setModalRequestInfoQA(false);
           }}
-          onCancel={() => {
-            setModalRequestInfoQA(false);
-
-          }}
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
@@ -1258,10 +1249,6 @@ export default function SubTask() {
           width={900}
           onOk={() => {
             setModalQA_visible(false);
-          }}
-          onCancel={() => {
-            setModalQA_visible(false);
-            // window.location.reload("false");
           }}
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
