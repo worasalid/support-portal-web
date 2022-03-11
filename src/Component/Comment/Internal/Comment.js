@@ -355,7 +355,7 @@ export default function CommentBox() {
                             : ""
                     }
                 </Col>
-                <Col span={24} span={24} hidden={hidden} style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
+                <Col span={24} hidden={hidden} style={{ position: "sticky", bottom: -30, zIndex: 1, backgroundColor: "white" }}>
                     <Form
                         form={form}
                         name="Customer"
