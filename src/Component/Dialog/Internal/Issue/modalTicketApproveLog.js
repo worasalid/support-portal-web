@@ -18,7 +18,7 @@ export default function ModalTicketApproveLog({ visible = false, onOk, onCancel,
         }).then((res) => {
             setApproveResult(res.data.data[0]);
             setApproveHistory(res.data.datalist);
-            
+
         }).catch((error) => {
             console.log("error", error)
         });
@@ -47,18 +47,16 @@ export default function ModalTicketApproveLog({ visible = false, onOk, onCancel,
                         <label className='header-text' >จำนวน Manday ที่ประเมิน</label> : {`(${details.manday} Manday)`}
                     </Col>
                 </Row>
-
                 <br />
                 <Row>
                     <Col span={2}>
                         <b><label>ประเภท :</label></b>
                     </Col>
                     <Col span={22}>
-                        <label>{approveResult?.approve_type === 1 ? "ขอฟรี" : "ขอลดราคา"}</label>
+                        <label>{approveResult?.ApproveType === 1 ? "ขอฟรี" : "ขอลดราคา"}</label>
                     </Col>
                 </Row>
                 <br />
-
                 <Row>
                     <Col span={24}>
                         <b><label>เหตุผลในการขอ ขอนุมัติ :</label></b>
@@ -66,12 +64,11 @@ export default function ModalTicketApproveLog({ visible = false, onOk, onCancel,
                     <Col span={24}>
                         <Input.TextArea disabled rows={5} value={approveResult?.Description} />
                     </Col>
-
                     <Col span={24} style={{ marginTop: 30 }}>
                         <label className='header-text' >ผลการอนุมัติ :</label>&nbsp;
-                        <label style={{ color: approveResult?.ApproveResultText === "อนุมัติ" ? "green" : "red" }}
+                        <label
                             style={{
-                                color: approveResult?.ApproveResultText === "รออนุมัติ" ? "orange" :
+                                color: approveResult?.ApproveResultText === null ? "orange" :
                                     approveResult?.ApproveResultText === "อนุมัติ" ? "#00CC00" : "#FF4D4F"
                             }}
                         >
@@ -80,7 +77,6 @@ export default function ModalTicketApproveLog({ visible = false, onOk, onCancel,
                             }
                         </label>
                     </Col>
-
                     <Col span={24} style={{ marginTop: 30 }}>
                         <label className='header-text' >รายละเอียดการอนุมัติ</label>&nbsp;
                     </Col>

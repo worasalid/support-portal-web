@@ -1795,7 +1795,7 @@ export default function Subject() {
             ticket_number: userstate?.issuedata?.details[0]?.Number,
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
             flowoutput: userstate.node.output_data,
-            manday: userstate?.issuedata?.details[0]?.cntManday
+            manday: userstate?.issuedata?.details[0]?.Manday === null ? userstate?.issuedata?.details[0]?.cntManday : userstate?.issuedata?.details[0]?.Manday
           }}
         />
 
