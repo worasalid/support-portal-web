@@ -1826,7 +1826,7 @@ export default function Subject() {
           }}
           details={{
             ticketId: userstate?.issuedata?.details[0]?.Id,
-            manday: userstate?.issuedata?.details[0]?.cntManday
+            manday: userstate?.issuedata?.details[0]?.Manday === null ? userstate?.issuedata?.details[0]?.cntManday : userstate?.issuedata?.details[0]?.Manday
           }}
         />
 
