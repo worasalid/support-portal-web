@@ -324,7 +324,7 @@ export default function IssueCreate() {
                         <br />
                         <Row hidden={match.params.id === "2" ? false : true}>
                             <Col span={24}>
-                                <label className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1QKR0py0Z6CNYuguZhnfJ5MeyIgtTTsP7&export=download", "_blank")}>
+                                <label className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1CdeD4dK4WCSnnu6T6UViFj1OoNHaWqcC&export=download", "_blank")}>
                                     Template CR Form&nbsp;
                                     <Icon icon="ant-design:download-outlined" fontSize="18" />
                                 </label>
@@ -550,7 +550,7 @@ export default function IssueCreate() {
                         </Form.Item>
                         <Row>
                             <label hidden={match.params.id === "2" ? false : true}
-                                className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1QKR0py0Z6CNYuguZhnfJ5MeyIgtTTsP7&export=download", "_blank")}>
+                                className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1CdeD4dK4WCSnnu6T6UViFj1OoNHaWqcC&export=download", "_blank")}>
                                 Template CR Form&nbsp;
                                 <Icon icon="ant-design:download-outlined" fontSize="18" />
                             </label>

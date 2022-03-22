@@ -853,7 +853,6 @@ export default function Subject() {
     if (modalChangeduedate === false) {
       getMailBox();
       getdetail();
-
     }
   }, [modalChangeduedate])
 
@@ -1829,7 +1828,6 @@ export default function Subject() {
             manday: userstate?.issuedata?.details[0]?.Manday === null ? userstate?.issuedata?.details[0]?.cntManday : userstate?.issuedata?.details[0]?.Manday
           }}
         />
-
       </Spin >
     </MasterPage >
   );
