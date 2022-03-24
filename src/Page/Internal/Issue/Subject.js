@@ -1107,7 +1107,7 @@ export default function Subject() {
                   </Col>
                 </Row>
 
-                <div style={{ textAlign: "right", position:"sticky", bottom:150 }}>
+                <div style={{ textAlign: "right", position: "sticky", bottom: 150 }}>
                   {btnBackTop && (
                     <button onClick={() => scrollToTop()} className="back-to-top">
                       &#8679;
@@ -1393,7 +1393,8 @@ export default function Subject() {
                   </Col>
                   <Col span={18} style={{ marginTop: 10 }}>
                     {
-                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue")
+                      userstate?.mailbox[0]?.NodeName === "support" && 
+                      (userstate?.mailbox[0]?.NodeActionText === "CheckIssue" || userstate?.mailbox[0]?.NodeActionText === "Resolved" || userstate?.mailbox[0]?.NodeActionText === "CheckDeploy")
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
