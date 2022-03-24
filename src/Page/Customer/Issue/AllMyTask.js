@@ -360,7 +360,7 @@ export default function AllMyTask() {
                         </label>
                       </div>
 
-                      <div hidden={record.GroupStatus === "Completed" ? false : true}>
+                      <div hidden={record.GroupStatus === "Complete" || record.GroupStatus === "Completed" ? false : true}>
                         <label className="table-column-text11">
                           {record.GroupStatus} <br />
                           {moment(record.CompleteDate).format("DD/MM/YYYY")}
