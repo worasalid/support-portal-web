@@ -4,12 +4,14 @@ import UploadFile from '../../../UploadFile'
 import TextEditor from '../../../TextEditor';
 import Axios from 'axios';
 import { SwapRightOutlined } from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
 
 export default function ModalChangeAssign({ visible = false, onOk, onCancel, details, ...props }) {
     const uploadRef = useRef(null);
     const editorRef = useRef(null)
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const history = useHistory(null);
 
     const saveComment = async () => {
         if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
@@ -61,6 +63,7 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
             }).then((res) => {
                 saveComment();
                 setLoading(false);
+                history.push({pathname:"/internal/issue/mytask"});
                 onOk();
 
             }).catch((error) => {
