@@ -926,10 +926,11 @@ export default function SubTask() {
                     <label className="header-text">Module</label>
                     <br />
                     {
-                      (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "developer_2") &&
-                        userstate.taskdata.data[0]?.MailType === "in" &&
+                        (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "developer_2") &&
+                        (userstate.taskdata.data[0]?.MailType === "in") &&
                         (userstate?.taskdata?.data[0]?.Status === "Waiting Progress" || userstate?.taskdata?.data[0]?.Status === "InProgress") &&
-                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Wait H.Dev Assign")
+                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Wait H.Dev Assign") 
+                        || (userstate?.mailbox[0]?.NodeName === "cr_center" && (userstate?.mailbox[0]?.NodeActionText === "CheckManday" || userstate?.mailbox[0]?.NodeActionText === "ApproveCR"))
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
