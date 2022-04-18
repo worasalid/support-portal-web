@@ -201,6 +201,7 @@ export default function Dashboard3() {
                                             mode='multiple'
                                             maxTagCount={1}
                                             showSearch
+                                            allowClear
                                             style={{ width: "90%" }}
                                             filterOption={(input, option) =>
                                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
