@@ -202,7 +202,7 @@ export default function SubTask() {
           if (userstate?.mailbox[0]?.NodeName === "cr_center" && userstate?.taskdata?.data[0]?.FlowStatus === "Manday Estimated") {
             userdispatch({
               type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RejectManday" || x.value === "RejectMandaySA"))
+              payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RejectManday" || x.value === "RejectMandaySA" || x.value ==="CancelTask"))
             })
           }
         }
