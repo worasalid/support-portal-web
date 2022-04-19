@@ -37,6 +37,7 @@ import TimeSheet1 from './Page/Internal/DashBoard/TimeSheet/TimeSheet1';
 import TimeSheet2 from './Page/Internal/DashBoard/TimeSheet/TimeSheet2';
 import TimeSheet3 from './Page/Internal/DashBoard/TimeSheet/TimeSheet3';
 import DashBoard6 from './Page/Internal/DashBoard/DashBoard6';
+import Dashboard_AllIssue from './Page/Internal/DashBoard/Issue/DashBoard_Issue6';
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -183,6 +184,7 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/timesheet2" exact component={TimeSheet2} />
                                     <Route path="/internal/dashboard/timesheet3" exact component={TimeSheet3} />
                                     <Route path="/internal/dashboard/dashboard6" exact component={DashBoard6} />
+                                    <Route path="/internal/dashboard/allissue" exact component={Dashboard_AllIssue} />
 
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />

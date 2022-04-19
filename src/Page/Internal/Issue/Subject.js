@@ -853,7 +853,6 @@ export default function Subject() {
     if (modalChangeduedate === false) {
       getMailBox();
       getdetail();
-
     }
   }, [modalChangeduedate])
 
@@ -1108,7 +1107,7 @@ export default function Subject() {
                   </Col>
                 </Row>
 
-                <div style={{ textAlign: "right", position:"sticky", bottom:150 }}>
+                <div style={{ textAlign: "right", position: "sticky", bottom: 150 }}>
                   {btnBackTop && (
                     <button onClick={() => scrollToTop()} className="back-to-top">
                       &#8679;
@@ -1180,7 +1179,11 @@ export default function Subject() {
                           }
                           onClick={() => GetPriority()}
 
-                          options={userstate.masterdata.priorityState && userstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))}
+                          options={
+                            userstate.issuedata.details[0]?.IssueType === "Memo" || userstate.issuedata.details[0]?.IssueType === "ChangeRequest"
+                              ? userstate?.masterdata?.priorityState?.filter((f) => f.Name !== "Critical").map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))
+                              : userstate?.masterdata?.priorityState?.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))
+                          }
                           onChange={(value, item) => onChange(value, item)}
                           value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
                         />
@@ -1336,13 +1339,13 @@ export default function Subject() {
                   </Col>
                   <Col span={18} style={{ marginTop: 10 }}>
                     {
-                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue"
+                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support"
+                        && (userstate?.mailbox[0]?.NodeActionText === "CheckIssue" || userstate?.mailbox[0]?.NodeActionText === "Resolved")
                         && (userstate?.issuedata?.details[0]?.taskResolved === 0))
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
                           showSearch
-
                           filterOption={(input, option) =>
                             option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                           }
@@ -1354,7 +1357,6 @@ export default function Subject() {
 
                         : <label className="value-text">{userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalTypeText}</label>
                     }
-
                   </Col>
                 </Row>
 
@@ -1394,7 +1396,8 @@ export default function Subject() {
                   </Col>
                   <Col span={18} style={{ marginTop: 10 }}>
                     {
-                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" && userstate?.mailbox[0]?.NodeActionText === "CheckIssue")
+                      userstate?.mailbox[0]?.NodeName === "support" &&
+                        (userstate?.mailbox[0]?.NodeActionText === "CheckIssue" || userstate?.mailbox[0]?.NodeActionText === "Resolved" || userstate?.mailbox[0]?.NodeActionText === "CheckDeploy")
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
@@ -1795,7 +1798,7 @@ export default function Subject() {
             ticket_number: userstate?.issuedata?.details[0]?.Number,
             mailboxid: userstate?.mailbox[0]?.MailBoxId,
             flowoutput: userstate.node.output_data,
-            manday: userstate?.issuedata?.details[0]?.cntManday
+            manday: userstate?.issuedata?.details[0]?.Manday === null ? userstate?.issuedata?.details[0]?.cntManday : userstate?.issuedata?.details[0]?.Manday
           }}
         />
 
@@ -1826,10 +1829,9 @@ export default function Subject() {
           }}
           details={{
             ticketId: userstate?.issuedata?.details[0]?.Id,
-            manday: userstate?.issuedata?.details[0]?.cntManday
+            manday: userstate?.issuedata?.details[0]?.Manday === null ? userstate?.issuedata?.details[0]?.cntManday : userstate?.issuedata?.details[0]?.Manday
           }}
         />
-
       </Spin >
     </MasterPage >
   );

@@ -163,8 +163,8 @@ export default function ModalApprover({ visible = false, onOk, onCancel, datarow
                             name="control-hooks" layout="vertical" onFinish={onFinish} >
                             <Form.Item name="approve_result" rules={[{ required: true, message: 'กรุณาระบุ ผลอนุมัติ' }]}>
                                 <Radio.Group>
-                                    <Radio value={1}>อนุมัติ</Radio>
-                                    <Radio value={0}>ไม่อนุมัติ</Radio>
+                                    <Radio value={true}>อนุมัติ</Radio>
+                                    <Radio value={false}>ไม่อนุมัติ</Radio>
                                 </Radio.Group>
                             </Form.Item>
 
