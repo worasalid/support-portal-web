@@ -1179,7 +1179,11 @@ export default function Subject() {
                           }
                           onClick={() => GetPriority()}
 
-                          options={userstate.masterdata.priorityState && userstate.masterdata.priorityState.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))}
+                          options={
+                            userstate.issuedata.details[0]?.IssueType === "Memo" || userstate.issuedata.details[0]?.IssueType === "ChangeRequest"
+                              ? userstate?.masterdata?.priorityState?.filter((f) => f.Name !== "Critical").map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))
+                              : userstate?.masterdata?.priorityState?.map((x) => ({ value: x.Id, label: x.Name, type: "priority" }))
+                          }
                           onChange={(value, item) => onChange(value, item)}
                           value={userstate.issuedata.details[0] && userstate.issuedata.details[0].InternalPriority}
                         />
@@ -1335,7 +1339,7 @@ export default function Subject() {
                   </Col>
                   <Col span={18} style={{ marginTop: 10 }}>
                     {
-                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support" 
+                      (userstate?.mailbox[0]?.MailType === "in" && userstate?.mailbox[0]?.NodeName === "support"
                         && (userstate?.mailbox[0]?.NodeActionText === "CheckIssue" || userstate?.mailbox[0]?.NodeActionText === "Resolved")
                         && (userstate?.issuedata?.details[0]?.taskResolved === 0))
                         ? <Select
@@ -1392,8 +1396,8 @@ export default function Subject() {
                   </Col>
                   <Col span={18} style={{ marginTop: 10 }}>
                     {
-                      userstate?.mailbox[0]?.NodeName === "support" && 
-                      (userstate?.mailbox[0]?.NodeActionText === "CheckIssue" || userstate?.mailbox[0]?.NodeActionText === "Resolved" || userstate?.mailbox[0]?.NodeActionText === "CheckDeploy")
+                      userstate?.mailbox[0]?.NodeName === "support" &&
+                        (userstate?.mailbox[0]?.NodeActionText === "CheckIssue" || userstate?.mailbox[0]?.NodeActionText === "Resolved" || userstate?.mailbox[0]?.NodeActionText === "CheckDeploy")
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
