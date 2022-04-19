@@ -302,7 +302,8 @@ export default function IssueCreate() {
         // }
     }, [fileList.length]);
 
-
+    console.log("priorityState", customerstate?.masterdata?.productState[0]?.Name)
+    console.log("productState", customerstate?.masterdata?.productState?.length)
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>
@@ -475,7 +476,6 @@ export default function IssueCreate() {
                             />
                         </Form.Item>
 
-
                         <Form.Item label="Scene" name="scene">
                             <Select
                                 placeholder="Scene"
@@ -497,8 +497,12 @@ export default function IssueCreate() {
                             <Select
                                 defaultValue={4}
                                 placeholder="Priority"
-                                options={customerstate && customerstate.masterdata.priorityState.map(x => ({ value: x.Id, label: x.Name }))}>
-
+                                options={
+                                    `${title}` === "ChageRequest"
+                                        ? customerstate?.masterdata?.priorityState?.filter((f) => f.Name !== "Critical").map(x => ({ value: x.Id, label: x.Name }))
+                                        : customerstate?.masterdata?.priorityState?.map(x => ({ value: x.Id, label: x.Name }))
+                                }
+                            >
                             </Select>
                         </Form.Item>
 
