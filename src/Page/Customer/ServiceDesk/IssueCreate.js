@@ -498,7 +498,7 @@ export default function IssueCreate() {
                                 defaultValue={4}
                                 placeholder="Priority"
                                 options={
-                                    `${title}` === "ChageRequest"
+                                    (`${title}` === "ChageRequest" ||  `${title}` === "Memo")
                                         ? customerstate?.masterdata?.priorityState?.filter((f) => f.Name !== "Critical").map(x => ({ value: x.Id, label: x.Name }))
                                         : customerstate?.masterdata?.priorityState?.map(x => ({ value: x.Id, label: x.Name }))
                                 }
