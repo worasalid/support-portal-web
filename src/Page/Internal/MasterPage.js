@@ -5,8 +5,7 @@ import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
 import {
   PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined,
-  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined, PhoneOutlined,
-  RightCircleOutlined, LeftCircleOutlined
+  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined, PhoneOutlined
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";

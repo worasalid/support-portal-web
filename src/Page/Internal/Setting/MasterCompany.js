@@ -1,9 +1,10 @@
 import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Radio, Spin } from 'antd';
+import { Button, Table, Input, InputNumber, Form, Modal, Row, Col, Radio, Spin, DatePicker } from 'antd';
 import Column from 'antd/lib/table/Column';
 import Axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import MasterPage from '../MasterPage'
+import moment from "moment";
 
 export default function MasterCompany() {
     const [formAdd] = Form.useForm();
@@ -71,7 +72,19 @@ export default function MasterCompany() {
                 id: param
             }
         }).then((res) => {
-            setSelectcompany(res.data)
+            setSelectcompany(res.data);
+            form.setFieldsValue({
+                code: res.data[0].Code,
+                name: res.data[0].Name,
+                fullname_th: res.data[0].FullNameTH,
+                fullname_en: res.data[0].FullNameEN,
+                cost: res.data[0].CostManday,
+                is_cloud: res.data[0].IsCloudSite,
+                sites_color: res.data[0].SitesColor === null ? "#0074E0" : res.data[0].SitesColor,
+                running_format: res.data[0].RunFormat,
+                golive_date: res.data[0].GoliveDate === null ? undefined : moment(res.data[0].GoliveDate),
+                support_date: res.data[0].SupportDate === null ? undefined : moment(res.data[0].SupportDate)
+            });
         }).catch(() => {
 
         })
@@ -153,7 +166,9 @@ export default function MasterCompany() {
                     cost: param.cost,
                     is_cloud: param.is_cloud,
                     sites_color: param.sites_color,
-                    running_format: param.running_format
+                    running_format: param.running_format,
+                    golive_date: param.golive_date === undefined || param.golive_date === null ? null : param.golive_date.format("YYYY-MM-DD"),
+                    support_date: param.support_date === undefined || param.support_date === null ? null : param.support_date.format("YYYY-MM-DD")
                 }
             });
             await Axios({
@@ -203,6 +218,7 @@ export default function MasterCompany() {
     };
 
     const onFinish = async (values) => {
+        console.log("onFinish", values)
         setLoadingEdit(true);
         try {
             const updatecompany = await Axios({
@@ -219,7 +235,9 @@ export default function MasterCompany() {
                     cost: values.cost,
                     is_cloud: values.is_cloud,
                     sites_color: values.sites_color,
-                    running_format: values.running_format
+                    running_format: values.running_format,
+                    golive_date: values.golive_date === undefined || values.golive_date === null ? null : values.golive_date.format("YYYY-MM-DD"),
+                    support_date: values.support_date === undefined || values.support_date === null ? null : values.support_date.format("YYYY-MM-DD")
                 }
             });
 
@@ -248,6 +266,7 @@ export default function MasterCompany() {
                     okText: "Close",
                     onOk() {
                         setVisible(false);
+                        getCompany();
                     },
                 });
             }
@@ -324,7 +343,25 @@ export default function MasterCompany() {
                     loading={loading}>
                     <Column title="Code" width="10%" dataIndex="Code" />
                     <Column title="CompanyName" width="20%" dataIndex="Name" />
-                    <Column title="FullName" width="60%" dataIndex="FullNameTH" />
+                    <Column title="FullName" width="40%" dataIndex="FullNameTH" />
+                    <Column title="วันที่ GoLive" width="10%" align='center'
+                        render={(record) => {
+                            return (
+                                <>
+                                    {record.GoliveDate !== null ? moment(record.GoliveDate).format("DD/MM/YYYY") : ""}
+                                </>
+                            )
+                        }}
+                    />
+                    <Column title="วันที่เริ่ม Support" width="10%" align='center'
+                        render={(record) => {
+                            return (
+                                <>
+                                    {record.SupportDate !== null ? moment(record.SupportDate).format("DD/MM/YYYY") : ""}
+                                </>
+                            )
+                        }}
+                    />
                     <Column title=""
                         align="center"
                         width="10%"
@@ -336,16 +373,6 @@ export default function MasterCompany() {
                                         onClick={() => {
                                             getCompanyById(record.Id);
                                             getCustomerProduct(record.Id);
-                                            form.setFieldsValue({
-                                                code: record.Code,
-                                                name: record.Name,
-                                                fullname_th: record.FullNameTH,
-                                                fullname_en: record.FullNameEN,
-                                                cost: record.CostManday,
-                                                is_cloud: record.IsCloudSite,
-                                                sites_color: record.SitesColor === null ? "#0074E0" : record.SitesColor,
-                                                running_format: record.RunFormat
-                                            });
                                             setVisible(true)
                                         }}
                                     >
@@ -446,6 +473,12 @@ export default function MasterCompany() {
                     >
                         <Input style={{ width: "20%" }} />
                     </Form.Item>
+                    <Form.Item name="golive_date" label="วันที่ GoLive">
+                        <DatePicker format="DD/MM/YYYY" />
+                    </Form.Item>
+                    <Form.Item name="support_date" label="วันที่เริ่ม Support">
+                        <DatePicker format="DD/MM/YYYY" />
+                    </Form.Item>
                 </Form>
                 <Row>
                     <Col span={24}>
@@ -525,6 +558,12 @@ export default function MasterCompany() {
                             <Input style={{ width: "20%" }} />
 
                             {/* <label>Format ที่ใช้แสดงเลข Issue ในการแจ้งปัญหา</label> */}
+                        </Form.Item>
+                        <Form.Item name="golive_date" label="วันที่ GoLive">
+                            <DatePicker format="DD/MM/YYYY" />
+                        </Form.Item>
+                        <Form.Item name="support_date" label="วันที่เริ่ม Support">
+                            <DatePicker format="DD/MM/YYYY" />
                         </Form.Item>
                     </Form>
 
