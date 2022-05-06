@@ -102,9 +102,6 @@ import CallService from './Page/Internal/ServiceDesk/CallService';
 import Case from './Page/Internal/CallCenter/Case';
 import CaseSubject from './Page/Internal/CallCenter/Subject';
 
-// Customer License
-import CustomerLicense from './Page/Internal/CustomerLicense/license';
-
 
 import AuthenContext, { reducer, initState } from "./utility/authenContext";
 import MasterContext, { masterReducer, masterState } from "./utility/masterContext";
@@ -235,9 +232,6 @@ export default function Routes() {
                                     <Route path="/servicedesk/voxtron" exact component={CallService} />
                                     <Route path="/internal/callcenter/case" exact component={Case} />
                                     <Route path="/internal/callcenter/case/subject/:caseid?" exact component={CaseSubject} />
-
-                                    {/* Customer License */}
-                                    <Route path="/internal/license" exact component={CustomerLicense} />
 
                                 </Switch>
                             </Router>
