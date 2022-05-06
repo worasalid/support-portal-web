@@ -1,14 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useHistory } from 'react-router-dom';
 import MasterPage from "../MasterPage";
-import { Button, Row, Col, Card, Checkbox, Table, Modal, message, Skeleton, Form, Input } from 'antd';
+import { Button, Row, Col, Card, Checkbox, Table, Modal, message, Skeleton, Form, Input, Result } from 'antd';
 import { LeftCircleOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
+import AuthenContext from "../../../utility/authenContext";
 
 export default function IssueFlow() {
+    const { state, dispatch } = useContext(AuthenContext);
+    return (
+        <>
+            {
+                state?.usersdata?.permission?.menu?.setting === true ?
+                    <PageSetting /> :
+                    <MasterPage>
+                        <Result
+                            status="403"
+                            title="403"
+                            subTitle="Sorry, you are not authorized to access this page."
+                        />
+                    </MasterPage>
+            }
+        </>
+    )
+}
+
+export function PageSetting() {
     const { Column } = Table;
     const history = useHistory(null);
+
     const [formMail] = Form.useForm();
     const [formCCMail] = Form.useForm();
     const [pageLoad, setPageLoad] = useState(true);
@@ -43,8 +64,6 @@ export default function IssueFlow() {
         }).then((res) => {
             setIsAdmin(res.data[0].IsAdmin);
             setIsUser(res.data[0].IsUser);
-
-            console.log("getFlowAssign", res.data[0])
         }).catch((error) => {
             console.log(error)
         })
@@ -298,6 +317,8 @@ export default function IssueFlow() {
         getCCEmail();
     }, [])
 
+
+
     return (
         <MasterPage>
             <div style={{ padding: "24px 24px 24px 24px" }}>
@@ -358,7 +379,7 @@ export default function IssueFlow() {
                                                                 className="icon-link-hover"
                                                                 onClick={() => updateEmail(record)}
                                                             /> :
-                                                            <Icon icon="bytesize:close" color="red" width="14" height="14"
+                                                            <Icon icon="fe:disabled" color="red" width="18" height="18"
                                                                 className="icon-link-hover"
                                                                 onClick={() => updateEmail(record)}
                                                             />
@@ -385,7 +406,7 @@ export default function IssueFlow() {
 
                     <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
                         <Skeleton loading={pageLoad}>
-                            <Card title="แจ้งเตือน CC Email"
+                            <Card title="แจ้งเตือน CC Email (ส่ง Issue)"
                                 extra={
                                     <Button type="default" icon={<Icon icon="akar-icons:plus" />}
                                         onClick={() => setModalCCMail(true)}
@@ -410,7 +431,7 @@ export default function IssueFlow() {
                                                                 className="icon-link-hover"
                                                                 onClick={() => updateEmail(record)}
                                                             /> :
-                                                            <Icon icon="bytesize:close" color="red" width="14" height="14"
+                                                            <Icon icon="fe:disabled" color="red" width="18" height="18"
                                                                 className="icon-link-hover"
                                                                 onClick={() => updateEmail(record)}
                                                             />
