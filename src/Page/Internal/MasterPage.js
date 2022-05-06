@@ -5,8 +5,7 @@ import { Layout, Menu, Col, Row, Button, Tooltip, Dropdown, Modal } from 'antd';
 import { Badge, Avatar } from 'antd';
 import {
   PieChartOutlined, NotificationOutlined, SettingOutlined, FileOutlined, AuditOutlined,
-  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined, PhoneOutlined,
-  RightCircleOutlined, LeftCircleOutlined
+  BellOutlined, ReadOutlined, MenuUnfoldOutlined, MenuFoldOutlined, PhoneOutlined
 } from '@ant-design/icons';
 import Axios from 'axios';
 import AuthenContext from "../../utility/authenContext";
@@ -436,6 +435,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     display: state.usersdata?.organize.OrganizeCode === "support" ||
                       state.usersdata?.organize.OrganizeCode === "consult" ||
                       state.usersdata?.organize.OrganizeCode === "manage" ||
+                      state.usersdata?.organize.OrganizeCode === "sa" ||
                       state.usersdata?.users.code === "I0017" ||
                       state.usersdata?.users.code === "I0005" ? "block" : "none"
                   }}
