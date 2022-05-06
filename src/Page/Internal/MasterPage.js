@@ -411,7 +411,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             }}
           >
             <Menu theme="light"
-              style={{ backgroundColor: "#edebec",marginTop: 16 }}
+              style={{ backgroundColor: "#edebec", marginTop: 16 }}
               mode="inline"
               defaultOpenKeys={state.collapsed ? [] : [match.path.split('/')[2]]}
               selectedKeys={[active_submenu]}
@@ -558,6 +558,13 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                   {/* </Badge> */}
                 </Menu.Item>
               </SubMenu>
+
+              <Menu.Item key="license"
+                icon={<AuditOutlined />}
+                onClick={() => history.push({ pathname: "/internal/license" })}
+              >
+                Customer License
+              </Menu.Item>
 
               <SubMenu key="setting" icon={<SettingOutlined />} title="Setting" >
                 <Menu.Item key="11"
