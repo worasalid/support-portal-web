@@ -302,7 +302,8 @@ export default function IssueCreate() {
         // }
     }, [fileList.length]);
 
-
+    console.log("priorityState", customerstate?.masterdata?.productState[0]?.Name)
+    console.log("productState", customerstate?.masterdata?.productState?.length)
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>
@@ -324,7 +325,7 @@ export default function IssueCreate() {
                         <br />
                         <Row hidden={match.params.id === "2" ? false : true}>
                             <Col span={24}>
-                                <label className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1Zx51G_a_L7bsIhjkNBCWpvvPyRzyIp4I&export=download", "_blank")}>
+                                <label className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1CdeD4dK4WCSnnu6T6UViFj1OoNHaWqcC&export=download", "_blank")}>
                                     Template CR Form&nbsp;
                                     <Icon icon="ant-design:download-outlined" fontSize="18" />
                                 </label>
@@ -475,7 +476,6 @@ export default function IssueCreate() {
                             />
                         </Form.Item>
 
-
                         <Form.Item label="Scene" name="scene">
                             <Select
                                 placeholder="Scene"
@@ -497,8 +497,12 @@ export default function IssueCreate() {
                             <Select
                                 defaultValue={4}
                                 placeholder="Priority"
-                                options={customerstate && customerstate.masterdata.priorityState.map(x => ({ value: x.Id, label: x.Name }))}>
-
+                                options={
+                                    (`${title}` === "ChageRequest" ||  `${title}` === "Memo")
+                                        ? customerstate?.masterdata?.priorityState?.filter((f) => f.Name !== "Critical").map(x => ({ value: x.Id, label: x.Name }))
+                                        : customerstate?.masterdata?.priorityState?.map(x => ({ value: x.Id, label: x.Name }))
+                                }
+                            >
                             </Select>
                         </Form.Item>
 
@@ -550,7 +554,7 @@ export default function IssueCreate() {
                         </Form.Item>
                         <Row>
                             <label hidden={match.params.id === "2" ? false : true}
-                                className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1Zx51G_a_L7bsIhjkNBCWpvvPyRzyIp4I&export=download", "_blank")}>
+                                className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1CdeD4dK4WCSnnu6T6UViFj1OoNHaWqcC&export=download", "_blank")}>
                                 Template CR Form&nbsp;
                                 <Icon icon="ant-design:download-outlined" fontSize="18" />
                             </label>

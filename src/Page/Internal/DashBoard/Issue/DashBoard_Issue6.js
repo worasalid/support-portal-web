@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Column, Pie } from '@ant-design/charts';
-import MasterPage from '../MasterPage'
+import MasterPage from '../../MasterPage'
 import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Tabs, Empty } from 'antd';
 import moment from "moment"
-import Axios from "axios";
+import axios from "axios";
 import xlsx from 'xlsx'
 import { BarChartOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
@@ -12,7 +12,7 @@ import Slider from "react-slick";
 
 const { RangePicker } = DatePicker;
 
-export default function Dashboard3() {
+export default function Dashboard_AllIssue() {
     const [loading, setLoading] = useState(true);
     const [slickCount, setSlickCount] = useState(0);
 
@@ -22,17 +22,19 @@ export default function Dashboard3() {
     const [tableData, setTableData] = useState([]);
     const [excelData, setExcelData] = useState([]);
     const [tabProduct, setTabProduct] = useState([]);
+    const [company, setCompany] = useState([]);
 
     // filter
     const [selectProduct, setSelectProduct] = useState([]);
     const [selectDate, setSelectDate] = useState([]);
     const [isStack, setIsStack] = useState(false);
-    const [tabSelect, setTabSelect] = useState("")
+    const [tabSelect, setTabSelect] = useState("");
+    const [selectCompany, setSelectCompany] = useState([]);
 
     const chartData_config = {
         xField: 'CompanyName',
         yField: 'Value',
-        seriesField: 'GroupStatus',
+        //seriesField: 'GroupStatus',
         //isPercent: true,
         isStack: isStack,
         isGroup: !isStack,
@@ -83,7 +85,7 @@ export default function Dashboard3() {
 
     const getProduct = async () => {
         try {
-            const result = await Axios({
+            const result = await axios({
                 url: process.env.REACT_APP_API_URL + "/master/products",
                 method: "GET",
                 headers: {
@@ -103,14 +105,15 @@ export default function Dashboard3() {
     const getData = async () => {
         setLoading(true);
 
-        await Axios({
-            url: process.env.REACT_APP_API_URL + "/dashboard/dashboard2",
+        await axios({
+            url: process.env.REACT_APP_API_URL + "/dashboard/allissue",
             method: "GET",
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
             },
             params: {
                 product_id: selectProduct,
+                company_id: selectCompany,
                 startdate: (selectDate[0] === undefined || selectDate[0] === "") ? "" : moment(selectDate[0], "DD/MM/YYYY").format("YYYY-MM-DD"),
                 enddate: (selectDate[1] === undefined || selectDate[1] === "") ? "" : moment(selectDate[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
             }
@@ -144,26 +147,24 @@ export default function Dashboard3() {
             let ws = xlsx.utils.json_to_sheet(json.map((o, index) => {
                 return {
                     No: index + 1,
-                    Issue: o.Number,
-                    Company: o.CompanyName,
-                    IssueType: o.IssueType,
-                    Priority: o.Priority,
-                    Status: o.GroupStatus,
-                    Product: o.Product,
-                    Module: o.ModuleName,
-                    "Task Status": o.TaskStatus,
-                    FlowStatus: o.FlowStatus,
-                    HandOver: o.NodeName,
-                    User: o.DisplayAllName,
-                    Title: o.Title,
-                    AssignDate: o.AssignIconDate,
-                    DueDate: o.DueDate,
-                    OverDueAll: o.OverDueAll,
-                    OverDue: o.OverDue,
-                    "DueDate (Dev)": o.DueDate_Dev,
-                    "DueDate (Dev) ครั้งที่ 2": o.DueDate_Dev2,
-                    "DueDate (Dev) ครั้งที่ 3": o.DueDate_Dev3
-
+                    "Company": o.CompanyName,
+                    "Product": o.Product,
+                    "IssueNumber": o.TicketNumber,
+                    "IssueType": o.IssueType,
+                    "Priority": o.Priority,
+                    "Scene": o.Scene,
+                    "Title": o.Title,
+                    "วันที่ Assign": o.AssignDate,
+                    "DueDate": o.DueDate,
+                    "DueDate (เลื่อน)": o.DueDate2,
+                    "OverDue (วัน)": o.OverDue,
+                    "เลื่อน Due (จำนวนครั้ง)": o.CntDue,
+                    "ReOpen (จำนวนครั้ง)": o.CntReOpen,
+                    "Status": o.GroupStatus,
+                    "Flow ปัจจุบัน": o.FlowStatus,
+                    "HandOver": o.NodeName,
+                    "ResolvedDate": o.ResolvedDate,
+                    "CompleteDate": o.CompleteDate
                 }
             }));
             let wb = xlsx.utils.book_new();
@@ -172,15 +173,28 @@ export default function Dashboard3() {
         }
     }
 
+    const getCompany = async () => {
+        await axios.get(process.env.REACT_APP_API_URL + "/master/company", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+        }).then((res) => {
+            setCompany(res.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
     useEffect(() => {
         getProduct();
+        getCompany();
     }, [])
 
     useEffect(() => {
         if (selectProduct.length !== 0) {
             getData();
         }
-    }, [selectProduct.length, selectDate && selectDate[0], isStack]);
+    }, [selectProduct.length, selectCompany.length, selectDate && selectDate[0], isStack]);
 
 
     return (
@@ -191,11 +205,10 @@ export default function Dashboard3() {
                         <Card
                             title={
                                 <Row>
-                                    <Col span={10}>
-                                        <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard All Site By Product
-
+                                    <Col span={6}>
+                                        <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard All Issue
                                     </Col>
-                                    <Col span={8}>
+                                    <Col span={6}>
                                         <Select
                                             placeholder="Select Product"
                                             mode='multiple'
@@ -208,6 +221,23 @@ export default function Dashboard3() {
                                             }
                                             options={product && product.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})`, code: x.Name }))}
                                             onChange={(value, item) => { setSelectProduct(value) }}
+                                        >
+                                        </Select>
+                                    </Col>
+                                    <Col span={6}>
+                                        <Select
+                                            placeholder="Select Company"
+                                            mode='multiple'
+                                            maxTagCount={1}
+                                            showSearch
+                                            allowClear
+                                            style={{ width: "90%" }}
+                                            filterOption={(input, option) =>
+                                                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            disabled={selectProduct.length === 0 ? true : false}
+                                            options={company && company.map((x) => ({ value: x.Id, label: x.Name }))}
+                                            onChange={(value, item) => setSelectCompany(value)}
                                         >
                                         </Select>
                                     </Col>
@@ -329,25 +359,49 @@ export default function Dashboard3() {
                                                             }}
                                                         />
 
-                                                        <Column title="InProgress"
+                                                        <Column title="Bug"
                                                             align="center"
                                                             width="10%"
                                                             render={(record, row, index) => {
                                                                 return (
                                                                     <label className="table-column-text12">
-                                                                        {record.InProgress}
+                                                                        {record.BugCnt}
                                                                     </label>
                                                                 )
                                                             }}
                                                         />
 
-                                                        <Column title="ReOpen"
+                                                        <Column title="CR"
                                                             align="center"
                                                             width="10%"
                                                             render={(record, row, index) => {
                                                                 return (
                                                                     <label className="table-column-text12">
-                                                                        {record.ReOpen}
+                                                                        {record.CRCnt}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="Memo"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.MemoCnt}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="Use"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.UseCnt}
                                                                     </label>
                                                                 )
                                                             }}

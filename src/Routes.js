@@ -37,6 +37,7 @@ import TimeSheet1 from './Page/Internal/DashBoard/TimeSheet/TimeSheet1';
 import TimeSheet2 from './Page/Internal/DashBoard/TimeSheet/TimeSheet2';
 import TimeSheet3 from './Page/Internal/DashBoard/TimeSheet/TimeSheet3';
 import DashBoard6 from './Page/Internal/DashBoard/DashBoard6';
+import Dashboard_AllIssue from './Page/Internal/DashBoard/Issue/DashBoard_Issue6';
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -102,6 +103,9 @@ import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
 import CallService from './Page/Internal/ServiceDesk/CallService';
 import Case from './Page/Internal/CallCenter/Case';
 import CaseSubject from './Page/Internal/CallCenter/Subject';
+
+// Customer License
+import CustomerLicense from './Page/Internal/CustomerLicense/license';
 
 
 import AuthenContext, { reducer, initState } from "./utility/authenContext";
@@ -182,6 +186,7 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/timesheet2" exact component={TimeSheet2} />
                                     <Route path="/internal/dashboard/timesheet3" exact component={TimeSheet3} />
                                     <Route path="/internal/dashboard/dashboard6" exact component={DashBoard6} />
+                                    <Route path="/internal/dashboard/allissue" exact component={Dashboard_AllIssue} />
 
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
@@ -235,6 +240,9 @@ export default function Routes() {
                                     <Route path="/servicedesk/voxtron" exact component={CallService} />
                                     <Route path="/internal/callcenter/case" exact component={Case} />
                                     <Route path="/internal/callcenter/case/subject/:caseid?" exact component={CaseSubject} />
+
+                                    {/* Customer License */}
+                                    <Route path="/internal/license" exact component={CustomerLicense} />
 
                                 </Switch>
                             </Router>

@@ -202,7 +202,7 @@ export default function SubTask() {
           if (userstate?.mailbox[0]?.NodeName === "cr_center" && userstate?.taskdata?.data[0]?.FlowStatus === "Manday Estimated") {
             userdispatch({
               type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RejectManday" || x.value === "RejectMandaySA"))
+              payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RejectManday" || x.value === "RejectMandaySA" || x.value ==="CancelTask"))
             })
           }
         }
@@ -471,6 +471,9 @@ export default function SubTask() {
           setModalsendtask_visible(true)
         }
         if (item.data.value === "SendToDeploy" || item.data.value === "CheckDeploy") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "CancelTask") {
           setModalsendtask_visible(true)
         }
       }
@@ -788,6 +791,7 @@ export default function SubTask() {
                       style={{ width: '100%' }} placeholder="None"
                       onChange={(value, item) => HandleChange(value, item)}
                       options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
+                      disabled={userstate.taskdata.data[0]?.Status === "Cancel" ? true : false}
                     />
                   </Col>
                   <Col span={18}
@@ -922,10 +926,11 @@ export default function SubTask() {
                     <label className="header-text">Module</label>
                     <br />
                     {
-                      (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "developer_2") &&
-                        userstate.taskdata.data[0]?.MailType === "in" &&
+                        (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "developer_2") &&
+                        (userstate.taskdata.data[0]?.MailType === "in") &&
                         (userstate?.taskdata?.data[0]?.Status === "Waiting Progress" || userstate?.taskdata?.data[0]?.Status === "InProgress") &&
-                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Wait H.Dev Assign")
+                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Wait H.Dev Assign") 
+                        || (userstate?.mailbox[0]?.NodeName === "cr_center" && (userstate?.mailbox[0]?.NodeActionText === "CheckManday" || userstate?.mailbox[0]?.NodeActionText === "ApproveCR"))
                         ? <Select
                           style={{ width: '100%' }}
                           allowClear
@@ -1144,7 +1149,6 @@ export default function SubTask() {
           onOk={() => {
             setModalleaderqc_visible(false);
           }}
-         
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
