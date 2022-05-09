@@ -685,8 +685,7 @@ export default function Subject() {
                             value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                             options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                             disabled={
-                              mailbox?.MailType === "in" && permission.send_flow_to_icon ? false :
-                                (mailbox?.MailType === "in" && permission.send_flow_to_icon === false && permission.config_assign.is_user) ? false : true
+                              mailbox?.MailType === "in" &&  mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon ? false : true
                             }
                           >
                           </Select>
