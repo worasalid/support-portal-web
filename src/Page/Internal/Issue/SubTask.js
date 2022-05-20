@@ -202,7 +202,7 @@ export default function SubTask() {
           if (userstate?.mailbox[0]?.NodeName === "cr_center" && userstate?.taskdata?.data[0]?.FlowStatus === "Manday Estimated") {
             userdispatch({
               type: "LOAD_ACTION_FLOW",
-              payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RejectManday" || x.value === "RejectMandaySA" || x.value ==="CancelTask"))
+              payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "RejectManday" || x.value === "RejectMandaySA" || x.value === "CancelTask"))
             })
           }
         }
@@ -228,6 +228,14 @@ export default function SubTask() {
                 type: "LOAD_ACTION_FLOW",
                 payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
               })
+
+              // Check Flow Resolved ที่ไม่มีการแก้ไข Bug จะไม่มีการเดิน flow ต่อ
+              if (userstate?.taskdata?.data[0]?.IsDeploy === false) {
+                userdispatch({
+                  type: "LOAD_ACTION_FLOW",
+                  payload: []
+                })
+              }
             }
           }
 
@@ -389,10 +397,18 @@ export default function SubTask() {
     // Flow Bug
     if (userstate?.taskdata?.data[0]?.IssueType === "Bug") {
       if (item.data.NodeName === "support") {
-        if (item.data.value === "SendToDev") { setModalsendtask_visible(true) }
-        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
-        if (item.data.value === "RejectToQA") { setModalsendtask_visible(true) }
-        if (item.data.value === "SendToDeploy") { setModalsendtask_visible(true) }
+        if (item.data.value === "SendToDev") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "ResolvedTask" || item.data.value === "CloseTask") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "RejectToQA") {
+          setModalsendtask_visible(true)
+        }
+        if (item.data.value === "SendToDeploy") {
+          setModalsendtask_visible(true)
+        }
       }
 
       if (item.data.NodeName === "developer_2") {
@@ -541,10 +557,17 @@ export default function SubTask() {
     // Flow Use
     if (userstate?.taskdata?.data[0]?.IssueType === "Use") {
       if (item.data.NodeName === "support") {
-        if (item.data.value === "RequestInfoDev") { setModalRequestInfoDev(true) }
-        if (item.data.value === "RequestInfoQA") { setModalRequestInfoQA(true) }
-        if (item.data.value === "ResolvedTask") { setModalsendtask_visible(true) }
+        if (item.data.value === "RequestInfoDev") {
+          setModalRequestInfoDev(true)
+        }
+        if (item.data.value === "RequestInfoQA") {
+          setModalRequestInfoQA(true)
+        }
+        if (item.data.value === "ResolvedTask" || item.data.value === "CloseTask") {
+          setModalsendtask_visible(true)
+        }
       }
+
       if (item.data.NodeName === "developer_1") {
         if (item.data.value === "SendInfoToSupport") { setModalsendtask_visible(true) }
       }
@@ -633,7 +656,7 @@ export default function SubTask() {
   }, [modalTimeDevelop])
 
 
-
+  console.log("userstate?.actionflow?", userstate?.actionflow?.length)
 
   return (
     <MasterPage>
@@ -926,10 +949,10 @@ export default function SubTask() {
                     <label className="header-text">Module</label>
                     <br />
                     {
-                        (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "developer_2") &&
+                      (userstate?.mailbox[0]?.NodeName === "support" || userstate?.mailbox[0]?.NodeName === "cr_center" || userstate?.mailbox[0]?.NodeName === "developer_2") &&
                         (userstate.taskdata.data[0]?.MailType === "in") &&
                         (userstate?.taskdata?.data[0]?.Status === "Waiting Progress" || userstate?.taskdata?.data[0]?.Status === "InProgress") &&
-                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Wait H.Dev Assign") 
+                        (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support" || userstate?.taskdata?.data[0]?.FlowStatus === "Return to CR Center" || userstate?.taskdata?.data[0]?.FlowStatus === "Waiting Progress" || userstate?.taskdata?.data[0]?.FlowStatus === "Wait H.Dev Assign")
                         || (userstate?.mailbox[0]?.NodeName === "cr_center" && (userstate?.mailbox[0]?.NodeActionText === "CheckManday" || userstate?.mailbox[0]?.NodeActionText === "ApproveCR"))
                         ? <Select
                           style={{ width: '100%' }}
