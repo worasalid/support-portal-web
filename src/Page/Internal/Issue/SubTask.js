@@ -220,7 +220,7 @@ export default function SubTask() {
             if (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support") {
               userdispatch({
                 type: "LOAD_ACTION_FLOW",
-                payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "SendToDev" || x.value === "ResolvedTask"))
+                payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "SendToDev" || x.value === "CloseTask"))
               })
             }
             if (userstate?.taskdata?.data[0]?.Status === "Resolved" || userstate?.taskdata?.data[0]?.Status === "Done") {
