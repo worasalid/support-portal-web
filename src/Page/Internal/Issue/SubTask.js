@@ -1241,7 +1241,6 @@ export default function SubTask() {
           onOk={() => {
             setModalRequestInfoDev(false);
           }}
-
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
@@ -1259,7 +1258,6 @@ export default function SubTask() {
           onOk={() => {
             setModalRequestInfoQA(false);
           }}
-
           details={{
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,

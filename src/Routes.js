@@ -16,6 +16,8 @@ import CustomerPass from './Page/Customer/Issue/Pass';
 import CustomerCancel from './Page/Customer/Issue/Cancel';
 import CustomerSubject from './Page/Customer/Issue/Subject';
 import Customerlogin from './Page/Customer/login';
+import CustomerSetting from "./Page/Customer/Setting/index";
+import CustomerSettingIssueFlow from "./Page/Customer/Setting/IssueFlow";
 
 import MyDashboard from './Page/Internal/DashBoard/MyDashBoard';
 import AllDashBoard from './Page/Internal/DashBoard/AllDashBoard';
@@ -227,6 +229,9 @@ export default function Routes() {
                                     <Route path="/customer/issue/Subject/:id?" exact component={CustomerSubject} />
                                     <Route path="/customer/issue/complete" exact component={CustomerComplete} />
                                     <Route path="/customer/issue/cancel" exact component={CustomerCancel} />
+                                    <Route path="/customer/system/setting" exact component={CustomerSetting} />
+                                    <Route path="/customer/system/setting/issue-flow" exact component={CustomerSettingIssueFlow} />
+                                    
 
                                     {/* CallCenter Service */}
                                     <Route path="/servicedesk/voxtron" exact component={CallService} />
