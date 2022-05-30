@@ -675,7 +675,7 @@ export default function Subject() {
                     >
                       <Row style={{ marginBottom: 20 }}>
                         <Col span={18}>
-                          <label className="header-text">Progress Status.</label>
+                          <label className="header-text">Progress Status</label>
                           <br />
                           <Select
                             style={{ width: "100%", marginTop: 8 }}
@@ -686,6 +686,7 @@ export default function Subject() {
                             options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                             disabled={
                               mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === false ? true : 
+                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === true ? false :
                               mailbox?.MailType === "in" && mailbox?.GroupStatus !== "Open" ? false : true
                             }
                           >
