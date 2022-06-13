@@ -1,4 +1,4 @@
-import { Button, Col, Row, Table, Tag, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Tooltip, Result } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer, useRef } from "react";
@@ -20,8 +20,29 @@ import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import Notification from "../../../Component/Notifications/Internal/Notification";
 import { CalculateTime } from "../../../utility/calculateTime";
+import { Icon } from '@iconify/react';
 
 export default function InProgress() {
+  console.log(process.env.REACT_APP_MENU_INPROGRESS_MAINTENANCE)
+  return (
+    <>
+      {
+        process.env.REACT_APP_MENU_INPROGRESS_MAINTENANCE === "true" ?
+          <MasterPage>
+            <Result
+              icon={<Icon icon="akar-icons:circle-alert" color="gray" width="100" height="100" />}
+              title="กำลังอยู่ในระหว่าง ปรับปรุงระบบ"
+              subTitle="Issue ที่กำลังดำเนินการ ใน Out Box ไม่สามารถค้นหาได้ชั่วคราว ให้ค้นหาที่ inbox (เมนู All Issue ,All Task) และ กรองสถานะ"
+            />
+          </MasterPage>
+          :
+          <PageInProgress />
+      }
+    </>
+  )
+}
+
+export function PageInProgress() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
   const notiRef = useRef();
@@ -156,7 +177,7 @@ export default function InProgress() {
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
 
             <Table dataSource={userstate.issuedata.data} loading={loading}
-            className="header-sticky"
+              className="header-sticky"
               style={{ padding: "5px 5px" }}
               pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
               onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
@@ -560,7 +581,7 @@ export default function InProgress() {
 export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
 
   const calculateTime = new CalculateTime();
-  
+
   function rederSLAPriority(sla, ticket_sla, priority) {
     switch (priority) {
       case 'Critical':

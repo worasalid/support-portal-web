@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Menu, Row, Table, Typography, Tag, Divider, Select, DatePicker, Input, Tooltip } from "antd";
+import { Button, Col, Row, Table, Tag, Tooltip, Result } from "antd";
 import moment from "moment";
 import Axios from "axios";
 import React, { useEffect, useState, useContext, useReducer } from "react";
@@ -18,8 +18,28 @@ import ModalFileDownload from "../../../Component/Dialog/Internal/modalFileDownl
 import ClockSLA from "../../../utility/SLATime";
 import ModalTimetracking from "../../../Component/Dialog/Internal/modalTimetracking";
 import { CalculateTime } from "../../../utility/calculateTime";
+import { Icon } from '@iconify/react';
 
 export default function Complete() {
+  return (
+    <>
+      {
+        process.env.REACT_APP_MENU_COMPLETE_MAINTENANCE === "true" ?
+          <MasterPage>
+            <Result
+              icon={<Icon icon="akar-icons:circle-alert" color="gray" width="100" height="100" />}
+              title="กำลังอยู่ในระหว่าง ปรับปรุงระบบ"
+              subTitle="Issue ที่กำลังดำเนินการ ใน Out Box ไม่สามารถค้นหาได้ชั่วคราว ให้ค้นหาที่ inbox (เมนู All Issue ,All Task) และ กรองสถานะ"
+            />
+          </MasterPage>
+          :
+          <PageComplete />
+      }
+    </>
+  )
+}
+
+export function PageComplete() {
   const history = useHistory();
   const [loading, setLoadding] = useState(false);
 

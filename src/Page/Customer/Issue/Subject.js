@@ -685,7 +685,9 @@ export default function Subject() {
                             value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                             options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                             disabled={
-                              mailbox?.MailType === "in" &&  mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon ? false : true
+                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === false ? true : 
+                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === true ? false :
+                              mailbox?.MailType === "in" && mailbox?.GroupStatus !== "Open" ? false : true
                             }
                           >
                           </Select>
@@ -694,7 +696,8 @@ export default function Subject() {
                       </Row>
 
                       <Row style={{ marginBottom: 20 }}
-                        hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                        // hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                        hidden={customerstate?.issuedata?.details[0]?.GroupStatus !== "Open" ? true : false}
                       >
                         <Col span={18}>
                           <label className="header-text">IssueType</label>
@@ -715,7 +718,8 @@ export default function Subject() {
                       </Row>
 
                       <Row style={{ marginBottom: 20 }}
-                        hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}
+                        // hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}
+                        hidden={customerstate?.issuedata?.details[0]?.GroupStatus === "Open" ? true : false}
                       >
                         <Col span={18}>
                           <label className="header-text">IssueType</label>
@@ -730,7 +734,8 @@ export default function Subject() {
                           <br />
 
                           {
-                            customerstate?.issuedata?.details[0]?.AssignIconDate !== null ?
+                            // customerstate?.issuedata?.details[0]?.AssignIconDate !== null ?
+                            customerstate?.issuedata?.details[0]?.GroupStatus !== "Open" ?
                               <label className="value-text">
                                 {renderColorPriority(customerstate?.issuedata?.details[0]?.Priority)}&nbsp;&nbsp;
                                 {customerstate?.issuedata?.details[0]?.Priority}
@@ -748,7 +753,8 @@ export default function Subject() {
                       </Row>
 
                       <Row style={{ marginBottom: 20 }}
-                        hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                        // hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                        hidden={customerstate?.issuedata?.details[0]?.GroupStatus !== "Open" ? true : false}
                       >
                         <Col span={18}>
                           <label className="header-text">Product</label>
@@ -763,7 +769,10 @@ export default function Subject() {
                         </Col>
                       </Row>
 
-                      <Row style={{ marginBottom: 20 }} hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}>
+                      <Row style={{ marginBottom: 20 }}
+                        // hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}
+                        hidden={customerstate?.issuedata?.details[0]?.GroupStatus === "Open" ? true : false}
+                      >
                         <Col span={18}>
                           <label className="header-text">Product</label>
                           <br />
@@ -773,7 +782,8 @@ export default function Subject() {
 
 
                       <Row style={{ marginBottom: 20 }}
-                        hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                        // hidden={customerstate?.issuedata?.details[0]?.AssignIconDate !== null ? true : false}
+                        hidden={customerstate?.issuedata?.details[0]?.GroupStatus !== "Open" ? true : false}
                       >
                         <Col span={18}>
                           <label className="header-text">Scene</label>
@@ -794,7 +804,8 @@ export default function Subject() {
                       </Row>
 
                       <Row style={{ marginBottom: 20 }}
-                        hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}
+                        // hidden={customerstate?.issuedata?.details[0]?.AssignIconDate === null ? true : false}
+                        hidden={customerstate?.issuedata?.details[0]?.GroupStatus === "Open" ? true : false}
                       >
                         <Col span={18}>
                           <label className="header-text">Scene</label>

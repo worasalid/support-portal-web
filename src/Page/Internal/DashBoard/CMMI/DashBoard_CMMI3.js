@@ -455,7 +455,7 @@ export default function DashBoard_CMMI3() {
                                         return (
                                             <>
                                                 <label className="table-column-text12">
-                                                    {parseFloat(record.issue_all_minute / record.issue_cnt).toFixed(2)}
+                                                    {record.issue_cnt === 0 ? 0 : parseFloat(record.issue_all_minute / record.issue_cnt).toFixed(2)}
                                                 </label>
                                             </>
                                         )
@@ -527,7 +527,7 @@ export default function DashBoard_CMMI3() {
                                             return (
                                                 <>
                                                     <label className="table-column-text12">
-                                                        {parseFloat(record.issue_not_over_minute / record.issue_not_over).toFixed(2)}
+                                                        {record.issue_not_over === 0 ? 0 : parseFloat(record.issue_not_over_minute / record.issue_not_over).toFixed(2)}
                                                     </label>
                                                 </>
                                             )
