@@ -100,7 +100,7 @@ export default function InProgress() {
         <IssueSearch Version="show" />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={customerstate.issuedata.data} loading={loading}
+            <Table dataSource={customerstate.issuedata.data} loading={loading} className="header-sticky"
               footer={(x) => {
                 return (
                   <>
@@ -289,13 +289,11 @@ export default function InProgress() {
                       </label>
                       <br />
                       {record.cntDueDate >= 1 ?
-                        <Tag style={{ marginLeft: 16 }} color="warning"
-                          style={{ cursor: "pointer" }}
+                        <Tag style={{ marginLeft: 16, cursor: "pointer" }} color="warning"
                           onClick={() => {
                             customerdispatch({ type: "SELECT_DATAROW", payload: record })
                             setHistoryduedate_visible(true)
-                          }
-                          }
+                          }}
                         >
                           DueDate ถูกเลื่อน
                         </Tag> : ""

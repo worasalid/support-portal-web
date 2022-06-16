@@ -36,8 +36,12 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                 //reftype: details.reftype
             }
         }).then((result) => {
-            setListGroupFile(_.uniqBy(result.data, "GroupType"))
-            setListfile(result.data)
+            // หน้า Customer ให้นำ Tab ข้อมูล deploy_document กับ file_deploy ออก
+            const groupFile = result.data.filter((x) => x.GroupType !== "deploy_document" && x.GroupType !== "file_deploy")
+            setListGroupFile(_.uniqBy(groupFile, "GroupType"));
+
+            setListfile(result.data);
+            console.log("result", result.data)
         }).catch(() => {
 
         })
@@ -88,10 +92,10 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                             n.GroupType === "quotation" ? "ใบเสนอราคา" :
                                                 n.GroupType === "PO_Document" ? "เอกสาร PO" :
                                                     n.GroupType === "testResult" ? "Test Result" :
-                                                        n.GroupType === "deploy_document" ? "Document Deploy" :
-                                                            n.GroupType === "file_deploy" ? "File Deploy" :
-                                                                n.GroupType === "test_result_QA" ? "QA Test Result" :
-                                                                    n.GroupType === "vdoUpload" ? "Video" : ""
+                                                        // n.GroupType === "deploy_document" ? "Document Deploy" :
+                                                        //     n.GroupType === "file_deploy" ? "File Deploy" :
+                                                        n.GroupType === "test_result_QA" ? "QA Test Result" :
+                                                            n.GroupType === "vdoUpload" ? "Video" : ""
                                         }
                                     </label>
                                 }
