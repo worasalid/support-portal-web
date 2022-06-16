@@ -611,6 +611,10 @@ export default function Subject() {
             setModalresolved_visible(true);
           }
         }
+
+        if (item.data.value === "RejectToCus") {
+          setModalsendissue_visible(true);
+        }
       }
 
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {

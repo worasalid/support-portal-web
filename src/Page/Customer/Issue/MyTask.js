@@ -114,7 +114,7 @@ export default function MyTask() {
         <IssueSearch Version="show" />
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
-            <Table dataSource={customerstate?.issuedata?.data} loading={loading}
+            <Table dataSource={customerstate?.issuedata?.data} loading={loading} className="header-sticky"
               footer={(x) => {
                 return (
                   <>
