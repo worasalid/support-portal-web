@@ -215,6 +215,13 @@ div.sticky-background {
     cursor: pointer;
 }
 
+.icon-hover-red:hover {
+    text-decoration: underline;
+    text-decoration-color: #ff5d18;
+    color: #ff5d18;
+    cursor: pointer;
+}
+
 // table
 .table-hover,
 .table-hover > td {

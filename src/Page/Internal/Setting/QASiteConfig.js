@@ -3,7 +3,7 @@ import MasterPage from '../MasterPage'
 import { Row, Col, Button, Table, Modal, Input, message, Divider } from "antd";
 import axios from "axios";
 import { useRouteMatch, useHistory } from "react-router-dom";
-import { LeftCircleOutlined } from '@ant-design/icons';
+import { LeftCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
 import _ from 'lodash'
 
@@ -27,6 +27,7 @@ export default function QASiteConfig() {
 
 
     const getUser = async () => {
+        setLoading(true);
         await axios.get(`${process.env.REACT_APP_API_URL}/master/profile`, {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -35,9 +36,11 @@ export default function QASiteConfig() {
                 user_id: match.params.id
             }
         }).then((res) => {
+            setLoading(false);
             setUser(res.data.usersdata.users);
 
         }).catch((error) => {
+            setLoading(false);
             console.log("error", error)
         })
     }
@@ -262,15 +265,26 @@ export default function QASiteConfig() {
                         render={(value, record) => {
                             return (
                                 <>
-                                    <Icon icon="ant-design:edit-outlined" width="18" height="18"
+                                    {/* <Icon icon="ant-design:edit-outlined" width="18" height="18"
                                         className="icon-hover"
+                                        onClick={() => history.push({ pathname: `/internal/setting/config_qa/userid-${match.params.id}/comid-${record.com_id}` })}
+                                    /> */}
+                                    <EditOutlined
+                                        className="icon-hover"
+                                        style={{ fontSize: 18 }}
                                         onClick={() => history.push({ pathname: `/internal/setting/config_qa/userid-${match.params.id}/comid-${record.com_id}` })}
                                     />
                                     <Divider type="vertical" />
-                                    <Icon icon="ant-design:delete-outlined" width="18" height="18"
+
+                                    <DeleteOutlined
+                                        className="icon-hover-red"
+                                        style={{ fontSize: 18 }}
+                                        onClick={() => history.push({ pathname: `/internal/setting/config_qa/userid-${match.params.id}/comid-${record.com_id}` })}
+                                    />
+                                    {/* <Icon icon="ant-design:delete-outlined" width="18" height="18"
                                         className="icon-link-delete"
                                         onClick={() => deleteSiteOwner(record.com_id)}
-                                    />
+                                    /> */}
                                 </>
                             )
                         }}
