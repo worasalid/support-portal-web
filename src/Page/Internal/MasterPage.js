@@ -411,7 +411,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
             }}
           >
             <Menu theme="light"
-              style={{ backgroundColor: "#edebec",marginTop: 16 }}
+              style={{ backgroundColor: "#edebec", marginTop: 16 }}
               mode="inline"
               defaultOpenKeys={state.collapsed ? [] : [match.path.split('/')[2]]}
               selectedKeys={[active_submenu]}
@@ -436,6 +436,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                       state.usersdata?.organize.OrganizeCode === "consult" ||
                       state.usersdata?.organize.OrganizeCode === "manage" ||
                       state.usersdata?.organize.OrganizeCode === "sa" ||
+                      state.usersdata?.organize.OrganizeCode === "it_support" ||
                       state.usersdata?.users.code === "I0017" ||
                       state.usersdata?.users.code === "I0005" ? "block" : "none"
                   }}
@@ -509,7 +510,11 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 </Menu.ItemGroup>
               </SubMenu>
 
-              <Menu.Item key="callcenter" hidden={state.usersdata?.organize?.OrganizeCode !== "support" ? true : false}
+              <Menu.Item key="callcenter"
+                hidden={
+                  state.usersdata?.organize?.OrganizeCode !== "support" &&
+                    state.usersdata?.organize.OrganizeCode !== "it_support" ? true : false
+                }
                 icon={<PhoneOutlined />} onClick={() => history.push('/internal/callcenter/case')}>
                 Call Center
               </Menu.Item>
@@ -575,7 +580,8 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 </Menu.Item>
                 <Menu.Item key="12"
                   style={{
-                    display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" || state.usersdata?.users.code === "I0017" ? "block" : "none"
+                    display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" || state.usersdata?.users.code === "I0017"
+                      || state.usersdata?.organize.OrganizeCode === "it_support" ? "block" : "none"
                   }}
                   onClick={() => {
                     history.push('/internal/setting/mapcompany');
@@ -588,6 +594,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                   style={{
                     display: state.usersdata?.organize.OrganizeCode === "dev" ||
                       state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.organize.OrganizeCode === "it_support" ||
                       state.usersdata?.users?.code === "I0017" ? "block" : "none"
 
                   }}
@@ -599,6 +606,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                   style={{
                     display: state.usersdata?.organize.OrganizeCode === "qa" ||
                       state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.organize.OrganizeCode === "it_support" ||
                       state.usersdata?.users.code === "I0017" ? "block" : "none"
                   }}
                 >
@@ -608,6 +616,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                   style={{
                     display: state.usersdata?.organize.OrganizeCode === "sa" ||
                       state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.organize.OrganizeCode === "it_support" ||
                       state.usersdata?.users.code === "I0017" ? "block" : "none"
                   }}
                 >
