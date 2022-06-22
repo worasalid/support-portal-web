@@ -279,7 +279,7 @@ export default function QASiteConfig() {
                                     <DeleteOutlined
                                         className="icon-hover-red"
                                         style={{ fontSize: 18 }}
-                                        onClick={() => history.push({ pathname: `/internal/setting/config_qa/userid-${match.params.id}/comid-${record.com_id}` })}
+                                        onClick={() => deleteSiteOwner(record.com_id)}
                                     />
                                     {/* <Icon icon="ant-design:delete-outlined" width="18" height="18"
                                         className="icon-link-delete"
