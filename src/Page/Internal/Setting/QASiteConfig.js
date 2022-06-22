@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MasterPage from '../MasterPage'
-import { Row, Col, Button, Table, Modal, Input, message, Divider } from "antd";
+import { Row, Col, Button, Table, Modal, Input, message, Divider, Popconfirm } from "antd";
 import axios from "axios";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { LeftCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -276,15 +276,19 @@ export default function QASiteConfig() {
                                     />
                                     <Divider type="vertical" />
 
-                                    <DeleteOutlined
-                                        className="icon-hover-red"
-                                        style={{ fontSize: 18 }}
-                                        onClick={() => deleteSiteOwner(record.com_id)}
-                                    />
-                                    {/* <Icon icon="ant-design:delete-outlined" width="18" height="18"
-                                        className="icon-link-delete"
-                                        onClick={() => deleteSiteOwner(record.com_id)}
-                                    /> */}
+
+
+                                    <Popconfirm title="ต้องการลบ ใช่หรือไม่"
+                                        okText="Yes" cancelText="No"
+                                        onConfirm={() => {
+                                            deleteSiteOwner(record.com_id)
+                                        }}
+                                    >
+                                        <DeleteOutlined
+                                            className="icon-hover-red"
+                                            style={{ fontSize: 18 }}
+                                        />
+                                    </Popconfirm>
                                 </>
                             )
                         }}

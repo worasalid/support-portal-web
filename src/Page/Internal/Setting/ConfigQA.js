@@ -1,5 +1,5 @@
 import { DeleteOutlined, PlusOutlined, LeftCircleOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
+import { Button, Table, Modal, message, Popconfirm, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useHistory, useRouteMatch } from 'react-router-dom';
@@ -433,8 +433,7 @@ export default function ConfigQA() {
                                                 </label>
                                             </div>
                                         )
-                                    }
-                                    }
+                                    }}
                                 />
                                 <Column title="FullName"
                                     width="80%"
@@ -460,8 +459,7 @@ export default function ConfigQA() {
                                                 </label>
                                             </div>
                                         )
-                                    }
-                                    }
+                                    }}
                                 />
                                 <Column title=""
                                     align="center"
@@ -469,24 +467,21 @@ export default function ConfigQA() {
                                     render={(record) => {
                                         return (
                                             <>
-                                                <Button type="link"
-                                                    icon={<DeleteOutlined />}
-                                                    onClick={() => {
-                                                        return (
 
-                                                            setTimeout(() => {
-                                                                deleteProductOwner(record.ProductId)
-                                                            }, 1000)
-
-                                                        )
-                                                    }
-                                                    }
+                                                <Popconfirm title="ต้องการลบ ใช่หรือไม่"
+                                                    okText="Yes" cancelText="No"
+                                                    onConfirm={() => {
+                                                        deleteProductOwner(record.ProductId)
+                                                    }}
                                                 >
-                                                </Button>
+                                                    <DeleteOutlined
+                                                        className="icon-hover-red"
+                                                        style={{ fontSize: 18 }}
+                                                    />
+                                                </Popconfirm>
                                             </>
                                         )
-                                    }
-                                    }
+                                    }}
                                 />
                             </Table>
                         </Col>
