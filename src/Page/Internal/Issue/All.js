@@ -308,8 +308,7 @@ export default function AllIssue() {
 
                     </>
                   )
-                }
-                }
+                }}
               />
               <Column title="Issue By"
                 align="center"
@@ -386,8 +385,7 @@ export default function AllIssue() {
 
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column
@@ -397,17 +395,14 @@ export default function AllIssue() {
                 render={(record) => {
                   return (
                     <>
-
                       <div>
                         <label className="table-column-text">
                           {record.InternalStatus === "Open" ? "Open" : record.GroupStatus}<br />
                           {record.FlowStatus === null || record.GroupStatus === record.FlowStatus ? "" : `(${record.FlowStatus})`}
                         </label>
-
                       </div>
                     </>
                   );
-
                 }}
               />
 
@@ -419,21 +414,14 @@ export default function AllIssue() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        {/* <ClockSLA
-                          start={moment(record.AssignIconDate)}
-                          due={moment(record.SLA_DueDate)}
-                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-                          type={record.Priority}
-                        /> */}
                         <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} />
                       </div>
                     </>
                   )
-                }
-                }
+                }}
               />
 
-              <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
+              {/* <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
                 width="5%"
                 align="center"
                 render={(record) => {
@@ -448,7 +436,7 @@ export default function AllIssue() {
                       </Button>
 
 
-                      {/* FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา*/}
+                      FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา
                       <Button type="link"
                         hidden={record.FileUrl === "" ? true : false}
                         icon={<DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
@@ -461,7 +449,7 @@ export default function AllIssue() {
                   )
                 }
                 }
-              />
+              /> */}
             </Table>
           </Col>
         </Row>
@@ -508,7 +496,7 @@ export default function AllIssue() {
 export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
 
   const calculateTime = new CalculateTime();
-  
+
   function rederSLAPriority(sla, ticket_sla, priority) {
     switch (priority) {
       case 'Critical':
