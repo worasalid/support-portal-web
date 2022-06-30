@@ -528,6 +528,10 @@ export default function Subject() {
         if (item.data.value === "Cancel") {
           setModalCancel_visible(true);
         }
+
+        if (item.data.value === "RejectToCus") {
+          setModalsendissue_visible(true);
+        }
       }
     }
     //CR FLOW
