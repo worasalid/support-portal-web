@@ -267,6 +267,7 @@ export default function CompanySiteConfig() {
                     message.success({ content: 'Success!', duration: 1 });
                     getProductConfig({ user_id: param.user_id });
                 }, 1000);
+                getSupportSiteOwner();
             }
         } catch (error) {
 

@@ -4,6 +4,7 @@ import Axios from 'axios';
 import { Button, Table, Modal, message, Tabs, Row, Col, Input } from 'antd';
 import { EditOutlined, SearchOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router';
+import _ from "lodash";
 
 const { Column } = Table;
 const { TabPane } = Tabs;
@@ -133,18 +134,17 @@ export default function MapQA() {
                             <Column title="Site ที่รับผิดชอบ"
                                 align="center"
                                 width="15%"
-                                render={(record) => {
+                                render={(value, record) => {
                                     return (
                                         <>
                                             <Button type="link"
-                                                onClick={() => history.push({ pathname: "/internal/setting/config_qa/userid-" + record.UserId })}
+                                                onClick={() => history.push({ pathname: "/internal/setting/mapqa/siteconfig/userid-" + record.UserId })}
                                             >
-                                                <EditOutlined />
+                                                <label>{record.SiteOwner}</label>
                                             </Button>
                                         </>
                                     )
-                                }
-                                }
+                                }}
                             />
 
                         </Table>
@@ -170,18 +170,17 @@ export default function MapQA() {
                             <Column title="Site ที่รับผิดชอบ"
                                 align="center"
                                 width="15%"
-                                render={(record) => {
+                                render={(value, record) => {
                                     return (
                                         <>
                                             <Button type="link"
-                                                onClick={() => history.push({ pathname: "/internal/setting/config_qa/userid-" + record.UserId })}
+                                                onClick={() => history.push({ pathname: "/internal/setting/mapqa/siteconfig/userid-" + record.UserId })}
                                             >
-                                                <EditOutlined />
+                                                <label>{record.SiteOwner}</label>
                                             </Button>
                                         </>
                                     )
-                                }
-                                }
+                                }}
                             />
                         </Table>
                     </TabPane>

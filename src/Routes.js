@@ -69,6 +69,7 @@ import MapQA from './Page/Internal/Setting/MapQA';
 import ConfigQA from './Page/Internal/Setting/ConfigQA';
 import MapSA from './Page/Internal/Setting/MapSA';
 import ConfigSA from './Page/Internal/Setting/ConfigSA';
+import QASiteConfig from './Page/Internal/Setting/QASiteConfig';
 
 import ConfigFlow from './Page/Internal/Setting/System/ConfigFlow/index';
 
@@ -141,9 +142,9 @@ export default function Routes() {
                                     <Route path="/internal/setting/mapdeveloper" exact component={MappingDeveloper} />
                                     <Route path="/internal/setting/config_developer/userid-:id?" exact component={ConfigDeveloper} />
                                     <Route path="/internal/setting/mapqa" exact component={MapQA} />
-                                    <Route path="/internal/setting/config_qa/userid-:id?" exact component={ConfigQA} />
+                                    <Route path="/internal/setting/config_qa/userid-:id?/comid-:comid?" exact component={ConfigQA} />
                                     <Route path="/internal/setting/mapsa" exact component={MapSA} />
-                                    <Route path="/internal/setting/config_sa/userid-:id?" exact component={ConfigSA} />
+                                    <Route path="/internal/setting/mapqa/siteconfig/userid-:id?" exact component={QASiteConfig} />
 
                                     {/* ตั้งค่าระบบ */}
                                     <Route path="/internal/setting/system" exact component={SystemConfig} />
