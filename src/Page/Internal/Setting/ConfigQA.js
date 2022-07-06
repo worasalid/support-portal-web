@@ -1,8 +1,8 @@
 import { DeleteOutlined, PlusOutlined, LeftCircleOutlined } from '@ant-design/icons';
 import { Button, Table, Modal, message, Tabs, Row, Col, Spin, Input } from 'antd';
 import Axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react'
+import { useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import MasterPage from '../MasterPage'
 
 const { Column } = Table;
@@ -10,6 +10,7 @@ const { Column } = Table;
 export default function ConfigQA() {
 
     const match = useRouteMatch();
+    const param = useParams();
     const history = useHistory(null);
     const [loading, setLoading] = useState(false);
     const [loadingProduct, setLoadingProduct] = useState(false);
@@ -35,6 +36,8 @@ export default function ConfigQA() {
     const [masterModule, setMasterModule] = useState([]);
     const [moduleOwner, setModuleOwner] = useState([]);
     const [selectModule, setSelectModule] = useState([]);
+
+    const inputRef = useRef();
 
 
     const rowProductSelection = {
@@ -211,6 +214,7 @@ export default function ConfigQA() {
             params: {
                 user_id: match.params.id,
                 product_id: selectProductRow?.ProductId,
+                company_id: param.comid,
                 keyword: filterModule
             }
         });
@@ -351,7 +355,6 @@ export default function ConfigQA() {
             getProductOwner();
         }
     }, [productOwner.length])
-
 
     return (
         <MasterPage>
@@ -549,19 +552,21 @@ export default function ConfigQA() {
                             setModalProduct(false);
                             addProductOwner();
                             setSelectedRowKeys([]);
+                            inputRef.current.state.value = ""
 
                         }}
                         okText="Add"
                         onCancel={() => {
                             setModalProduct(false)
                             setSelectedRowKeys([]);
+                            inputRef.current.state.value = ""
                         }}
                     >
                         <Row style={{ marginBottom: 20 }}>
                             <Col span={16}>
                             </Col>
                             <Col span={8}>
-                                <Input.Search placeholder="Code / Product" allowClear
+                                <Input.Search placeholder="Code / Product" allowClear ref={inputRef}
                                     enterButton
                                     onSearch={searchProduct}
                                 />
@@ -591,19 +596,23 @@ export default function ConfigQA() {
                             setModalModule(false);
                             addModuleOwner();
                             setSelectedRowKeys([]);
+                            inputRef.current.state.value = ""
 
                         }}
                         okText="Add"
                         onCancel={() => {
                             setModalModule(false)
                             setSelectedRowKeys([]);
+                            setFilterModule(null);
+                            console.log("inputRef", inputRef.current.state.value)
+                            inputRef.current.state.value = ""
                         }}
                     >
                         <Row style={{ marginBottom: 20 }}>
                             <Col span={16}>
                             </Col>
                             <Col span={8}>
-                                <Input.Search placeholder="Module" allowClear
+                                <Input.Search placeholder="Module" allowClear ref={inputRef}
                                     enterButton
                                     onSearch={searchModule}
                                 />

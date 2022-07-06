@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Table, Modal, Row, Col, Input, Tabs, Popconfirm, message, Divider, Radio } from 'antd';
 import Axios from 'axios';
 import MasterPage from '../../MasterPage';
@@ -28,7 +28,8 @@ export default function ConfigOrganize() {
     const [organizeId, setOrganizeId] = useState("1");
     const [organizeUser, setOrganizeUser] = useState([]);
     const [user, setUser] = useState([]);
-    const [selectPosition, setSelectPosition] = useState(null)
+    const [selectPosition, setSelectPosition] = useState(null);
+    const inputRef = useRef(null);
 
     const rowSelectionUser = {
         selectedRowKeys: selectedRow,
@@ -212,7 +213,9 @@ export default function ConfigOrganize() {
     }, [])
 
     useEffect(() => {
+        setFilterUser(null);
         getOrganizeUser();
+
     }, [organizeId])
 
     return (
@@ -233,14 +236,18 @@ export default function ConfigOrganize() {
                 </Row>
                 <Row>
                     <Col span={24}>
-                        <Tabs type="card" onChange={(key, value) => setOrganizeId(key)}>
+                        <Tabs type="card" onChange={(key, value) => {
+                            setOrganizeId(key);
+                            inputRef.current.state.value = null;
+                            setFilterUser(null);
+                        }}>
                             {
                                 organize.map((n, index) => {
                                     return (
                                         <TabPane tab={n.Name} key={n.Id}>
                                             <Row style={{ marginBottom: 16 }} gutter={[16, 16]}>
                                                 <Col span={24} style={{ textAlign: "right" }}>
-                                                    <Input.Search placeholder="code / Name / FullName" allowClear
+                                                    <Input.Search placeholder="code / Name / FullName" allowClear ref={inputRef}
                                                         style={{ width: "40%" }}
                                                         enterButton
                                                         onSearch={searchOrganize}
