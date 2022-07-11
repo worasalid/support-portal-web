@@ -27,13 +27,13 @@ export default function AllDashBoard() {
             {
                 no: "3",
                 dashboard_name: "DashBoard All Site By Product",
-                description: "ดูข้อมูล Issue ที่ค้างของแต่ละ site แยกตาม Product",
+                description: "ดูข้อมูล Issue ทุกสถานะ ของแต่ละ site แยกตาม Product และ Module",
                 url: "/internal/dashboard/dashboard2"
             },
             {
                 no: "4",
                 dashboard_name: "DashBoard All Site (OverDue) By Product",
-                description: "ดูข้อมูล Issue ที่ค้างและเกิน SLA ของแต่ละ site แยกตาม Product",
+                description: "ดูข้อมูล Issue ที่ค้างและเกิน SLA ของแต่ละ site แยกตาม Product และ Module",
                 url: "/internal/dashboard/dashboard3"
             },
             {
