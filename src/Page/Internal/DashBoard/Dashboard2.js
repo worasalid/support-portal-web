@@ -163,8 +163,8 @@ export default function Dashboard3() {
                     OverDue: o.OverDue,
                     "DueDate (Dev)": o.DueDate_Dev,
                     "DueDate (Dev) ครั้งที่ 2": o.DueDate_Dev2,
-                    "DueDate (Dev) ครั้งที่ 3": o.DueDate_Dev3
-
+                    "DueDate (Dev) ครั้งที่ 3": o.DueDate_Dev3,
+                    "จำนวน ReOpen": o.CntReOpen === 0 ? "" : o.CntReOpen
                 }
             }));
             let wb = xlsx.utils.book_new();
