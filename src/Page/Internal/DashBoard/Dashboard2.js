@@ -149,6 +149,7 @@ export default function Dashboard3() {
                     Company: o.CompanyName,
                     IssueType: o.IssueType,
                     Priority: o.Priority,
+                    Scene: o.Scene,
                     Status: o.GroupStatus,
                     Product: o.Product,
                     Module: o.ModuleName,
