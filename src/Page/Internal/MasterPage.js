@@ -595,6 +595,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                     display: state.usersdata?.organize.OrganizeCode === "dev" ||
                       state.usersdata?.organize?.ComCode === "ERP" ||
                       state.usersdata?.organize.OrganizeCode === "it_support" ||
+                      state.usersdata?.users.id === 96 ||
                       state.usersdata?.users?.code === "I0017" ? "block" : "none"
 
                   }}
