@@ -571,6 +571,7 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                       state.usersdata?.organize.OrganizeCode === "cr_center" ||
                       state.usersdata?.organize.OrganizeCode === "consult" ||
                       state.usersdata?.organize?.ComCode === "ERP" ||
+                      state.usersdata?.users.id === 96 ||
                       state.usersdata?.users.code === "I0017" ? "block" : "none"
                   }}
                   onClick={() => {
@@ -580,7 +581,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
                 </Menu.Item>
                 <Menu.Item key="12"
                   style={{
-                    display: state.usersdata?.organize.OrganizeCode === "support" || state.usersdata?.organize.OrganizeCode === "consult" || state.usersdata?.users.code === "I0017"
+                    display: state.usersdata?.organize.OrganizeCode === "support" ||
+                      state.usersdata?.organize.OrganizeCode === "consult" ||
+                      state.usersdata?.users.id === 96 ||
+                      state.usersdata?.users.code === "I0017"
                       || state.usersdata?.organize.OrganizeCode === "it_support" ? "block" : "none"
                   }}
                   onClick={() => {
