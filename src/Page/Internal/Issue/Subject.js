@@ -619,6 +619,7 @@ export default function Subject() {
         if (item.data.value === "RejectToCus") {
           setModalsendissue_visible(true);
         }
+
       }
 
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {
@@ -712,6 +713,10 @@ export default function Subject() {
           } else {
             setModalsendissue_visible(true);
           }
+        }
+
+        if (item.data.value === "SendFileDeploy") {
+          setModalsendissue_visible(true);
         }
 
       }
