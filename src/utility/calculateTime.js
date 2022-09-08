@@ -67,10 +67,10 @@ export class CalculateTime extends Component {
         }
     }
 
-    countSLACriticalOverDue(sla, overtime) {
-        const minute = Math.floor(Math.abs((overtime-sla)) % 60);
-        const hours = parseInt(Math.floor((Math.abs((overtime-sla)) / 60) % 24));
-        const days = parseInt(Math.floor(Math.abs((overtime-sla)) / 60) / 24);
+    countSLACriticalOverDue(overtime) {
+        const minute = Math.floor(Math.abs((overtime)) % 60);
+        const hours = parseInt(Math.floor((Math.abs((overtime)) / 60) % 24));
+        const days = parseInt(Math.floor(Math.abs((overtime)) / 60) / 24);
 
         return {
             en_0: { days: days, hours: hours, minute: minute },

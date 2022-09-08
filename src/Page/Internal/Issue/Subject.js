@@ -1877,13 +1877,13 @@ export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
               <label className="value-text">
                 {"-"}
                 {
-                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d}d `
+                  calculateTime.countSLACriticalOverDue(ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(ticket_sla).en_1.d}d `
                 }
                 {
-                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h}h `
+                  calculateTime.countSLACriticalOverDue(ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(ticket_sla).en_1.h}h `
                 }
                 {
-                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m}m `
+                  calculateTime.countSLACriticalOverDue(ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(ticket_sla).en_1.m}m `
                 }
               </label>
             }
