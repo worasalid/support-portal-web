@@ -32,8 +32,8 @@ export default function Dashboard4() {
         //isPercent: true,
         isStack: isStack,
         isGroup: !isStack,
-        
-       // scrollbar: { type: 'horizontal' },
+
+        // scrollbar: { type: 'horizontal' },
         slider: {
             start: 0,
             end: 1,
@@ -172,8 +172,8 @@ export default function Dashboard4() {
                     FlowStatus: x.FlowStatus,
                     AssignDate: x.AssignIconDate,
                     DueDate: x.DueDate,
-                    OverDue: x.OverDue
-
+                    OverDue: x.OverDue,
+                    Dev_DueDate: x.DevDueDate
                 }
             }));
             let wb = xlsx.utils.book_new();
@@ -198,7 +198,7 @@ export default function Dashboard4() {
             getData();
         }
 
-    }, [selectOrganize,selectUser, isStack]);
+    }, [selectOrganize, selectUser, isStack]);
 
 
     return (
@@ -241,7 +241,7 @@ export default function Dashboard4() {
                                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                             }
                                             onChange={(value) => setSelecUser(value)}
-                                            options={user && user.map((n) => ({ value: n.UserId, label: n.DisplayName  }))}
+                                            options={user && user.map((n) => ({ value: n.UserId, label: n.DisplayName }))}
                                         >
                                         </Select>
                                     </Col>
@@ -275,7 +275,7 @@ export default function Dashboard4() {
                                 data={chartData && chartData.filter((n) => n.Value !== 0)}
                                 height={300}
                                 xAxis={{ position: "bottom" }}
-                                
+
                             />
                         </Card>
                         {/* </div> */}
