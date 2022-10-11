@@ -45,7 +45,7 @@ export default function AllDashBoard() {
             {
                 no: "6",
                 dashboard_name: "DashBoard Satisfaction",
-                description: "ดูข้อมูล ความพึงพอใจของลูกค้า",
+                description: "ดูข้อมูล ข้อเสนอแนะ / ความคิดเห็นของลูกค้า",
                 url: "/internal/dashboard/dashboard5"
             },
             {
@@ -80,9 +80,9 @@ export default function AllDashBoard() {
             },
             {
                 no: "12",
-                dashboard_name: "DashBoard CMMI5_1",
-                description: "รายงานสรุปจำนวนการ Login เข้าใช้งานระบบ (Detail)",
-                url: "/internal/dashboard/cmmi/dashboard_cmmi5_1"
+                dashboard_name: "DashBoard CMMI6",
+                description: "รายงาน สรุปคะแนนความพึงพอใจของลูกค้า",
+                url: "/internal/dashboard/cmmi/dashboard_cmmi6"
             },
             {
                 no: "13",
@@ -108,7 +108,8 @@ export default function AllDashBoard() {
                 description: "รายงานรายละเอียด ข้อมูล CR , Memo",
                 url: "/internal/dashboard/dashboard6"
             },
-          
+
+
         ]
 
     const searchDashboard = (param) => {
