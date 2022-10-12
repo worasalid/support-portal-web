@@ -164,7 +164,9 @@ export default function Dashboard_AllIssue() {
                     "Flow ปัจจุบัน": o.FlowStatus,
                     "HandOver": o.NodeName,
                     "ResolvedDate": o.ResolvedDate,
-                    "CompleteDate": o.CompleteDate
+                    "CompleteDate": o.CompleteDate,
+                    "GoLiveDate": o.GoLiveDate,
+                    "SupportDate": o.SupportDate
                 }
             }));
             let wb = xlsx.utils.book_new();
