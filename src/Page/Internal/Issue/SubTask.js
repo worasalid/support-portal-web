@@ -532,7 +532,7 @@ export default function SubTask() {
       }
 
       if (item.data.NodeName === "qa") {
-        if (item.data.value === "QApass") {
+        if (item.data.value === "QApass" || item.data.value ==="SendQALeader") {
           setModalQA_visible(true)
         }
         if (item.data.value === "QAReject" || item.data.value === "QARejectDev") {
