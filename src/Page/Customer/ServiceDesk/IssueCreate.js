@@ -268,7 +268,7 @@ export default function IssueCreate() {
 
     useEffect(() => {
         setTypeDes(
-            match.params.id === "1" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด" :
+            match.params.id === "1" ? "แจ้งปัญหา ที่เกิดจากระบบทำงานผิดพลาด" :
                 match.params.id === "2" ? "แจ้งปรับปรุง หรือ เพิ่มเติมการทำงานของระบบ" :
                     match.params.id === "3" ? "แจ้งปรับปรุงข้อมูลในระบบ" :
                         match.params.id === "4" ? "สอบถามข้อมูลทั่วไป / การใช้งานระบบ" : ""
