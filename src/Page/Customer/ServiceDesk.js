@@ -223,7 +223,7 @@ export default function ServiceDesk(props) {
                                     <BugOutlined style={{ fontSize: 30 }} />
                                 }
                                 title={<label className="card-title-menu">Bug</label>}
-                                description="แจ้งปัญหา ที่เกิดจากระบบทำงานผิดผลาด"
+                                description="แจ้งปัญหา ที่เกิดจากระบบทำงานผิดพลาด"
                             />
                         </Card>
                         <Card className="card-box" hoverable>
