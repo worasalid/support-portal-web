@@ -56,7 +56,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                 mailtype: "in"
             }
         }).then((res) => {
-            setManday(res.data.map((x) => x.Manday))
+            setManday(res.data.filter(f => f.Status !== "Cancel").map((x) => x.Manday))
             setListdata(res.data.filter((n) => n.Status === "InProgress").map((value) => {
                 return {
                     taskid: value.TaskId,
