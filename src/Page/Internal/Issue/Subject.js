@@ -584,7 +584,7 @@ export default function Subject() {
         if (item.data.value === "SendManday") {
           setModalsendissue_visible(true)
         }
-        if (item.data.value === "ConfirmManday") {
+        if (item.data.value === "ConfirmManday" || item.data.value === "RejectManday") {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "SendDueDate" || item.data.value === "RequestDueDate") {
@@ -1149,7 +1149,7 @@ export default function Subject() {
                           value={userstate?.mailbox[0]?.FlowStatus}
                           style={{ width: '100%' }} placeholder="None"
                           //onClick={() => getflow_output(userstate?.mailbox[0]?.TransId)}
-                          onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
+                          onClick={() => (userstate.issuedata.details[0]?.InternalPriority === null || userstate.issuedata.details[0]?.InternalPriority === "None") ?
                             Modal.warning({
                               title: 'กรุณา ระบุ Priority',
                               okText: "Close"

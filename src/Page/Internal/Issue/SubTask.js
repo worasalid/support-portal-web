@@ -428,8 +428,13 @@ export default function SubTask() {
           setModalDevSendVersion(true)
         }
 
-        if (item.data.value === "RejectToSupport") { setModalsendtask_visible(true) }
-        if (item.data.value === "Deploy") { setModalcomplete_visible(true) }
+        if (item.data.value === "RejectToSupport" || item.data.value ==="RejectToQA") { 
+          setModalsendtask_visible(true) 
+        }
+
+        if (item.data.value === "Deploy") { 
+          setModalcomplete_visible(true) 
+        }
       }
 
       if (item.data.NodeName === "developer_1") {
@@ -499,7 +504,7 @@ export default function SubTask() {
         if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
         if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject" ||
-          item.data.value === "RequestInfo" || item.data.value === "SendInfoToSA") {
+          item.data.value === "RequestInfo" || item.data.value === "SendInfoToSA" || item.data.value ==="RejectToQA") {
           setModalsendtask_visible(true)
         }
         if (item.data.value === "Deploy") {
