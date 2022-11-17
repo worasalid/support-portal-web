@@ -37,22 +37,20 @@ export default function ModalRequestInfoDev({ visible = false, onOk, onCancel, d
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
-                const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                    },
-                    data: {
-                        ticketid: details && details.ticketid,
-                        taskid: details.taskid,
-                        comment_text: editorRef.current.getValue(),
-                        comment_type: "task",
-                        files: uploadRef.current.getFiles().map((n) => n.response),
-                    }
-                });
-            }
+            await Axios({
+                url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ticketid: details && details.ticketid,
+                    taskid: details.taskid,
+                    comment_text: editorRef.current.getValue(),
+                    comment_type: "task",
+                    files: uploadRef.current.getFiles().map((n) => n.response),
+                }
+            });
         } catch (error) {
 
         }

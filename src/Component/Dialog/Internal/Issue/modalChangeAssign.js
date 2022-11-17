@@ -14,26 +14,24 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
     const history = useHistory(null);
 
     const saveComment = async () => {
-        if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
-            await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    ticketid: details.ticketId,
-                    taskid: details.taskId,
-                    comment_text: editorRef.current.getValue(),
-                    comment_type: "task",
-                    files: uploadRef.current.getFiles().map((n) => n.response),
-                }
-            }).then((res) => {
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketid: details.ticketId,
+                taskid: details.taskId,
+                comment_text: editorRef.current.getValue(),
+                comment_type: "task",
+                files: uploadRef.current.getFiles().map((n) => n.response),
+            }
+        }).then((res) => {
 
-            }).catch((error) => {
+        }).catch((error) => {
 
-            });
-        }
+        });
     }
 
     const changeAssign = async () => {
