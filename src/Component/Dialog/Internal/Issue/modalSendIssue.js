@@ -15,20 +15,22 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
 
     const SaveComment = async () => {
         try {
-            await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    ticketid: details && details.ticketid,
-                    taskid: details.taskid,
-                    comment_text: editorRef.current.getValue(),
-                    comment_type: details.flowoutput.Type === null ? "customer" : "internal",
-                    files: uploadRef.current.getFiles().map((n) => n.response),
-                }
-            });
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
+                await Axios({
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                    },
+                    data: {
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: details.flowoutput.Type === null ? "customer" : "internal",
+                        files: uploadRef.current.getFiles().map((n) => n.response),
+                    }
+                });
+            }
         } catch (error) {
 
         }
@@ -128,7 +130,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             visible={visible}
             confirmLoading={loading}
             okText="Send"
-            onOk={() => form.submit() }
+            onOk={() => form.submit()}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okType="dashed"
             onCancel={() => { form.resetFields(); onCancel() }}
@@ -152,7 +154,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
                     >
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
             </Spin>
