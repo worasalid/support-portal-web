@@ -38,20 +38,22 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
 
     const SaveComment = async () => {
         try {
-            await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    ticketid: details && details.ticketid,
-                    taskid: details.taskid,
-                    comment_text: editorRef.current.getValue(),
-                    comment_type: "customer",
-                    files: uploadRef.current.getFiles().map((n) => n.response),
-                }
-            });
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
+                await Axios({
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                    },
+                    data: {
+                        ticketid: details && details.ticketid,
+                        taskid: details.taskid,
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "customer",
+                        files: uploadRef.current.getFiles().map((n) => n.response),
+                    }
+                });
+            }
         } catch (error) {
 
         }
@@ -162,7 +164,7 @@ export default function ModalQuotation({ visible = false, onOk, onCancel, dataro
                     >
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
             </Spin>

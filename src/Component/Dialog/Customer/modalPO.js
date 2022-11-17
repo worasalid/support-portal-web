@@ -38,8 +38,8 @@ export default function ModalPO({ visible = false, onOk, onCancel, datarow, deta
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
-                const comment = await Axios({
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
