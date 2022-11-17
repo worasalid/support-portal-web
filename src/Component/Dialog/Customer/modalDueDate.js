@@ -32,7 +32,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
                         ticketid: details && details.ticketid,
                         comment_text: textValue,
                         comment_type: "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
 
