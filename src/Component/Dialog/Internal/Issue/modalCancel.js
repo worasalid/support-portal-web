@@ -41,9 +41,9 @@ export default function ModalCancel({ visible = false, onOk, onCancel, datarow, 
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
                 await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -100,7 +100,7 @@ export default function ModalCancel({ visible = false, onOk, onCancel, datarow, 
                         editorRef.current.setvalue();
                         history.push({ pathname: "/internal/issue/cancel" });
                         window.location.reload(true);
-                       
+
                     },
                 });
             }
@@ -195,9 +195,9 @@ export default function ModalCancel({ visible = false, onOk, onCancel, datarow, 
                         label="Remark :"
 
                     >
-                        <TextEditor ref={editorRef} ticket_id={details.ticketid}/>
+                        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
             </Spin>

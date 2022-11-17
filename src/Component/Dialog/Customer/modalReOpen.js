@@ -38,19 +38,21 @@ export default function ModalReOpen({ visible = false, onOk, onCancel, datarow, 
 
     const SaveComment = async () => {
         try {
-            await Axios({
-                url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-                },
-                data: {
-                    ticketid: details && details.ticketid,
-                    comment_text: editorRef.current.getValue(),
-                    comment_type: "customer",
-                    files: uploadRef.current.getFiles().map((n) => n.response),
-                }
-            });
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
+                await Axios({
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                    },
+                    data: {
+                        ticketid: details && details.ticketid,
+                        comment_text: editorRef.current.getValue(),
+                        comment_type: "customer",
+                        files: uploadRef.current.getFiles().map((n) => n.response),
+                    }
+                });
+            }
         } catch (error) {
 
         }

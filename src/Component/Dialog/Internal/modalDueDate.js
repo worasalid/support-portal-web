@@ -24,8 +24,8 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
+            if ((textValue !== null) || (textValue === null && uploadRef.current.getFiles().length > 0)) {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
                     method: "POST",
                     headers: {
@@ -78,7 +78,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                             <p>ประเมิน DueDate เรียบร้อยแล้ว</p>
                         </div>
                     ),
-                    okText:"Close",
+                    okText: "Close",
                     onOk() {
                         editorRef.current.editor.setContent("");
                         window.location.reload(false)
@@ -94,7 +94,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                         <p>{error.response.data}</p>
                     </div>
                 ),
-                okText:"Close",
+                okText: "Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
                     history.push({ pathname: "/internal/issue/inprogress" })
@@ -135,7 +135,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                             <p>บันทึกข้อมูลสำเร็จ</p>
                         </div>
                     ),
-                    okText:"Close",
+                    okText: "Close",
                     onOk() {
                         editorRef.current.editor.setContent("")
                         history.push({ pathname: "/internal/issue/inprogress" })
@@ -151,7 +151,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                         <p>{error.response.data}</p>
                     </div>
                 ),
-                okText:"Close",
+                okText: "Close",
                 onOk() {
                     editorRef.current.editor.setContent("")
                     history.push({ pathname: "/internal/issue/inprogress" })
@@ -238,7 +238,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, details,
                     onEditorChange={handleEditorChange}
                 />
                 <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                AttachFile : <UploadFile ref={uploadRef} />
             </Spin>
         </Modal >
     )

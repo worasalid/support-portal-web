@@ -14,24 +14,26 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
     const history = useHistory(null);
 
     const saveComment = async () => {
-        await Axios({
-            url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-            },
-            data: {
-                ticketid: details.ticketId,
-                taskid: details.taskId,
-                comment_text: editorRef.current.getValue(),
-                comment_type: "task",
-                files: uploadRef.current.getFiles().map((n) => n.response),
-            }
-        }).then((res) => {
+        if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
+            await Axios({
+                url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ticketid: details.ticketId,
+                    taskid: details.taskId,
+                    comment_text: editorRef.current.getValue(),
+                    comment_type: "task",
+                    files: uploadRef.current.getFiles().map((n) => n.response),
+                }
+            }).then((res) => {
 
-        }).catch((error) => {
+            }).catch((error) => {
 
-        });
+            });
+        }
     }
 
     const changeAssign = async () => {
@@ -61,7 +63,7 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
             }).then((res) => {
                 saveComment();
                 setLoading(false);
-                history.push({pathname:"/internal/issue/mytask"});
+                history.push({ pathname: "/internal/issue/mytask" });
                 onOk();
 
             }).catch((error) => {
