@@ -33,7 +33,7 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
                         ticketid: details && details.ticketid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
 
