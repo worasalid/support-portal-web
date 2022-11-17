@@ -22,21 +22,19 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
 
   const SaveComment = async () => {
     try {
-      if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
-        await Axios({
-          url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
-          },
-          data: {
-            ticketid: details && details.ticketid,
-            comment_text: editorRef.current.getValue(),
-            comment_type: "customer",
-            files: uploadRef.current.getFiles().map((n) => n.response),
-          }
-        });
-      }
+      await Axios({
+        url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+        },
+        data: {
+          ticketid: details && details.ticketid,
+          comment_text: editorRef.current.getValue(),
+          comment_type: "customer",
+          files: uploadRef.current.getFiles().map((n) => n.response),
+        }
+      });
     } catch (error) {
 
     }
@@ -115,7 +113,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             },
           });
         }
-        if (details.flowoutput.value === "Pass" || details.flowoutput.value ===  "SendToDeploy") {
+        if (details.flowoutput.value === "Pass" || details.flowoutput.value === "SendToDeploy") {
           await Modal.success({
             title: 'บันทึกข้อมูลสำเร็จ',
             content: (
@@ -127,7 +125,7 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
             okText: "Close",
             onOk() {
               editorRef.current.setvalue()
-              history.push({ pathname: "/customer/issue/pass"});
+              history.push({ pathname: "/customer/issue/pass" });
 
               window.location.reload(true);
             },
@@ -174,9 +172,9 @@ export default function ModalSendIssue({ visible = false, onOk, onCancel, dataro
       {...props}
     >
       <Spin spinning={loading} size="large" tip="Loading...">
-        <TextEditor ref={editorRef} ticket_id ={details.ticketid} />
+        <TextEditor ref={editorRef} ticket_id={details.ticketid} />
         <br />
-      AttachFile : <UploadFile ref={uploadRef} />
+        AttachFile : <UploadFile ref={uploadRef} />
       </Spin>
     </Modal>
   );
