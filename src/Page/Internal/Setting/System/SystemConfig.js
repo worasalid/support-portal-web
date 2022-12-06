@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Table, Modal, Row, Col, Card } from 'antd';
+import { NotificationOutlined } from '@ant-design/icons'
 import Axios from 'axios';
 import MasterPage from '../../MasterPage';
 import { useHistory } from 'react-router-dom';
@@ -222,6 +223,25 @@ export default function SystemConfig() {
                                 description={
                                     <label className="value-text">
                                         ตั้งค่าเหตุผลการ Reject
+                                    </label>
+                                }
+                            />
+                        </Card>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                        <Card className="card-box issue-active" bordered hoverable
+                            style={{ width: "100%" }}
+                            onClick={() => history.push("/internal/setting/system/customer-complain")}
+                        >
+                            <Meta
+                                avatar={
+                                    <NotificationOutlined style={{ fontSize: "32px" }} />
+                                }
+                                title={<label className="card-title-menu">ข้อมูล หัวข้อการ Complain</label>}
+                                description={
+                                    <label className="value-text">
+                                        ตั้งค่าประเภทหัวข้อการ Complain ของลูกค้า
                                     </label>
                                 }
                             />

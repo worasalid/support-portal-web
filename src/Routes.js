@@ -93,6 +93,8 @@ import UserManual from './Page/Internal/Setting/System/UserManual';
 import ConfigOrganize from './Page/Internal/Setting/System/ConfigOrganize';
 import FlowApprove from './Page/Internal/Setting/System/ConfigFlow/FlowApprove';
 import FlowDeploy from './Page/Internal/Setting/System/ConfigFlow/FlowDeploy';
+import ConfigComplainType from './Page/Internal/Setting/System/ConfigComplain';
+import ConfigComplainEmail from './Page/Internal/Setting/System/ConfigComplainEmail';
 
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
@@ -101,6 +103,7 @@ import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
 import ServiceDesk from "./Page/Customer/ServiceDesk/Index";
 import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
+import CustomerComplain from "./Page/Customer/ServiceDesk/Complain";
 
 // Call Center Service
 import CallService from './Page/Internal/ServiceDesk/CallService';
@@ -166,7 +169,9 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/flow-config" exact component={ConfigFlow} />
                                     <Route path="/internal/setting/system/flow-config/flow-deploy" component={FlowDeploy} />
                                     <Route path="/internal/setting/system/flow-config/flow-approve" component={FlowApprove} />
-
+                                    <Route path="/internal/setting/system/customer-complain" exact component={ConfigComplainType} />
+                                    <Route path="/internal/setting/system/email_config/complain" exact component={ConfigComplainEmail} />
+                                    
 
                                     {/* dashboard */}
                                     <Route path="/internal/mydashboard" exact component={MyDashboard} />
@@ -225,6 +230,7 @@ export default function Routes() {
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />
                                     <Route path="/customer/servicedesk/issuemenu" exact component={IssueMenu} />
                                     <Route path="/customer/servicedesk/issuecreate/:id?" exact component={IssueCreate} />
+                                    <Route path="/customer/servicedesk/complain" exact component={CustomerComplain} />
                                     <Route path="/customer/dashboard/all" exact component={CustomerDashboardAll} />
                                     <Route path="/customer/dashboard" exact component={CustomerDashboard} />
                                     <Route path="/customer/issue/all-issue" exact component={CustomerAllIssue} />
