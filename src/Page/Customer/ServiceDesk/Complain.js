@@ -44,7 +44,7 @@ export default function CustomerComplain() {
                 groups: "CustomerComplain"
             }
         }).then((res) => {
-            setComplainType(res.data.map((item) => {
+            setComplainType(res.data.filter(f => f.IsActive).map((item) => {
                 return {
                     key: item.key,
                     value: item.Value,
