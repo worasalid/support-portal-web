@@ -625,7 +625,6 @@ export default function Subject() {
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
           setModalsendissue_visible(true)
-
         }
 
         if (item.data.value === "SendToSA") {
@@ -716,9 +715,25 @@ export default function Subject() {
         }
 
         if (item.data.value === "SendFileDeploy") {
-          setModalsendissue_visible(true);
-        }
+          if (userstate.issuedata.details[0]?.taskComplete > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่ Deploy',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Deploy งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
 
+              }
+            });
+          }
+
+          if (userstate.issuedata.details[0]?.taskComplete === 0) {
+            setModalsendissue_visible(true);
+          }
+        }
       }
 
       if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
