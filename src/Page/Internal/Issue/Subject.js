@@ -1061,7 +1061,7 @@ export default function Subject() {
                     }}>
                     <Button icon={<FileAddOutlined />}
                       shape="round"
-                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
+                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ||  userstate.issuedata.details[0]?.InternalPriority === "None"?
                         Modal.info({
                           title: 'กรุณา ระบุ Priority',
                           okText: "Close"
