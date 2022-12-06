@@ -6,6 +6,7 @@
   "dependencies": {
     "@ant-design/charts": "^1.0.17",
     "@ant-design/icons": "^4.0.0",
+    "@azure/msal-browser": "^2.32.0",
     "@balkangraph/orgchart.js": "^7.7.25",
     "@line/liff": "^2.13.0",
     "@reduxjs/toolkit": "^1.6.2",
