@@ -41,8 +41,8 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
-                const comment = await Axios({
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
+                await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
@@ -94,7 +94,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                             <p>Assign งานให้ {select_assign}</p>
                         </div>
                     ),
-                    okText:"Close",
+                    okText: "Close",
                     onOk() {
                         editorRef.current.setvalue();
                         if (param === state?.usersdata?.users?.id) {
@@ -116,7 +116,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         <p>{error.response.data}</p>
                     </div>
                 ),
-                okText:"Close",
+                okText: "Close",
                 onOk() {
                     editorRef.current.setvalue();
                     onOk();
@@ -141,11 +141,11 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
         <Modal
             visible={visible}
             confirmLoading={loading}
-            onOk={() => form.submit() }
+            onOk={() => form.submit()}
             okButtonProps={{ type: "primary", htmlType: "submit" }}
             okText="Send"
             okType="dashed"
-            onCancel={() => {form.resetFields(); onCancel() }}
+            onCancel={() => { form.resetFields(); onCancel() }}
             {...props}
         >
             <Spin spinning={loading} size="large" tip="Loading...">
@@ -199,7 +199,7 @@ export default function ModalLeaderAssign({ visible = false, onOk, onCancel, dat
                         {/* Remark : */}
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
-                     AttachFile : <UploadFile ref={uploadRef} />
+                        AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>
             </Spin>

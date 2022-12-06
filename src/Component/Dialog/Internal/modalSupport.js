@@ -23,7 +23,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "") {
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
@@ -77,7 +77,7 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     taskid: details.taskid,
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
-                    
+
 
                 }
             });
@@ -202,10 +202,10 @@ export default function ModalSupport({ visible = false, onOk, onCancel, datarow,
                     </Select>
                 </Form.Item> */}
             </Form>
-             Remark :
+            Remark :
             <TextEditor ref={editorRef} />
             <br />
-             AttachFile : <UploadFile ref={uploadRef} />
+            AttachFile : <UploadFile ref={uploadRef} />
         </Modal>
     );
 }

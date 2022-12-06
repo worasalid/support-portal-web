@@ -56,7 +56,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
                 mailtype: "in"
             }
         }).then((res) => {
-            setManday(res.data.map((x) => x.Manday))
+            setManday(res.data.filter(f => f.Status !== "Cancel").map((x) => x.Manday))
             setListdata(res.data.filter((n) => n.Status === "InProgress").map((value) => {
                 return {
                     taskid: value.TaskId,
@@ -89,7 +89,7 @@ export default function ModalManday({ visible = false, onOk, onCancel, datarow, 
 
     const saveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
                 await Axios({
                     url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",

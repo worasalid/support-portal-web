@@ -7,11 +7,11 @@ import { LeftCircleOutlined, CheckOutlined, PlusOutlined, StopOutlined } from '@
 
 const { Column } = Table;
 
-export default function ConfigReOpen() {
+export default function ConfigComplainEmail() {
     const history = useHistory(null)
     const [form] = Form.useForm();
 
-    const [dataReOpen, setDataReOpen] = useState(null)
+    const [emailData, setEmailData] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
     const [loading, setLoading] = useState(true)
 
@@ -24,15 +24,13 @@ export default function ConfigReOpen() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    groups: "ReOpen"
+                    groups: "ComplainEmail"
                 }
             });
 
             if (result.status === 200) {
-                setTimeout(() => {
-                    setLoading(false)
-                    setDataReOpen(result.data)
-                }, 1000)
+                setLoading(false);
+                setEmailData(result.data);
             }
         } catch (error) {
 
@@ -76,7 +74,7 @@ export default function ConfigReOpen() {
                 },
                 data: {
                     description: param.description,
-                    groups: "ReOpen"
+                    groups: "ComplainEmail"
                 }
             });
 
@@ -113,7 +111,7 @@ export default function ConfigReOpen() {
                     </Row>
                 <Row>
                     <Col>
-                        <h1>ตั้งค่าเหตุผลในการ ReOpen</h1>
+                        <h1>ตั้งค่า Email ที่ใช้ส่ง กรณีลูกค้า Complain</h1>
                     </Col>
                 </Row>
                 <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
@@ -126,9 +124,9 @@ export default function ConfigReOpen() {
                     </Button>
                     </Col>
                 </Row>
-                <Table dataSource={dataReOpen} loading={loading}>
+                <Table dataSource={emailData} loading={loading}>
                     <Column title="No" width="5%" dataIndex="Sequence" />
-                    <Column title="รายละเอียด" dataIndex="Name" width="55%" />
+                    <Column title="Email" dataIndex="Name" width="55%" />
                     <Column title="สถานะ"
                         align="center"
                         width="15%"
@@ -152,7 +150,7 @@ export default function ConfigReOpen() {
             </div>
             <Modal
                 visible={modalVisible}
-                title="เหตุผลในการ ReOpen"
+                title="ตั้งค่า Email ในการแจ้ง Complain"
                 width={500}
                 onCancel={() => {
                     setModalVisible(false);
@@ -167,9 +165,9 @@ export default function ConfigReOpen() {
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        label="เหตุผลในการ ReOpen"
+                        label="Email"
                         name="description"
-                        rules={[{ required: true, message: 'กรุณาระบุรายละเอียด' }]}
+                        rules={[{ required: true, message: 'กรุณาระบุ Email' }]}
                     >
                         <Input />
                     </Form.Item>

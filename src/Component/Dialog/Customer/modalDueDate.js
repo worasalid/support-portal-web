@@ -21,9 +21,9 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
 
     const SaveComment = async () => {
         try {
-            if (textValue !== "") {
-                const comment = await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
+                await Axios({
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -32,11 +32,9 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
                         ticketid: details && details.ticketid,
                         comment_text: textValue,
                         comment_type: "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
-
-
             }
         } catch (error) {
 
@@ -59,10 +57,10 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
                 }
             });
 
-            if (sendflow.status === 200 ) {
+            if (sendflow.status === 200) {
                 SaveComment();
                 onOk();
-                
+
                 await Modal.info({
                     title: 'บันทึกข้อมูลสำเร็จ',
                     content: (
@@ -73,7 +71,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
                     ),
                     onOk() {
                         editorRef.current.editor.setContent("")
-                      
+
                         if (sendflow.data === "InProgress") {
                             history.push({ pathname: "/customer/issue/inprogress" })
                         }
@@ -108,7 +106,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
         <Modal
             visible={visible}
             okText="Send"
-            onOk={() => { return ( SendFlow()) }}
+            onOk={() => { return (SendFlow()) }}
             onCancel={() => { return (editorRef.current.editor.setContent(""), onCancel()) }}
             {...props}
         >
@@ -120,7 +118,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
                 </Col>
             </Row>
 
-            <Row style={{marginTop: 40}}>
+            <Row style={{ marginTop: 40 }}>
                 Remark :  <br />
                 <Col span={24}>
                     <Editor
@@ -141,7 +139,7 @@ export default function ModalDueDate({ visible = false, onOk, onCancel, datarow,
                         onEditorChange={handleEditorChange}
                     />
                     <br />
-                      AttachFile : <UploadFile ref={uploadRef} />
+                    AttachFile : <UploadFile ref={uploadRef} />
                 </Col>
             </Row>
 

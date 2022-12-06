@@ -22,9 +22,9 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
 
     const SaveComment = async () => {
         try {
-            if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
+            if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
                 await Axios({
-                    url: process.env.REACT_APP_API_URL + "/tickets/create_comment",
+                    url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
@@ -33,11 +33,9 @@ export default function ModalConfirmManday({ visible = false, onOk, onCancel, da
                         ticketid: details && details.ticketid,
                         comment_text: editorRef.current.getValue(),
                         comment_type: "customer",
-                        files: uploadRef.current.getFiles().map((n) => n.response.id),
+                        files: uploadRef.current.getFiles().map((n) => n.response),
                     }
                 });
-
-
             }
         } catch (error) {
 

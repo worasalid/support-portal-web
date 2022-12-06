@@ -58,7 +58,8 @@ export default function Dashboard3() {
             // if (x.developer === "InProgress") { return "#5B8FF9" } // สีฟ้า
             if (x.GroupStatus === "InProgress") { return "#52C41A" } // เขียว
             if (x.GroupStatus === "ReOpen") { return "#FF5500" } // สีส้ม
-            //if (x.status === "ReOpen") { return "#CD201F" }//สีแดง
+            if (x.GroupStatus === "Resolved") { return "#FF5500" } // สีส้ม
+            if (x.GroupStatus === "Cancel") { return "#CD201F" }//สีแดง
         },
         onclick: function onclick() {
             alert()
@@ -148,6 +149,7 @@ export default function Dashboard3() {
                     Company: o.CompanyName,
                     IssueType: o.IssueType,
                     Priority: o.Priority,
+                    Scene: o.Scene,
                     Status: o.GroupStatus,
                     Product: o.Product,
                     Module: o.ModuleName,
@@ -162,8 +164,8 @@ export default function Dashboard3() {
                     OverDue: o.OverDue,
                     "DueDate (Dev)": o.DueDate_Dev,
                     "DueDate (Dev) ครั้งที่ 2": o.DueDate_Dev2,
-                    "DueDate (Dev) ครั้งที่ 3": o.DueDate_Dev3
-
+                    "DueDate (Dev) ครั้งที่ 3": o.DueDate_Dev3,
+                    "จำนวน ReOpen": o.CntReOpen === 0 ? "" : o.CntReOpen
                 }
             }));
             let wb = xlsx.utils.book_new();
@@ -193,7 +195,6 @@ export default function Dashboard3() {
                                 <Row>
                                     <Col span={10}>
                                         <BarChartOutlined style={{ fontSize: 24, color: "#5BC726" }} /> DashBoard All Site By Product
-
                                     </Col>
                                     <Col span={8}>
                                         <Select
@@ -258,9 +259,7 @@ export default function Dashboard3() {
                                                             shape='round'>
                                                             <label>{n.product}</label>
                                                         </Button>
-
                                                     </Col>
-
                                                 ))
                                             }
                                         </Row>
@@ -269,7 +268,6 @@ export default function Dashboard3() {
                                                 dots={true}
                                                 infinite={true}
                                                 speed={500}
-
                                                 slidesToShow={1}
                                                 slidesToScroll={1}
                                                 swipeToSlide={true}
@@ -278,10 +276,8 @@ export default function Dashboard3() {
                                                 }
                                                 nextArrow={
                                                     <Icon icon="dashicons:arrow-right-alt2" color="gray" />
-
                                                 }
                                             >
-
                                                 {
                                                     Array.from(Array(slickCount), (e, index) => {
                                                         return (
@@ -302,8 +298,7 @@ export default function Dashboard3() {
                                         </div>
 
                                         <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
-
-                                            <Col span={10}>
+                                            <Col span={24}>
                                                 <Card className="card-dashboard" title="">
                                                     <Table dataSource={tabSelect === "" ? tableData : _.filter(tableData, { Product: tabSelect })} loading={loading}>
                                                         <Column title="No" align="center"
@@ -319,7 +314,7 @@ export default function Dashboard3() {
 
                                                         <Column title="Company"
                                                             align="left"
-                                                            width="65%"
+                                                            width="40%"
                                                             render={(record, row, index) => {
                                                                 return (
                                                                     <label className="table-column-text12">
@@ -353,6 +348,42 @@ export default function Dashboard3() {
                                                             }}
                                                         />
 
+                                                        <Column title="Resolved"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.Resolved}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="Cancel"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.Cancel}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
+                                                        <Column title="Complete"
+                                                            align="center"
+                                                            width="10%"
+                                                            render={(record, row, index) => {
+                                                                return (
+                                                                    <label className="table-column-text12">
+                                                                        {record.Complete}
+                                                                    </label>
+                                                                )
+                                                            }}
+                                                        />
+
                                                         <Column title="Total"
                                                             align="center"
                                                             width="10%"
@@ -367,16 +398,14 @@ export default function Dashboard3() {
                                                     </Table>
                                                 </Card>
                                             </Col>
-                                            <Col span={14}>
+                                            {/* <Col span={14}>
                                                 <Card title="Issue Total" bordered={true} style={{ width: "100%" }} loading={loading} className="card-dashboard">
                                                     <Pie {...piechart_config}
                                                         data={tabSelect === "" ? tableData : _.filter(tableData, { Product: tabSelect })}
                                                         height={300}
                                                     />
                                                 </Card>
-
-                                            </Col>
-
+                                            </Col> */}
                                         </Row>
                                     </>
                             }

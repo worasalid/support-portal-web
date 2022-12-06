@@ -550,7 +550,6 @@ export default function Subject() {
     }
   }, [customerstate?.issuedata?.details[0]?.Id])
 
-
   return (
     <MasterPage>
 
@@ -685,9 +684,9 @@ export default function Subject() {
                             value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                             options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                             disabled={
-                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === false ? true : 
-                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === true ? false :
-                              mailbox?.MailType === "in" && mailbox?.GroupStatus !== "Open" ? false : true
+                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === false ? true :
+                                mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === true ? false :
+                                  mailbox?.MailType === "in" && mailbox?.GroupStatus !== "Open" ? false : true
                             }
                           >
                           </Select>
@@ -746,7 +745,11 @@ export default function Subject() {
                                 placeholder="None"
                                 onChange={onChange}
                                 value={customerstate?.issuedata?.details[0]?.Priority}
-                                options={customerstate?.masterdata?.priorityState.map((x) => ({ value: x.Id, label: x.Name, group: "priority" }))}
+                                options={
+                                  (customerstate?.issuedata?.details[0]?.IssueType === "ChangeRequest" || customerstate?.issuedata?.details[0]?.IssueType === "Memo") ?
+                                    customerstate?.masterdata?.priorityState.filter(f => f.Name !== "Critical").map((x) => ({ value: x.Id, label: x.Name, group: "priority" })) :
+                                    customerstate?.masterdata?.priorityState.map((x) => ({ value: x.Id, label: x.Name, group: "priority" }))
+                                }
                               />
                           }
                         </Col>

@@ -528,6 +528,10 @@ export default function Subject() {
         if (item.data.value === "Cancel") {
           setModalCancel_visible(true);
         }
+
+        if (item.data.value === "RejectToCus") {
+          setModalsendissue_visible(true);
+        }
       }
     }
     //CR FLOW
@@ -580,7 +584,7 @@ export default function Subject() {
         if (item.data.value === "SendManday") {
           setModalsendissue_visible(true)
         }
-        if (item.data.value === "ConfirmManday") {
+        if (item.data.value === "ConfirmManday" || item.data.value === "RejectManday") {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "SendDueDate" || item.data.value === "RequestDueDate") {
@@ -621,7 +625,6 @@ export default function Subject() {
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
           setModalsendissue_visible(true)
-
         }
 
         if (item.data.value === "SendToSA") {
@@ -712,9 +715,25 @@ export default function Subject() {
         }
 
         if (item.data.value === "SendFileDeploy") {
-          setModalsendissue_visible(true);
-        }
+          if (userstate.issuedata.details[0]?.taskComplete > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่ Deploy',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Deploy งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
 
+              }
+            });
+          }
+
+          if (userstate.issuedata.details[0]?.taskComplete === 0) {
+            setModalsendissue_visible(true);
+          }
+        }
       }
 
       if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
@@ -1145,7 +1164,7 @@ export default function Subject() {
                           value={userstate?.mailbox[0]?.FlowStatus}
                           style={{ width: '100%' }} placeholder="None"
                           //onClick={() => getflow_output(userstate?.mailbox[0]?.TransId)}
-                          onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
+                          onClick={() => (userstate.issuedata.details[0]?.InternalPriority === null || userstate.issuedata.details[0]?.InternalPriority === "None") ?
                             Modal.warning({
                               title: 'กรุณา ระบุ Priority',
                               okText: "Close"
@@ -1873,13 +1892,13 @@ export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
               <label className="value-text">
                 {"-"}
                 {
-                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.d}d `
+                  calculateTime.countSLACriticalOverDue(ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACriticalOverDue(ticket_sla).en_1.d}d `
                 }
                 {
-                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.h}h `
+                  calculateTime.countSLACriticalOverDue(ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACriticalOverDue(ticket_sla).en_1.h}h `
                 }
                 {
-                  calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(sla, ticket_sla).en_1.m}m `
+                  calculateTime.countSLACriticalOverDue(ticket_sla).en_1.m === 0 ? "" : `${calculateTime.countSLACriticalOverDue(ticket_sla).en_1.m}m `
                 }
               </label>
             }

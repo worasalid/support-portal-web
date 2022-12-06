@@ -131,13 +131,14 @@ export default function DashBoard_CMMI4() {
 
     useEffect(() => {
         getCompany();
-        getData();
         getPriority();
         getIssueType();
     }, [])
 
     useEffect(() => {
-        getData();
+        if (selectCompany !== null && selectCompany.length !== 0) {
+            getData();
+        }
         getProduct()
     }, [selectCompany, selectProduct, selectPriority, selectDate, selectIssueType])
 

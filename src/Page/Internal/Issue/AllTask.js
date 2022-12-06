@@ -71,8 +71,9 @@ export default function AllTask() {
       if (results.status === 200) {
         setLoadding(false);
         setPageTotal(results.data.total);
-        setIssueAllStatus(results.data.issue_status);
+        // setIssueAllStatus(results.data.issue_status);
         userdispatch({ type: "LOAD_ISSUE", payload: results.data.data });
+        console.log("loadIssue", results.data)
       }
     } catch (error) {
 
@@ -105,9 +106,6 @@ export default function AllTask() {
         }
       });
 
-      if (result.status === 200) {
-
-      }
     } catch (error) {
 
     }
@@ -151,8 +149,6 @@ export default function AllTask() {
     loadIssue();
   }, [pageCurrent]);
 
-
-
   return (
     <IssueContext.Provider value={{ state: userstate, dispatch: userdispatch }}>
       <MasterPage>
@@ -163,7 +159,6 @@ export default function AllTask() {
         </Row>
 
         <IssueSearch Progress="show" />
-
 
         <Row>
           <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
@@ -180,7 +175,6 @@ export default function AllTask() {
                       <label>{pageTotal}</label>
                       {/* <label> จากทั้งหมด : </label>
                       <label>{pageTotal}</label> */}
-
                     </div>
                   </>
                 )
@@ -198,10 +192,8 @@ export default function AllTask() {
                 return (
                   (index === recHover ? "table-hover" : "")
                 )
-              }
-              }
+              }}
             >
-
               <Column
                 title="IssueNo"
                 width="5%"
@@ -225,8 +217,7 @@ export default function AllTask() {
                       </label>
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column
@@ -333,8 +324,7 @@ export default function AllTask() {
 
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column title="Issue By" width="10%"
@@ -364,9 +354,7 @@ export default function AllTask() {
 
                     </>
                   )
-                }
-
-                }
+                }}
               />
 
               <Column title="Due Date" width="8%"
@@ -409,8 +397,7 @@ export default function AllTask() {
 
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column title="ProgressStatus" width="10%"
@@ -418,7 +405,6 @@ export default function AllTask() {
                 render={(record) => {
                   return (
                     <>
-
                       <div>
                         <label className="table-column-text">
                           {record.InternalStatus}
@@ -428,7 +414,6 @@ export default function AllTask() {
                       </div>
                     </>
                   );
-
                 }}
               />
 
@@ -436,7 +421,6 @@ export default function AllTask() {
                 align="center"
                 render={(record) => {
                   return (
-
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
                         {/* <Clock
@@ -456,8 +440,7 @@ export default function AllTask() {
                       </div>
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
@@ -473,15 +456,13 @@ export default function AllTask() {
                             userdispatch({ type: "SELECT_DATAROW", payload: record }),
                             setModalfiledownload_visible(true)
                           )
-                        }
-                        }
+                        }}
                       >
                         {record.cntFile === 0 ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
                       </Button>
                     </>
                   )
-                }
-                }
+                }}
               />
             </Table>
           </Col>
@@ -537,7 +518,7 @@ export default function AllTask() {
 export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
 
   const calculateTime = new CalculateTime();
-  
+
   function rederSLAPriority(sla, ticket_sla, priority) {
     switch (priority) {
       case 'Critical':
@@ -547,7 +528,7 @@ export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
 
               <label className="value-text">
                 {
-                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countcountSLACriticalDownSLA(sla, ticket_sla).en_1.d}d `
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.d}d `
                 }
                 {
                   calculateTime.countSLACritical(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.h}h `

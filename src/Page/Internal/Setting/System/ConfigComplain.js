@@ -7,11 +7,11 @@ import { LeftCircleOutlined, CheckOutlined, PlusOutlined, StopOutlined } from '@
 
 const { Column } = Table;
 
-export default function ConfigReOpen() {
+export default function ConfigComplainType() {
     const history = useHistory(null)
     const [form] = Form.useForm();
 
-    const [dataReOpen, setDataReOpen] = useState(null)
+    const [dataComplain, setDataComplain] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
     const [loading, setLoading] = useState(true)
 
@@ -24,14 +24,14 @@ export default function ConfigReOpen() {
                     "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
                 },
                 params: {
-                    groups: "ReOpen"
+                    groups: "CustomerComplain"
                 }
             });
 
             if (result.status === 200) {
                 setTimeout(() => {
                     setLoading(false)
-                    setDataReOpen(result.data)
+                    setDataComplain(result.data)
                 }, 1000)
             }
         } catch (error) {
@@ -76,7 +76,7 @@ export default function ConfigReOpen() {
                 },
                 data: {
                     description: param.description,
-                    groups: "ReOpen"
+                    groups: "CustomerComplain"
                 }
             });
 
@@ -106,14 +106,14 @@ export default function ConfigReOpen() {
                             onClick={() => history.goBack()}
                         >
                             Back
-                               </Button>
+                        </Button>
                     </Col>
-                   &nbsp; &nbsp;
+                    &nbsp; &nbsp;
 
-                    </Row>
+                </Row>
                 <Row>
                     <Col>
-                        <h1>ตั้งค่าเหตุผลในการ ReOpen</h1>
+                        <h1> ตั้งค่าหัวข้อการ Complain</h1>
                     </Col>
                 </Row>
                 <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
@@ -123,10 +123,10 @@ export default function ConfigReOpen() {
                             onClick={() => setModalVisible(true)}
                         >
                             เพิ่มข้อมูล
-                    </Button>
+                        </Button>
                     </Col>
                 </Row>
-                <Table dataSource={dataReOpen} loading={loading}>
+                <Table dataSource={dataComplain} loading={loading}>
                     <Column title="No" width="5%" dataIndex="Sequence" />
                     <Column title="รายละเอียด" dataIndex="Name" width="55%" />
                     <Column title="สถานะ"
@@ -152,7 +152,7 @@ export default function ConfigReOpen() {
             </div>
             <Modal
                 visible={modalVisible}
-                title="เหตุผลในการ ReOpen"
+                title="หัวข้อการ Complain"
                 width={500}
                 onCancel={() => {
                     setModalVisible(false);
@@ -167,7 +167,7 @@ export default function ConfigReOpen() {
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        label="เหตุผลในการ ReOpen"
+                        label="หัวข้อการ Complain"
                         name="description"
                         rules={[{ required: true, message: 'กรุณาระบุรายละเอียด' }]}
                     >

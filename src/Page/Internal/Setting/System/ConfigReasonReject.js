@@ -52,6 +52,7 @@ export default function ConfigReasonReject() {
                 },
                 data: {
                     id: param.Id,
+                    description: param.Name,
                     value: param.Value,
                     groups: param.Groups,
                     is_active: param.IsActive

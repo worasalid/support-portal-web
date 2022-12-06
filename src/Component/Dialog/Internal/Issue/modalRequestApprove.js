@@ -55,7 +55,7 @@ export default function ModalRequestApprove({ visible = false, onOk, onCancel, d
 
             if (result.status === 200) {
 
-                if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
+                if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
                     await axios({
                         url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                         method: "POST",

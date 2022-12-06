@@ -38,6 +38,8 @@ import TimeSheet2 from './Page/Internal/DashBoard/TimeSheet/TimeSheet2';
 import TimeSheet3 from './Page/Internal/DashBoard/TimeSheet/TimeSheet3';
 import DashBoard6 from './Page/Internal/DashBoard/DashBoard6';
 import Dashboard_AllIssue from './Page/Internal/DashBoard/Issue/DashBoard_Issue6';
+import DashBoard_CMMI6 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6';
+import DashBoard_CMMI6_1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6_1';
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -91,6 +93,8 @@ import UserManual from './Page/Internal/Setting/System/UserManual';
 import ConfigOrganize from './Page/Internal/Setting/System/ConfigOrganize';
 import FlowApprove from './Page/Internal/Setting/System/ConfigFlow/FlowApprove';
 import FlowDeploy from './Page/Internal/Setting/System/ConfigFlow/FlowDeploy';
+import ConfigComplainType from './Page/Internal/Setting/System/ConfigComplain';
+import ConfigComplainEmail from './Page/Internal/Setting/System/ConfigComplainEmail';
 
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
@@ -99,6 +103,7 @@ import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
 import ServiceDesk from "./Page/Customer/ServiceDesk/Index";
 import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
+import CustomerComplain from "./Page/Customer/ServiceDesk/Complain";
 
 // Call Center Service
 import CallService from './Page/Internal/ServiceDesk/CallService';
@@ -144,6 +149,7 @@ export default function Routes() {
                                     <Route path="/internal/setting/mapqa" exact component={MapQA} />
                                     <Route path="/internal/setting/config_qa/userid-:id?/comid-:comid?" exact component={ConfigQA} />
                                     <Route path="/internal/setting/mapsa" exact component={MapSA} />
+                                    <Route path="/internal/setting/config_sa/userid-:id?" exact component={ConfigSA} />
                                     <Route path="/internal/setting/mapqa/siteconfig/userid-:id?" exact component={QASiteConfig} />
 
                                     {/* ตั้งค่าระบบ */}
@@ -163,7 +169,9 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/flow-config" exact component={ConfigFlow} />
                                     <Route path="/internal/setting/system/flow-config/flow-deploy" component={FlowDeploy} />
                                     <Route path="/internal/setting/system/flow-config/flow-approve" component={FlowApprove} />
-
+                                    <Route path="/internal/setting/system/customer-complain" exact component={ConfigComplainType} />
+                                    <Route path="/internal/setting/system/email_config/complain" exact component={ConfigComplainEmail} />
+                                    
 
                                     {/* dashboard */}
                                     <Route path="/internal/mydashboard" exact component={MyDashboard} />
@@ -179,6 +187,8 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi3" exact component={DashBoard_CMMI3} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi4" exact component={DashBoard_CMMI4} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi5" exact component={DashBoard_CMMI5} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi6" exact component={DashBoard_CMMI6} />
+                                    <Route path="/internal/dashboard/cmmi/dashboard_cmmi6_1/id=:id?" exact component={DashBoard_CMMI6_1} />
                                     <Route path="/internal/dashboard/cmmi/dashboard_cmmi5_1/id=:id?/year=:year?" exact component={DashBoard_CMMI5_1} />
                                     <Route path="/internal/dashboard/timesheet1" exact component={TimeSheet1} />
                                     <Route path="/internal/dashboard/timesheet2" exact component={TimeSheet2} />
@@ -220,6 +230,7 @@ export default function Routes() {
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />
                                     <Route path="/customer/servicedesk/issuemenu" exact component={IssueMenu} />
                                     <Route path="/customer/servicedesk/issuecreate/:id?" exact component={IssueCreate} />
+                                    <Route path="/customer/servicedesk/complain" exact component={CustomerComplain} />
                                     <Route path="/customer/dashboard/all" exact component={CustomerDashboardAll} />
                                     <Route path="/customer/dashboard" exact component={CustomerDashboard} />
                                     <Route path="/customer/issue/all-issue" exact component={CustomerAllIssue} />

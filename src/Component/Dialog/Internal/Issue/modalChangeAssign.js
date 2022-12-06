@@ -14,7 +14,7 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
     const history = useHistory(null);
 
     const saveComment = async () => {
-        if (editorRef.current.getValue() !== "" && editorRef.current.getValue() !== null && editorRef.current.getValue() !== undefined) {
+        if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
             await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/create_comment",
                 method: "POST",
@@ -63,7 +63,7 @@ export default function ModalChangeAssign({ visible = false, onOk, onCancel, det
             }).then((res) => {
                 saveComment();
                 setLoading(false);
-                history.push({pathname:"/internal/issue/mytask"});
+                history.push({ pathname: "/internal/issue/mytask" });
                 onOk();
 
             }).catch((error) => {
