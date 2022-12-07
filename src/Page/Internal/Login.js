@@ -90,6 +90,7 @@ export default function NormalLoginForm() {
           dispatch({ type: 'Authen', payload: true });
           dispatch({ type: 'LOGIN', payload: res.data.usersdata });
           history.push("/internal/mydashboard");
+          window.location.reload(true);
 
         }).catch((error) => {
           setLoading(false);

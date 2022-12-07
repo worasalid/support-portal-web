@@ -123,6 +123,11 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                     <ArrowRightOutlined style={{ fontSize: "16px", color: "#cd201f" }} />&nbsp;&nbsp;
                     <label style={{ color: "#cd201f" }}>{param}</label>
                 </>
+            case 'Close':
+                return <>
+                    <ArrowRightOutlined style={{ fontSize: "16px", color: "#595959" }} />&nbsp;&nbsp;
+                    <label style={{ color: "#595959" }}>{param}</label>
+                </>
 
         }
     }
@@ -158,7 +163,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
 
             }
 
-            <div style={{ display: divcollapse, marginTop: "16px" , marginLeft:"10px" }}>
+            <div style={{ display: divcollapse, marginTop: "16px", marginLeft: "10px" }}>
                 <List
                     itemLayout="horizontal"
                     dataSource={listdata}
@@ -216,7 +221,7 @@ export default forwardRef(({ ticketId, mailtype, ...props }, ref) => {
                                                         </Col>
                                                         <Col span={6} style={{ textAlign: "right" }} >
                                                             {renderTaskStatus(item.status)}
-                                                            <br/>
+                                                            <br />
                                                             <label className="value-text">
                                                                 {item.flowstatus === null ? "" : `(${item.flowstatus})`}
                                                             </label>
