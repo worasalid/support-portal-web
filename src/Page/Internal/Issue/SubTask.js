@@ -224,10 +224,10 @@ export default function SubTask() {
               })
             }
             if (userstate?.taskdata?.data[0]?.Status === "Resolved" || userstate?.taskdata?.data[0]?.Status === "Done") {
-              userdispatch({
-                type: "LOAD_ACTION_FLOW",
-                payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
-              })
+              // userdispatch({
+              //   type: "LOAD_ACTION_FLOW",
+              //   payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
+              // })
 
               // Check Flow Resolved ที่ไม่มีการแก้ไข Bug จะไม่มีการเดิน flow ต่อ
               if (userstate?.taskdata?.data[0]?.IsDeploy === false) {
