@@ -41,7 +41,6 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
             setListGroupFile(_.uniqBy(groupFile, "GroupType"));
 
             setListfile(result.data);
-            console.log("result", result.data)
         }).catch(() => {
 
         })

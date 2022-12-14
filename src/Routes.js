@@ -41,6 +41,7 @@ import Dashboard_AllIssue from './Page/Internal/DashBoard/Issue/DashBoard_Issue6
 import DashBoard_CMMI6 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6';
 import DashBoard_CMMI6_1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6_1';
 
+// Issue
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
 import MyTask from './Page/Internal/Issue/MyTask';
@@ -50,6 +51,10 @@ import SubTask from './Page/Internal/Issue/SubTask'
 import Resolved from './Page/Internal/Issue/Resolved';
 import Complete from './Page/Internal/Issue/Complete';
 import Cancel from './Page/Internal/Issue/Cancel';
+import ManualTask from './Page/Internal/Issue/ManualPage/ManualTask';
+import ManualPageSubject from './Page/Internal/Issue/ManualPage/Subject';
+
+// Ricef
 import Ricef from './Page/Internal/Ricef/Ricef';
 import RicefHeader from './Page/Internal/Ricef/RicefHeader';
 import RicefDetails from './Page/Internal/Ricef/RicefDetails';
@@ -171,7 +176,7 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/flow-config/flow-approve" component={FlowApprove} />
                                     <Route path="/internal/setting/system/customer-complain" exact component={ConfigComplainType} />
                                     <Route path="/internal/setting/system/email_config/complain" exact component={ConfigComplainEmail} />
-                                    
+
 
                                     {/* dashboard */}
                                     <Route path="/internal/mydashboard" exact component={MyDashboard} />
@@ -207,6 +212,9 @@ export default function Routes() {
                                     <Route path="/internal/issue/subject/:id?" exact component={Subject} />
                                     <Route path="/internal/issue/subject/:id?/task-:task?" exact component={SubTask} />
                                     <Route path="/internal/report/charts" exact component={Charts} />
+                                    <Route path="/internal/issue/manual-task" exact component={ManualTask} />
+                                    <Route path="/internal/issue/manual-task/subject/:id?" exact component={ManualPageSubject} />
+
 
                                     {/* Patch */}
                                     <Route path="/internal/patch/cut_of_patch" exact component={IssuePatch} />
@@ -243,7 +251,7 @@ export default function Routes() {
                                     <Route path="/customer/issue/cancel" exact component={CustomerCancel} />
                                     <Route path="/customer/system/setting" exact component={CustomerSetting} />
                                     <Route path="/customer/system/setting/issue-flow" exact component={CustomerSettingIssueFlow} />
-                                    
+
 
                                     {/* CallCenter Service */}
                                     <Route path="/servicedesk/voxtron" exact component={CallService} />
