@@ -141,7 +141,7 @@ export default function CustomerComplain() {
                         style={{ marginTop: "80px" }}
                         {...layout}
 
-                        name="complain"
+                        name="complaint"
                         initialValues={{
                         }}
                         layout="vertical"
