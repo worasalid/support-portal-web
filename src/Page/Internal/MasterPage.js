@@ -180,6 +180,9 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       if (match.url.search("complete") > 0) {
         setActive_submenu('6');
       }
+      if (match.url.search("manual-task") > 0) {
+        setActive_submenu('19');
+      }
 
     }
     //ricef
@@ -445,8 +448,16 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
 
                 </Menu.Item>
                 <Menu.Item key="1" onClick={() => history.push('/internal/issue/alltask')}>
-                  {/* <Menu.Item key="1" onClick={() => {history.push({ pathname: '/internal/issue/alltask' }); window.location.reload(true)}}> */}
                   All Task
+                </Menu.Item>
+                <Menu.Item key="19" onClick={() => history.push('/internal/issue/manual-task')}
+                  hidden={
+                    state.usersdata?.organize.OrganizeCode === "support" ||
+                      state.usersdata?.organize.OrganizeCode === "cr_center" ||
+                      state.usersdata?.users.code === "I0017" ? false : true
+                  }
+                >
+                  Manual Issue
                 </Menu.Item>
 
                 <Menu.ItemGroup key="g1" title={<label className="header-text">In Box</label>}>
