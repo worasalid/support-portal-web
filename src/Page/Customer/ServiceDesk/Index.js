@@ -61,7 +61,7 @@ export default function Index() {
                         avatar={
                             <NotificationOutlined style={{ fontSize: 30 }} />
                         }
-                        title={<label className="card-title-menu">Complain</label>}
+                        title={<label className="card-title-menu">Complaint</label>}
                         description="แจ้งเรื่องร้องเรียน / ข้อเสนอแนะ"
                     />
                 </Card>
