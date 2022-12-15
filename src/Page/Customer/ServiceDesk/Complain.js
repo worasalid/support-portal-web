@@ -84,6 +84,9 @@ export default function CustomerComplain() {
                 companyId: state?.usersdata?.users?.company_id,
                 complain_type: values.complain_type,
                 product_id: values.product,
+                user: values.user,
+                user: values.user,
+                department: values.department,
                 description: values.description
 
             }
@@ -93,7 +96,7 @@ export default function CustomerComplain() {
                 title: 'บันทึกข้อมูลสำเร็จ',
                 content: (
                     <div>
-                        
+
                     </div>
                 ),
                 okText: "Close",
@@ -193,6 +196,51 @@ export default function CustomerComplain() {
                                 placeholder="==เลือกผลิตภัณฑ์=="
                                 onChange={(value) => customerdispatch({ type: "SELECT_PRODUCT", payload: value })}
                                 options={customerstate && customerstate.masterdata.productState.map((x) => ({ value: x.ProductId, label: `${x.Name} - (${x.FullName})` }))}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="ชื่อพนักงาน"
+                            name="user"
+                            hidden={(selectType != 2) ? true : false}
+                            style={{ width: "100%" }}
+
+                        >
+                            <Input placeholder='==ระบุชื่อพนักงาน==' />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="แผนก"
+                            name="department"
+                            hidden={(selectType != 2) ? true : false}
+                            style={{ width: "100%" }}
+
+                        >
+                            <Select
+                                allowClear
+                                placeholder="==เลือกแผนก=="
+                                options={[
+                                    {
+                                        value: "Application Support",
+                                        label: "Application Support"
+                                    },
+                                    {
+                                        value: "Development",
+                                        label: "Development"
+                                    },
+                                    {
+                                        value: "Consult",
+                                        label: "Consult"
+                                    },
+                                    {
+                                        value: "Sale && Marketing",
+                                        label: "Sale && Marketing"
+                                    },
+                                    {
+                                        value: "Finance && Accounting",
+                                        label: "Finance && Accounting"
+                                    }
+                                ]}
                             />
                         </Form.Item>
 
