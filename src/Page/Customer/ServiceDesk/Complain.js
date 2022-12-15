@@ -233,12 +233,20 @@ export default function CustomerComplain() {
                                         label: "Development"
                                     },
                                     {
-                                        value: "Consult",
-                                        label: "Consult"
+                                        value: "System Analyst",
+                                        label: "System Analyst"
                                     },
                                     {
-                                        value: "Sale & Marketing",
-                                        label: "Sale & Marketing"
+                                        value: "Consultant",
+                                        label: "Consultant"
+                                    },
+                                    {
+                                        value: "Sales",
+                                        label: "Sales"
+                                    },
+                                    {
+                                        value: "Marketing",
+                                        label: "Marketing"
                                     },
                                     {
                                         value: "Finance & Accounting",
