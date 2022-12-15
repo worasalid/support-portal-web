@@ -23,8 +23,8 @@ export default function ConfigEmail() {
         },
         {
             key: '3',
-            topic: "ตั้งค่า Email Customer Complain",
-            description: 'ส่งเมล์ แจ้งกรณีลูกค้ามีการ Complain',
+            topic: "ตั้งค่า Email Customer Complaint",
+            description: 'ส่งเมล์ แจ้งกรณีลูกค้ามีการ Complaint',
             url: "/internal/setting/system/email_config/complain"
         }
     ]
