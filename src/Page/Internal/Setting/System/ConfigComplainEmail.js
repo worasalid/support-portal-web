@@ -111,7 +111,7 @@ export default function ConfigComplainEmail() {
                     </Row>
                 <Row>
                     <Col>
-                        <h1>ตั้งค่า Email ที่ใช้ส่ง กรณีลูกค้า Complain</h1>
+                        <h1>ตั้งค่า Email ที่ใช้ส่ง กรณีลูกค้า Complaint</h1>
                     </Col>
                 </Row>
                 <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
@@ -150,7 +150,7 @@ export default function ConfigComplainEmail() {
             </div>
             <Modal
                 visible={modalVisible}
-                title="ตั้งค่า Email ในการแจ้ง Complain"
+                title="ตั้งค่า Email ในการแจ้ง Complaint"
                 width={500}
                 onCancel={() => {
                     setModalVisible(false);

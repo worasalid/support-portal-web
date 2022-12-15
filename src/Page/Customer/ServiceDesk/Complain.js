@@ -206,7 +206,7 @@ export default function CustomerComplain() {
                             style={{ width: "100%" }}
 
                         >
-                            <Input placeholder='==ระบุชื่อพนักงาน==' />
+                            <Input placeholder='กรุณา ระบุชื่อพนักงาน' />
                         </Form.Item>
 
                         <Form.Item
@@ -225,6 +225,10 @@ export default function CustomerComplain() {
                                         label: "Application Support"
                                     },
                                     {
+                                        value: "CR CENTER",
+                                        label: "CR CENTER"
+                                    },
+                                    {
                                         value: "Development",
                                         label: "Development"
                                     },
@@ -233,12 +237,12 @@ export default function CustomerComplain() {
                                         label: "Consult"
                                     },
                                     {
-                                        value: "Sale && Marketing",
-                                        label: "Sale && Marketing"
+                                        value: "Sale & Marketing",
+                                        label: "Sale & Marketing"
                                     },
                                     {
-                                        value: "Finance && Accounting",
-                                        label: "Finance && Accounting"
+                                        value: "Finance & Accounting",
+                                        label: "Finance & Accounting"
                                     }
                                 ]}
                             />
