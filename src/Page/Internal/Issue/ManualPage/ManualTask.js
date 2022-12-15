@@ -149,16 +149,16 @@ export default function ManualTask() {
                     <Col span={24} style={{ padding: "0px 24px 0px 24px" }}>
                         <Table dataSource={userstate?.issuedata?.data} loading={loading} className="header-sticky"
                             style={{ padding: "5px 5px" }}
-                            // footer={(x) => {
-                            //     return (
-                            //         <>
-                            //             <div style={{ textAlign: "right" }}>
-                            //                 <label>จำนวนเคส : </label>
-                            //                 <label>{pageTotal}</label>
-                            //             </div>
-                            //         </>
-                            //     )
-                            // }}
+                            footer={(x) => {
+                                return (
+                                    <>
+                                        <div style={{ textAlign: "right" }}>
+                                            <label>จำนวนเคส : </label>
+                                            <label>{pageTotal}</label>
+                                        </div>
+                                    </>
+                                )
+                            }}
                             pagination={{ current: pageCurrent, pageSize: pageSize, total: pageTotal }}
 
                             onChange={(x) => { setPageCurrent(x.current); setPageSize(x.pageSize) }}
