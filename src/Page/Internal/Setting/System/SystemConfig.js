@@ -238,10 +238,10 @@ export default function SystemConfig() {
                                 avatar={
                                     <NotificationOutlined style={{ fontSize: "32px" }} />
                                 }
-                                title={<label className="card-title-menu">ข้อมูล หัวข้อการ Complain</label>}
+                                title={<label className="card-title-menu">ข้อมูล หัวข้อการ Complaint</label>}
                                 description={
                                     <label className="value-text">
-                                        ตั้งค่าประเภทหัวข้อการ Complain ของลูกค้า
+                                        ตั้งค่าประเภทหัวข้อการ Complaint ของลูกค้า
                                     </label>
                                 }
                             />
