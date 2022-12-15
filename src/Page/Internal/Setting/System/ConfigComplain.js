@@ -113,7 +113,7 @@ export default function ConfigComplainType() {
                 </Row>
                 <Row>
                     <Col>
-                        <h1> ตั้งค่าหัวข้อการ Complain</h1>
+                        <h1> ตั้งค่าหัวข้อการ Complaint</h1>
                     </Col>
                 </Row>
                 <Row style={{ marginBottom: 16, textAlign: "right" }} gutter={[16, 16]}>
@@ -152,7 +152,7 @@ export default function ConfigComplainType() {
             </div>
             <Modal
                 visible={modalVisible}
-                title="หัวข้อการ Complain"
+                title="หัวข้อการ Complaint"
                 width={500}
                 onCancel={() => {
                     setModalVisible(false);
@@ -167,7 +167,7 @@ export default function ConfigComplainType() {
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        label="หัวข้อการ Complain"
+                        label="หัวข้อการ Complaint"
                         name="description"
                         rules={[{ required: true, message: 'กรุณาระบุรายละเอียด' }]}
                     >
