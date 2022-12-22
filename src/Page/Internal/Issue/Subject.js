@@ -281,7 +281,8 @@ export default function Subject() {
       data: {
         ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
         typeid: value,
-        transid: userstate?.mailbox[0]?.TransId
+        transid: userstate?.mailbox[0]?.TransId,
+        nodeid: userstate?.mailbox[0]?.NodeId
       }
     }).then(() => {
       Modal.success({
@@ -1061,8 +1062,8 @@ export default function Subject() {
                     }}>
                     <Button icon={<FileAddOutlined />}
                       shape="round"
-                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ||  userstate.issuedata.details[0]?.InternalPriority === "None"?
-                        Modal.info({
+                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null || userstate.issuedata.details[0]?.InternalPriority === "None" ?
+                        Modal.warning({
                           title: 'กรุณา ระบุ Priority',
                           okText: "Close"
                         })

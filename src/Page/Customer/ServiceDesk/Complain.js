@@ -225,8 +225,8 @@ export default function CustomerComplain() {
                                         label: "Application Support"
                                     },
                                     {
-                                        value: "CR CENTER",
-                                        label: "CR CENTER"
+                                        value: "CR Center",
+                                        label: "CR Center"
                                     },
                                     {
                                         value: "Development",

@@ -237,8 +237,24 @@ export default function Subject() {
 
         return (modalSendissue_visible(true))
       }
+
       if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
-      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") {
+        Modal.warning({
+          title: 'กรุณาตรวจสอบข้อมูลก่อนการปิด Complete',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "ดำเนินการต่อ",
+          onOk() {
+            setModalcomplete_visible(true)
+          },
+        });
+      }
+      
       if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
 
@@ -274,7 +290,18 @@ export default function Subject() {
         setModalcancel_visible(true)
       }
       if (item.data.value === "Complete") {
-        setModalcomplete_visible(true)
+        Modal.warning({
+          title: 'กรุณาตรวจสอบข้อมูลก่อนการปิด Complete',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "ดำเนินการต่อ",
+          onOk() {
+            setModalcomplete_visible(true)
+          },
+        });
       }
     }
 
@@ -283,8 +310,24 @@ export default function Subject() {
       if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
         return (modalSendissue_visible(true))
       }
+
       if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
-      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") {
+        Modal.warning({
+          title: 'กรุณาตรวจสอบข้อมูลก่อนการปิด Complete',
+          content: (
+            <div>
+              <p></p>
+            </div>
+          ),
+          okText: "ดำเนินการต่อ",
+          onOk() {
+            setModalcomplete_visible(true)
+          },
+        });
+      }
+
       if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
 
