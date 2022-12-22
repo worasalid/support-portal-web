@@ -337,7 +337,7 @@ export default function All() {
                             <label className="table-column-text11">{record.GroupStatus}</label>
                             <br />
                             <label className="table-column-text11">
-                              {`(${record.ProgressStatus})`}
+                              {record.ProgressStatus === null ? "" : `(${record.ProgressStatus})`}
                             </label>
                             <br />
                             <label className="table-column-text11">

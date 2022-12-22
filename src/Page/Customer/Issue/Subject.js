@@ -241,20 +241,21 @@ export default function Subject() {
       if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
 
       if (item.data.NodeName === "customer" && item.data.value === "Complete") {
-        Modal.warning({
-          title: 'กรุณาตรวจสอบข้อมูลก่อนการปิด Complete',
+        Modal.confirm({
+          title: 'กรุณาตรวจสอบข้อมูล ',
           content: (
             <div>
-              <p></p>
+              <p>หลังจากการ Update Patch / Deploy  ก่อนการปิด Complete ทุกครั้ง</p>
             </div>
           ),
+          cancelText: "ยกเลิก",
           okText: "ดำเนินการต่อ",
           onOk() {
             setModalcomplete_visible(true)
           },
         });
       }
-      
+
       if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
 
