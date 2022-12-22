@@ -225,20 +225,24 @@ export default function CustomerComplain() {
                                         label: "Application Support"
                                     },
                                     {
-                                        value: "CR Center",
-                                        label: "CR Center"
-                                    },
-                                    {
                                         value: "Development",
                                         label: "Development"
                                     },
                                     {
-                                        value: "System Analyst",
-                                        label: "System Analyst"
+                                        value: "Information Technology (IT)",
+                                        label: "Information Technology (IT)"
                                     },
                                     {
-                                        value: "Consultant",
-                                        label: "Consultant"
+                                        value: "System Analyst (SA)",
+                                        label: "System Analyst (SA)"
+                                    },
+                                    {
+                                        value: "Business Analyst (BA)",
+                                        label: "Business Analyst (BA)"
+                                    },
+                                    {
+                                        value: "Project Implementation",
+                                        label: "Project Implementation"
                                     },
                                     {
                                         value: "Sales",
