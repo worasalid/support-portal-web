@@ -40,6 +40,8 @@ import DashBoard6 from './Page/Internal/DashBoard/DashBoard6';
 import Dashboard_AllIssue from './Page/Internal/DashBoard/Issue/DashBoard_Issue6';
 import DashBoard_CMMI6 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6';
 import DashBoard_CMMI6_1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6_1';
+import DashBoard_OKR1 from './Page/Internal/DashBoard/OKR/Dashboard_OKR1';
+
 
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
@@ -190,7 +192,7 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/timesheet3" exact component={TimeSheet3} />
                                     <Route path="/internal/dashboard/dashboard6" exact component={DashBoard6} />
                                     <Route path="/internal/dashboard/allissue" exact component={Dashboard_AllIssue} />
-
+                                    <Route path="/internal/dashboard/okr/dashboard_okr1" exact component={DashBoard_OKR1} />
 
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
@@ -237,7 +239,7 @@ export default function Routes() {
                                     <Route path="/customer/issue/cancel" exact component={CustomerCancel} />
                                     <Route path="/customer/system/setting" exact component={CustomerSetting} />
                                     <Route path="/customer/system/setting/issue-flow" exact component={CustomerSettingIssueFlow} />
-                                    
+
 
                                     {/* CallCenter Service */}
                                     <Route path="/servicedesk/voxtron" exact component={CallService} />
