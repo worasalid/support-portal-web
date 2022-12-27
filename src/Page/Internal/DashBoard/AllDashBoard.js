@@ -108,6 +108,12 @@ export default function AllDashBoard() {
                 description: "รายงานรายละเอียด ข้อมูล CR , Memo",
                 url: "/internal/dashboard/dashboard6"
             },
+            {
+                no: "17",
+                dashboard_name: "DashBoard OKR1",
+                description: "รายงาน สรุป OKR Satisfication",
+                url: "/internal/dashboard/okr/dashboard_okr1"
+            }
 
 
         ]
