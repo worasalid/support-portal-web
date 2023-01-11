@@ -819,7 +819,7 @@ export default function SubTask() {
                       style={{ width: '100%' }} placeholder="None"
                       onChange={(value, item) => HandleChange(value, item)}
                       options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
-                      disabled={userstate.taskdata.data[0]?.Status === "Cancel" ? true : false}
+                      disabled={userstate.taskdata.data[0]?.Status === "Cancel" || userstate.taskdata.data[0]?.Status === "Close" ? true : false}
                     />
                   </Col>
                   <Col span={18}

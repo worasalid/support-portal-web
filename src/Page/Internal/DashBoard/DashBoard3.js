@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Column, Pie } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Tabs, Empty } from 'antd';
+import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Tabs, Empty, Input } from 'antd';
 import moment from "moment"
 import Axios from "axios";
 import xlsx from 'xlsx'
@@ -22,12 +22,20 @@ export default function Dashboard3() {
     const [tableData, setTableData] = useState([]);
     const [excelData, setExcelData] = useState([]);
     const [tabProduct, setTabProduct] = useState([]);
+    const [dataFilter, setDataFilter] = useState([]);
 
     // filter
     const [selectProduct, setSelectProduct] = useState([]);
     const [selectDate, setSelectDate] = useState([]);
     const [isStack, setIsStack] = useState(false);
-    const [tabSelect, setTabSelect] = useState("")
+    const [tabSelect, setTabSelect] = useState("");
+
+    // table filter
+    const [filterInfo, setFilterInfo] = useState({})
+    const [columnIssueTypeFilter, setColumnIssueTypeFilter] = useState([]);
+    const [columnNodeFilter, setColumnNodeFilter] = useState([]);
+    const [columnDevFilter, setColumnDevFilter] = useState([]);
+
 
     const chartData_config = {
         xField: 'CompanyName',
@@ -79,7 +87,6 @@ export default function Dashboard3() {
         },
         interactions: [{ type: 'element-selected' }, { type: 'element-active' }],
     };
-
 
     const getProduct = async () => {
         try {
@@ -133,6 +140,29 @@ export default function Dashboard3() {
             }));
             setTableData(res.data.tabledata);
             setExcelData(res.data.exceldata);
+            setDataFilter(res.data.exceldata);
+
+            setColumnIssueTypeFilter(_.uniqBy(res.data.exceldata, 'IssueType').map((item) => {
+                return {
+                    text: item.IssueType,
+                    value: item.IssueType
+                }
+            }));
+
+            setColumnNodeFilter(_.uniqBy(res.data.exceldata, 'NodeName').map((item) => {
+                return {
+                    text: item.NodeName,
+                    value: item.NodeName
+                }
+            }));
+
+            setColumnDevFilter(_.uniqBy(res.data.exceldata, 'DevTeamLead').map((item) => {
+                return {
+                    text: item.DevTeamLead,
+                    value: item.DevTeamLead
+                }
+            }));
+
             setLoading(false);
         }).catch(() => {
             setLoading(false);
@@ -182,6 +212,29 @@ export default function Dashboard3() {
             getData();
         }
     }, [selectProduct.length, selectDate && selectDate[0], isStack]);
+
+    useEffect(() => {
+        setColumnNodeFilter(_.uniqBy(excelData.filter(f => f.Product === tabSelect), 'NodeName').map((item) => {
+            return {
+                text: item.NodeName === null ? "" : item.NodeName,
+                value: item.NodeName === null ? "" : item.NodeName
+            }
+        }));
+
+        setColumnDevFilter(_.uniqBy(excelData.filter(f => f.Product === tabSelect && f.DevTeamLead !== null), 'DevTeamLead').map((item) => {
+            return {
+                text: item.DevTeamLead,
+                value: item.DevTeamLead
+            }
+        }));
+
+    }, [tabSelect])
+
+    useEffect(() => {
+        if (dataFilter?.length !== 0) {
+            console.log("dataFilter", dataFilter)
+        }
+    }, [dataFilter?.length])
 
 
     return (
@@ -249,19 +302,22 @@ export default function Dashboard3() {
                                         <Row>
                                             {
                                                 tabProduct.map((n, index) => (
-                                                    <Col span={2}
-                                                        onClick={(value) => { setTabSelect(n.product); console.log("product", n.product) }}
-                                                    >
+                                                    <Col span={2}>
                                                         <Button
                                                             type={
                                                                 (tabSelect === "" ? tabProduct[0]?.product : tabSelect) === n.product ? 'primary' : 'default'
                                                             }
-                                                            shape='round'>
+                                                            shape='round'
+                                                            onClick={() => {
+                                                                if ((tabSelect === "" ? tabProduct[0]?.product : tabSelect) !== n.product) {
+                                                                    setFilterInfo({});
+                                                                }
+                                                                setTabSelect(n.product);
+                                                            }}
+                                                        >
                                                             <label>{n.product}</label>
                                                         </Button>
-
                                                     </Col>
-
                                                 ))
                                             }
                                         </Row>
@@ -303,7 +359,6 @@ export default function Dashboard3() {
                                         </div>
 
                                         <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
-
                                             <Col span={10}>
                                                 <Card className="card-dashboard" title="">
                                                     <Table dataSource={tabSelect === "" ? tableData : _.filter(tableData, { Product: tabSelect })} loading={loading}>
@@ -378,6 +433,255 @@ export default function Dashboard3() {
 
                                             </Col>
 
+                                        </Row>
+
+                                        <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
+                                            <Col span={24}>
+                                                <Table dataSource={tabSelect === "" ? excelData : _.filter(excelData, { Product: tabSelect })} loading={loading}
+                                                    scroll={{ x: 3000 }} bordered size="small"
+                                                    onChange={(pagination, filters, sorter) => {
+                                                        setFilterInfo(filters);
+                                                        //console.log("filters", filters)
+
+                                                        // filters.NodeName.forEach((i) => console.log("i", _.filter(excelData, function (o) {
+                                                        //     return o.NodeName === i
+                                                        // })))
+
+                                                        // if (filters.IssueType !== null) {
+                                                        //     let issueTypeFilter = [...dataFilter]
+                                                        //     let result = []
+                                                        //     filters.IssueType.forEach((i) => _.filter(issueTypeFilter, function (o) {
+                                                        //         return o.IssueType === i
+                                                        //     }))
+
+                                                        //     console.log("issueTypeFilter", result)
+                                                        //     setDataFilter(result)
+                                                        // }
+
+                                                        // if (filters.NodeName !== null) {
+                                                        //     const resultFilter = result
+                                                        //     setDataFilter(filters.IssueType.forEach((i) => _.filter(resultFilter, function (o) {
+                                                        //         return o.IssueType === i
+                                                        //     })))
+                                                        // }
+
+                                                        // filters.NodeName.forEach((i) => console.log("iNodeName", _.filter(excelData, function (o) {
+                                                        //     return o.NodeName === i
+                                                        // }).length))
+                                                    }}
+                                                // footer={(x) => {
+                                                //     return (
+                                                //         <>
+                                                //             <div style={{ textAlign: "right" }}>
+                                                //                 <label>จำนวนเคส : </label>
+                                                //             </div>
+                                                //         </>
+                                                //     )
+                                                // }}
+
+                                                // summary={(pageData) => {
+                                                //     console.log("pageData", pageData)
+                                                //     return (
+                                                //         <>
+                                                //             <Table.Summary.Row>
+                                                //                 <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                                                //                 <Table.Summary.Cell index={1} colSpan={10}>13</Table.Summary.Cell>
+                                                //             </Table.Summary.Row>
+                                                //         </>
+                                                //     )
+                                                // }}
+                                                >
+                                                    <Table.Column
+                                                        title='Issue'
+                                                        dataIndex='Number'
+                                                        fixed="left"
+                                                        width="120px"
+                                                        align='center'
+                                                        render={(value) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'left' }}>
+                                                                        <label className="table-column-text12">
+                                                                            {value}
+                                                                        </label>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='Company'
+                                                        dataIndex='CompanyName'
+                                                        fixed="left"
+                                                        width="150px"
+                                                        align='center'
+                                                        render={(value) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'left' }}>
+                                                                        <label className="table-column-text12">
+                                                                            {value}
+                                                                        </label>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='Title'
+                                                        dataIndex='Title'
+                                                        // fixed="left"
+                                                        width="300px"
+                                                        align='center'
+                                                        render={(value) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'left' }}>
+                                                                        <label className="table-column-text12">
+                                                                            {value}
+                                                                        </label>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='Issue Type'
+                                                        dataIndex='IssueType'
+                                                        width='100px'
+                                                        align='center'
+                                                        filters={columnIssueTypeFilter}
+                                                        filteredValue={filterInfo.IssueType || null}
+                                                        onFilter={(value, record) => {
+
+                                                            return record.IssueType.toLowerCase().includes(value.toLowerCase())
+                                                            //return record.IssueType.includes(value)
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='Flow Status'
+                                                        dataIndex='FlowStatus'
+                                                        width='200px'
+                                                        align='center'
+                                                        render={(value) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'left' }}>
+                                                                        <label className="table-column-text12">
+                                                                            {value}
+                                                                        </label>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='Module'
+                                                        dataIndex='ModuleName'
+                                                        width='150px'
+                                                        align='center'
+                                                        render={(value) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'left' }}>
+                                                                        <label className="table-column-text12">
+                                                                            {value}
+                                                                        </label>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='Hand Over'
+                                                        dataIndex='NodeName'
+                                                        width='100px'
+                                                        filters={columnNodeFilter}
+                                                        filteredValue={filterInfo.NodeName || null}
+                                                        onFilter={(value, record) => {
+                                                            return record.NodeName.toLowerCase().includes(value.toLowerCase())
+                                                            //return record.NodeName.includes(value)
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='H.Develop'
+                                                        dataIndex='DevTeamLead'
+                                                        width='150px'
+                                                        align='center'
+                                                        filters={columnDevFilter}
+                                                        filteredValue={filterInfo.DevTeamLead || null}
+                                                        onFilter={(value, record) => {
+                                                            //console.log("onFilter", record)
+                                                            return record.DevTeamLead === null ? "" : record.DevTeamLead.toLowerCase().includes(value.toLowerCase())
+                                                            // return record.DevTeamLead.includes(value)
+                                                        }}
+                                                        render={(value) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'left' }}>
+                                                                        <label className="table-column-text12">
+                                                                            {value}
+                                                                        </label>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='User'
+                                                        dataIndex='DisplayAllName'
+                                                        align='center'
+                                                        width='300px'
+                                                        render={(value) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'left' }}>
+                                                                        <label className="table-column-text12">
+                                                                            {value}
+                                                                        </label>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
+                                                    <Table.Column
+                                                        title='IssueDate'
+                                                        dataIndex='AssignIconDate'
+                                                        width='100px'
+                                                        align='center'
+                                                    />
+                                                    <Table.Column
+                                                        title='DueDate'
+                                                        dataIndex='DueDate'
+                                                        width='100px'
+                                                        align='center'
+                                                    />
+                                                    <Table.Column
+                                                        title='OverDue'
+                                                        dataIndex='OverDue'
+                                                        width='100px'
+                                                        align='center'
+                                                    />
+                                                    <Table.Column
+                                                        title='Due Date (ครั้งที่ 1)'
+                                                        dataIndex='DueDate_Dev'
+                                                        width='100px'
+                                                        align='center'
+                                                    />
+                                                    <Table.Column
+                                                        title='Due Date (ครั้งที่ 2)'
+                                                        dataIndex='DueDate_Dev2'
+                                                        width='100px'
+                                                        align='center'
+                                                    />
+                                                    <Table.Column
+                                                        title='Due Date (ครั้งที่ 3)'
+                                                        dataIndex='DueDate_Dev3'
+                                                        width='100px'
+                                                        align='center'
+                                                    />
+                                                </Table>
+                                            </Col>
                                         </Row>
                                     </>
                             }
