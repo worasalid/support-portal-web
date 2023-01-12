@@ -96,7 +96,6 @@ export default function Subject() {
   const [duedateType, setDuedateType] = useState(null);
   const [sla, setSLA] = useState(0);
   const [taskProcess, serTaskProcess] = useState(0);
-  const [flowOutput, setFlowOutput] = useState(null);
 
   const [btnBackTop, setBtnBackTop] = useState(false);
   const scrollRef = useRef(null);
@@ -241,7 +240,10 @@ export default function Subject() {
         nodeActionId: userstate?.mailbox[0]?.FlowId === 2 ? 20 : 65
       }
     }).then((res) => {
-      setFlowOutput(res.data.filter((item) => item.type === "Issue" || item.type === null));
+      userdispatch({
+        type: "LOAD_ACTION_FLOW",
+        payload: res.data.filter((item) => item.Type === "Issue" || item.Type === null)
+      });
     });
   }
 
@@ -524,7 +526,7 @@ export default function Subject() {
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-
+    console.log("item.data", item.data)
     // Bug Flow
     if (userstate.issuedata.details[0]?.IssueType === "Bug") {
       if (userstate?.mailbox[0]?.NodeName === "support") {
@@ -1216,19 +1218,17 @@ export default function Subject() {
                               title: 'กรุณา ระบุ Priority',
                               okText: "Close"
                             })
-                            : taskProcess === 0 ? getFlowByNode() : getflow_output(userstate?.mailbox[0]?.TransId)}
+                            : taskProcess === 0 && userstate?.mailbox[0]?.NodeName === "cr_center" ? getFlowByNode() : getflow_output(userstate?.mailbox[0]?.TransId)}
                           onChange={(value, item) => HandleChange(value, item)}
                           options={
-                            taskProcess === 0 ? flowOutput && flowOutput.map((x) => ({ value: x.id, label: x.text_eng, data: x }))
-                              : userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))
+                            userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))
                           }
                         />
-
                         : <label className="value-text">{userstate?.mailbox[0]?.FlowStatus}</label>
                     }
-
                   </Col>
                 </Row>
+
                 <Row style={{ marginBottom: 20 }} align="middle">
                   <Col span={24}>
                     <label className="header-text">Priority</label>
