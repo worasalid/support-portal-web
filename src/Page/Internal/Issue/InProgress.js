@@ -23,7 +23,6 @@ import { CalculateTime } from "../../../utility/calculateTime";
 import { Icon } from '@iconify/react';
 
 export default function InProgress() {
-  console.log(process.env.REACT_APP_MENU_INPROGRESS_MAINTENANCE)
   return (
     <>
       {
