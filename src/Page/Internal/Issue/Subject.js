@@ -850,19 +850,39 @@ export default function Subject() {
         },
         onOk() {
           if (item.type === "issuetype") {
-            SaveIssueType(value);
+            if (taskProcess > 0) {
+              Modal.warning({
+                title: 'กรุณาปิด Task งาน (Close Task)',
+                okText: "Close"
+              });
+
+            } else {
+              SaveIssueType(value);
+            }
           }
+
           if (item.type === "priority") {
             UpdatePriority(value, item)
           }
+
           if (item.type === "scene") {
             updateScene(value, item)
           }
+
           if (item.type === "version") {
             updateVersion(value, item)
           }
+
           if (item.type === "product") {
-            updateProduct(value, item)
+            if (taskProcess > 0) {
+              Modal.warning({
+                title: 'กรุณาปิด Task งาน (Close Task)',
+                okText: "Close"
+              });
+
+            } else {
+              updateProduct(value, item)
+            }
           }
         },
       });
