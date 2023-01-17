@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Column, Pie } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Tabs, Empty, Input } from 'antd';
+import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Empty } from 'antd';
 import moment from "moment"
 import Axios from "axios";
 import xlsx from 'xlsx'
@@ -15,6 +15,7 @@ const { RangePicker } = DatePicker;
 export default function Dashboard3() {
     const [loading, setLoading] = useState(true);
     const [slickCount, setSlickCount] = useState(0);
+    const [slick2Count, setSlick2Count] = useState(0);
 
     //data
     const [product, setProduct] = useState(null);
@@ -23,6 +24,8 @@ export default function Dashboard3() {
     const [excelData, setExcelData] = useState([]);
     const [tabProduct, setTabProduct] = useState([]);
     const [dataFilter, setDataFilter] = useState([]);
+    const [userChart, setUserChart] = useState([]);
+    const [tableTeamSummary, setTableTeamSummary] = useState([]);
 
     // filter
     const [selectProduct, setSelectProduct] = useState([]);
@@ -67,6 +70,43 @@ export default function Dashboard3() {
             if (x.GroupStatus === "InProgress") { return "#52C41A" } // เขียว
             if (x.GroupStatus === "ReOpen") { return "#FF5500" } // สีส้ม
             //if (x.status === "ReOpen") { return "#CD201F" }//สีแดง
+        },
+        onclick: function onclick() {
+            alert()
+        },
+
+    };
+
+    const chartUser_config = {
+        xField: 'developName',
+        yField: 'value',
+        seriesField: 'issueType',
+        //isPercent: true,
+        isStack: isStack,
+        isGroup: !isStack,
+        //scrollbar: { type: 'horizontal' },
+        slider: {
+            start: 0,
+            end: 1,
+            maxLimit: 100,
+        },
+        columnWidthRatio: 0.4,
+        label: {
+            position: 'middle',
+            content: function content(item) {
+                return item.value.toFixed(0);
+            },
+            style: { fill: '#fff' },
+        },
+        legend: {
+            layout: 'horizontal',
+            position: 'bottom'
+        },
+        color: function color(x) {
+            // if (x.developer === "InProgress") { return "#5B8FF9" } // สีฟ้า
+            if (x.issueType === "CR") { return "#52C41A" } // เขียว
+            if (x.issueType === "Memo") { return "#FF5500" } // สีส้ม
+            if (x.issueType === "Bug") { return "#CD201F" }//สีแดง
         },
         onclick: function onclick() {
             alert()
@@ -122,13 +162,12 @@ export default function Dashboard3() {
                 enddate: (selectDate[1] === undefined || selectDate[1] === "") ? "" : moment(selectDate[1], "DD/MM/YYYY").format("YYYY-MM-DD"),
             }
         }).then((res) => {
-
             setTabProduct(_.uniqBy(res.data.chartdata, 'Product').map((n) => {
                 return {
                     product: n.Product
                 }
             }));
-            setSlickCount(Math.ceil(res.data.chartdata.length / 10))
+            setSlickCount(Math.ceil(res.data.chartdata.length / 10));
             setChartData(res.data.chartdata.map((o, index) => {
                 return {
                     no: index + 1,
@@ -141,6 +180,18 @@ export default function Dashboard3() {
             setTableData(res.data.tabledata);
             setExcelData(res.data.exceldata);
             setDataFilter(res.data.exceldata);
+            setTableTeamSummary(res.data.teamSummary);
+
+            setSlick2Count(Math.ceil(res.data.chartUserSummary.length / 4));
+            setUserChart(res.data.chartUserSummary.map((item, index) => {
+                return {
+                    no: index + 1,
+                    product: item.Product,
+                    developName: item.DeveloperName,
+                    issueType: item.IssueType,
+                    value: item.Value
+                }
+            }));
 
             setColumnIssueTypeFilter(_.uniqBy(res.data.exceldata, 'IssueType').map((item) => {
                 return {
@@ -299,6 +350,7 @@ export default function Dashboard3() {
                             {
                                 selectProduct.length === 0 ? <Empty /> :
                                     <>
+                                        {/* Product Tags */}
                                         <Row>
                                             {
                                                 tabProduct.map((n, index) => (
@@ -321,6 +373,8 @@ export default function Dashboard3() {
                                                 ))
                                             }
                                         </Row>
+
+                                        {/* Company Chart */}
                                         <div style={{ padding: "24px 24px 0px 24px" }}>
                                             <Slider
                                                 dots={true}
@@ -358,10 +412,13 @@ export default function Dashboard3() {
                                             </Slider>
                                         </div>
 
+                                        {/* Company Summary */}
                                         <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
                                             <Col span={10}>
                                                 <Card className="card-dashboard" title="">
-                                                    <Table dataSource={tabSelect === "" ? tableData : _.filter(tableData, { Product: tabSelect })} loading={loading}>
+                                                    <Table dataSource={tabSelect === "" ? tableData : _.filter(tableData, { Product: tabSelect })} loading={loading}
+                                                        pagination={{ pageSize: 5 }}
+                                                    >
                                                         <Column title="No" align="center"
                                                             width="10%"
                                                             render={(record, row, index) => {
@@ -430,16 +487,161 @@ export default function Dashboard3() {
                                                         height={300}
                                                     />
                                                 </Card>
+
+                                            </Col>
+
+                                        </Row>
+
+                                        {/* User Chart */}
+                                        <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
+                                            <Col span={14}>
+                                                <Card title="Summary By User" bordered={true} style={{ width: "100%" }} loading={loading} className="card-dashboard">
+                                                    {
+                                                        userChart.filter((o) => o.product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)).length !== 0
+                                                            ?
+                                                            <div style={{ padding: "24px 24px 0px 24px" }}>
+                                                                <Slider
+                                                                    dots={true}
+                                                                    infinite={true}
+                                                                    speed={500}
+
+                                                                    slidesToShow={1}
+                                                                    slidesToScroll={1}
+                                                                    swipeToSlide={true}
+                                                                    prevArrow={
+                                                                        <Icon icon="dashicons:arrow-left-alt2" color="gray" />
+                                                                    }
+                                                                    nextArrow={
+                                                                        <Icon icon="dashicons:arrow-right-alt2" color="gray" />
+
+                                                                    }
+                                                                >
+
+                                                                    {
+                                                                        Array.from(Array(slick2Count), (e, index) => {
+                                                                            return (
+                                                                                <div>
+                                                                                    <Column {...chartUser_config}
+                                                                                        data={
+                                                                                            userChart.filter((o) => o.product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)
+                                                                                                && (o.no > (index) * 4) && (o.no <= (index + 1) * 4))
+                                                                                        }
+                                                                                        height={300}
+                                                                                        xAxis={{ position: "bottom" }}
+                                                                                    />
+                                                                                </div>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                </Slider>
+                                                            </div>
+                                                            : <Empty />
+                                                    }
+                                                </Card>
+                                            </Col>
+                                            <Col span={10}>
+                                                <Card title="Summary By Team" bordered={true} style={{ width: "100%" }} loading={loading} className="card-dashboard">
+                                                    <Table dataSource={tabSelect === "" ? tableTeamSummary : _.filter(tableTeamSummary, { Product: tabSelect })}
+                                                        loading={loading}
+                                                        pagination={{ pageSize: 4 }}
+                                                    >
+                                                        <Table.Column
+                                                            title='TeamName'
+                                                            dataIndex='TeamName'
+                                                            fixed="left"
+                                                            width="55%"
+                                                            align='center'
+                                                            render={(value) => {
+                                                                return (
+                                                                    <Row>
+                                                                        <Col span={24} style={{ textAlign: 'left' }}>
+                                                                            <label className="table-column-text12">
+                                                                                {value}
+                                                                            </label>
+                                                                        </Col>
+                                                                    </Row>
+                                                                )
+                                                            }}
+                                                        />
+                                                        <Table.Column
+                                                            title='Bug'
+                                                            dataIndex='Bug'
+                                                            align='center'
+                                                            width="15%"
+                                                        />
+                                                        <Table.Column
+                                                            title='CR'
+                                                            dataIndex='CR'
+                                                            align='center'
+                                                            width="15%"
+                                                        />
+                                                        <Table.Column
+                                                            title='Memo'
+                                                            dataIndex='Memo'
+                                                            align='center'
+                                                            width="15%"
+                                                        />
+                                                    </Table>
+                                                </Card>
                                             </Col>
                                         </Row>
 
+                                        {/* Table Detail */}
                                         <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
                                             <Col span={24}>
                                                 <Table dataSource={tabSelect === "" ? excelData : _.filter(excelData, { Product: tabSelect })} loading={loading}
                                                     scroll={{ x: 3000 }} bordered size="small"
                                                     onChange={(pagination, filters, sorter) => {
                                                         setFilterInfo(filters);
+                                                        console.log("filters", filters)
+
+                                                        // filters.NodeName.forEach((i) => console.log("i", _.filter(excelData, function (o) {
+                                                        //     return o.NodeName === i
+                                                        // })))
+
+                                                        // if (filters.IssueType !== null) {
+                                                        //     let issueTypeFilter = [...dataFilter]
+                                                        //     let result = []
+                                                        //     filters.IssueType.forEach((i) => _.filter(issueTypeFilter, function (o) {
+                                                        //         return o.IssueType === i
+                                                        //     }))
+
+                                                        //     console.log("issueTypeFilter", result)
+                                                        //     setDataFilter(result)
+                                                        // }
+
+                                                        // if (filters.NodeName !== null) {
+                                                        //     const resultFilter = result
+                                                        //     setDataFilter(filters.IssueType.forEach((i) => _.filter(resultFilter, function (o) {
+                                                        //         return o.IssueType === i
+                                                        //     })))
+                                                        // }
+
+                                                        // filters.NodeName.forEach((i) => console.log("iNodeName", _.filter(excelData, function (o) {
+                                                        //     return o.NodeName === i
+                                                        // }).length))
                                                     }}
+                                                // footer={(x) => {
+                                                //     return (
+                                                //         <>
+                                                //             <div style={{ textAlign: "right" }}>
+                                                //                 <label>จำนวนเคส : </label>
+                                                //             </div>
+                                                //         </>
+                                                //     )
+                                                // }}
+
+                                                // summary={(pageData) => {
+                                                //     console.log("pageData", pageData)
+                                                //     return (
+                                                //         <>
+                                                //             <Table.Summary.Row>
+                                                //                 <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                                                //                 <Table.Summary.Cell index={1} colSpan={10}>13</Table.Summary.Cell>
+                                                //             </Table.Summary.Row>
+                                                //         </>
+                                                //     )
+                                                // }}
                                                 >
                                                     <Table.Column
                                                         title='Issue'
@@ -561,7 +763,9 @@ export default function Dashboard3() {
                                                         filters={columnDevFilter}
                                                         filteredValue={filterInfo.DevTeamLead || null}
                                                         onFilter={(value, record) => {
+                                                            //console.log("onFilter", record)
                                                             return record.DevTeamLead === null ? "" : record.DevTeamLead.toLowerCase().includes(value.toLowerCase())
+                                                            // return record.DevTeamLead.includes(value)
                                                         }}
                                                         render={(value) => {
                                                             return (
