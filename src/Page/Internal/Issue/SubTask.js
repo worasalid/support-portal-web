@@ -144,7 +144,6 @@ export default function SubTask() {
           setDivProgress("show")
         }
 
-
         // เงื่อนไข flow ของ อื่นๆ ของทีมอื่น ที่ไม่ใช่ QA
         if (userstate?.mailbox[0]?.NodeName !== "qa" || userstate?.mailbox[0]?.NodeName !== "qa_leader") {
           userdispatch({ type: "LOAD_ACTION_FLOW", payload: flow_output.data.filter((x) => x.Type === "Task") })
@@ -217,25 +216,30 @@ export default function SubTask() {
                 payload: flow_output.data.filter((x) => x.Type === "Task" && x.value === "SendToDev")
               })
             }
+
             if (userstate?.taskdata?.data[0]?.FlowStatus === "Return to Support") {
               userdispatch({
                 type: "LOAD_ACTION_FLOW",
-                payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "SendToDev" || x.value === "CloseTask"))
+                payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "SendToDev" || x.value === "CloseTask" || x.value === "ResolvedTask"))
               })
             }
-            if (userstate?.taskdata?.data[0]?.Status === "Resolved" || userstate?.taskdata?.data[0]?.Status === "Done") {
-              // userdispatch({
-              //   type: "LOAD_ACTION_FLOW",
-              //   payload: flow_output.data.filter((x) => x.Type === "Task" && x.value !== "SendToDev")
-              // })
 
-              // Check Flow Resolved ที่ไม่มีการแก้ไข Bug จะไม่มีการเดิน flow ต่อ
+            if (userstate?.taskdata?.data[0]?.Status === "Resolved" || userstate?.taskdata?.data[0]?.Status === "Done") {
+              // Check Flow Resolved ที่ไม่มีการแก้ไข Bug
               if (userstate?.taskdata?.data[0]?.IsDeploy === false) {
                 userdispatch({
                   type: "LOAD_ACTION_FLOW",
-                  payload: []
+                  payload: flow_output.data.filter((x) => x.Type === "Task" && (x.value === "SendToDev" || x.value === "CloseTask" || x.value === "ResolvedTask"))
                 })
               }
+            }
+
+            // Check Flow ที่ Close แล้วจะไม่มีการเดิน flow ต่อ
+            if (userstate?.taskdata?.data[0]?.Status === "Close") {
+              userdispatch({
+                type: "LOAD_ACTION_FLOW",
+                payload: []
+              })
             }
           }
 
@@ -254,14 +258,11 @@ export default function SubTask() {
               })
             }
           }
-
         }
-
       }
     } catch (error) {
 
     }
-
   }
 
   const loadModule = async () => {
@@ -428,12 +429,12 @@ export default function SubTask() {
           setModalDevSendVersion(true)
         }
 
-        if (item.data.value === "RejectToSupport" || item.data.value ==="RejectToQA") { 
-          setModalsendtask_visible(true) 
+        if (item.data.value === "RejectToSupport" || item.data.value === "RejectToQA") {
+          setModalsendtask_visible(true)
         }
 
-        if (item.data.value === "Deploy") { 
-          setModalcomplete_visible(true) 
+        if (item.data.value === "Deploy") {
+          setModalcomplete_visible(true)
         }
       }
 
@@ -504,7 +505,7 @@ export default function SubTask() {
         if (item.data.value === "SendDueDate") { setModalduedate_visible(true) }
         if (item.data.value === "LeaderAssign") { setModalleaderassign_visible(true) }
         if (item.data.value === "LeaderQC" || item.data.value === "RejectToCR" || item.data.value === "LeaderReject" ||
-          item.data.value === "RequestInfo" || item.data.value === "SendInfoToSA" || item.data.value ==="RejectToQA") {
+          item.data.value === "RequestInfo" || item.data.value === "SendInfoToSA" || item.data.value === "RejectToQA") {
           setModalsendtask_visible(true)
         }
         if (item.data.value === "Deploy") {
@@ -537,7 +538,7 @@ export default function SubTask() {
       }
 
       if (item.data.NodeName === "qa") {
-        if (item.data.value === "QApass" || item.data.value ==="SendQALeader") {
+        if (item.data.value === "QApass" || item.data.value === "SendQALeader") {
           setModalQA_visible(true)
         }
         if (item.data.value === "QAReject" || item.data.value === "QARejectDev") {

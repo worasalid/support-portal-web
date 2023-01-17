@@ -317,10 +317,10 @@ export default function Subject() {
 
       if (item.data.NodeName === "customer" && item.data.value === "Complete") {
         Modal.confirm({
-          title: 'กรุณาตรวจสอบข้อมูล ',
+          //title: 'กรุณาตรวจสอบข้อมูล ',
           content: (
             <div>
-              <p>หลังจากการ Update Patch / Deploy  ก่อนการปิด Complete ทุกครั้ง</p>
+              <p>กรุณาตรวจสอบข้อมูล ก่อนการปิด Complete ทุกครั้ง</p>
             </div>
           ),
           cancelText: "ยกเลิก",
