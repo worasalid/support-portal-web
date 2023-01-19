@@ -20,11 +20,13 @@ export default function Dashboard3() {
     //data
     const [product, setProduct] = useState(null);
     const [chartData, setChartData] = useState([]);
+    const [chartDataFilter, setChartDataFilter] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [excelData, setExcelData] = useState([]);
     const [tabProduct, setTabProduct] = useState([]);
     const [dataFilter, setDataFilter] = useState([]);
     const [userChart, setUserChart] = useState([]);
+    const [userChartFilter, setUserChartFilter] = useState([]);
     const [tableTeamSummary, setTableTeamSummary] = useState([]);
 
     // filter
@@ -279,14 +281,16 @@ export default function Dashboard3() {
             }
         }));
 
+        const resultUserChart = [...userChart.filter((o) => o.product === tabSelect)];
+        setUserChartFilter(resultUserChart);
+        setSlick2Count(Math.ceil(resultUserChart.length / 4));
+
     }, [tabSelect])
 
     useEffect(() => {
         if (dataFilter?.length !== 0) {
-            console.log("dataFilter", dataFilter)
         }
     }, [dataFilter?.length])
-
 
     return (
         <MasterPage bgColor="#f0f2f5">
@@ -497,7 +501,7 @@ export default function Dashboard3() {
                                             <Col span={14}>
                                                 <Card title="Summary By User" bordered={true} style={{ width: "100%" }} loading={loading} className="card-dashboard">
                                                     {
-                                                        userChart.filter((o) => o.product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)).length !== 0
+                                                        userChartFilter.filter((o) => o.product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)).length !== 0
                                                             ?
                                                             <div style={{ padding: "24px 24px 0px 24px" }}>
                                                                 <Slider
@@ -523,7 +527,7 @@ export default function Dashboard3() {
                                                                                 <div>
                                                                                     <Column {...chartUser_config}
                                                                                         data={
-                                                                                            userChart.filter((o) => o.product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)
+                                                                                            userChartFilter.filter((o) => o.product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)
                                                                                                 && (o.no > (index) * 4) && (o.no <= (index + 1) * 4))
                                                                                         }
                                                                                         height={300}
