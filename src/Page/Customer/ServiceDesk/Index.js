@@ -49,7 +49,7 @@ export default function Index() {
                         description="เข้าสู่ หน้าหลัก / Home"
                     />
                 </Card>
-                <Card className="card-box issue-active" bordered hoverable
+                {/* <Card className="card-box issue-active" bordered hoverable
                     style={{ marginTop: 30 }}
                     onClick={() => {
                         history.push({ pathname: "/customer/servicedesk/complain" })
@@ -64,7 +64,7 @@ export default function Index() {
                         title={<label className="card-title-menu">Complaint</label>}
                         description="แจ้งเรื่องร้องเรียน / ข้อเสนอแนะ"
                     />
-                </Card>
+                </Card> */}
             </div>
             <div style={{ position: "fixed", bottom: 30, right: 30 }}>
                 <label style={{ fontSize: 14, color: "gray" }}>
