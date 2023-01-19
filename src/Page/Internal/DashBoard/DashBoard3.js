@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Column, Pie } from '@ant-design/charts';
 import MasterPage from '../MasterPage'
-import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Empty } from 'antd';
+import { Row, Col, Card, Spin, Table, Select, DatePicker, Checkbox, Button, Empty, Drawer, List, Avatar, notification } from 'antd';
 import moment from "moment"
 import Axios from "axios";
 import xlsx from 'xlsx'
@@ -9,13 +9,24 @@ import { BarChartOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
 import _ from "lodash";
 import Slider from "react-slick";
+import TextEditor from '../../../Component/TextEditor';
+import AuthenContext from '../../../utility/authenContext';
 
 const { RangePicker } = DatePicker;
 
 export default function Dashboard3() {
+    const { state, dispatch } = useContext(AuthenContext);
     const [loading, setLoading] = useState(true);
+    const [drawerLoading, setDrawerLoading] = useState(false);
     const [slickCount, setSlickCount] = useState(0);
     const [slick2Count, setSlick2Count] = useState(0);
+    const [openDrawer, setOpenDrawer] = useState(false);
+    const editorRef = useRef(null);
+    const [activeButton, setActiveButton] = useState(false);
+    const [selectTicket, setSelectTicket] = useState({
+        ticketId: null,
+        ticketNumber: ""
+    });
 
     //data
     const [product, setProduct] = useState(null);
@@ -28,6 +39,7 @@ export default function Dashboard3() {
     const [userChart, setUserChart] = useState([]);
     const [userChartFilter, setUserChartFilter] = useState([]);
     const [tableTeamSummary, setTableTeamSummary] = useState([]);
+    const [ticketRemark, setTicketRemark] = useState([]);
 
     // filter
     const [selectProduct, setSelectProduct] = useState([]);
@@ -96,7 +108,7 @@ export default function Dashboard3() {
         label: {
             position: 'middle',
             content: function content(item) {
-                return item.value.toFixed(0);
+                return item?.value?.toFixed(0);
             },
             style: { fill: '#fff' },
         },
@@ -169,6 +181,7 @@ export default function Dashboard3() {
                     product: n.Product
                 }
             }));
+
             setSlickCount(Math.ceil(res.data.chartdata.length / 10));
             setChartData(res.data.chartdata.map((o, index) => {
                 return {
@@ -256,6 +269,66 @@ export default function Dashboard3() {
         }
     }
 
+    const getTicketRemark = async (ticketId) => {
+        setDrawerLoading(true);
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/tickets/issue-remark",
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            params: {
+                ticketId: ticketId
+            }
+        }).then((res) => {
+            setDrawerLoading(false);
+
+            setTicketRemark(res.data.map((item) => {
+                return {
+                    ticketId: item.ticketId,
+                    ticketNumber: item.TicketNumber,
+                    description: item.Description,
+                    userName: item.DisplayName,
+                    profileImg: item.ProfileImage,
+                    email: item.Email,
+                    remarkDate: moment(item.CreateDate).format("DD/MM/YYYY : HH:mm")
+                }
+            }))
+        }).catch(() => {
+            setDrawerLoading(false);
+        })
+    }
+
+    const saveTicketRemark = async (ticketId) => {
+        try {
+            if (editorRef?.current?.getValue() === "" || editorRef?.current?.getValue() === null || editorRef?.current?.getValue() === undefined) {
+                throw ("กรุณาระบุ Comment!")
+            }
+
+            setDrawerLoading(true);
+            await Axios({
+                url: process.env.REACT_APP_API_URL + "/tickets/issue-remark",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+                },
+                data: {
+                    ticketId: ticketId,
+                    description: editorRef?.current?.getValue()
+                }
+            }).then(() => {
+                setDrawerLoading(false);
+                getTicketRemark(ticketId);
+            })
+        } catch (error) {
+            notification.warning({
+                duration: 1.5,
+                message: error,
+                placement: "bottomRight"
+            });
+        }
+    }
+
     useEffect(() => {
         getProduct();
     }, [])
@@ -284,7 +357,6 @@ export default function Dashboard3() {
         const resultUserChart = [...userChart.filter((o) => o.product === tabSelect)];
         setUserChartFilter(resultUserChart);
         setSlick2Count(Math.ceil(resultUserChart.length / 4));
-
     }, [tabSelect])
 
     useEffect(() => {
@@ -316,7 +388,9 @@ export default function Dashboard3() {
                                                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                             }
                                             options={product && product.map((x) => ({ value: x.Id, label: `${x.Name} - (${x.FullName})`, code: x.Name }))}
-                                            onChange={(value, item) => { setSelectProduct(value) }}
+                                            onChange={(value, item) => {
+                                                setSelectProduct(value);
+                                            }}
                                         >
                                         </Select>
                                     </Col>
@@ -496,12 +570,36 @@ export default function Dashboard3() {
 
                                         </Row>
 
+                                        {/* Product Tags */}
+                                        <Row style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
+                                            {
+                                                tabProduct.map((n, index) => (
+                                                    <Col span={2}>
+                                                        <Button
+                                                            type={
+                                                                (tabSelect === "" ? tabProduct[0]?.product : tabSelect) === n.product ? 'primary' : 'default'
+                                                            }
+                                                            shape='round'
+                                                            onClick={() => {
+                                                                if ((tabSelect === "" ? tabProduct[0]?.product : tabSelect) !== n.product) {
+                                                                    setFilterInfo({});
+                                                                }
+                                                                setTabSelect(n.product);
+                                                            }}
+                                                        >
+                                                            <label>{n.product}</label>
+                                                        </Button>
+                                                    </Col>
+                                                ))
+                                            }
+                                        </Row>
+
                                         {/* User Chart */}
-                                        <Row gutter={16} style={{ marginTop: "48px", padding: "0px 0px 24px 24px" }}>
+                                        <Row gutter={16} style={{ marginTop: "16px", padding: "0px 0px 24px 24px" }}>
                                             <Col span={14}>
                                                 <Card title="Summary By User" bordered={true} style={{ width: "100%" }} loading={loading} className="card-dashboard">
                                                     {
-                                                        userChartFilter.filter((o) => o.product === (tabSelect === "" ? tabProduct[0]?.product : tabSelect)).length !== 0
+                                                        userChartFilter.length !== 0
                                                             ?
                                                             <div style={{ padding: "24px 24px 0px 24px" }}>
                                                                 <Slider
@@ -709,9 +807,7 @@ export default function Dashboard3() {
                                                         filters={columnIssueTypeFilter}
                                                         filteredValue={filterInfo.IssueType || null}
                                                         onFilter={(value, record) => {
-
                                                             return record.IssueType.toLowerCase().includes(value.toLowerCase())
-                                                            //return record.IssueType.includes(value)
                                                         }}
                                                     />
                                                     <Table.Column
@@ -767,9 +863,7 @@ export default function Dashboard3() {
                                                         filters={columnDevFilter}
                                                         filteredValue={filterInfo.DevTeamLead || null}
                                                         onFilter={(value, record) => {
-                                                            //console.log("onFilter", record)
                                                             return record.DevTeamLead === null ? "" : record.DevTeamLead.toLowerCase().includes(value.toLowerCase())
-                                                            // return record.DevTeamLead.includes(value)
                                                         }}
                                                         render={(value) => {
                                                             return (
@@ -836,6 +930,34 @@ export default function Dashboard3() {
                                                         width='100px'
                                                         align='center'
                                                     />
+                                                    <Table.Column
+                                                        title='Remark'
+                                                        align='center'
+                                                        width='100px'
+                                                        render={(value, record) => {
+                                                            return (
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'center' }}>
+                                                                        <Icon icon="material-symbols:info-outline" width="24" height="24"
+                                                                            style={{
+                                                                                cursor: 'pointer',
+                                                                                color: record.RemarkCnt > 1 ? "orange" : ""
+                                                                            }}
+
+                                                                            onClick={() => {
+                                                                                setSelectTicket({
+                                                                                    ticketId: record.TicketId,
+                                                                                    ticketNumber: record.Number
+                                                                                })
+                                                                                getTicketRemark(record.TicketId)
+                                                                                setOpenDrawer(true);
+                                                                            }}
+                                                                        />
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }}
+                                                    />
                                                 </Table>
                                             </Col>
                                         </Row>
@@ -845,6 +967,96 @@ export default function Dashboard3() {
                     </Col>
                 </Row >
             </Spin >
+
+            <Drawer title={selectTicket.ticketNumber} placement="right"
+                width={600}
+                visible={openDrawer}
+                closable={true}
+                onClose={() => {
+                    setOpenDrawer(false);
+                    editorRef.current.setvalue("");
+                }}
+                footer={
+                    <div
+                        style={{
+                            textAlign: 'right',
+                        }}
+                    >
+                        <TextEditor
+                            ref={editorRef}
+                            init={{
+                                toolbar1: ['undo redo | bold italic underline forecolor backcolor fontsizeselect'],
+                                toolbar2: ['alignleft aligncenter alignright alignjustify bullist numlist preview']
+                            }}
+                        />
+
+                        <Button
+                            loading={drawerLoading}
+                            onClick={() => editorRef.current.setvalue("")}
+                            style={{ marginTop: 12 }}
+                        >
+                            Clear
+                        </Button>
+                        &nbsp;&nbsp; &nbsp;&nbsp;
+
+                        <Button
+                            type="primary"
+                            loading={drawerLoading}
+                            onClick={() => saveTicketRemark(selectTicket?.ticketId)}
+                            style={{
+                                backgroundColor: "#00CC00",
+                                marginTop: 12
+                            }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <Spin spinning={drawerLoading}>
+                    <List
+                        itemLayout="horizontal"
+                        dataSource={ticketRemark}
+                        renderItem={item => (
+                            <List.Item key={item.ticketId}>
+                                <List.Item.Meta key={item.ticketId}
+                                    avatar={
+                                        <Avatar size={24} src={item.profileImg}
+                                            icon={item.email.substring(0, 1).toLocaleUpperCase()}
+                                        />
+                                    }
+                                    title={
+                                        <>
+                                            <label
+                                                style={{ marginLeft: 10 }}
+                                            >
+                                                {item.userName}
+                                            </label>
+                                            <label
+                                                style={{ marginLeft: 30, color: "orange" }}
+                                            >
+                                                {item.remarkDate}
+                                            </label>
+                                        </>
+                                    }
+                                    description={
+                                        <>
+                                            <div dangerouslySetInnerHTML={{ __html: item.description }}
+                                                style={{
+                                                    textOverflow: "ellipsis",
+                                                    overflow: "hidden",
+                                                }}
+                                            >
+                                            </div>
+                                        </>
+                                    }
+                                />
+                            </List.Item>
+                        )}
+                    >
+                    </List>
+                </Spin>
+            </Drawer >
         </MasterPage >
     )
 }
