@@ -115,7 +115,6 @@ export default function AllDashBoard() {
                 url: "/internal/dashboard/okr/dashboard_okr1"
             }
 
-
         ]
 
     const searchDashboard = (param) => {
