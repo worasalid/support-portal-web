@@ -313,54 +313,61 @@ export default function All() {
                           onClick={() => {
                             customerdispatch({ type: "SELECT_DATAROW", payload: record })
                             setHistoryduedate_visible(true)
-                          }
-                          }
+                          }}
                         >
                           DueDate ถูกเลื่อน
                         </Tag> : ""
                       }
-
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column
                 title="ProgressStatus"
-                width="10%"
+                width="15%"
                 align="center"
                 render={(record) => {
                   return (
                     <>
-                      <div hidden={record.GroupStatus === "Resolved" ? false : true}>
-                        <label className="table-column-text11">{record.GroupStatus}</label>
-                        <br />
-                        <label className="table-column-text11">
-                          {moment(record.ResolvedDate).format("DD/MM/YYYY")}
-                        </label>
-                      </div>
-
-                      <div hidden={record.GroupStatus === "Complete" || record.GroupStatus === "Completed" ? false : true}>
-                        <label className="table-column-text11">
-                          {record.GroupStatus} <br />
-                          {moment(record.CompleteDate).format("DD/MM/YYYY")}
-                        </label>
-                      </div>
-
-                      <div hidden={(record.GroupStatus === "Complete" || record.GroupStatus === "Completed") || record.GroupStatus === "Resolved" ? true : false}>
-                        <label className="table-column-text11">{record.GroupStatus}</label>
-                        <br />
-                        <label className="table-column-text11">
-                          {record.ProgressStatus === null || record.ProgressStatus === record.GroupStatus ? "" : `(${record.ProgressStatus})`}
-                        </label>
-                      </div>
+                      {
+                        record.GroupStatus === "Resolved"
+                          ?
+                          <>
+                            <label className="table-column-text11">{record.GroupStatus}</label>
+                            <br />
+                            <label className="table-column-text11">
+                              {record.ProgressStatus === null ? "" : `(${record.ProgressStatus})`}
+                            </label>
+                            <br />
+                            <label className="table-column-text11">
+                              {moment(record.ResolvedDate).format("DD/MM/YYYY")}
+                            </label>
+                          </>
+                          :
+                          record.GroupStatus === "Complete" || record.GroupStatus === "Completed" ?
+                            <>
+                              <label className="table-column-text11">
+                                {record.GroupStatus} <br />
+                                {moment(record.CompleteDate).format("DD/MM/YYYY")}
+                              </label>
+                            </>
+                            :
+                            <>
+                              <label className="table-column-text11">{record.GroupStatus}</label>
+                              <br />
+                              <label className="table-column-text11">
+                                {record.ProgressStatus === null || record.ProgressStatus === record.GroupStatus ? "" : `(${record.ProgressStatus})`}
+                              </label>
+                              <br />
+                            </>
+                      }
                     </>
                   );
                 }}
               />
               <Column title={<DownloadOutlined style={{ fontSize: 30 }} />}
-                width="10%"
+                width="5%"
                 align="center"
                 render={(record) => {
                   return (
@@ -376,7 +383,7 @@ export default function All() {
                         {record.cntFile === 0 ? "" : <DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
                       </Button>
 
-                      {/* FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา*/}
+                      {/* FileUrl จากระบบเดิม แสดงเฉพาะ เคสที่ Migrate ข้อมูลมา */}
                       <Button type="link"
                         hidden={record.FileUrl === "" ? true : false}
                         icon={<DownloadOutlined style={{ fontSize: 30, color: "#007bff" }} />}
@@ -387,8 +394,7 @@ export default function All() {
                       </Button>
                     </>
                   )
-                }
-                }
+                }}
               />
             </Table>
           </Col>

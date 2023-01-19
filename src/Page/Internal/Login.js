@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 import AuthenContext from '../../utility/authenContext';
 
 import { GoogleLogin } from 'react-google-login';
+import { PublicClientApplication } from '@azure/msal-browser';
 
 export default function NormalLoginForm() {
   const { state, dispatch } = useContext(AuthenContext);
@@ -54,6 +55,62 @@ export default function NormalLoginForm() {
       });
 
       setLoading(false);
+    }
+  }
+
+  const azureLogin = async () => {
+    const msalInstance = new PublicClientApplication({
+      auth: {
+        clientId: process.env.REACT_APP_AZURE_CLIENT_ID,
+        authority: process.env.REACT_APP_AZURE_AUTHORITY,
+        redirectUri: process.env.REACT_APP_WEB_URL
+      },
+      cache: {
+        cacheLocation: "sessionStorage",
+        storeAuthStateInCookie: true
+      }
+    });
+
+    try {
+      const result = await msalInstance.loginPopup({
+        scopes: ['user.read'],
+        prompt: "select_account"
+      });
+
+      if (result.accessToken) {
+        setLoading(true);
+        await axios(`${process.env.REACT_APP_API_URL}/auth/microsoft/user`, {
+          method: "POST",
+          data: {
+            email: result?.account?.username,
+          }
+        }).then((res) => {
+          setLoading(false);
+          localStorage.setItem("sp-ssid", res.data.ssid);
+          dispatch({ type: 'Authen', payload: true });
+          dispatch({ type: 'LOGIN', payload: res.data.usersdata });
+          history.push("/internal/mydashboard");
+          window.location.reload(true);
+
+        }).catch((error) => {
+          setLoading(false);
+          Modal.error({
+            title: 'Login ไม่สำเร็จ',
+            content: (
+              <div>
+                <p>{error.response.data}</p>
+                <p>กรุณาติดต่อ ผู้ดูแลระบบ</p>
+              </div>
+            ),
+            okText: "Close",
+            onOk() {
+
+            },
+          });
+        })
+      }
+    } catch (error) {
+      console.log("close")
     }
   }
 
@@ -116,8 +173,6 @@ export default function NormalLoginForm() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            //background: "#ccc",
-
           }}
         >
           <Form
@@ -188,21 +243,35 @@ export default function NormalLoginForm() {
               </Button>
             </Form.Item>
 
-            <div
+            {/* <div
               style={{ textAlign: "center", borderRadius: 10 }}
             >
               <GoogleLogin
                 clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}
-                // clientId="353179342338-988knc9gv71ct89cmdo7ap7go7renato.apps.googleusercontent.com"
                 onSuccess={responseGoogle}
                 onFailure={responseGoogle}
                 cookiePolicy={'single_host_origin'}
-              // scope='https://www.googleapis.com/auth/drive.file'
               />
+            </div> */}
+
+            <div
+              style={{
+                textAlign: "center",
+                borderRadius: 10,
+              }}
+            >
+              <Button
+                style={{
+                  borderRadius: 5, height: "50px", boxShadow: "rgb(0 0 0 / 24%) 0px 2px 2px 0px, rgb(0 0 0 / 24%) 0px 0px 1px 0px"
+                }}
+                onClick={azureLogin}
+              >
+                <img src={`${process.env.PUBLIC_URL}/logo-microsoft.svg`} alt="microsoft" width={16} height={16} style={{ marginRight: 16 }} />
+                Sign in with Microsoft
+              </Button>
             </div>
-
-
           </Form>
+
         </div>
         <div style={{ position: "fixed", bottom: 30, right: 30 }}>
           <label style={{ fontSize: 14, color: "white" }}>

@@ -42,7 +42,7 @@ import DashBoard_CMMI6 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6';
 import DashBoard_CMMI6_1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6_1';
 import DashBoard_OKR1 from './Page/Internal/DashBoard/OKR/Dashboard_OKR1';
 
-
+// Issue
 import AllIssue from './Page/Internal/Issue/All';
 import AllTask from './Page/Internal/Issue/AllTask';
 import MyTask from './Page/Internal/Issue/MyTask';
@@ -52,6 +52,10 @@ import SubTask from './Page/Internal/Issue/SubTask'
 import Resolved from './Page/Internal/Issue/Resolved';
 import Complete from './Page/Internal/Issue/Complete';
 import Cancel from './Page/Internal/Issue/Cancel';
+import ManualTask from './Page/Internal/Issue/ManualPage/ManualTask';
+import ManualPageSubject from './Page/Internal/Issue/ManualPage/Subject';
+
+// Ricef
 import Ricef from './Page/Internal/Ricef/Ricef';
 import RicefHeader from './Page/Internal/Ricef/RicefHeader';
 import RicefDetails from './Page/Internal/Ricef/RicefDetails';
@@ -95,6 +99,8 @@ import UserManual from './Page/Internal/Setting/System/UserManual';
 import ConfigOrganize from './Page/Internal/Setting/System/ConfigOrganize';
 import FlowApprove from './Page/Internal/Setting/System/ConfigFlow/FlowApprove';
 import FlowDeploy from './Page/Internal/Setting/System/ConfigFlow/FlowDeploy';
+import ConfigComplainType from './Page/Internal/Setting/System/ConfigComplain';
+import ConfigComplainEmail from './Page/Internal/Setting/System/ConfigComplainEmail';
 
 import Migration from './Page/Internal/Migration/Migration';
 import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
@@ -103,6 +109,7 @@ import ScriptSQL from './Page/Internal/Migration/ScriptSQL';
 import IssueCreate from "./Page/Customer/ServiceDesk/IssueCreate";
 import ServiceDesk from "./Page/Customer/ServiceDesk/Index";
 import IssueMenu from "./Page/Customer/ServiceDesk/IssueMenu";
+import CustomerComplain from "./Page/Customer/ServiceDesk/Complain";
 
 // Call Center Service
 import CallService from './Page/Internal/ServiceDesk/CallService';
@@ -168,6 +175,8 @@ export default function Routes() {
                                     <Route path="/internal/setting/system/flow-config" exact component={ConfigFlow} />
                                     <Route path="/internal/setting/system/flow-config/flow-deploy" component={FlowDeploy} />
                                     <Route path="/internal/setting/system/flow-config/flow-approve" component={FlowApprove} />
+                                    <Route path="/internal/setting/system/customer-complain" exact component={ConfigComplainType} />
+                                    <Route path="/internal/setting/system/email_config/complain" exact component={ConfigComplainEmail} />
 
 
                                     {/* dashboard */}
@@ -194,6 +203,7 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/allissue" exact component={Dashboard_AllIssue} />
                                     <Route path="/internal/dashboard/okr/dashboard_okr1" exact component={DashBoard_OKR1} />
 
+                                    
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
                                     <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />
@@ -204,6 +214,9 @@ export default function Routes() {
                                     <Route path="/internal/issue/subject/:id?" exact component={Subject} />
                                     <Route path="/internal/issue/subject/:id?/task-:task?" exact component={SubTask} />
                                     <Route path="/internal/report/charts" exact component={Charts} />
+                                    <Route path="/internal/issue/manual-task" exact component={ManualTask} />
+                                    <Route path="/internal/issue/manual-task/subject/:id?" exact component={ManualPageSubject} />
+
 
                                     {/* Patch */}
                                     <Route path="/internal/patch/cut_of_patch" exact component={IssuePatch} />
@@ -227,6 +240,7 @@ export default function Routes() {
                                     <Route path="/customer/servicedesk" exact component={ServiceDesk} />
                                     <Route path="/customer/servicedesk/issuemenu" exact component={IssueMenu} />
                                     <Route path="/customer/servicedesk/issuecreate/:id?" exact component={IssueCreate} />
+                                    <Route path="/customer/servicedesk/complain" exact component={CustomerComplain} />
                                     <Route path="/customer/dashboard/all" exact component={CustomerDashboardAll} />
                                     <Route path="/customer/dashboard" exact component={CustomerDashboard} />
                                     <Route path="/customer/issue/all-issue" exact component={CustomerAllIssue} />

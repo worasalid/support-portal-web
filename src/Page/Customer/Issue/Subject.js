@@ -237,8 +237,25 @@ export default function Subject() {
 
         return (modalSendissue_visible(true))
       }
+
       if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
-      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") {
+        Modal.confirm({
+          title: 'กรุณาตรวจสอบข้อมูล ',
+          content: (
+            <div>
+              <p>หลังจากการ Update Patch / Deploy  ก่อนการปิด Complete ทุกครั้ง</p>
+            </div>
+          ),
+          cancelText: "ยกเลิก",
+          okText: "ดำเนินการต่อ",
+          onOk() {
+            setModalcomplete_visible(true)
+          },
+        });
+      }
+
       if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
 
@@ -274,7 +291,19 @@ export default function Subject() {
         setModalcancel_visible(true)
       }
       if (item.data.value === "Complete") {
-        setModalcomplete_visible(true)
+        Modal.confirm({
+          title: 'กรุณาตรวจสอบข้อมูล ',
+          content: (
+            <div>
+              <p>หลังจากการ Update Patch / Deploy  ก่อนการปิด Complete ทุกครั้ง</p>
+            </div>
+          ),
+          cancelText: "ยกเลิก",
+          okText: "ดำเนินการต่อ",
+          onOk() {
+            setModalcomplete_visible(true)
+          },
+        });
       }
     }
 
@@ -283,8 +312,25 @@ export default function Subject() {
       if (item.data.NodeName === "customer" && item.data.value === "AssignIcon" || item.data.value === "Pass" || item.data.value === "SendInfo") {
         return (modalSendissue_visible(true))
       }
+
       if (item.data.NodeName === "customer" && item.data.value === "ReOpen") { return (setModalreopen_visible(true)) }
-      if (item.data.NodeName === "customer" && item.data.value === "Complete") { return (setModalcomplete_visible(true)) }
+
+      if (item.data.NodeName === "customer" && item.data.value === "Complete") {
+        Modal.confirm({
+          //title: 'กรุณาตรวจสอบข้อมูล ',
+          content: (
+            <div>
+              <p>กรุณาตรวจสอบข้อมูล ก่อนการปิด Complete ทุกครั้ง</p>
+            </div>
+          ),
+          cancelText: "ยกเลิก",
+          okText: "ดำเนินการต่อ",
+          onOk() {
+            setModalcomplete_visible(true)
+          },
+        });
+      }
+
       if (item.data.NodeName === "customer" && item.data.value === "Cancel") { return (setModalcancel_visible(true)) }
     }
 
@@ -550,7 +596,6 @@ export default function Subject() {
     }
   }, [customerstate?.issuedata?.details[0]?.Id])
 
-
   return (
     <MasterPage>
 
@@ -685,9 +730,9 @@ export default function Subject() {
                             value={customerstate.issuedata.details[0] && customerstate.issuedata.details[0].ProgressStatus}
                             options={customerstate && customerstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
                             disabled={
-                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === false ? true : 
-                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === true ? false :
-                              mailbox?.MailType === "in" && mailbox?.GroupStatus !== "Open" ? false : true
+                              mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === false ? true :
+                                mailbox?.MailType === "in" && mailbox?.GroupStatus === "Open" && permission.send_flow_to_icon === true ? false :
+                                  mailbox?.MailType === "in" && mailbox?.GroupStatus !== "Open" ? false : true
                             }
                           >
                           </Select>
@@ -746,7 +791,11 @@ export default function Subject() {
                                 placeholder="None"
                                 onChange={onChange}
                                 value={customerstate?.issuedata?.details[0]?.Priority}
-                                options={customerstate?.masterdata?.priorityState.map((x) => ({ value: x.Id, label: x.Name, group: "priority" }))}
+                                options={
+                                  (customerstate?.issuedata?.details[0]?.IssueType === "ChangeRequest" || customerstate?.issuedata?.details[0]?.IssueType === "Memo") ?
+                                    customerstate?.masterdata?.priorityState.filter(f => f.Name !== "Critical").map((x) => ({ value: x.Id, label: x.Name, group: "priority" })) :
+                                    customerstate?.masterdata?.priorityState.map((x) => ({ value: x.Id, label: x.Name, group: "priority" }))
+                                }
                               />
                           }
                         </Col>

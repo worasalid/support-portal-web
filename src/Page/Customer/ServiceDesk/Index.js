@@ -3,7 +3,7 @@ import { Card } from 'antd'
 import { useHistory } from "react-router-dom";
 import MasterPage from "./MasterPage"
 // import AuthenContext from '../../../utility/authenContext';  
-import { HomeOutlined, SendOutlined, CommentOutlined } from '@ant-design/icons';
+import { HomeOutlined, SendOutlined, CommentOutlined, NotificationOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
 
@@ -49,6 +49,22 @@ export default function Index() {
                         description="เข้าสู่ หน้าหลัก / Home"
                     />
                 </Card>
+                {/* <Card className="card-box issue-active" bordered hoverable
+                    style={{ marginTop: 30 }}
+                    onClick={() => {
+                        history.push({ pathname: "/customer/servicedesk/complain" })
+                        window.location.reload(true);
+                    }
+                    }
+                >
+                    <Meta
+                        avatar={
+                            <NotificationOutlined style={{ fontSize: 30 }} />
+                        }
+                        title={<label className="card-title-menu">Complaint</label>}
+                        description="แจ้งเรื่องร้องเรียน / ข้อเสนอแนะ"
+                    />
+                </Card> */}
             </div>
             <div style={{ position: "fixed", bottom: 30, right: 30 }}>
                 <label style={{ fontSize: 14, color: "gray" }}>

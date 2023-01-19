@@ -302,8 +302,6 @@ export default function IssueCreate() {
         // }
     }, [fileList.length]);
 
-    console.log("priorityState", customerstate?.masterdata?.productState[0]?.Name)
-    console.log("productState", customerstate?.masterdata?.productState?.length)
     return (
         <MasterPage>
             <div style={{ padding: 24 }}>

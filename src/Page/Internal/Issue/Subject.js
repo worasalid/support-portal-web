@@ -15,7 +15,7 @@ import Axios from "axios";
 import AuthenContext from "../../../utility/authenContext";
 import IssueContext, { userReducer, userState } from "../../../utility/issueContext";
 import ModalDueDate from "../../../Component/Dialog/Internal/modalDueDate";
-// import Clock from "../../../utility/countdownTimer";
+import _ from 'lodash'
 import ClockSLA from "../../../utility/SLATime";
 import moment from "moment";
 import TabsDocument from "../../../Component/Subject/Customer/tabsDocument";
@@ -95,6 +95,7 @@ export default function Subject() {
   const [history_loading, setHistory_loading] = useState(false);
   const [duedateType, setDuedateType] = useState(null);
   const [sla, setSLA] = useState(0);
+  const [taskProcess, serTaskProcess] = useState(0);
 
   const [btnBackTop, setBtnBackTop] = useState(false);
   const scrollRef = useRef(null);
@@ -200,7 +201,6 @@ export default function Subject() {
 
   // Load flow ที่จะใช้ในการ Action งาน
   const getflow_output = async (trans_id) => {
-
     try {
       const flow_output = await Axios({
         url: process.env.REACT_APP_API_URL + "/workflow/action_flow",
@@ -225,7 +225,26 @@ export default function Subject() {
     } catch (error) {
 
     }
+  }
 
+  const getFlowByNode = async () => {
+    await Axios({
+      url: process.env.REACT_APP_API_URL + "/workflow/flowoutput-bynode",
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      data: {
+        flowId: userstate?.mailbox[0]?.FlowId,
+        nodeId: userstate?.mailbox[0]?.NodeId,
+        nodeActionId: userstate?.mailbox[0]?.FlowId === 2 ? 20 : 65
+      }
+    }).then((res) => {
+      userdispatch({
+        type: "LOAD_ACTION_FLOW",
+        payload: res.data.filter((item) => item.Type === "Issue" || item.Type === null)
+      });
+    });
   }
 
   // Load ข้อมูล Detail ของ Issue และ ข้อมูล mailbox ล่าสุด
@@ -270,6 +289,33 @@ export default function Subject() {
     })
   }
 
+  const getTaskList = async () => {
+    await Axios({
+      url: process.env.REACT_APP_API_URL + "/tickets/load-task",
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+      },
+      params: {
+        ticketId: match.params.id
+      }
+    }).then((res) => {
+      serTaskProcess(_.differenceWith(res.data, ['Close', 'Cancel'], ({ Status }, value) => value === Status).length)
+      // setTaskData(res.data.map((item) => {
+      //   return {
+      //     taskId: item.TaskId,
+      //     title: item.Title,
+      //     module: item.ModuleName,
+      //     status: item.Status,
+      //     flowstatus: item.FlowStatus,
+      //     description: item.Description,
+      //     releasenote: item.IsReleaseNote,
+      //     manday: item.Manday,
+      //   }
+      // }));
+    });
+  }
+
   // Update ข้อมูล
   const SaveIssueType = async (value, item) => {
     const issuetype = await Axios({
@@ -281,7 +327,8 @@ export default function Subject() {
       data: {
         ticketid: userstate.issuedata.details[0] && userstate.issuedata.details[0].Id,
         typeid: value,
-        transid: userstate?.mailbox[0]?.TransId
+        transid: userstate?.mailbox[0]?.TransId,
+        nodeid: userstate?.mailbox[0]?.NodeId
       }
     }).then(() => {
       Modal.success({
@@ -475,12 +522,11 @@ export default function Subject() {
     });
   }
 
-
   // Fuction 
   function HandleChange(value, item) {
     setProgressStatus(item.label);
     userdispatch({ type: "SELECT_NODE_OUTPUT", payload: item.data })
-
+    console.log("item.data", item.data)
     // Bug Flow
     if (userstate.issuedata.details[0]?.IssueType === "Bug") {
       if (userstate?.mailbox[0]?.NodeName === "support") {
@@ -584,7 +630,7 @@ export default function Subject() {
         if (item.data.value === "SendManday") {
           setModalsendissue_visible(true)
         }
-        if (item.data.value === "ConfirmManday") {
+        if (item.data.value === "ConfirmManday" || item.data.value === "RejectManday") {
           setModalsendissue_visible(true)
         }
         if (item.data.value === "SendDueDate" || item.data.value === "RequestDueDate") {
@@ -625,7 +671,6 @@ export default function Subject() {
       if (userstate?.mailbox[0]?.NodeName === "cr_center") {
         if (item.data.value === "RequestInfo") {
           setModalsendissue_visible(true)
-
         }
 
         if (item.data.value === "SendToSA") {
@@ -716,9 +761,25 @@ export default function Subject() {
         }
 
         if (item.data.value === "SendFileDeploy") {
-          setModalsendissue_visible(true);
-        }
+          if (userstate.issuedata.details[0]?.taskComplete > 0) {
+            Modal.warning({
+              title: 'มี Task งานที่ยังไม่ Deploy',
+              content: (
+                <div>
+                  <label style={{ color: "red", fontSize: 12 }}> *** กรุณา Deploy งานก่อน</label>
+                </div>
+              ),
+              okText: "Close",
+              onOk() {
 
+              }
+            });
+          }
+
+          if (userstate.issuedata.details[0]?.taskComplete === 0) {
+            setModalsendissue_visible(true);
+          }
+        }
       }
 
       if (userstate?.mailbox[0]?.NodeName === "sa") { return setModalsa_visible(true) }
@@ -789,19 +850,39 @@ export default function Subject() {
         },
         onOk() {
           if (item.type === "issuetype") {
-            SaveIssueType(value);
+            if (taskProcess > 0) {
+              Modal.warning({
+                title: 'กรุณาปิด Task งาน (Close Task)',
+                okText: "Close"
+              });
+
+            } else {
+              SaveIssueType(value);
+            }
           }
+
           if (item.type === "priority") {
             UpdatePriority(value, item)
           }
+
           if (item.type === "scene") {
             updateScene(value, item)
           }
+
           if (item.type === "version") {
             updateVersion(value, item)
           }
+
           if (item.type === "product") {
-            updateProduct(value, item)
+            if (taskProcess > 0) {
+              Modal.warning({
+                title: 'กรุณาปิด Task งาน (Close Task)',
+                okText: "Close"
+              });
+
+            } else {
+              updateProduct(value, item)
+            }
           }
         },
       });
@@ -845,20 +926,21 @@ export default function Subject() {
     if (userstate?.issuedata?.details[0] !== undefined) {
       getMailBox();
       getdetail();
-
     }
+
     if (userstate?.mailbox[0]?.NodeName === "support") {
       // setTabKey("1");
       if (userstate?.mailbox[0]?.NodeName !== "support" && userstate?.mailbox[0]?.NodeName !== undefined) {
         setTabKey("4")
       }
     }
-  }, [])
 
+  }, [])
 
   useEffect(() => {
     if (userstate?.mailbox[0]?.TransId !== undefined) {
       getflow_output(userstate?.mailbox[0]?.TransId);
+      getTaskList();
     }
   }, [userstate?.mailbox[0]?.TransId])
 
@@ -868,7 +950,6 @@ export default function Subject() {
       getdetail();
     }
   }, [modalChangeduedate])
-
 
   useEffect(() => {
     if (historyduedate_visible) {
@@ -881,6 +962,10 @@ export default function Subject() {
       // getdetail();
     }
   }, [modalSaveDuedate])
+
+  useEffect(() => {
+    getTaskList();
+  }, [])
 
 
   const tabDocDetail = useMemo(() => {
@@ -1046,8 +1131,8 @@ export default function Subject() {
                     }}>
                     <Button icon={<FileAddOutlined />}
                       shape="round"
-                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
-                        Modal.info({
+                      onClick={() => userstate.issuedata.details[0]?.InternalPriority === null || userstate.issuedata.details[0]?.InternalPriority === "None" ?
+                        Modal.warning({
                           title: 'กรุณา ระบุ Priority',
                           okText: "Close"
                         })
@@ -1148,22 +1233,22 @@ export default function Subject() {
                         ? <Select ref={selectRef}
                           value={userstate?.mailbox[0]?.FlowStatus}
                           style={{ width: '100%' }} placeholder="None"
-                          //onClick={() => getflow_output(userstate?.mailbox[0]?.TransId)}
-                          onClick={() => userstate.issuedata.details[0]?.InternalPriority === null ?
+                          onClick={() => (userstate.issuedata.details[0]?.InternalPriority === null || userstate.issuedata.details[0]?.InternalPriority === "None") ?
                             Modal.warning({
                               title: 'กรุณา ระบุ Priority',
                               okText: "Close"
                             })
-                            : getflow_output(userstate?.mailbox[0]?.TransId)}
+                            : taskProcess === 0 && userstate?.mailbox[0]?.NodeName === "cr_center" ? getFlowByNode() : getflow_output(userstate?.mailbox[0]?.TransId)}
                           onChange={(value, item) => HandleChange(value, item)}
-                          options={userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))}
+                          options={
+                            userstate.actionflow && userstate.actionflow.map((x) => ({ value: x.FlowOutputId, label: x.TextEng, data: x }))
+                          }
                         />
-
                         : <label className="value-text">{userstate?.mailbox[0]?.FlowStatus}</label>
                     }
-
                   </Col>
                 </Row>
+
                 <Row style={{ marginBottom: 20 }} align="middle">
                   <Col span={24}>
                     <label className="header-text">Priority</label>

@@ -193,7 +193,6 @@ export default function Mytask() {
                       <label>{pageTotal}</label>
                       {/* <label> จากทั้งหมด : </label>
                       <label>{pageTotal}</label> */}
-
                     </div>
                   </>
                 )
@@ -214,8 +213,7 @@ export default function Mytask() {
                 return (
                   (index === recHover ? "table-hover" : "")
                 )
-              }
-              }
+              }}
             >
 
               <Column title="IssueNo" width="5%"
@@ -352,13 +350,11 @@ export default function Mytask() {
                             className="table-column-detail">
                             รายละเอียด
                           </label>
-
                         </Col>
                       </Row>
                     </>
                   )
-                }
-                }
+                }}
               />
               <Column title="Issue By" width="10%"
                 align="center"
@@ -385,13 +381,11 @@ export default function Mytask() {
                           </label>
                         </Tag>
                       </Tooltip>
-
                     </>
                   )
-                }
-
-                }
+                }}
               />
+
               <Column title="Due Date" width="10%"
                 align="center"
                 render={(record) => {
@@ -437,8 +431,7 @@ export default function Mytask() {
                       </div>
                     </>
                   )
-                }
-                }
+                }}
               />
 
               <Column
@@ -605,7 +598,7 @@ export default function Mytask() {
 export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
 
   const calculateTime = new CalculateTime();
-  
+
   function rederSLAPriority(sla, ticket_sla, priority) {
     switch (priority) {
       case 'Critical':

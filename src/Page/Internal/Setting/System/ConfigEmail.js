@@ -20,6 +20,12 @@ export default function ConfigEmail() {
             topic: "ตั้งค่า Email Patch Update",
             description: 'ส่งเมล์ แจ้งกรณี update patch version',
             url: "/internal/setting/system/email_config/patch"
+        },
+        {
+            key: '3',
+            topic: "ตั้งค่า Email Customer Complaint",
+            description: 'ส่งเมล์ แจ้งกรณีลูกค้ามีการ Complaint',
+            url: "/internal/setting/system/email_config/complain"
         }
     ]
     return (
@@ -52,7 +58,7 @@ export default function ConfigEmail() {
                     render={(record) => {
                         return (
                             <>
-                                <Button onClick={() => history.push({pathname: record.url})} >
+                                <Button onClick={() => history.push({ pathname: record.url })} >
                                     view
                                 </Button>
                             </>

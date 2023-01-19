@@ -306,7 +306,7 @@ export default function DashBoard_OKR1() {
                                                         <Spin spinning={loading}>
                                                             <Row>
                                                                 <Col span={24} style={{ textAlign: "left" }}>
-                                                                    <label style={{ color: "orange" }}>จำนวน ค่าเฉลี่ย</label>
+                                                                    <label style={{ color: "orange"}}>จำนวน ค่าเฉลี่ย</label>
                                                                 </Col>
                                                             </Row>
                                                             <Column {...chartData_config}
