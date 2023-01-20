@@ -1948,7 +1948,7 @@ export function RenderSLA({ sla = 0, ticket_sla = 0, priority = "" }) {
 
               <label className="value-text">
                 {
-                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countcountSLACriticalDownSLA(sla, ticket_sla).en_1.d}d `
+                  calculateTime.countSLACritical(sla, ticket_sla).en_1.d === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.d}d `
                 }
                 {
                   calculateTime.countSLACritical(sla, ticket_sla).en_1.h === 0 ? "" : `${calculateTime.countSLACritical(sla, ticket_sla).en_1.h}h `
