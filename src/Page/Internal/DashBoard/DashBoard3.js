@@ -48,11 +48,10 @@ export default function Dashboard3() {
     const [tabSelect, setTabSelect] = useState("");
 
     // table filter
-    const [filterInfo, setFilterInfo] = useState({})
+    const [filterInfo, setFilterInfo] = useState({ NodeName: ['H.DEV', 'DEV'] })
     const [columnIssueTypeFilter, setColumnIssueTypeFilter] = useState([]);
     const [columnNodeFilter, setColumnNodeFilter] = useState([]);
     const [columnDevFilter, setColumnDevFilter] = useState([]);
-
 
     const chartData_config = {
         xField: 'CompanyName',
@@ -340,6 +339,8 @@ export default function Dashboard3() {
     }, [selectProduct.length, selectDate && selectDate[0], isStack]);
 
     useEffect(() => {
+        setFilterInfo({ NodeName: ['H.DEV', 'DEV'] })
+
         setColumnNodeFilter(_.uniqBy(excelData.filter(f => f.Product === tabSelect), 'NodeName').map((item) => {
             return {
                 text: item.NodeName === null ? "" : item.NodeName,
