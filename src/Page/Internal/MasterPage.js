@@ -146,11 +146,9 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       //notiRef.current.getNoti();
       CountStatus();
     } else {
-      setInterval(() => {
-        //getNotification();
-        //notiRef.current.getNoti();
-        CountStatus();
-      }, 500000)
+      // setInterval(() => {
+      //   CountStatus();
+      // }, 500000)
     }
   }, [state.authen])
 

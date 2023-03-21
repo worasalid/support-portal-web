@@ -394,15 +394,7 @@ export function PageResolved() {
                 render={(record) => {
                   return (
                     <>
-                      {/* <div style={{ display: record.IssueType === "Bug" ? "block" : "none" }}>
-                        <ClockSLA
-                          start={moment(record.AssignIconDate)}
-                          due={moment(record.SLA_DueDate)}
-                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-                          type={record.Priority}
-                        />
-                      </div> */}
-                      <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} />
+                      {/* <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} /> */}
                     </>
                   )
                 }

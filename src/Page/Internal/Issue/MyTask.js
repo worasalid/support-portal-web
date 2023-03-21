@@ -462,14 +462,7 @@ export default function Mytask() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        {/* <ClockSLA
-                          start={moment(record.AssignIconDate)}
-                          due={moment(record.SLA_DueDate)}
-                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-                          type={record.Priority}
-                        /> */}
-                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} />
-
+                        {/* <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} /> */}
                       </div>
                     </>
                   )
