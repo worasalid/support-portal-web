@@ -423,20 +423,7 @@ export default function AllTask() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        {/* <Clock
-                          showseconds={false}
-                          deadline={record.DueDate}
-                          createdate={record.AssignIconDate === null ? undefined : record.AssignIconDate}
-                          resolvedDate={record.ResolvedDate === null ? undefined : record.ResolvedDate}
-                          onClick={() => { setModaltimetracking_visible(true); userdispatch({ type: "SELECT_DATAROW", payload: record }) }}
-                        /> */}
-                        {/* <ClockSLA
-                          start={moment(record.AssignIconDate)}
-                          due={moment(record.DueDate)}
-                          end={record.ResolvedDate === null ? moment() : moment(record.ResolvedDate)}
-
-                        /> */}
-                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} />
+                        {/* <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} /> */}
                       </div>
                     </>
                   )
