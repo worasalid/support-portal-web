@@ -414,7 +414,7 @@ export default function AllIssue() {
                   return (
                     <>
                       <div style={{ display: record.IssueType === "Bug" && record.DueDate !== null ? "block" : "none" }}>
-                        <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} />
+                        {/* <RenderSLA sla={record.SLA} ticket_sla={record.TicketSLA} priority={record.Priority} /> */}
                       </div>
                     </>
                   )
