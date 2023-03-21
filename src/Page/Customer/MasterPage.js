@@ -110,10 +110,10 @@ export default function MasterPage({ bgColor = '#fff', ...props }) {
       CountStatus();
     } else {
       getuser();
-      setInterval(() => {
-        getNotification();
-        CountStatus();
-      }, 500000)
+      // setInterval(() => {
+      //   getNotification();
+      //   CountStatus();
+      // }, 500000)
     }
 
   }, [state.authen])

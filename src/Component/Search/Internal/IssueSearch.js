@@ -183,9 +183,9 @@ export default function Issuesearch({ Progress = "hide" }) {
 
         } else {
             getMasterdata();
-            setInterval(() => {
-                userdispatch({ type: "SEARCH", payload: true })
-            }, 300000)
+            // setInterval(() => {
+            //     userdispatch({ type: "SEARCH", payload: true })
+            // }, 300000)
         }
     }, [state.authen]);
 
