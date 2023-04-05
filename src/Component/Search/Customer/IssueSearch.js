@@ -156,14 +156,14 @@ export default function Issuesearch({ Progress = "hide", Version = "hide" }) {
         getPatch();
     }
 
-    // useEffect(() => {
-    //     if (state.usersdata !== null) {
-    //         setInterval(() => {
-    //             customerdispatch({ type: "SEARCH", payload: true })
-    //         }, 500000)
-    //         getMasterdata()
-    //     }
-    // }, [state.usersdata])
+    useEffect(() => {
+        if (state.usersdata !== null) {
+            // setInterval(() => {
+            //     customerdispatch({ type: "SEARCH", payload: true })
+            // }, 500000)
+            getMasterdata();
+        }
+    }, [state.usersdata])
 
 
     return (
