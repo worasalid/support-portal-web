@@ -41,6 +41,8 @@ import Dashboard_AllIssue from './Page/Internal/DashBoard/Issue/DashBoard_Issue6
 import DashBoard_CMMI6 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6';
 import DashBoard_CMMI6_1 from './Page/Internal/DashBoard/CMMI/DashBoard_CMMI6_1';
 import DashBoard_OKR1 from './Page/Internal/DashBoard/OKR/Dashboard_OKR1';
+import DashBoard_MGMT_1_Graph from './Page/Internal/DashBoard/MGMT/Dashboard_MGMT1_Graph';
+import DashBoard_MGMT_1_Table from './Page/Internal/DashBoard/MGMT/Dashboard_MGMT1_Table';
 
 // Issue
 import AllIssue from './Page/Internal/Issue/All';
@@ -202,8 +204,10 @@ export default function Routes() {
                                     <Route path="/internal/dashboard/dashboard6" exact component={DashBoard6} />
                                     <Route path="/internal/dashboard/allissue" exact component={Dashboard_AllIssue} />
                                     <Route path="/internal/dashboard/okr/dashboard_okr1" exact component={DashBoard_OKR1} />
+                                    <Route path="/internal/dashboard/mgmt/dashboard_mgmt1/graph" exact component={DashBoard_MGMT_1_Graph} />
+                                    <Route path="/internal/dashboard/mgmt/dashboard_mgmt1/table" exact component={DashBoard_MGMT_1_Table} />
 
-                                    
+
                                     <Route path="/internal/issue/other" exact component={AllIssue} />
                                     <Route path="/internal/issue/alltask" exact component={AllTask} />
                                     <Route path="/internal/issue/mytask/:id?" exact component={MyTask} />

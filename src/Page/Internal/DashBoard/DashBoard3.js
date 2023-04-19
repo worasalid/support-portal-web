@@ -442,7 +442,7 @@ export default function Dashboard3() {
         if (dataFilter?.length !== 0) {
         }
     }, [dataFilter?.length])
-console.log("tabSelectProduct",tabSelectProduct)
+
     return (
         <MasterPage bgColor="#f0f2f5">
 
