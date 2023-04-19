@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Table, Modal, Row, Col, Card } from 'antd';
+import React, { useContext } from 'react'
+import { Row, Col, Card } from 'antd';
 import { NotificationOutlined } from '@ant-design/icons'
-import Axios from 'axios';
+
 import MasterPage from '../../MasterPage';
 import { useHistory } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+
+import AuthenContext from "../../../../utility/authenContext";
 
 const { Meta } = Card;
 
 export default function SystemConfig() {
     const history = useHistory(null);
+    const { state, dispatch } = useContext(AuthenContext);
 
     return (
         <MasterPage bgColor="#f0f2f5">
@@ -87,7 +90,9 @@ export default function SystemConfig() {
                         </Card>
                     </Col>
 
-                    <Col xs={24} sm={24} md={12} lg={8} xl={6}>
+                    <Col xs={24} sm={24} md={12} lg={8} xl={6}
+                        hidden={state.usersdata?.users.code !== "I0017" ? true : false}
+                    >
                         <Card className="card-box issue-active" bordered hoverable
                             style={{ width: "100%" }}
                             onClick={() => history.push("/internal/setting/system/module")}
@@ -241,7 +246,7 @@ export default function SystemConfig() {
                                 title={<label className="card-title-menu">ข้อมูล หัวข้อการ Complaint</label>}
                                 description={
                                     <label className="value-text">
-                                        ตั้งค่าประเภทหัวข้อการ Complaint ของลูกค้า
+                                        ตั้งค่าประเภทหัวข้อการ Complaint
                                     </label>
                                 }
                             />

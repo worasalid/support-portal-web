@@ -113,6 +113,12 @@ export default function AllDashBoard() {
                 dashboard_name: "DashBoard OKR1",
                 description: "รายงาน สรุป OKR Satisfication",
                 url: "/internal/dashboard/okr/dashboard_okr1"
+            },
+            {
+                no: "18",
+                dashboard_name: "DashBoard Management (Issue)",
+                description: "รายงาน สรุป Issue OverDue",
+                url: "/internal/dashboard/mgmt/dashboard_mgmt1/graph"
             }
 
         ]
