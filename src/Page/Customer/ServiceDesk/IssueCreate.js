@@ -552,7 +552,7 @@ export default function IssueCreate() {
                         </Form.Item>
                         <Row>
                             <label hidden={match.params.id === "2" ? false : true}
-                                className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1CdeD4dK4WCSnnu6T6UViFj1OoNHaWqcC&export=download", "_blank")}>
+                                className="text-link" onClick={() => window.open("https://drive.google.com/u/0/uc?id=1g3qs_aIVzJt5UzBriXQxNLke-wgWkFQG&export=download", "_blank")}>
                                 Template CR Form&nbsp;
                                 <Icon icon="ant-design:download-outlined" fontSize="18" />
                             </label>
