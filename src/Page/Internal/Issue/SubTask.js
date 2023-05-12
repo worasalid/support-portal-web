@@ -39,6 +39,7 @@ import DuedateLog from "../../../Component/Dialog/Internal/Issue/modalTaskDueDat
 import ModalSA from "../../../Component/Dialog/Internal/modalSA";
 import ModalSA_Assessment from "../../../Component/Dialog/Internal/modalSA_Assessment";
 import ModalChangeAssign from "../../../Component/Dialog/Internal/Issue/modalChangeAssign";
+import ModalSendTaskReport from "../../../Component/Dialog/Internal/Issue/modalSendTaskReport";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -81,6 +82,7 @@ export default function SubTask() {
   const [modalSA, setModalSA] = useState(false);
   const [modalAssessment, setModalAssessment] = useState(false);
   const [modalChangeAssign, setModalChangeAssign] = useState(false);
+  const [modalSendTarkReport, setModalSendTaskReport] = useState(false);
 
   //div
   const [container, setContainer] = useState(null);
@@ -399,14 +401,21 @@ export default function SubTask() {
     if (userstate?.taskdata?.data[0]?.IssueType === "Bug") {
       if (item.data.NodeName === "support") {
         if (item.data.value === "SendToDev") {
-          setModalsendtask_visible(true)
+          if (userstate?.taskdata?.data[0]?.ModuleName === "Report" || userstate?.taskdata?.data[0]?.ModuleName === "PrintForm") {
+            setModalSendTaskReport(true);
+          } else {
+            setModalsendtask_visible(true);
+          }
         }
+
         if (item.data.value === "ResolvedTask" || item.data.value === "CloseTask") {
           setModalsendtask_visible(true)
         }
+
         if (item.data.value === "RejectToQA") {
           setModalsendtask_visible(true)
         }
+
         if (item.data.value === "SendToDeploy") {
           setModalsendtask_visible(true)
         }
@@ -660,9 +669,6 @@ export default function SubTask() {
       getDevelopDuration()
     }
   }, [modalTimeDevelop])
-
-
-  console.log("userstate?.actionflow?", userstate?.actionflow?.length)
 
   return (
     <MasterPage>
@@ -1000,6 +1006,19 @@ export default function SubTask() {
                   </Col>
                 </Row>
 
+                <Row
+                  hidden={userstate?.taskdata?.data[0]?.RequestAccessStartDate ? false : true}
+                  style={{ marginBottom: 20, }}>
+                  <Col span={18}>
+                    <label className="header-text">Request Access</label>&nbsp;&nbsp;
+                    <label className="value-text">
+                      {moment(userstate?.taskdata?.data[0]?.RequestAccessStartDate).format("DD/MM/YYYY HH:mm")}
+                      &nbsp;&nbsp;-&nbsp;&nbsp;
+                      {moment(userstate?.taskdata?.data[0]?.RequestAccessEndDate).format("DD/MM/YYYY HH:mm")}
+                    </label>
+                  </Col>
+                </Row>
+
                 <Row style={{ marginBottom: 20, }}>
                   <Col span={18}>
                     <label className="header-text">Release Note</label>&nbsp;&nbsp;
@@ -1100,6 +1119,30 @@ export default function SubTask() {
           }}
         />
 
+        <ModalSendTaskReport
+          title={ProgressStatus}
+          visible={modalSendTarkReport}
+          width={800}
+          onCancel={() => {
+            setModalSendTaskReport(false);
+            setSelected(null);
+          }}
+          onOk={() => {
+            setModalsendtask_visible(false);
+          }}
+          details={{
+            ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
+            ticketNumber: userstate?.taskdata?.data[0]?.TicketNumber,
+            taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
+            mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            flowoutput: userstate.node.output_data,
+            task_remain: userstate?.taskdata?.data[0]?.TaskRemain,
+            module: userstate?.taskdata?.data[0]?.ModuleName,
+            deployUrl: userstate?.taskdata?.data[0]?.Deploy_URL
+          }}
+        />
+
         <ModalSupport
           title={ProgressStatus}
           visible={visible}
@@ -1166,7 +1209,8 @@ export default function SubTask() {
             ticketid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TicketId,
             taskid: userstate.taskdata.data[0] && userstate.taskdata.data[0].TaskId,
             mailboxid: userstate.taskdata.data[0] && userstate.taskdata.data[0].MailboxId,
-            flowoutputid: userstate.node.output_data.FlowOutputId
+            flowoutputid: userstate.node.output_data.FlowOutputId,
+            deployUrl: userstate?.taskdata?.data[0]?.Deploy_URL
           }}
         />
 

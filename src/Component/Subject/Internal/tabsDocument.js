@@ -88,7 +88,8 @@ function TabsDocument({ visible = false, onOk, onCancel, details, ...props }) {
                                                 n.GroupType === "deploy_document" ? "Document Deploy" :
                                                     n.GroupType === "file_deploy" ? "File Deploy" :
                                                         n.GroupType === "test_result_QA" ? "QA Test Result" :
-                                                            n.GroupType === "vdoUpload" ? "Video" : ""
+                                                            n.GroupType === "vdoUpload" ? "Video" : 
+                                                            n.GroupType === "deploy_url" ? "Deploy (URL)" : ""
                                         }
                                     </label>
                                 }

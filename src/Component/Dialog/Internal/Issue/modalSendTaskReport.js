@@ -1,22 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { Spin, Modal, Form, Tabs } from 'antd';
-// import { Editor } from '@tinymce/tinymce-react';
-import UploadFile from '../../UploadFile'
+import { Spin, Modal, Form, Checkbox, DatePicker } from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
+import UploadFile from '../../../UploadFile';
 import Axios from 'axios';
-import TextEditor from '../../TextEditor';
+import TextEditor from '../../../TextEditor';
+import moment from 'moment';
 
-const { TabPane } = Tabs;
-
-export default function ModalSendTask({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+export default function ModalSendTaskReport({ visible = false, onOk, onCancel, datarow, details, ...props }) {
+    const { RangePicker } = DatePicker;
     const history = useHistory();
     const match = useRouteMatch();
     const uploadRef = useRef(null);
     const [form] = Form.useForm();
     const editorRef = useRef(null);
     const [loading, setLoading] = useState(false);
+    const [hidden, setHidden] = useState(false);
 
-    const SaveComment = async () => {
+    const saveComment = async () => {
         try {
             if ((editorRef.current.getValue() !== null) || (editorRef.current.getValue() === null && uploadRef.current.getFiles().length > 0)) {
                 await Axios({
@@ -39,7 +40,26 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
         }
     }
 
-    const SendFlow = async () => {
+    const saveAccessRequest = async (values) => {
+        console.log("date", moment(values?.requestDate).format("DD/MM/YYYY HH:mm"))
+        await Axios({
+            url: process.env.REACT_APP_API_URL + "/workflow/create-access-request",
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("sp-ssid")
+            },
+            data: {
+                ticketId: details?.ticketid,
+                ticketNumber: details?.ticketNumber,
+                taskId: details?.taskid,
+                requestStartDate: moment(values?.requestDate[0]).format("DD/MM/YYYY HH:mm"),
+                requestEndDate: moment(values?.requestDate[1]).format("DD/MM/YYYY HH:mm")
+            }
+        });
+    }
+
+    const sendFlow = async (values) => {
+        setLoading(true);
         try {
             const sendflow = await Axios({
                 url: process.env.REACT_APP_API_URL + "/workflow/send",
@@ -52,13 +72,14 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
                     mailboxid: details.mailboxid,
                     flowoutputid: details.flowoutputid,
                     value: {
+                        deploy_url: values.deployUrl,
                         comment_text: editorRef.current.getValue()
                     }
                 }
             });
 
             if (sendflow.status === 200) {
-                SaveComment();
+                saveComment();
                 onOk();
                 setLoading(false);
 
@@ -118,8 +139,8 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
     }
 
     const onFinish = (values) => {
-        setLoading(true);
-        SendFlow();
+        sendFlow(values);
+        saveAccessRequest(values);
     };
 
     return (
@@ -135,22 +156,74 @@ export default function ModalSendTask({ visible = false, onOk, onCancel, datarow
         >
             <Spin spinning={loading} size="large" tip="Loading...">
                 <Form form={form} style={{ padding: 0, maxWidth: "100%", backgroundColor: "white" }}
-                    name="qa-test"
-                    layout="vertical"
-                    className="login-form"
+                    name="form"
+                    layout="horizontal"
                     initialValues={{
                         remember: true,
+                        accessRequest: false,
+                        deployUrl: details?.deployUrl
                     }}
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        // style={{ minWidth: 300, maxWidth: 300 }}
+                        label="Access Request"
+                        name="accessRequest"
+                        valuePropName="checked"
+                        rules={[
+                            {
+                                required: false,
+                                message: '!!!',
+                            },
+                        ]}
+                    >
+                        <Checkbox onChange={() => setHidden(!hidden)} />
+                    </Form.Item>
+                    {
+
+                        hidden
+                            ? (
+                                <Form.Item
+                                    label="Request Date"
+                                    name="requestDate"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '*กรุณาระบุ วันที่',
+                                        },
+                                    ]}
+                                >
+                                    {/* <DatePicker format="DD/MM/YYYY HH:mm" showTime
+                                        onChange={(date, datestring) => console.log("xxx", datestring)}
+                                    /> */}
+                                    <RangePicker format="DD/MM/YYYY HH:mm" showTime
+                                        onChange={(date, datestring) => console.log("xxx", datestring)}
+                                    />
+                                </Form.Item>
+                            )
+                            : <></>
+                    }
+
+                    <Form.Item
+                        wrapperCol={6}
+                        label="Deploy (URL)"
+                        name="deployUrl"
+                        rules={[
+                            {
+                                required: true,
+                                message: '*กรุณาใส่ Deploy Url',
+                            },
+                        ]}
+                    >
+                        <TextArea rows="2" style={{ width: "100%" }} />
+                    </Form.Item>
+
+                    <Form.Item
                         name="remark"
                         label="Remark :"
-
                     >
                         <TextEditor ref={editorRef} ticket_id={details.ticketid} />
                         <br />
+
                         AttachFile : <UploadFile ref={uploadRef} />
                     </Form.Item>
                 </Form>

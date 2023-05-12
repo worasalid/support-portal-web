@@ -13,7 +13,9 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
   const [textValue, setTextValue] = useState("")
   const { state: customerstate, dispatch: customerdispatch } = useContext(IssueContext);
   const [form] = Form.useForm();
+  const [form2] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [isValidate, setIsValidate] = useState(false);
 
   const layout = {
     labelCol: {
@@ -24,7 +26,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
     },
   };
 
-  const FlowComplete = async (values) => {
+  const flowComplete = async (values, values2) => {
     setLoading(true);
     try {
       const completeflow = await Axios({
@@ -43,8 +45,7 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
             score3: values.score3,
             score4: values.score4,
             score5: values.score5,
-            suggestion: textValue
-
+            suggestion: values2.suggestion
           }
         }
       });
@@ -92,26 +93,40 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
     }
   }
 
-  const onFinish = values => {
-    
-    FlowComplete(values);
+  const onFinish = (values, values2) => {
+    const totalScore = (values.score + values.score2 + values.score3 + values.score4 + + values.score5)
+
+    if ((totalScore / 5) <= 3.5) {
+      setIsValidate(true);
+      form2.submit();
+      if (textValue !== "") {
+        onFinish2(values, values2)
+      }
+    } else {
+      setIsValidate(false);
+      form2.submit();
+      onFinish2(values, values2)
+    }
   };
 
-  useEffect(() => {
-
-  }, [])
-
-
+  const onFinish2 = (values, values2) => {
+    flowComplete(values, values2)
+  };
 
   return (
     <Modal
       visible={visible}
       confirmLoading={loading}
-      onOk={() => form.submit()}
+      onOk={() => {
+        form.submit();
+      }}
       okButtonProps={{ className: "modal-button-save" }}
       okText="Save"
-
-      onCancel={() => { return onCancel(), form.resetFields() }}
+      onCancel={() => {
+        form.resetFields();
+        form2.resetFields();
+        onCancel();
+      }}
       {...props}
     >
       <Spin spinning={loading} size="large" tip="Loading...">
@@ -119,11 +134,9 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           {...layout}
           form={form}
           name="satisfication"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-
+          // initialValues={{ remember: true }}
+          onFinish={() => onFinish(form.getFieldValue(), form2.getFieldValue())}
         >
-
           <Form.Item
             style={{ border: "1px solid", marginBottom: 0 }}
             label="แก้ไขปัญหาได้ถูกต้อง"
@@ -132,7 +145,6 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           >
             <Rate
               tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-              onChange={(x) => console.log(x)}
             >
             </Rate>
           </Form.Item>
@@ -144,7 +156,6 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           >
             <Rate
               tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-              onChange={(x) => console.log(x)}
             >
             </Rate>
           </Form.Item>
@@ -156,7 +167,6 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           >
             <Rate
               tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-              onChange={(x) => console.log(x)}
             >
             </Rate>
           </Form.Item>
@@ -168,7 +178,6 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           >
             <Rate
               tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-              onChange={(x) => console.log(x)}
             >
             </Rate>
           </Form.Item>
@@ -180,24 +189,31 @@ export default function ModalCompleteIssue({ visible = false, onOk, onCancel, da
           >
             <Rate
               tooltips={['ควรปรับปรุง', 'แย่', 'พอใช้', 'ดี', 'ยอดเยี่ยม']}
-              onChange={(x) => console.log(x)}
             >
             </Rate>
           </Form.Item>
+        </Form>
 
+        <Form
+          form={form2}
+          name="textSuggestion"
+          layout='vertical'
+          initialValues={{ suggestion: '' }}
+          style={{ marginTop: '24px' }}
+          onFinish={() => onFinish2(form.getFieldValue(), form2.getFieldValue())}
+        >
+          <Form.Item
+            // style={{ border: "1px solid", marginBottom: 0 }}
+            name="suggestion"
+            label="แนะนำคำติชม"
+            rules={[{ required: isValidate, message: 'กรุณาระบุ รายละเอียด!' }]}
+          >
+            <TextArea rows={5} style={{ width: "200%" }} />
+          </Form.Item>
 
-          <Row style={{ marginTop: 40 }}>
-            <Col span={24}>
-              แนะนำคำติชม
-          </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <TextArea rows={5} style={{ width: "100%" }} onChange={(x) => setTextValue(x.target.value)} />
-            </Col>
-          </Row>
-        </Form >
+          ทุกความคิดเห็นของคุณ มีความสำคัญต่อการพัฒนาทีมงานและการพัฒนาระบบของเรา ขอเชิญคุณมาร่วมเป็นส่วนหนึ่งในแบ่งปันข้อเสนอแนะ ข้อคิดเห็นต่างๆที่จะช่วยFeedback ให้กับทาง ICON Framework นำไปปรับปรุงและพัฒนาต่อไป
+        </Form>
       </Spin>
-    </Modal>
+    </Modal >
   );
 }

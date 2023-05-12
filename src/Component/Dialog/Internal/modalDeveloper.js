@@ -262,7 +262,7 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         <UploadFile ref={uploadRef_document} />
                     </Form.Item> */}
 
-                    <Form.Item
+                    {/* <Form.Item
                         wrapperCol={6}
                         label="File Deploy"
                         name="file_deploy"
@@ -274,6 +274,24 @@ export default function ModalDeveloper({ visible = false, onOk, onCancel, dataro
                         ]}
                     >
                         <UploadFile ref={uploadRef_filedeploy} />
+                    </Form.Item> */}
+
+
+                    <Form.Item
+                        label="Deploy (URL)"
+                        name="deployUrl"
+                        rules={[
+                            {
+                                required: false,
+                                message: '!!!',
+                            },
+                        ]}
+                    >
+                        <label className="text-hover value-text" style={{ padding: 0, color: "#1890ff" }}
+                            onClick={() => window.open(details?.deployUrl, "_blank")}
+                        >
+                            {details?.deployUrl}
+                        </label>
                     </Form.Item>
 
                     <Form.Item
